@@ -2,7 +2,7 @@ package com.shabinder.musicForEveryone
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.shabinder.musicForEveryone.ui.main.MainFragment
+import com.shabinder.musicForEveryone.fragments.MainFragment
 
 class MainActivity : AppCompatActivity() {
 

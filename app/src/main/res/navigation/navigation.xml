@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.shabinder.musicForEveryone.ui.main.MainFragment"
+        android:name="com.shabinder.musicForEveryone.fragments.MainFragment"
         android:label="main_fragment"
         tools:layout="@layout/main_fragment" />
 </navigation>

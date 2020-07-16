@@ -53,6 +53,14 @@ dependencies {
 
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
+    implementation 'com.github.kaaes:spotify-web-api-android:0.4.1'
+
+    implementation 'com.google.apis:google-api-services-youtube:v3-rev180-1.22.0'
+    implementation 'com.google.oauth-client:google-oauth-client:1.22.0'
+    implementation 'com.spotify.android:auth:1.2.3'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.squareup.okhttp3:okhttp:4.8.0'
+
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
