@@ -6,7 +6,7 @@ apply plugin: "androidx.navigation.safeargs.kotlin"
 
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 29
     buildToolsVersion "30.0.0"
 
     buildFeatures{
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId 'com.shabinder.musicforeveryone'
         minSdkVersion 22
-        targetSdkVersion 30
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 

@@ -1,6 +1,7 @@
 package com.shabinder.musicForEveryone.fragments
 
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.github.kiulian.downloader.model.formats.Format
+import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.google.android.material.snackbar.Snackbar
 import com.shabinder.musicForEveryone.R
 import com.shabinder.musicForEveryone.SharedViewModel
@@ -17,6 +20,7 @@ import com.shabinder.musicForEveryone.bindImage
 import com.shabinder.musicForEveryone.databinding.MainFragmentBinding
 import com.shabinder.musicForEveryone.utils.YoutubeConnector
 import kaaes.spotify.webapi.android.SpotifyService
+import java.io.File
 
 
 class MainFragment : Fragment() {
@@ -103,6 +107,18 @@ class MainFragment : Fragment() {
                 val ytDownloader = sharedViewModel.ytDownloader
                 val video = ytDownloader?.getVideo(data.id)
                 val details = video?.details()
+
+                val outputDir = File(Environment.getExternalStorageDirectory().toString() + File.separator + "MyAudio")
+                val format:Format = video?.findAudioWithQuality(AudioQuality.low)?.get(0) as Format
+                val audioUrl = format.url()
+                if (audioUrl != null) {
+                    Log.i("ytDownloader", audioUrl)
+                }else{Log.i("YT audio url is null", format.toString())}
+
+                val file:File = video.download( format , outputDir)
+
+                Log.i("YT File Path=> ", file.path)
+
                 Log.i("ytDownloader", details?.title()?:"Error")
                 binding.name.text = details?.title()
             }
