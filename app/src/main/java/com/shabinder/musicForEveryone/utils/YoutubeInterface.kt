@@ -7,7 +7,7 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.youtube.YouTube
 import java.io.IOException
 
-object YoutubeConnector {
+object YoutubeInterface {
     private var youtube: YouTube? = null
     private var query:YouTube.Search.List? = null
     var apiKey:String = "AIzaSyDuRmMA_2mF56BjlhhNpa0SIbjMgjjFaEI"
@@ -15,8 +15,7 @@ object YoutubeConnector {
 
     fun youtubeConnector() {
         youtube =
-            YouTube.Builder(NetHttpTransport(), JacksonFactory(),
-                HttpRequestInitializer { })
+            YouTube.Builder(NetHttpTransport(), JacksonFactory(), HttpRequestInitializer { })
                 .setApplicationName("Music For Everyone").build()
         try {
             query = youtube?.search()?.list("id,snippet")

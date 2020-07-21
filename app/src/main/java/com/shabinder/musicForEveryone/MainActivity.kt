@@ -1,6 +1,8 @@
 package com.shabinder.musicForEveryone
 
 import android.Manifest
+import android.app.DownloadManager
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -11,7 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.musicForEveryone.databinding.MainActivityBinding
-import com.shabinder.musicForEveryone.utils.YoutubeConnector
+import com.shabinder.musicForEveryone.utils.YoutubeInterface
 import com.spotify.sdk.android.authentication.AuthenticationClient
 import com.spotify.sdk.android.authentication.AuthenticationRequest
 import com.spotify.sdk.android.authentication.AuthenticationResponse
@@ -24,6 +26,7 @@ import retrofit.RestAdapter
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: MainActivityBinding
     var ytDownloader : YoutubeDownloader? = null
+    var downloadManager : DownloadManager? = null
     val REDIRECT_URI = "musicforeveryone://callback"
     val CLIENT_ID:String = "694d8bf4f6ec420fa66ea7fb4c68f89d"
 //    val musicDirectory = File(this.filesDir?.absolutePath + "/Music/")
@@ -49,8 +52,11 @@ class MainActivity : AppCompatActivity() {
         ytDownloader = YoutubeDownloader()
         sharedViewModel.ytDownloader = ytDownloader
         //Initialing Communication with Youtube
-        YoutubeConnector.youtubeConnector()
+        YoutubeInterface.youtubeConnector()
 
+        //Getting System Download Manager
+        downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        sharedViewModel.downloadManager = downloadManager
 
 
     }

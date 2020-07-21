@@ -1,5 +1,6 @@
 package com.shabinder.musicForEveryone
 
+import android.app.DownloadManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.kiulian.downloader.YoutubeDownloader
@@ -14,6 +15,8 @@ class SharedViewModel : ViewModel() {
     var spotify :SpotifyService? = null
     var spotifyExtra :SpotifyNewService? = null
     var ytDownloader : YoutubeDownloader? = null
+    var downloadManager : DownloadManager? = null
+
 
     fun getTrackDetails(trackLink:String): Track?{
         return spotify?.getTrack(trackLink)
