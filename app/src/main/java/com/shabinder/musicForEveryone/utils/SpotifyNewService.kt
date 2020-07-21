@@ -1,4 +1,4 @@
-package com.shabinder.musicForEveryone
+package com.shabinder.musicForEveryone.utils
 
 import kaaes.spotify.webapi.android.models.Playlist
 import retrofit.http.GET

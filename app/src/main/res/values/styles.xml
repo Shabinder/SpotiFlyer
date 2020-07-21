@@ -1,10 +1,34 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryDark">#00730C</item>
+        <item name="colorPrimary">#05A300</item>
+        <item name="android:background">#000000</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="colorAccent">#43FF56</item>
+        <item name="android:outlineAmbientShadowColor" tools:targetApi="p">#6DFF7C</item>
+        <item name="android:radius">11dp</item>
+        <!-- Text Appearances !-->
+        <!-- use our brand's custom TextAppearance4 !-->
+        <item name="textAppearanceHeadline4">@style/TextAppearance.AppTheme.Headline4</item>
+        <!-- use default Body2 text apperance !-->
+        <item name="textAppearanceBody2">@style/TextAppearance.MaterialComponents.Body2</item>
     </style>
 
+    <!-- override the Headline4 style present in the Material Theme !-->
+    <style name="TextAppearance.AppTheme.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="android:textSize">28sp</item>
+        <item name="android:letterSpacing">0.1</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.AppCompat.Body2">
+        <item name="android:textColor">@color/grey</item>
+    </style>
+
+    <style name="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:background">@color/white</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
 </resources>

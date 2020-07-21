@@ -1,10 +1,11 @@
-package com.shabinder.musicForEveryone
+package com.shabinder.musicForEveryone.utils
 
 import android.widget.ImageView
 import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.shabinder.musicForEveryone.R
 
 
 @BindingAdapter("imageUrl")

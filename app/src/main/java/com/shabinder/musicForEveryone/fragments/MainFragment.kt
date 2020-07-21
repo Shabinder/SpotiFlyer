@@ -10,13 +10,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.snackbar.Snackbar
 import com.shabinder.musicForEveryone.R
 import com.shabinder.musicForEveryone.SharedViewModel
-import com.shabinder.musicForEveryone.bindImage
 import com.shabinder.musicForEveryone.databinding.MainFragmentBinding
 import com.shabinder.musicForEveryone.downloadHelper.DownloadHelper
+import com.shabinder.musicForEveryone.recyclerView.TrackListAdapter
+import com.shabinder.musicForEveryone.utils.bindImage
 import kaaes.spotify.webapi.android.SpotifyService
+import kaaes.spotify.webapi.android.models.Track
 
 
 class MainFragment : Fragment(),DownloadHelper {
@@ -34,10 +35,10 @@ class MainFragment : Fragment(),DownloadHelper {
         spotify =  sharedViewModel.spotify
         sharedViewModel.userName.observe(viewLifecycleOwner, Observer {
             binding.message.text = it
-            if(it!="Placeholder"){Snackbar.make(requireView(),"Hello, $it!", Snackbar.LENGTH_SHORT).show()}
-            })
+//            if(it!="Placeholder"){Snackbar.make(requireView(),"Hello, $it!", Snackbar.LENGTH_SHORT).show()}
+        })
 
-        binding.btnGetDetails.setOnClickListener {
+        binding.btnSearch.setOnClickListener {
             val spotifyLink = binding.spotifyLink.text.toString()
 
             val link = spotifyLink.substringAfterLast('/' , "Error").substringBefore('?')
@@ -45,47 +46,55 @@ class MainFragment : Fragment(),DownloadHelper {
 
             Log.i("Fragment", "$type : $link")
 
+            val adapter = TrackListAdapter()
+            binding.trackList.adapter = adapter
+            adapter.sharedViewModel  = sharedViewModel
+
             when(type){
                 "track" -> {
                     val trackObject = sharedViewModel.getTrackDetails(link)
-                    Log.i("Fragment",trackObject?.name.toString())
-                    binding.name.text = trackObject?.name ?: "Error"
-                    var artistNames = ""
-                    trackObject?.artists?.forEach { artistNames = artistNames.plus("${it.name} ,") }
-                    binding.artist.text = artistNames
-                    binding.popularity.text = trackObject?.popularity.toString()
-                    binding.duration.text = ((trackObject?.duration_ms!! /1000/60).toString() + "minutes")
-                    binding.albumName.text = trackObject.album.name
-                    bindImage(binding.imageUrl, trackObject.album.images[0].url)
+
+                    val trackList = mutableListOf<Track>()
+                    trackList.add(trackObject!!)
+                    adapter.totalItems = 1
+                    adapter.trackList = trackList
+                    adapter.notifyDataSetChanged()
+
+                    Log.i("Adapter",trackList.size.toString())
                 }
 
                 "album" -> {
                     val albumObject = sharedViewModel.getAlbumDetails(link)
-                    Log.i("Fragment",albumObject?.name.toString())
-                    binding.name.text = albumObject?.name ?: "Error"
-                    var artistNames = ""
-                    albumObject?.artists?.forEach { artistNames = artistNames.plus(", ${it.name}") }
-                    binding.artist.text = artistNames
-                    binding.popularity.text = albumObject?.popularity.toString()
-                    binding.duration.visibility = View.GONE
-                    binding.textView5.visibility = View.GONE
-                    binding.albumName.text = albumObject?.name
-                    bindImage(binding.imageUrl, albumObject?.images?.get(0)?.url)
+
+                    bindImage(binding.imageView,albumObject!!.images[1].url)
+                    binding.titleView.text = albumObject.name
+                    binding.titleView.visibility =View.VISIBLE
+                    binding.imageView.visibility =View.VISIBLE
+
+                    val trackList = mutableListOf<Track>()
+                    albumObject.tracks?.items?.forEach { trackList.add(it as Track) }
+                    adapter.totalItems = trackList.size
+                    adapter.trackList = trackList
+                    adapter.notifyDataSetChanged()
+
+                    Log.i("Adapter",trackList.size.toString())
+
                 }
 
                 "playlist" -> {
                     val playlistObject = sharedViewModel.getPlaylistDetails(link)
-                    Log.i("Fragment",playlistObject?.name.toString())
-                    binding.name.text = playlistObject?.name ?: "Error"
-                    binding.artist.visibility = View.GONE
-                    binding.textView1.visibility = View.GONE
-                    binding.popularity.text = playlistObject?.followers?.total.toString()
-                    binding.textview3.text = "Followers"
-                    binding.duration.visibility = View.GONE
-                    binding.textView5.visibility = View.GONE
-                    binding.textView7.text = "Total Tracks"
-                    binding.albumName.text = playlistObject?.tracks?.items?.size.toString()
-                    bindImage(binding.imageUrl, playlistObject?.images?.get(0)?.url)
+
+                    bindImage(binding.imageView,playlistObject!!.images[0].url)
+                    binding.titleView.text = playlistObject.name
+                    binding.titleView.visibility =View.VISIBLE
+                    binding.imageView.visibility =View.VISIBLE
+
+                    val trackList = mutableListOf<Track>()
+                    playlistObject.tracks?.items!!.forEach { trackList.add(it.track) }
+                    adapter.trackList = trackList.toList()
+                    adapter.totalItems = trackList.size
+                    adapter.notifyDataSetChanged()
+                    Log.i("Adapter",trackList.size.toString())
                 }
 
                 "episode" -> {showToast("Implementation Pending")}
@@ -94,12 +103,6 @@ class MainFragment : Fragment(),DownloadHelper {
 
             binding.spotifyLink.setText(link)
         }
-
-        binding.btnDownload.setOnClickListener {
-            downloadTrack(sharedViewModel.ytDownloader,sharedViewModel.downloadManager,"${binding.name.text} ${if(binding.artist.text != "TextView" ){binding.artist.text}else{""}}")
-            }
-
-
         return binding.root
     }
 

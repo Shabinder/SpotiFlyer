@@ -13,6 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.musicForEveryone.databinding.MainActivityBinding
+import com.shabinder.musicForEveryone.utils.SpotifyNewService
 import com.shabinder.musicForEveryone.utils.YoutubeInterface
 import com.spotify.sdk.android.authentication.AuthenticationClient
 import com.spotify.sdk.android.authentication.AuthenticationRequest

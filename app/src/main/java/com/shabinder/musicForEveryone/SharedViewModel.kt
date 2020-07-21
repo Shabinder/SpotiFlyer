@@ -4,6 +4,7 @@ import android.app.DownloadManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.kiulian.downloader.YoutubeDownloader
+import com.shabinder.musicForEveryone.utils.SpotifyNewService
 import kaaes.spotify.webapi.android.SpotifyService
 import kaaes.spotify.webapi.android.models.Album
 import kaaes.spotify.webapi.android.models.Playlist
@@ -13,7 +14,7 @@ class SharedViewModel : ViewModel() {
     var accessToken:String = ""
     var userName = MutableLiveData<String>().apply { value = "Placeholder" }
     var spotify :SpotifyService? = null
-    var spotifyExtra :SpotifyNewService? = null
+    var spotifyExtra : SpotifyNewService? = null
     var ytDownloader : YoutubeDownloader? = null
     var downloadManager : DownloadManager? = null
 
