@@ -61,51 +61,56 @@ class MainFragment : Fragment(),DownloadHelper {
                         adapter.trackList = trackList
                         adapter.notifyDataSetChanged()
                         Log.i("Adapter",trackList.size.toString())
+                        binding.btnDownloadAll.setOnClickListener { downloadAllTracks(trackList) }
                     }
                 }
 
                 "album" -> {
                     sharedViewModel.uiScope.launch{
 
-                            val albumObject = sharedViewModel.getAlbumDetails(link)
+                        val albumObject = sharedViewModel.getAlbumDetails(link)
+//                        binding.titleView.text = albumObject!!.name
+//                        binding.titleView.visibility =View.VISIBLE
+                        binding.imageView.visibility =View.VISIBLE
+                        binding.btnDownloadAll.visibility =View.VISIBLE
+                        val trackList = mutableListOf<Track>()
+                        albumObject!!.tracks?.items?.forEach { trackList.add(it as Track) }
+                        adapter.totalItems = trackList.size
+                        adapter.trackList = trackList
+                        adapter.notifyDataSetChanged()
 
-                            binding.titleView.text = albumObject!!.name
-                            binding.titleView.visibility =View.VISIBLE
-                            binding.imageView.visibility =View.VISIBLE
+                        Log.i("Adapter",trackList.size.toString())
 
-                            val trackList = mutableListOf<Track>()
-                            albumObject.tracks?.items?.forEach { trackList.add(it as Track) }
-                            adapter.totalItems = trackList.size
-                            adapter.trackList = trackList
-                            adapter.notifyDataSetChanged()
+                        bindImage(binding.imageView, albumObject.images[0].url)
+                        binding.btnDownloadAll.setOnClickListener { downloadAllTracks(trackList) }
 
-                            Log.i("Adapter",trackList.size.toString())
-
-                            bindImage(binding.imageView, albumObject.images[0].url)
-                        }
+                    }
 
 
                 }
 
                 "playlist" -> {
                     sharedViewModel.uiScope.launch{
-                            val playlistObject = sharedViewModel.getPlaylistDetails(link)
-
-                            binding.titleView.text = "${if(playlistObject!!.name.length > 18){"${playlistObject.name.subSequence(0,17)}..."}else{playlistObject.name}}"
-                            binding.titleView.visibility =View.VISIBLE
-                            binding.imageView.visibility =View.VISIBLE
-                            binding.playlistOwner.visibility =View.VISIBLE
-                            binding.playlistOwner.text = "by: ${playlistObject.owner.display_name}"
-                            val trackList = mutableListOf<Track>()
-                            playlistObject.tracks?.items!!.forEach { trackList.add(it.track) }
-                            adapter.trackList = trackList.toList()
-                            adapter.totalItems = trackList.size
-                            adapter.notifyDataSetChanged()
-
-                            Log.i("Adapter",trackList.size.toString())
+                        val playlistObject = sharedViewModel.getPlaylistDetails(link)
+                        binding.btnDownloadAll.visibility =View.VISIBLE
 
 
-                            bindImage(binding.imageView, playlistObject.images[0].url)
+                        binding.imageView.visibility =View.VISIBLE
+//                        binding.titleView.text = "${if(playlistObject!!.name.length > 18){"${playlistObject.name.subSequence(0,17)}..."}else{playlistObject.name}}"
+//                        binding.titleView.visibility =View.VISIBLE
+//                        binding.playlistOwner.visibility =View.VISIBLE
+//                        binding.playlistOwner.text = "by: ${playlistObject.owner.display_name}"
+                        val trackList = mutableListOf<Track>()
+                        playlistObject!!.tracks?.items!!.forEach { trackList.add(it.track) }
+                        adapter.trackList = trackList.toList()
+                        adapter.totalItems = trackList.size
+                        adapter.notifyDataSetChanged()
+
+                        Log.i("Adapter",trackList.size.toString())
+
+                        bindImage(binding.imageView, playlistObject.images[0].url)
+
+                        binding.btnDownloadAll.setOnClickListener { downloadAllTracks(trackList) }
 
                     }
 
@@ -125,6 +130,12 @@ class MainFragment : Fragment(),DownloadHelper {
         })
 
         return binding.root
+    }
+
+    private fun downloadAllTracks(trackList : List<Track>) {
+        sharedViewModel.uiScope.launch {
+            trackList.forEach { downloadTrack(sharedViewModel.ytDownloader,sharedViewModel.downloadManager,"${it.name} ${it.artists[0].name?:""}") }
+        }
     }
 
     private fun showToast(message:String){

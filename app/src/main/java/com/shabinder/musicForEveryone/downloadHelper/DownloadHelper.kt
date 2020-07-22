@@ -14,43 +14,49 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 interface DownloadHelper {
-    suspend fun downloadTrack(ytDownloader: YoutubeDownloader?, downloadManager: DownloadManager?, searchQuery:String){
+    suspend fun downloadTrack(
+        ytDownloader: YoutubeDownloader?,
+        downloadManager: DownloadManager?,
+        searchQuery: String
+    ) {
 
-            withContext(Dispatchers.IO){
-                val downloadIdList = mutableListOf<Int>()
-                val data = YoutubeInterface.search(searchQuery)?.get(0)
-                if (data==null){Log.i("DownloadHelper","Youtube Request Failed!")}else{
+        withContext(Dispatchers.IO) {
+            val data = YoutubeInterface.search(searchQuery)?.get(0)
+            if (data == null) {
+                Log.i("DownloadHelper", "Youtube Request Failed!")
+            } else {
 
                 val video = ytDownloader?.getVideo(data.id)
                 //Fetching a Video Object.
                 val details = video?.details()
+                try{
+                    val format: Format =
+                        video?.findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
+                    val audioUrl = format.url()
+                    Log.i("DHelper Link Found", audioUrl)
+                    if (audioUrl != null) {
+                        downloadFile(audioUrl, downloadManager, details!!.title())
+                    } else {
+                        Log.i("YT audio url is null", format.toString())
+                    }
+                }catch (e:ArrayIndexOutOfBoundsException){
+                    Log.i("Catch",e.toString())
+                }
 
-                val format:Format = video?.findAudioWithQuality(AudioQuality.low)?.get(0) as Format
-
-                val audioUrl = format.url()
-
-                if (audioUrl != null) {
-                    downloadFile(audioUrl,downloadManager,details!!.title())
-                    Log.i("DHelper Start Download", audioUrl)
-                }else{Log.i("YT audio url is null", format.toString())}
 
             }
-
-
-//            Library Inbuilt function to Save File (Need Scoped Storage Implementation)
-//            val file: File = video.download( format , outputDir)
         }
-        //@data = 1st object from YT query.
     }
 
 
     /**
      * Downloading Using Android Download Manager
      * */
-    suspend fun downloadFile(url: String, downloadManager: DownloadManager?,title:String){
-        withContext(Dispatchers.IO){
+    suspend fun downloadFile(url: String, downloadManager: DownloadManager?, title: String) {
+        withContext(Dispatchers.IO) {
             val audioUri = Uri.parse(url)
-            val outputDir = File.separator + "Spotify-Downloads" +File.separator + "${removeIllegalChars(title)}.mp3"
+            val outputDir =
+                File.separator + "Spotify-Downloads" + File.separator  + "${removeIllegalChars(title)}.mp3"
 
             val request = DownloadManager.Request(audioUri)
                 .setAllowedNetworkTypes(
@@ -60,10 +66,10 @@ interface DownloadHelper {
                 .setAllowedOverRoaming(false)
                 .setTitle(title)
                 .setDescription("Spotify Downloader Working Up here...")
-                .setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC,outputDir)
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC, outputDir)
                 .setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             downloadManager?.enqueue(request)
-            Log.i("DownloadManager","Download Request Sent")
+            Log.i("DownloadManager", "Download Request Sent")
         }
     }
 

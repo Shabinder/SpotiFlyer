@@ -11,6 +11,8 @@ object YoutubeInterface {
     private var youtube: YouTube? = null
     private var query:YouTube.Search.List? = null
     var apiKey:String = "AIzaSyDuRmMA_2mF56BjlhhNpa0SIbjMgjjFaEI"
+    var apiKey2:String = "AIzaSyCotyqgqmz5qw4-IH0tiezIrIIDHLI2yNs"
+
     var clientID : String = "1040727735015-er2mvvljt45cabkuqimsh3iabqvfpvms.apps.googleusercontent.com"
 
     fun youtubeConnector() {
@@ -23,14 +25,14 @@ object YoutubeInterface {
             query?.maxResults = 1
             query?.type = "video"
             query?.fields =
-                "items(id/kind,id/videoId,snippet/title,snippet/description,snippet/thumbnails/default/url)"
+                "items(id/videoId,snippet/title,snippet/thumbnails/default/url)"
         } catch (e: IOException) {
-            Log.i("YC", "Could not initialize: $e")
+            Log.i("YI", "Could not initialize: $e")
         }
     }
 
     fun search(keywords: String?): List<VideoItem>? {
-        Log.i("YC searched for",keywords.toString())
+        Log.i("YI searched for",keywords.toString())
         if (youtube == null){youtubeConnector()}
         query!!.q= keywords
         return try {
@@ -42,23 +44,25 @@ object YoutubeInterface {
                 val item = VideoItem(
                     id = result.id.videoId,
                     title = result.snippet.title,
-                    description = result.snippet.description,
+//                    description = result.snippet.description,
                     thumbnailUrl = result.snippet.thumbnails.default.url
                 )
                 items.add(item)
-                Log.i("YC links received",item.id)
+                Log.i("YI links received",item.id)
             }
             items
         } catch (e: IOException) {
-            Log.d("YC", "Could not search: $e")
-            null
+            Log.d("YI", "Could not search: $e")
+            if(query?.key == apiKey2){return null}
+            query?.key = apiKey2
+            search(keywords)
         }
     }
 
     data class VideoItem(
         val id:String,
         val title:String,
-        val description: String,
+//        val description: String,
         val thumbnailUrl:String
     )
 

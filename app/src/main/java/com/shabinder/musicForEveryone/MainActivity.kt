@@ -104,8 +104,8 @@ class MainActivity : AppCompatActivity() ,DownloadHelper{
 
                     sharedViewModel.uiScope.launch {
                         val me = spotifyExtra?.getMe()?.display_name
-                        sharedViewModel.userName.value = me
-                        Log.i("Network",me!!)
+                        sharedViewModel.userName.value = "Logged in as: $me"
+                        Log.i("Network","Hello, " + me!!)
                     }
 
                     sharedViewModel.userName.observe(this, Observer {

@@ -2,12 +2,12 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimaryDark">#00730C</item>
-        <item name="colorPrimary">#05A300</item>
+        <item name="colorPrimaryDark">#000000</item>
+        <item name="colorPrimary">#FC5C7D</item>
         <item name="android:background">#000000</item>
         <item name="android:textColor">#FFFFFF</item>
-        <item name="colorAccent">#43FF56</item>
-        <item name="android:outlineAmbientShadowColor" tools:targetApi="p">#6DFF7C</item>
+        <item name="colorAccent">#6A82FB</item>
+        <item name="android:outlineAmbientShadowColor" tools:targetApi="p">#A9B200FF</item>
         <item name="android:radius">11dp</item>
         <!-- Text Appearances !-->
         <!-- use our brand's custom TextAppearance4 !-->
