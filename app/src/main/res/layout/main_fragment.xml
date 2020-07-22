@@ -1,105 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="25dp"
+    android:fitsSystemWindows="true"
+    tools:context=".fragments.MainFragment">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="230dp">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
+            app:layout_scrollInterpolator="@android:anim/decelerate_interpolator"
+            app:toolbarId="@+id/toolbar">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/spotifyLink"
+                    android:layout_width="257dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/text_background"
+                    android:ems="10"
+                    android:hint="Link From Spotify"
+                    android:inputType="text"
+                    android:padding="5dp"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/grey"
+                    android:textSize="19sp" />
+
+                <Button
+                    android:id="@+id/btn_search"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:text="Search"
+                    android:textSize="18sp" />
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/image_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:contentDescription="Album Cover"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_launcher_foreground"
+                app:layout_collapseMode="parallax"/>
+            </LinearLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
+        android:id="@+id/constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".fragments.MainFragment">
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-        <TextView
-            android:id="@+id/message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="MainFragment"
-            android:background="@drawable/text_backdround"
-            android:padding="5dp"
-            android:textColor="@color/colorPrimary"
-            android:textSize="12dp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <EditText
-            android:id="@+id/spotifyLink"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:background="@drawable/text_backdround"
-            android:hint="Link From Spotify"
-            android:ems="10"
-            android:padding="5dp"
-            android:inputType="text"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textColorHint="@color/grey"
-            android:textSize="20dp"
-            app:layout_constraintEnd_toStartOf="@+id/btn_search"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/btn_search"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:backgroundTint="@color/colorPrimary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Search"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@+id/spotifyLink"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/spotifyLink"
-            app:layout_constraintTop_toTopOf="@+id/spotifyLink" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/track_list"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="3dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@+id/message"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title_view"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <ImageView
-            android:id="@+id/image_view"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spotifyLink"
-            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/title_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="5dp"
-            android:text="TextView"
-            android:background="@drawable/text_backdround"
-            android:drawableTint="@color/colorPrimary"
-            android:paddingLeft="6dp"
-            android:paddingRight="6dp"
-            android:textAppearance="@style/TextAppearance.AppTheme.Headline4"
-            android:textAllCaps="false"
+            android:layout_marginTop="10dp"
+            android:text="Shabinder's Playlist"
+            android:textAlignment="center"
             android:textColor="@color/colorPrimary"
-            android:textSize="24sp"
+            android:textSize="26sp"
             android:visibility="gone"
-            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/track_list"
+            app:layout_constraintEnd_toStartOf="@+id/playlist_owner"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/playlist_owner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/text_background_accented"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:text="by : Shabinder"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/title_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/title_view" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/track_list"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="12dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/image_view" />
+            app:layout_constraintTop_toBottomOf="@+id/title_view" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

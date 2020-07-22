@@ -68,8 +68,13 @@ dependencies {
     implementation 'com.google.apis:google-api-services-youtube:v3-rev180-1.22.0'
     implementation 'com.google.oauth-client:google-oauth-client:1.22.0'
     implementation 'com.spotify.android:auth:1.1.0'
-    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.squareup.okhttp3:okhttp:4.8.0'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation "com.squareup.moshi:moshi:1.9.3"
+    implementation "com.squareup.moshi:moshi-kotlin:1.9.3"
+    implementation "com.squareup.retrofit2:converter-moshi:2.9.0"
+
 
     implementation 'com.github.sealedtx:java-youtube-downloader:2.2.2'
 
