@@ -7,17 +7,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.shabinder.musicForEveryone.R
 
-
 @BindingAdapter("imageUrl")
 fun bindImage(imgView: ImageView, imgUrl: String?) {
-
-        imgUrl?.let {
-            val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
-            Glide.with(imgView.context)
-                .load(imgUri)
-                .apply(RequestOptions()
-                    .error(R.drawable.ic_musicplaceholder))
-                .into(imgView)
-        }
-
+    imgUrl?.let {
+        val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
+        Glide.with(imgView.context)
+            .load(imgUri)
+            .apply(RequestOptions()
+                .placeholder(R.drawable.ic_song_placeholder)
+                .error(R.drawable.ic_musicplaceholder))
+            .into(imgView)
+    }
 }

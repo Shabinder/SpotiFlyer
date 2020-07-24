@@ -10,8 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.shabinder.musicForEveryone.R
 import com.shabinder.musicForEveryone.SharedViewModel
 import com.shabinder.musicForEveryone.downloadHelper.DownloadHelper
+import com.shabinder.musicForEveryone.fragments.MainFragment
+import com.shabinder.musicForEveryone.models.Track
 import com.shabinder.musicForEveryone.utils.bindImage
-import kaaes.spotify.webapi.android.models.Track
 import kotlinx.coroutines.launch
 
 class TrackListAdapter:RecyclerView.Adapter<TrackListAdapter.ViewHolder>(),DownloadHelper {
@@ -19,6 +20,8 @@ class TrackListAdapter:RecyclerView.Adapter<TrackListAdapter.ViewHolder>(),Downl
     var trackList = listOf<Track>()
     var totalItems:Int = 0
     var sharedViewModel = SharedViewModel()
+    var isAlbum:Boolean = false
+    var mainFragment:MainFragment? = null
 
     override fun getItemCount():Int =  totalItems
 
@@ -31,16 +34,16 @@ class TrackListAdapter:RecyclerView.Adapter<TrackListAdapter.ViewHolder>(),Downl
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = trackList[position]
-        if(totalItems == 1){holder.coverImage.visibility = View.GONE}else{
-            bindImage(holder.coverImage,item.album.images[0].url)
+        if(totalItems == 1 || isAlbum){holder.coverImage.visibility = View.GONE}else{
+            bindImage(holder.coverImage, item.album!!.images?.get(0)?.url)
         }
 
-        holder.trackName.text = "${if(item.name.length > 17){"${item.name.subSequence(0,16)}..."}else{item.name}}"
-        holder.artistName.text = "${item.artists[0]?.name?:""}..."
+        holder.trackName.text = "${if(item.name!!.length > 17){"${item.name!!.subSequence(0,16)}..."}else{item.name}}"
+        holder.artistName.text = "${item.artists?.get(0)?.name?:""}..."
         holder.duration.text = "${item.duration_ms/1000/60} minutes, ${(item.duration_ms/1000)%60} sec"
         holder.downloadBtn.setOnClickListener{
             sharedViewModel.uiScope.launch {
-                downloadTrack(sharedViewModel.ytDownloader,sharedViewModel.downloadManager,"${item.name} ${item.artists[0].name?:""}")
+                downloadTrack(mainFragment,sharedViewModel.ytDownloader,sharedViewModel.downloadManager,"${item.name} ${item.artists?.get(0)!!.name?:""}")
             }
         }
 

@@ -10,10 +10,8 @@ import java.io.IOException
 object YoutubeInterface {
     private var youtube: YouTube? = null
     private var query:YouTube.Search.List? = null
-    var apiKey:String = "AIzaSyDuRmMA_2mF56BjlhhNpa0SIbjMgjjFaEI"
-    var apiKey2:String = "AIzaSyCotyqgqmz5qw4-IH0tiezIrIIDHLI2yNs"
-
-    var clientID : String = "1040727735015-er2mvvljt45cabkuqimsh3iabqvfpvms.apps.googleusercontent.com"
+    private var apiKey:String = "AIzaSyDuRmMA_2mF56BjlhhNpa0SIbjMgjjFaEI"
+    private var apiKey2:String = "AIzaSyCotyqgqmz5qw4-IH0tiezIrIIDHLI2yNs"
 
     fun youtubeConnector() {
         youtube =

@@ -26,9 +26,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
+
+        </activity>
+        <activity android:name="com.shabinder.musicForEveryone.splash.SplashScreen"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Transparent">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -8,18 +8,29 @@ import android.util.Log
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
+import com.shabinder.musicForEveryone.fragments.MainFragment
+import com.shabinder.musicForEveryone.models.Track
 import com.shabinder.musicForEveryone.utils.YoutubeInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
 interface DownloadHelper {
+
+    /**
+     * Function To Download All Tracks Available in a List
+     **/
+    suspend fun downloadAllTracks(trackList : List<Track>, ytDownloader: YoutubeDownloader?, downloadManager: DownloadManager?) {
+        trackList.forEach { downloadTrack(null,ytDownloader,downloadManager,"${it.name} ${it.artists?.get(0)?.name ?:""}") }
+    }
+
+
     suspend fun downloadTrack(
+        mainFragment: MainFragment?,
         ytDownloader: YoutubeDownloader?,
         downloadManager: DownloadManager?,
         searchQuery: String
     ) {
-
         withContext(Dispatchers.IO) {
             val data = YoutubeInterface.search(searchQuery)?.get(0)
             if (data == null) {
@@ -36,11 +47,44 @@ interface DownloadHelper {
                     Log.i("DHelper Link Found", audioUrl)
                     if (audioUrl != null) {
                         downloadFile(audioUrl, downloadManager, details!!.title())
+                        withContext(Dispatchers.Main){
+                            mainFragment?.showToast("Download Started")
+                        }
                     } else {
                         Log.i("YT audio url is null", format.toString())
                     }
                 }catch (e:ArrayIndexOutOfBoundsException){
-                    Log.i("Catch",e.toString())
+                    try{
+                        val format: Format =
+                            video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
+                        val audioUrl = format.url()
+                        Log.i("DHelper Link Found", audioUrl)
+                        if (audioUrl != null) {
+                            downloadFile(audioUrl, downloadManager, details!!.title())
+                            withContext(Dispatchers.Main){
+                                mainFragment?.showToast("Download Started")
+                            }
+                        } else {
+                            Log.i("YT audio url is null", format.toString())
+                        }
+                    }catch (e:ArrayIndexOutOfBoundsException){
+                        try{
+                            val format: Format =
+                                video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
+                            val audioUrl = format.url()
+                            Log.i("DHelper Link Found", audioUrl)
+                            if (audioUrl != null) {
+                                downloadFile(audioUrl, downloadManager, details!!.title())
+                                withContext(Dispatchers.Main){
+                                    mainFragment?.showToast("Download Started")
+                                }
+                            } else {
+                                Log.i("YT audio url is null", format.toString())
+                            }
+                        }catch(e:ArrayIndexOutOfBoundsException){
+                            Log.i("Catch",e.toString())
+                        }
+                    }
                 }
 
 
@@ -70,6 +114,7 @@ interface DownloadHelper {
                 .setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             downloadManager?.enqueue(request)
             Log.i("DownloadManager", "Download Request Sent")
+
         }
     }
 
