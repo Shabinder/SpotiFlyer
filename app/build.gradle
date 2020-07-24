@@ -63,8 +63,6 @@ dependencies {
 
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
-    implementation 'com.github.kaaes:spotify-web-api-android:0.4.1'
-
     implementation 'com.google.apis:google-api-services-youtube:v3-rev180-1.22.0'
     implementation 'com.google.oauth-client:google-oauth-client:1.22.0'
     implementation 'com.spotify.android:auth:1.1.0'
