@@ -16,6 +16,42 @@
         <item name="textAppearanceBody2">@style/TextAppearance.MaterialComponents.Body2</item>
     </style>
 
+
+    <style name="AlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="shapeAppearanceMediumComponent">@style/CutShapeAppearance</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Alert.Button.Positive</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Alert.Button.Neutral</item>
+    </style>
+    <style name="CutShapeAppearance" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="background">@color/white</item>
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+
+    <style name="Alert.Button.Positive" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="backgroundTint">@color/colorPrimary</item>
+        <item name="rippleColor">@color/colorPrimaryDark</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Alert.Button.Neutral" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="rippleColor">@color/colorAccent</item>
+        <item name="android:textColor">@android:color/darker_gray</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+
+    <style name="Theme.Transparent" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+
     <!-- override the Headline4 style present in the Material Theme !-->
     <style name="TextAppearance.AppTheme.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
         <item name="android:textSize">28sp</item>

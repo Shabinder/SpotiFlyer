@@ -14,6 +14,7 @@
             android:layout_marginBottom="2dp"
             android:background="@drawable/text_background_accented"
             android:padding="5dp"
+            android:visibility="gone"
             android:paddingTop="6dp"
             android:text="Authentication Needed"
             android:textColor="@color/colorPrimary"
