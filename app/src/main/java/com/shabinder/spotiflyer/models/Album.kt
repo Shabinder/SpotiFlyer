@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.musicForEveryone.models
+package com.shabinder.spotiflyer.models
 
 data class Album(
     var album_type: String? = null,
