@@ -1,0 +1,959 @@
+D/Retrofit: <--- HTTP 200 https://api.spotify.com/v1/me/top/artists (7170ms)
+2020-07-17 18:24:00.718 25414-25414/com.shabinder.musicforeveryone I/Network: [kaaes.spotify.webapi.android.models.Artist@4fae9ec, kaaes.spotify.webapi.android.models.Artist@aa3b1b5, kaaes.spotify.webapi.android.models.Artist@ed6004a, kaaes.spotify.webapi.android.models.Artist@870dbbb, kaaes.spotify.webapi.android.models.Artist@8a2b8d8, kaaes.spotify.webapi.android.models.Artist@aab431, kaaes.spotify.webapi.android.models.Artist@a7bd716, kaaes.spotify.webapi.android.models.Artist@3477897, kaaes.spotify.webapi.android.models.Artist@7f68a84]
+
+
+ I/Network: https://api.spotify.com/v1/artists/7vk5e3vY1uw9plTHJAMwjN
+2020-07-17 18:47:28.421 28873-28873/com.shabinder.musicforeveryone I/Network: https://api.spotify.com/v1/artists/7f5Zgnp2spUuuzKplmRkt7
+2020-07-17 18:47:28.714 28873-28873/com.shabinder.musicforeveryone I/Network: Lost Frequencies
+2020-07-17 18:47:28.990 28873-28873/com.shabinder.musicforeveryone I/Network: https://api.spotify.com/v1/artists/173M6tvnbPT1Wp5ucD0uAS
+2020-07-17 18:47:29.278 28873-28873/com.shabinder.musicforeveryone I/Network: Sebastien
+2020-07-17 18:47:29.279 28873-28873/com.shabinder.musicforeveryone I/Network: Shabinder Singh
+
+GET https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=25&q=Spectre%20Alan%20Walker&key=[YOUR_API_KEY] HTTP/1.1
+{
+    "album": {
+        "album_type": "single",
+        "artists": [
+            {
+                "external_urls": {
+                    "spotify": "https://open.spotify.com/artist/6sFIWsNpZYqfjUpaCgueju"
+                },
+                "href": "https://api.spotify.com/v1/artists/6sFIWsNpZYqfjUpaCgueju",
+                "id": "6sFIWsNpZYqfjUpaCgueju",
+                "name": "Carly Rae Jepsen",
+                "type": "artist",
+                "uri": "spotify:artist:6sFIWsNpZYqfjUpaCgueju"
+            }
+        ],
+        "available_markets": [
+            "AD",
+            "AR",
+            "AT",
+            "ZA"
+        ],
+        "external_urls": {
+            "spotify": "https://open.spotify.com/album/0tGPJ0bkWOUmH7MEOR77qc"
+        },
+        "href": "https://api.spotify.com/v1/albums/0tGPJ0bkWOUmH7MEOR77qc",
+        "id": "0tGPJ0bkWOUmH7MEOR77qc",
+        "images": [
+            {
+                "height": 640,
+                "url": "https://i.scdn.co/image/966ade7a8c43b72faa53822b74a899c675aaafee",
+                "width": 640
+            },
+            {
+                "height": 300,
+                "url": "https://i.scdn.co/image/107819f5dc557d5d0a4b216781c6ec1b2f3c5ab2",
+                "width": 300
+            },
+            {
+                "height": 64,
+                "url": "https://i.scdn.co/image/5a73a056d0af707b4119a883d87285feda543fbb",
+                "width": 64
+            }
+        ],
+        "name": "Cut To The Feeling",
+        "release_date": "2017-05-26",
+        "release_date_precision": "day",
+        "type": "album",
+        "uri": "spotify:album:0tGPJ0bkWOUmH7MEOR77qc"
+    },
+    "artists": [
+        {
+            "external_urls": {
+                "spotify": "https://open.spotify.com/artist/6sFIWsNpZYqfjUpaCgueju"
+            },
+            "href": "https://api.spotify.com/v1/artists/6sFIWsNpZYqfjUpaCgueju",
+            "id": "6sFIWsNpZYqfjUpaCgueju",
+            "name": "Carly Rae Jepsen",
+            "type": "artist",
+            "uri": "spotify:artist:6sFIWsNpZYqfjUpaCgueju"
+        }
+    ],
+    "available_markets": [
+        "UY",
+        "VN",
+        "ZA"
+    ],
+    "disc_number": 1,
+    "duration_ms": 207959,
+    "explicit": false,
+    "external_ids": {
+        "isrc": "USUM71703861"
+    },
+    "external_urls": {
+        "spotify": "https://open.spotify.com/track/11dFghVXANMlKmJXsNCbNl"
+    },
+    "href": "https://api.spotify.com/v1/tracks/11dFghVXANMlKmJXsNCbNl",
+    "id": "11dFghVXANMlKmJXsNCbNl",
+    "is_local": false,
+    "name": "Cut To The Feeling",
+    "popularity": 63,
+    "preview_url": "https://p.scdn.co/mp3-preview/3eb16018c2a700240e9dfb8817b6f2d041f15eb1?cid=774b29d4f13844c495f206cafdad9c86",
+    "track_number": 1,
+    "type": "track",
+    "uri": "spotify:track:11dFghVXANMlKmJXsNCbNl"
+}
+{
+  "kind": "youtube#searchListResponse",
+  "etag": "wAEqqXnM33JRqz8g4LHOYfcUL2I",
+  "nextPageToken": "CBkQAA",
+  "regionCode": "IN",
+  "pageInfo": {
+    "totalResults": 1000000,
+    "resultsPerPage": 25
+  },
+  "items": [
+    {
+      "kind": "youtube#searchResult",
+      "etag": "iwDEsnD4okBQNDRhY9aP8IklmFA",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "wJnBTPUQS5A"
+      },
+      "snippet": {
+        "publishedAt": "2017-09-15T07:02:57Z",
+        "channelId": "UCJrOtniJ0-NWz37R30urifQ",
+        "title": "Alan Walker - The Spectre",
+        "description": "Thanks for listening. If you want to hear my newest single and the last video in the World of Walker trilogy, \"Heading Home,\" check out the official music video ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/wJnBTPUQS5A/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/wJnBTPUQS5A/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/wJnBTPUQS5A/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Alan Walker",
+        "liveBroadcastContent": "none",
+        "publishTime": "2017-09-15T07:02:57Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "Fhx4XbL6egbBH4MZadtY5TwHwmA",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "lmyd-6zuArk"
+      },
+      "snippet": {
+        "publishedAt": "2017-09-15T15:44:59Z",
+        "channelId": "UCJ6ERWrxZzb9Ua3oeRcIe0g",
+        "title": "Alan Walker ‒ The Spectre (Lyrics / Lyrics Video)",
+        "description": "Alan Walker ‒ The Spectre (Lyrics) is a lyric video with full lyrics for Alan Walker's new track The Spectre. ✘ Follow Taz Network's Official Spotify Playlist: ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/lmyd-6zuArk/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/lmyd-6zuArk/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/lmyd-6zuArk/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Taz Network",
+        "liveBroadcastContent": "none",
+        "publishTime": "2017-09-15T15:44:59Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "_W4RUuuKIeUuLjGJwkbTfqXz_rI",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "AOeY-nDp7hI"
+      },
+      "snippet": {
+        "publishedAt": "2015-01-06T17:25:41Z",
+        "channelId": "UC_aEa8K-EOJ3D6gOs7HcyNg",
+        "title": "Alan Walker - Spectre [NCS Release]",
+        "description": "NCS: Music Without Limitations NCS Spotify: http://spoti.fi/NCS Stream here: http://ncs.io/spectre NCS ➞ Twitch http://twitch.tv/nocopyrightsounds ➞ Spotify ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/AOeY-nDp7hI/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/AOeY-nDp7hI/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/AOeY-nDp7hI/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "NoCopyrightSounds",
+        "liveBroadcastContent": "none",
+        "publishTime": "2015-01-06T17:25:41Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "k8lMkfd_GKQo1Rw3j5pHtefGaSs",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "a-X6rRcYL70"
+      },
+      "snippet": {
+        "publishedAt": "2019-01-26T14:25:09Z",
+        "channelId": "UCWjDbk8VIEc_OYqsAyal-Cw",
+        "title": "ALAN WALKER – The Spectre feat. 周興哲 Eric Chou【第 14 屆 KKBOX 風雲榜 風雲大使】",
+        "description": "第14 屆KKBOX 風雲榜14th KKBOX Music Award 即從此刻，突破眼界超樂你的音樂想像Music Beyond Imagination 2019.1.26 臺北小巨蛋Taipei Arena - 樂 ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/a-X6rRcYL70/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/a-X6rRcYL70/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/a-X6rRcYL70/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "KKBOX",
+        "liveBroadcastContent": "none",
+        "publishTime": "2019-01-26T14:25:09Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "YRnWhR4Yg4WdwlXW7d-40YjHGMI",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "3hPDgLqm5-M"
+      },
+      "snippet": {
+        "publishedAt": "2018-08-06T21:22:40Z",
+        "channelId": "UCsYbJBlygPF1Xhuu7y0nhOw",
+        "title": "Alan Walker - The Spectre Live At Tomorrowland Belgium 2018",
+        "description": "Alan Walker - The Spectre Live At Tomorrowland Belgium 2018 Link : https://www.youtube.com/watch?v=xVWs0ti0J90 Follow Alan Walker Y Marshmello Fans ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/3hPDgLqm5-M/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/3hPDgLqm5-M/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/3hPDgLqm5-M/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Alan Walker Y Marshmello Fans",
+        "liveBroadcastContent": "none",
+        "publishTime": "2018-08-06T21:22:40Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "iAYdM6EKBRBvcXO7ID8oxKGID9s",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "Y7YhvUlhnMM"
+      },
+      "snippet": {
+        "publishedAt": "2018-10-15T16:47:54Z",
+        "channelId": "UCrRpYEytIHGyDgNWO6VbHlQ",
+        "title": "Alan Walker - The Spectre (8D AUDIO)",
+        "description": "Listen to 8D Music on Spotify https://lnk.to/8dplaylist If you like it please subscribe and turn on the notifications for more (Use headphones and close your ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/Y7YhvUlhnMM/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/Y7YhvUlhnMM/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/Y7YhvUlhnMM/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "8D TUNES",
+        "liveBroadcastContent": "none",
+        "publishTime": "2018-10-15T16:47:54Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "-dWrV_Tin8OGttliAtuW__tXh5Y",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "rGmzKaA0CWo"
+      },
+      "snippet": {
+        "publishedAt": "2019-04-01T02:08:04Z",
+        "channelId": "UCt_j8J0YOpw5PLBazpP7esA",
+        "title": "Alan Walker - The Spectre [Intro Remix by #10474]",
+        "description": "Alan Walker - The Spectre, Intro Remix by Walker #10474. Alan played a somewhat similar version at various festivals, but never published it as song.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/rGmzKaA0CWo/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/rGmzKaA0CWo/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/rGmzKaA0CWo/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Walker #10474",
+        "liveBroadcastContent": "none",
+        "publishTime": "2019-04-01T02:08:04Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "9jqugvjv5wyT03ybXDKauybnIXU",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "wRGhQhE3zWo"
+      },
+      "snippet": {
+        "publishedAt": "2018-02-07T12:15:45Z",
+        "channelId": "UClj_LJVE_1Ksu7-lu_RWrag",
+        "title": "Alan Walker - The Spectre - LYRICS",
+        "description": "Hello, hello Can you hear me, as I scream your name Hello, hello Do you need me, before I fade away Is this a place that I call home To find what I've become ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/wRGhQhE3zWo/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/wRGhQhE3zWo/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/wRGhQhE3zWo/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Alexandre Costa",
+        "liveBroadcastContent": "none",
+        "publishTime": "2018-02-07T12:15:45Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "mmKwCacMtMT-scLce94cl-NycxY",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "gkVB6EgoU-E"
+      },
+      "snippet": {
+        "publishedAt": "2018-01-10T14:45:01Z",
+        "channelId": "UCosp6H5fYfvv6yIeA1Tp6TQ",
+        "title": "The Spectre, Faded - Alan Walker (THE CREW)",
+        "description": "ELECTRONIC DANCE MUSIC ALANWALKER.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/gkVB6EgoU-E/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/gkVB6EgoU-E/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/gkVB6EgoU-E/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Music Electronic Dance",
+        "liveBroadcastContent": "none",
+        "publishTime": "2018-01-10T14:45:01Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "XVR3VCYH0bS4SUGfUY6gF-2623s",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "m8nkB9fuRFI"
+      },
+      "snippet": {
+        "publishedAt": "2018-07-12T09:57:34Z",
+        "channelId": "UCpZM7FlhhMATlVDmyJiNH2Q",
+        "title": "The Spectre vs See Your Face   Alan Walker 2018   BASS BOOSTED  Car Music Mix 2018",
+        "description": "Hi there i'm Farhan,you are watching ncs music .... The Spectre vs See Your Face Alan Walker 2018 BASS BOOSTED Car Music Mix 2018....... No copy rights ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/m8nkB9fuRFI/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/m8nkB9fuRFI/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/m8nkB9fuRFI/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "IDEAL PRO",
+        "liveBroadcastContent": "none",
+        "publishTime": "2018-07-12T09:57:34Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "hxO6SOuqX6r6oqR7pPxVVLz1MUY",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "KyZfPErd_Gk"
+      },
+      "snippet": {
+        "publishedAt": "2017-09-25T11:52:00Z",
+        "channelId": "UCMfpKuloYpHH0-C3pSsourw",
+        "title": "Alan Walker - The Spectre - Drum Cover | By TheKays",
+        "description": "Alan Walker just released The Spectre and we just had to get on to it and this time make a drum cover. As you all know, we have made covers of Alan Walker for ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/KyZfPErd_Gk/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/KyZfPErd_Gk/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/KyZfPErd_Gk/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "TheKays",
+        "liveBroadcastContent": "none",
+        "publishTime": "2017-09-25T11:52:00Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "FfQBqVWtjmeT0hM2HZkzBc5lXZ4",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "5nI2i84hZP0"
+      },
+      "snippet": {
+        "publishedAt": "2017-09-29T12:08:30Z",
+        "channelId": "UClkRzsdvg7_RKVhwDwiDZOA",
+        "title": "Alan Walker - The Spectre ( cover by J.Fla )",
+        "description": "You can stream all of my songs here; Spotify: http://bit.ly/JFla-Spotify Apple Music: http://bit.ly/\u200eJFla-AppleMusic Amazon: http://bit.ly/JFla-Amazon Deezer: ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/5nI2i84hZP0/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/5nI2i84hZP0/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/5nI2i84hZP0/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "JFlaMusic",
+        "liveBroadcastContent": "none",
+        "publishTime": "2017-09-29T12:08:30Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "tm11r-PSWL4gBWMxmLIsMcT8kAw",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "2ZiEs_C_gdQ"
+      },
+      "snippet": {
+        "publishedAt": "2019-04-19T02:02:32Z",
+        "channelId": "UCJUrGKnpyE8CYwOAtvKeIhg",
+        "title": "Alan Walker - Spectre  |  PUBG Gun Sync",
+        "description": "Another gun sync!! You guys asked for it so I did it! 3 hours of hard work! Music: Alan Walker - Spectre [NCS Release] #Gunsync #PUBGMOBILE.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/2ZiEs_C_gdQ/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/2ZiEs_C_gdQ/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/2ZiEs_C_gdQ/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Azure",
+        "liveBroadcastContent": "none",
+        "publishTime": "2019-04-19T02:02:32Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "Y0rA3lt0yZhk0RRV1HVp0TkjNAo",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "MlBvEWUqT7E"
+      },
+      "snippet": {
+        "publishedAt": "2018-08-09T18:17:16Z",
+        "channelId": "UCfr_asF53t9i244NKhvrzqA",
+        "title": "Alan Walker &quot;The Spectre Live&quot; Disco Tropics 2018",
+        "description": "Alan Walker \"The Spectre Live\" Disco Tropics 08-08-2018 Summer 2018.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/MlBvEWUqT7E/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/MlBvEWUqT7E/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/MlBvEWUqT7E/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Disco Tropics",
+        "liveBroadcastContent": "none",
+        "publishTime": "2018-08-09T18:17:16Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "d_XVTcsBFwuhFJjFuugR7B2npSE",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "R0eeDAMcGGg"
+      },
+      "snippet": {
+        "publishedAt": "2017-10-22T15:46:07Z",
+        "channelId": "UCfLiFOHz-UzhzFe1bg-1K8Q",
+        "title": "Alan Walker - The Spectre (Khaysonn feat. Ser0x ~ Melbourne Shuffle)",
+        "description": "Alan Walker - The Spectre is a awesome track! After 4 Years , finaly a new New Video with my friend Khaysonn :) Enjoy!",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/R0eeDAMcGGg/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/R0eeDAMcGGg/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/R0eeDAMcGGg/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Andre Serox",
+        "liveBroadcastContent": "none",
+        "publishTime": "2017-10-22T15:46:07Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "4JZEItzb_R0fctFDyhb2SM-WuY8",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "-ER19A0hfDw"
+      },
+      "snippet": {
+        "publishedAt": "2017-10-01T14:17:40Z",
+        "channelId": "UCUkPSd12Y4Nmli73etB3M7w",
+        "title": "Alan Walker - The Spectre | Launchpad Cover [UniPad]",
+        "description": "Hello hello...I'm back xDD Today, I bring to you a brand new cover and a brand new project!! ❤     Well, this is my fastest project I've ever made!! (I know is pretty ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/-ER19A0hfDw/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/-ER19A0hfDw/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/-ER19A0hfDw/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Clement Show",
+        "liveBroadcastContent": "none",
+        "publishTime": "2017-10-01T14:17:40Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "_2LuAuNUat39MptFq38ejejyHEI",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "-eOV38bg5SM"
+      },
+      "snippet": {
+        "publishedAt": "2017-12-01T17:39:17Z",
+        "channelId": "UCS1YPeG1g-dSUanUj4GCycg",
+        "title": "Alan Walker   The Spectre Bass Boosted",
+        "description": "GO TO MY NEW CHANNEL !!!GO TO MY NEW CHANNEL !!!GO TO MY NEW CHANNEL !!! https://www.youtube.com/channel/UCyGjoC1czMVJvZPczCKBEqQ.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/-eOV38bg5SM/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/-eOV38bg5SM/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/-eOV38bg5SM/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Bass Boosted",
+        "liveBroadcastContent": "none",
+        "publishTime": "2017-12-01T17:39:17Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "tUTlmWm19i3xkclSutbanv6MOj0",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "KlEU4mvnnig"
+      },
+      "snippet": {
+        "publishedAt": "2019-04-25T18:12:01Z",
+        "channelId": "UCR9WM3qWwNkZmjpvTOPpXsg",
+        "title": "Best of Alan walker - on my way, faded, lily, alone, spectre",
+        "description": "",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/KlEU4mvnnig/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/KlEU4mvnnig/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/KlEU4mvnnig/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Little Ghost",
+        "liveBroadcastContent": "none",
+        "publishTime": "2019-04-25T18:12:01Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "lRDQcfu3I4DdzpC1xKROzJILNxc",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "KT7lwCDH7bA"
+      },
+      "snippet": {
+        "publishedAt": "2020-05-08T12:30:01Z",
+        "channelId": "UCj-CSIqgsG9oFDpmAocMx6g",
+        "title": "Alan Walker - Spectre | Gym Motivation | 2020",
+        "description": "Alan Walker - Spectre | Gym Motivation | 2020 ▻This video is edited by Shredded Beast ▻This video is made for motivational purpose, to those who want to hit ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/KT7lwCDH7bA/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/KT7lwCDH7bA/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/KT7lwCDH7bA/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Shredded Beast",
+        "liveBroadcastContent": "none",
+        "publishTime": "2020-05-08T12:30:01Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "UZyADLcppjQoduA0GWOjgk6C3xE",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "pCdAPJeLBKY"
+      },
+      "snippet": {
+        "publishedAt": "2019-01-05T10:27:55Z",
+        "channelId": "UCyp_DCWb3-xz0cz-8Iql35Q",
+        "title": "Alan Walker - Spectre [NCS REALESE]",
+        "description": "Music: Alan Walker - Spectre [NCS REALESE] Video: Pip | A short animated film Subscribe to the channel ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/pCdAPJeLBKY/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/pCdAPJeLBKY/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/pCdAPJeLBKY/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Топ Обзор",
+        "liveBroadcastContent": "none",
+        "publishTime": "2019-01-05T10:27:55Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "LlysRsBW54-VDJqGOtL55WI5CoM",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "fJ4PUkKxZdQ"
+      },
+      "snippet": {
+        "publishedAt": "2017-12-21T20:01:55Z",
+        "channelId": "UCg7gQTPhYHuJpjCCDv_TrLQ",
+        "title": "Eminem, 2pac, Alan Walker - The Spectre (Baywatch Offical Music Video)",
+        "description": "Eminem, 2pac, Alan Walker - The Spectre Remix BayWatch Music Video) [Montage] ➤:GET YOUTUBE SUBSCRIBERZ / CHANNEL PROMOTION / CLICK LINK ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fJ4PUkKxZdQ/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fJ4PUkKxZdQ/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fJ4PUkKxZdQ/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "TahirMiri",
+        "liveBroadcastContent": "none",
+        "publishTime": "2017-12-21T20:01:55Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "jvPcrk1aFwsBUqDPo820HAL6DG4",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "p7nIEJ1vpFM"
+      },
+      "snippet": {
+        "publishedAt": "2015-01-06T17:27:59Z",
+        "channelId": "UCJrOtniJ0-NWz37R30urifQ",
+        "title": "Alan Walker - Spectre",
+        "description": "My new single \"Alone, Pt. II\" with Ava Max is out now! Check out the song here: https://lnk.to/AWAlonePtII My second release on NoCopyrightSounds! I am very ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/p7nIEJ1vpFM/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/p7nIEJ1vpFM/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/p7nIEJ1vpFM/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Alan Walker",
+        "liveBroadcastContent": "none",
+        "publishTime": "2015-01-06T17:27:59Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "ATMgtDKZc71Ah8gmFdU1EYfqcY0",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "PL2cUQNfo8c"
+      },
+      "snippet": {
+        "publishedAt": "2019-06-10T10:16:04Z",
+        "channelId": "UCai37pKuZTRJcys8qGkPesw",
+        "title": "Alan Walker-The Spectre-【立体音響】",
+        "description": "立体音響とは立体的に音を再生するシステムです。 イヤホンやヘッドホンをつけてお聞きください   ぜひチャンネル登録、高評価お願いし...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/PL2cUQNfo8c/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/PL2cUQNfo8c/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/PL2cUQNfo8c/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "【立体音響】#Musiclabo",
+        "liveBroadcastContent": "none",
+        "publishTime": "2019-06-10T10:16:04Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "F575trg9Z7zm5oanw8V8wvynK-0",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "jciYVqSbJ9I"
+      },
+      "snippet": {
+        "publishedAt": "2018-08-16T15:34:02Z",
+        "channelId": "UCVYCBraW_Cd-Cz0IIHj5I7g",
+        "title": "The Spectre (Alan Walker) 🎧 Shuffle Dance Official Music Video ♫ LED Shoes Dance Special",
+        "description": "The Spectre (Alan Walker) Shuffle Dance Official Music Video 2020 ♫ LED Shoes Dance Special Thanks for watching, and Subscribe if you haven't already: ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/jciYVqSbJ9I/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/jciYVqSbJ9I/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/jciYVqSbJ9I/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "V-Kool Vines",
+        "liveBroadcastContent": "none",
+        "publishTime": "2018-08-16T15:34:02Z"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "01sx5xf9qeQsDyZsXWinMGeSvqM",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "ZCf87siA7Rs"
+      },
+      "snippet": {
+        "publishedAt": "2020-05-22T14:11:34Z",
+        "channelId": "UCHn_gfWxbhVQvRU02B2ddDg",
+        "title": "Alan Walker EDM - Play, Faded &amp; The Spectre (Remix) ♫ Shuffle Dance Girls 2020",
+        "description": "Alan Walker ♫ Play, Faded & The Spectre (Remix) ♫ New Shuffle Dance Girls 2020 Join the Notification Squad! Click the ▽ Follow SEC tvTM: ☆ Youtube→ ...",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/ZCf87siA7Rs/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/ZCf87siA7Rs/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/ZCf87siA7Rs/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "SEC tvTM",
+        "liveBroadcastContent": "none",
+        "publishTime": "2020-05-22T14:11:34Z"
+      }
+    }
+  ]
+}
