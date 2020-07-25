@@ -15,5 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-include ':app'
-rootProject.name = "spotiflyer"
+package com.shabinder.spotiflyer.models
+
+data class PlaylistTrack(
+    var added_at: String? = null,
+    var added_by: UserPublic? = null,
+    var track: Track? = null,
+    var is_local: Boolean? = null)

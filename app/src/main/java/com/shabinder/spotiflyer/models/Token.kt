@@ -15,5 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-include ':app'
-rootProject.name = "spotiflyer"
+package com.shabinder.spotiflyer.models
+
+data class Token(
+    var access_token:String,
+    var token_type:String,
+    var expires_in:Int
+)

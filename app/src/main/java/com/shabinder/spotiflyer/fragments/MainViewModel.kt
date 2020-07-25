@@ -15,5 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-include ':app'
-rootProject.name = "spotiflyer"
+package com.shabinder.spotiflyer.fragments
+
+import androidx.lifecycle.ViewModel
+import com.shabinder.spotiflyer.models.Track
+
+class MainViewModel: ViewModel() {
+    var searchLink:String = ""
+    var trackList = mutableListOf<Track>()
+    var coverUrl:String = ""
+}

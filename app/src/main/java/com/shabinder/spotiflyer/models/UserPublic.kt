@@ -15,5 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-include ':app'
-rootProject.name = "spotiflyer"
+package com.shabinder.spotiflyer.models
+
+data class UserPublic(
+    var display_name: String? = null,
+    var external_urls: Map<String?, String?>? = null,
+    var followers: Followers? = null,
+    var href: String? = null,
+    var id: String? = null,
+    var images: List<Image?>? = null,
+    var type: String? = null,
+    var uri: String? = null)

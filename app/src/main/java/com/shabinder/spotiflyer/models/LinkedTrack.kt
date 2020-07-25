@@ -15,5 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-include ':app'
-rootProject.name = "spotiflyer"
+package com.shabinder.spotiflyer.models
+
+data class LinkedTrack(
+    var external_urls: Map<String?, String?>? = null,
+    var href: String? = null,
+    var id: String? = null,
+    var type: String? = null,
+    var uri: String? = null)

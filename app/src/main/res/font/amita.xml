@@ -16,15 +16,9 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/navigation"
-    app:startDestination="@id/mainFragment">
-
-    <fragment
-        android:id="@+id/mainFragment"
-        android:name="com.shabinder.spotiflyer.fragments.MainFragment"
-        android:label="main_fragment"
-        tools:layout="@layout/main_fragment" />
-</navigation>
+<font-family xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:fontProviderAuthority="com.google.android.gms.fonts"
+        app:fontProviderCerts="@array/com_google_android_gms_fonts_certs"
+        app:fontProviderPackage="com.google.android.gms"
+        app:fontProviderQuery="Amita">
+</font-family>

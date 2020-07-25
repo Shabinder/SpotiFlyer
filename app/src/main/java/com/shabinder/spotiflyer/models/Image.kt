@@ -15,5 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-include ':app'
-rootProject.name = "spotiflyer"
+package com.shabinder.spotiflyer.models
+data class Image(
+    var width: Int? = null,
+    var height: Int? = null,
+    var url: String? = null)

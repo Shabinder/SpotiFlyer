@@ -15,5 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-include ':app'
-rootProject.name = "spotiflyer"
+package com.shabinder.spotiflyer.models
+data class Copyright(
+    var text: String? = null,
+    var type: String? = null)
