@@ -23,31 +23,42 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.MainFragmentBinding
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
+import com.shabinder.spotiflyer.downloadHelper.DownloadHelper.downloadAllTracks
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
 import com.shabinder.spotiflyer.utils.SpotifyService
 import com.shabinder.spotiflyer.utils.bindImage
+import com.shabinder.spotiflyer.utils.copyTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.IOException
 
 @Suppress("DEPRECATION")
-class MainFragment : Fragment(),DownloadHelper {
+class MainFragment : Fragment() {
     private lateinit var binding:MainFragmentBinding
     private lateinit var mainViewModel: MainViewModel
     private lateinit var sharedViewModel: SharedViewModel
@@ -56,12 +67,13 @@ class MainFragment : Fragment(),DownloadHelper {
     private var type:String = ""
     private var spotifyLink = ""
     private var i: Intent? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater,R.layout.main_fragment,container,false)
-
+        DownloadHelper.context = requireContext()
         sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         spotifyService =  sharedViewModel.spotifyService
@@ -73,13 +85,14 @@ class MainFragment : Fragment(),DownloadHelper {
 
         binding.usage.text = spanStringBuilder
         openSpotifyButton()
+        openGithubButton()
+        openInstaButton()
 
         binding.btnDonate.setOnClickListener {
             sharedViewModel.easyUpiPayment?.startPayment()
         }
 
         binding.btnSearch.setOnClickListener {
-            sharedViewModel.isConnected.value = isOnline()
             spotifyLink = binding.linkSearch.text.toString()
 
             val link = spotifyLink.substringAfterLast('/', "Error").substringBefore('?')
@@ -87,16 +100,15 @@ class MainFragment : Fragment(),DownloadHelper {
 
             Log.i("Fragment", "$type : $link")
 
-            if(sharedViewModel.spotifyService == null){
+            if(sharedViewModel.spotifyService == null && !isOnline()){
                 (activity as MainActivity).authenticateSpotify()
             }
 
             if (type == "Error" || link == "Error") {
                 showToast("Please Check Your Link!")
-            } else if(sharedViewModel.isConnected.value == false){
+            } else if(!isOnline()){
                 sharedViewModel.showAlertDialog(resources,requireContext())
-            }
-            else {
+            } else {
                 adapter = TrackListAdapter()
                 binding.trackList.adapter = adapter
                 adapter.sharedViewModel = sharedViewModel
@@ -106,7 +118,9 @@ class MainFragment : Fragment(),DownloadHelper {
                 if(mainViewModel.searchLink == spotifyLink){
                     //it's a Device Configuration Change
                     adapterConfig(mainViewModel.trackList)
-                    bindImage(binding.imageView,mainViewModel.coverUrl)
+                    sharedViewModel.uiScope.launch {
+                        bindImage(binding.imageView,mainViewModel.coverUrl)
+                    }
                 }else{
                     when (type) {
                         "track" -> {
@@ -121,15 +135,14 @@ class MainFragment : Fragment(),DownloadHelper {
                                 adapterConfig(trackList)
 
                                 binding.btnDownloadAll.setOnClickListener {
+                                    showToast("Starting Download in Few Seconds")
                                     sharedViewModel.uiScope.launch {
                                         withContext(Dispatchers.IO) {
                                             downloadAllTracks(
                                                 "Tracks",
                                                 null,
                                                 trackList,
-                                                sharedViewModel.ytDownloader,
-                                                sharedViewModel.downloadManager
-                                            )
+                                                sharedViewModel.ytDownloader)
                                         }
                                     }
                                 }
@@ -142,22 +155,21 @@ class MainFragment : Fragment(),DownloadHelper {
                             sharedViewModel.uiScope.launch {
                                 val albumObject = sharedViewModel.getAlbumDetails(link)
                                 val trackList = mutableListOf<Track>()
-                                albumObject!!.tracks?.items?.forEach { trackList.add(it!!) }
+                                albumObject!!.tracks?.items?.forEach { trackList.add(it) }
                                 mainViewModel.trackList = trackList
                                 mainViewModel.coverUrl = albumObject.images?.get(0)!!.url!!
                                 bindImage(binding.imageView,mainViewModel.coverUrl)
                                 adapter.isAlbum = true
                                 adapterConfig(trackList)
                                 binding.btnDownloadAll.setOnClickListener {
+                                    showToast("Starting Download in Few Seconds")
                                     sharedViewModel.uiScope.launch {
                                         withContext(Dispatchers.IO) {
                                             downloadAllTracks(
                                                 "Albums",
                                                 albumObject.name,
                                                 trackList,
-                                                sharedViewModel.ytDownloader,
-                                                sharedViewModel.downloadManager
-                                            )
+                                                sharedViewModel.ytDownloader)
                                         }
                                     }
                                 }
@@ -171,21 +183,21 @@ class MainFragment : Fragment(),DownloadHelper {
                             sharedViewModel.uiScope.launch {
                                 val playlistObject = sharedViewModel.getPlaylistDetails(link)
                                 val trackList = mutableListOf<Track>()
-                                playlistObject!!.tracks?.items!!.forEach { trackList.add(it?.track!!) }
+                                playlistObject!!.tracks?.items!!.forEach { trackList.add(it.track!!) }
                                 mainViewModel.trackList = trackList
                                 mainViewModel.coverUrl =  playlistObject.images?.get(0)!!.url!!
                                 bindImage(binding.imageView,mainViewModel.coverUrl)
                                 adapterConfig(trackList)
                                 binding.btnDownloadAll.setOnClickListener {
+                                    showToast("Starting Download in Few Seconds")
                                     sharedViewModel.uiScope.launch {
                                         withContext(Dispatchers.IO) {
+                                            loadAllImages(trackList)
                                             downloadAllTracks(
                                                 "Playlists",
                                                 playlistObject.name,
                                                 trackList,
-                                                sharedViewModel.ytDownloader,
-                                                sharedViewModel.downloadManager
-                                            )
+                                                sharedViewModel.ytDownloader)
                                         }
                                     }
                                 }
@@ -213,6 +225,59 @@ class MainFragment : Fragment(),DownloadHelper {
         return binding.root
     }
 
+    /**
+     * Function to fetch all Images for using in mp3 tag.
+     **/
+    private fun loadAllImages(trackList: List<Track>) {
+        trackList.forEach {
+            val imgUrl = it.album!!.images?.get(0)?.url
+            imgUrl?.let {
+                val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
+                Glide
+                    .with(requireContext())
+                    .asFile()
+                    .load(imgUri)
+                    .listener(object: RequestListener<File> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<File>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            Log.i("Glide","LoadFailed")
+                            return false
+                        }
+
+                        override fun onResourceReady(
+                            resource: File?,
+                            model: Any?,
+                            target: Target<File>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            sharedViewModel.uiScope.launch {
+                                withContext(Dispatchers.IO){
+                                    try {
+                                        val file = File(
+                                            Environment.getExternalStorageDirectory(),
+                                            DownloadHelper.defaultDir+".Images/" + imgUrl.substringAfterLast('/') + ".jpeg"
+                                        )
+                                        resource?.copyTo(file)
+                                    } catch (e: IOException) {
+                                        e.printStackTrace()
+                                    }
+                                }
+                            }
+                            return false
+                        }
+                    }).submit()
+            }
+        }
+    }
+
+    /**
+     * Implementing button to Open Spotify App
+    **/
     private fun openSpotifyButton() {
         val manager: PackageManager = requireActivity().packageManager
         try {
@@ -232,14 +297,32 @@ class MainFragment : Fragment(),DownloadHelper {
         }
     }
 
+    private fun openGithubButton() {
+        val uri: Uri =
+            Uri.parse("http://github.com/Shabinder/SpotiFlyer")
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        binding.btnGithub.setOnClickListener {
+            startActivity(intent)
+        }
+    }
+    private fun openInstaButton() {
+        val uri: Uri =
+            Uri.parse("http://www.instagram.com/mr.shabinder")
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        binding.developerInsta.setOnClickListener {
+            startActivity(intent)
+        }
+    }
+
+
     /**
      * Configure Recycler View Adapter
      **/
     private fun adapterConfig(trackList: List<Track>){
         adapter.trackList = trackList.toList()
         adapter.totalItems = trackList.size
+        adapter.mainFragment = this
         adapter.notifyDataSetChanged()
-
     }
 
     /**
@@ -274,6 +357,10 @@ class MainFragment : Fragment(),DownloadHelper {
     fun showToast(message:String){
         Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
     }
+
+    /**
+     * Util. Function To Check Connection Status
+     **/
     private fun isOnline(): Boolean {
         val cm =
             requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

@@ -26,13 +26,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
-import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
+import com.shabinder.spotiflyer.downloadHelper.DownloadHelper.downloadTrack
 import com.shabinder.spotiflyer.fragments.MainFragment
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.utils.bindImage
 import kotlinx.coroutines.launch
 
-class TrackListAdapter:RecyclerView.Adapter<TrackListAdapter.ViewHolder>(),DownloadHelper {
+
+class TrackListAdapter:RecyclerView.Adapter<TrackListAdapter.ViewHolder>() {
 
     var trackList = listOf<Track>()
     var totalItems:Int = 0
@@ -52,7 +53,9 @@ class TrackListAdapter:RecyclerView.Adapter<TrackListAdapter.ViewHolder>(),Downl
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = trackList[position]
         if(totalItems == 1 || isAlbum){holder.coverImage.visibility = View.GONE}else{
-            bindImage(holder.coverImage, item.album!!.images?.get(0)?.url)
+            sharedViewModel.uiScope.launch {
+                bindImage(holder.coverImage, item.album!!.images?.get(0)?.url)
+            }
         }
 
         holder.trackName.text = "${if(item.name!!.length > 17){"${item.name!!.subSequence(0,16)}..."}else{item.name}}"
@@ -60,7 +63,7 @@ class TrackListAdapter:RecyclerView.Adapter<TrackListAdapter.ViewHolder>(),Downl
         holder.duration.text = "${item.duration_ms/1000/60} minutes, ${(item.duration_ms/1000)%60} sec"
         holder.downloadBtn.setOnClickListener{
             sharedViewModel.uiScope.launch {
-                downloadTrack(mainFragment,"Tracks",null,sharedViewModel.ytDownloader,sharedViewModel.downloadManager,"${item.name} ${item.artists?.get(0)!!.name?:""}")
+                downloadTrack(mainFragment,"Tracks",null,sharedViewModel.ytDownloader,"${item.name} ${item.artists?.get(0)!!.name?:""}",track = item,index = 0)
             }
         }
 

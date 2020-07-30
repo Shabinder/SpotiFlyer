@@ -17,8 +17,12 @@
 
 package com.shabinder.spotiflyer.models
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 data class Token(
     var access_token:String,
     var token_type:String,
     var expires_in:Int
-)
+): Parcelable

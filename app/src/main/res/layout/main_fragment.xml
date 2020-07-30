@@ -134,7 +134,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraint_layout"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:visibility="visible">
 
             <TextView
@@ -240,23 +240,95 @@
                 app:layout_constraintStart_toStartOf="@+id/btn_donate"
                 app:layout_constraintTop_toBottomOf="@+id/usage" />
 
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_github"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_marginTop="130dp"
+                android:background="@drawable/text_background"
+                android:drawableStart="@drawable/ic_github"
+                android:drawablePadding="5dp"
+                android:fontFamily="@font/capriola"
+                android:gravity="end|center_vertical"
+                android:padding="5dp"
+                android:text=" Github "
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_donate" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/developer_insta"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_marginTop="130dp"
+                android:background="@drawable/text_background"
+                android:drawableEnd="@drawable/ic_instagram"
+                android:drawablePadding="5dp"
+                android:fontFamily="@font/capriola"
+                android:gravity="end|center_vertical"
+                android:padding="5dp"
+                android:text=" Follow Me "
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_donate" />
+
+            <TextView
+                android:id="@+id/tagLine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="80dp"
+                android:layout_marginEnd="8dp"
+                android:fontFamily="@font/raleway_semibold"
+                android:text="Made with "
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toStartOf="@id/heart"
+                app:layout_constraintTop_toBottomOf="@+id/developer_insta" />
+
+            <ImageView
+                android:id="@+id/heart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="80dp"
+                android:contentDescription="Made With Love In India"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/developer_insta"
+                app:srcCompat="@drawable/ic_heart" />
+
+            <TextView
+                android:id="@+id/tagLine2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="80dp"
+                android:fontFamily="@font/raleway_semibold"
+                android:text=" in India"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="22sp"
+                app:layout_constraintStart_toEndOf="@id/heart"
+                app:layout_constraintTop_toBottomOf="@+id/developer_insta" />
+
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/track_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingTop="26dp"
-            android:visibility="gone"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/open_spotify" />
-
-
+        android:id="@+id/track_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="26dp"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/open_spotify" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

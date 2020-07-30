@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModel
 import com.shabinder.spotiflyer.models.Track
 
 class MainViewModel: ViewModel() {
-    var searchLink:String = ""
+    var searchLink: String = ""
     var trackList = mutableListOf<Track>()
-    var coverUrl:String = ""
+    var coverUrl: String = ""
 }

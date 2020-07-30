@@ -17,6 +17,10 @@
 
 package com.shabinder.spotiflyer.models
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 data class Track(
     var artists: List<Artist?>? = null,
     var available_markets: List<String?>? = null,
@@ -35,4 +39,4 @@ data class Track(
     var uri: String? = null,
     var album: Album? = null,
     var external_ids: Map<String?, String?>? = null,
-    var popularity: Int? = null)
+    var popularity: Int? = null):Parcelable

@@ -18,23 +18,26 @@
 package com.shabinder.spotiflyer
 
 import android.Manifest
-import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import com.github.javiersantos.appupdater.AppUpdater
+import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.databinding.MainActivityBinding
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.utils.SpotifyService
 import com.shabinder.spotiflyer.utils.SpotifyServiceToken
 import com.shabinder.spotiflyer.utils.YoutubeInterface
+import com.shabinder.spotiflyer.utils.createDirectory
 import com.shreyaspatil.EasyUpiPayment.EasyUpiPayment
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -48,12 +51,11 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 
 @Suppress("DEPRECATION")
-class MainActivity : AppCompatActivity() ,DownloadHelper{
+class MainActivity : AppCompatActivity(){
     private lateinit var binding: MainActivityBinding
     private var ytDownloader : YoutubeDownloader? = null
     private var spotifyService : SpotifyService? = null
     private var spotifyServiceToken : SpotifyServiceToken? = null
-    private var downloadManager : DownloadManager? = null
 //    private val redirectUri = "spotiflyer://callback"
     private val clientId:String = "694d8bf4f6ec420fa66ea7fb4c68f89d"
     private val clientSecret:String = "02ca2d4021a7452dae2328b47a6e8fe8"
@@ -63,20 +65,21 @@ class MainActivity : AppCompatActivity() ,DownloadHelper{
     private var token :String =""
     private lateinit var sharedViewModel: SharedViewModel
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.main_activity)
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         sharedPref = this.getPreferences(Context.MODE_PRIVATE)
 
-//        if(sharedPref?.contains("token")!! && (sharedPref?.getLong("time",System.currentTimeMillis()/1000/60/60)!! < (System.currentTimeMillis()/1000/60/60)) ){
-//            val savedToken = sharedPref?.getString("token","error")!!
-//            sharedViewModel.accessToken.value = savedToken
-//            Log.i("SharedPrefs Token:",savedToken)
-//            token = savedToken
-//
-//            implementSpotifyService(savedToken)
-//        }else{authenticateSpotify()}
+/*        if(sharedPref?.contains("token")!! && (sharedPref?.getLong("time",System.currentTimeMillis()/1000/60/60)!! < (System.currentTimeMillis()/1000/60/60)) ){
+            val savedToken = sharedPref?.getString("token","error")!!
+            sharedViewModel.accessToken.value = savedToken
+            Log.i("SharedPrefs Token:",savedToken)
+            token = savedToken
+
+            implementSpotifyService(savedToken)
+        }else{authenticateSpotify()}*/
 
         if(sharedViewModel.spotifyService == null){
             authenticateSpotify()
@@ -85,6 +88,12 @@ class MainActivity : AppCompatActivity() ,DownloadHelper{
         }
 
         requestPermission()
+        checkIfLatestVersion()
+        createDir()
+        setUpi()
+        isConnected = isOnline()
+        sharedViewModel.isConnected.value = isConnected
+        Log.i("Connection Status",isConnected.toString())
 
         //Object to download From Youtube {"https://github.com/sealedtx/java-youtube-downloader"}
         ytDownloader = YoutubeDownloader()
@@ -92,31 +101,8 @@ class MainActivity : AppCompatActivity() ,DownloadHelper{
         //Initialing Communication with Youtube
         YoutubeInterface.youtubeConnector()
 
-        //Getting System Download Manager
-        downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        sharedViewModel.downloadManager = downloadManager
-
-        isConnected = isOnline()
-        sharedViewModel.isConnected.value = isConnected
-
-        Log.i("Connection Status",isConnected.toString())
-
-
-         easyUpiPayment = EasyUpiPayment.Builder()
-            .with(this)
-            .setPayeeVpa("technoshab@paytm")
-            .setPayeeName("Shabinder Singh")
-            .setTransactionId("UNIQUE_TRANSACTION_ID")
-            .setTransactionRefId("UNIQUE_TRANSACTION_REF_ID")
-            .setDescription("Thanks for donating")
-            .setAmount("39.00")
-            .build()
-
-        sharedViewModel.easyUpiPayment = easyUpiPayment
-
         handleIntentFromExternalActivity()
     }
-
 
     /**
      * Adding my own new Spotify Web Api Requests!
@@ -245,6 +231,48 @@ class MainActivity : AppCompatActivity() ,DownloadHelper{
             super.onRestoreInstanceState(savedInstanceState)
         }
     }
+
+    private fun setUpi() {
+        easyUpiPayment = EasyUpiPayment.Builder()
+            .with(this)
+            .setPayeeVpa("technoshab@paytm")
+            .setPayeeName("Shabinder Singh")
+            .setTransactionId("UNIQUE_TRANSACTION_ID")
+            .setTransactionRefId("UNIQUE_TRANSACTION_REF_ID")
+            .setDescription("Thanks for donating")
+            .setAmount("39.00")
+            .build()
+
+        sharedViewModel.easyUpiPayment = easyUpiPayment
+
+    }
+
+    private fun createDir() {
+        createDirectory(DownloadHelper.defaultDir)
+        createDirectory(DownloadHelper.defaultDir+".Images/")
+        createDirectory(DownloadHelper.defaultDir+"Tracks/")
+        createDirectory(DownloadHelper.defaultDir+"Albums/")
+        createDirectory(DownloadHelper.defaultDir+"Playlists/")
+    }
+
+    private fun checkIfLatestVersion() {
+        val appUpdater = AppUpdater(this)
+            .showAppUpdated(false)//true:Show App is Update Dialog
+            .setUpdateFrom(UpdateFrom.XML)
+            .setUpdateXML("https://raw.githubusercontent.com/Shabinder/SpotiFlyer/master/app/src/main/res/xml/app_update.xml")
+            .setCancelable(false)
+            .setButtonUpdateClickListener { _, _ ->
+                val uri: Uri =
+                    Uri.parse("http://github.com/Shabinder/SpotiFlyer/releases")
+                val intent = Intent(Intent.ACTION_VIEW, uri)
+                startActivity(intent)
+            }
+            .setButtonDismissClickListener { dialog, _ ->
+                dialog.dismiss()
+            }
+        appUpdater.start()
+    }
+
 
     /*
     private fun authenticateSpotify() {

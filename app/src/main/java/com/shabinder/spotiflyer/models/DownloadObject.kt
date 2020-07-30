@@ -17,9 +17,12 @@
 
 package com.shabinder.spotiflyer.models
 
-import kotlinx.serialization.Serializable
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
-@Serializable
-data class Followers(
-    var href: String? = null,
-    var total: Int? = null):java.io.Serializable
+@Parcelize
+data class DownloadObject(
+    var track: Track,
+    var url:String,
+    var outputDir:String
+):Parcelable

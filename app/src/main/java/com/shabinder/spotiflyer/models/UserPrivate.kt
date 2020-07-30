@@ -17,6 +17,10 @@
 
 package com.shabinder.spotiflyer.models
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 data class UserPrivate(
     val country:String,
     var display_name: String,
@@ -28,4 +32,4 @@ data class UserPrivate(
     var images: List<Image?>? = null,
     var product:String,
     var type: String? = null,
-    var uri: String? = null)
+    var uri: String? = null): Parcelable

@@ -16,6 +16,11 @@
  */
 
 package com.shabinder.spotiflyer.models
+
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 data class Copyright(
     var text: String? = null,
-    var type: String? = null)
+    var type: String? = null):Parcelable

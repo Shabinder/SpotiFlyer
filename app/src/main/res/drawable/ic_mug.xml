@@ -1,5 +1,22 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="42dp"
-    android:height="42dp" android:viewportWidth="512" android:viewportHeight="512">
+<!--
+  ~ Copyright (C)  2020  Shabinder Singh
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="40dp"
+    android:height="40dp" android:viewportWidth="512" android:viewportHeight="512">
     <path android:fillColor="#ff5d7d" android:fillType="evenOdd" android:pathData="m258.229,255.863c-11.191,-11.155 -29.503,-11.155 -40.693,0 -4.486,4.471 -11.053,4.007 -15.072,0 -11.191,-11.155 -29.503,-11.155 -40.693,0 -30.403,30.307 28.128,83.271 48.229,88.64 20.102,-5.369 78.632,-58.333 48.229,-88.64z"/>
     <path android:fillColor="#fff" android:fillType="evenOdd" android:pathData="m258.229,255.863c30.403,30.307 -28.128,83.271 -48.23,88.64 -20.102,-5.369 -78.633,-58.334 -48.229,-88.64 11.191,-11.155 29.502,-11.155 40.693,0 4.02,4.007 10.587,4.471 15.072,0 11.191,-11.155 29.503,-11.155 40.694,0zM10,176c0,94.167 60,173.334 80,260h240c3.112,-13.487 7.193,-26.792 11.866,-40 4.742,-13.403 10.093,-26.707 15.66,-40 16.471,-39.33 34.83,-78.563 44.877,-119.994 3.154,-13.009 5.489,-26.235 6.689,-39.749 0.593,-6.679 0.908,-13.429 0.908,-20.257 0,-11 -9,-20 -20,-20 -120,0 -240,0 -360.001,0 -10.999,0 -19.999,9 -19.999,20z"/>
     <path android:fillColor="#ccf5fc" android:fillType="evenOdd" android:pathData="m402,356h-44.474c-5.567,13.293 -10.918,26.597 -15.66,40h60.134c55,0 99.999,-45 99.999,-100 0,-52.616 -41.185,-96.074 -92.908,-99.743 -1.2,13.514 -3.534,26.74 -6.69,39.749 32.818,0.218 59.599,27.129 59.599,59.994 0,33 -27,60 -60,60z"/>

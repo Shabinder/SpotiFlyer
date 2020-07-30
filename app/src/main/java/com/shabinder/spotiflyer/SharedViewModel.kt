@@ -17,9 +17,9 @@
 
 package com.shabinder.spotiflyer
 
-import android.app.DownloadManager
 import android.content.Context
 import android.content.res.Resources
+import android.os.Environment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.kiulian.downloader.YoutubeDownloader
@@ -32,15 +32,16 @@ import com.shreyaspatil.EasyUpiPayment.EasyUpiPayment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import java.io.File
 
 class SharedViewModel : ViewModel() {
     var intentString = ""
     var accessToken = MutableLiveData<String>().apply { value = "" }
     var spotifyService : SpotifyService? = null
     var ytDownloader : YoutubeDownloader? = null
-    var downloadManager : DownloadManager? = null
     var isConnected = MutableLiveData<Boolean>().apply { value = false }
     var easyUpiPayment: EasyUpiPayment? = null
+    val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator + ".Images" + File.separator
 
 
     private var viewModelJob = Job()
@@ -64,13 +65,12 @@ class SharedViewModel : ViewModel() {
     }
 
      fun showAlertDialog(resources:Resources,context: Context){
-        val dialog = MaterialAlertDialogBuilder(context,R.style.AlertDialogTheme)
+        MaterialAlertDialogBuilder(context,R.style.AlertDialogTheme)
             .setTitle(resources.getString(R.string.title))
             .setMessage(resources.getString(R.string.supporting_text))
             .setPositiveButton(resources.getString(R.string.cancel)) { _, _ ->
                 // Respond to neutral button press
             }
-            .setBackground(resources.getDrawable(R.drawable.gradient))
             .show()
     }
 }

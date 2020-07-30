@@ -17,9 +17,15 @@
 
 package com.shabinder.spotiflyer.models
 
-import kotlinx.serialization.Serializable
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
-@Serializable
-data class Followers(
+@Parcelize
+data class PagingObjectPlaylistTrack(
     var href: String? = null,
-    var total: Int? = null):java.io.Serializable
+    var items: List<PlaylistTrack>? = null,
+    var limit: Int = 0,
+    var next: String? = null,
+    var offset: Int = 0,
+    var previous: String? = null,
+    var total: Int = 0): Parcelable

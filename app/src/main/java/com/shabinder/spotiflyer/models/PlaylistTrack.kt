@@ -17,8 +17,12 @@
 
 package com.shabinder.spotiflyer.models
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 data class PlaylistTrack(
     var added_at: String? = null,
     var added_by: UserPublic? = null,
     var track: Track? = null,
-    var is_local: Boolean? = null)
+    var is_local: Boolean? = null): Parcelable

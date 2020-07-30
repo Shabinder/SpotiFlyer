@@ -26,9 +26,12 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-<!--    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!--    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />-->
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -48,19 +51,20 @@
         <activity android:name="com.shabinder.spotiflyer.splash.SplashScreen"
             android:label="@string/app_name"
             android:theme="@style/Theme.Transparent">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
+       <!-- <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
+-->
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <service android:name=".worker.ForegroundService"/>
 
     </application>
 

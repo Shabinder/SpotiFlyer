@@ -17,7 +17,11 @@
 
 package com.shabinder.spotiflyer.models
 
+import android.os.Parcelable
 import com.squareup.moshi.Json
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 data class Playlist(
     @Json(name = "collaborative")var is_collaborative: Boolean? = null,
     var description: String? = null,
@@ -30,6 +34,6 @@ data class Playlist(
     var owner: UserPublic? = null,
     @Json(name = "public")var is_public: Boolean? = null,
     var snapshot_id: String? = null,
-    var tracks: PagingObject<PlaylistTrack?>? = null,
+    var tracks: PagingObjectPlaylistTrack? = null,
     var type: String? = null,
-    var uri: String? = null)
+    var uri: String? = null): Parcelable

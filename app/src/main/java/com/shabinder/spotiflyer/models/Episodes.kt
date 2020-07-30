@@ -17,6 +17,10 @@
 
 package com.shabinder.spotiflyer.models
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
 data class Episodes(
     var audio_preview_url:String?,
     var description:String?,
@@ -35,4 +39,4 @@ data class Episodes(
     var release_date_precision:String?,
     var type:String?,
     var uri:String
-)
+): Parcelable

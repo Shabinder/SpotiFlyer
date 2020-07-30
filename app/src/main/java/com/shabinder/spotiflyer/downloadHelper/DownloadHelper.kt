@@ -17,22 +17,28 @@
 
 package com.shabinder.spotiflyer.downloadHelper
 
-import android.app.DownloadManager
-import android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
-import android.net.Uri
+import android.content.Context
+import android.content.Intent
 import android.os.Environment
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.shabinder.spotiflyer.fragments.MainFragment
+import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.utils.YoutubeInterface
+import com.shabinder.spotiflyer.worker.ForegroundService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-interface DownloadHelper {
+object DownloadHelper {
+
+    var context : Context? = null
+    val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
+    private var downloadList = arrayListOf<DownloadObject>()
 
     /**
      * Function To Download All Tracks Available in a List
@@ -40,111 +46,106 @@ interface DownloadHelper {
     suspend fun downloadAllTracks(
         type:String,
         subFolder: String?,
-        trackList: List<Track>, ytDownloader: YoutubeDownloader?, downloadManager: DownloadManager?) {
-        trackList.forEach { downloadTrack(null,type,subFolder,ytDownloader,downloadManager,"${it.name} ${it.artists?.get(0)?.name ?:""}") }
+        trackList: List<Track>, ytDownloader: YoutubeDownloader?) {
+        var size = trackList.size
+        trackList.forEach {
+            size--
+            if(size == 0){
+                downloadTrack(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it ,0  )
+            }else{
+                downloadTrack(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it   )
+            }
+        }
     }
-
 
     suspend fun downloadTrack(
         mainFragment: MainFragment?,
         type:String,
         subFolder:String?,
         ytDownloader: YoutubeDownloader?,
-        downloadManager: DownloadManager?,
-        searchQuery: String
+        searchQuery: String,
+        track: Track,
+        index: Int? = null
     ) {
         withContext(Dispatchers.IO) {
-            val data = YoutubeInterface.search(searchQuery)?.get(0)
-            if (data == null) {
-                Log.i("DownloadHelper", "Youtube Request Failed!")
-            } else {
+            val data: YoutubeInterface.VideoItem = YoutubeInterface.search(searchQuery)?.get(0)!!
 
-                val video = ytDownloader?.getVideo(data.id)
-                //Fetching a Video Object.
-                val details = video?.details()
-                try{
-                    val format: Format =
-                        video?.findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
-                    val audioUrl = format.url()
-                    Log.i("DHelper Link Found", audioUrl)
-                    if (audioUrl != null) {
-                        downloadFile(audioUrl, downloadManager, details!!.title(),subFolder,type)
-                        withContext(Dispatchers.Main){
-                            mainFragment?.showToast("Download Started")
-                        }
-                    } else {
-                        Log.i("YT audio url is null", format.toString())
+            //Fetching a Video Object.
+            try {
+                val audioUrl = getDownloadLink(AudioQuality.medium, ytDownloader, data)
+                withContext(Dispatchers.Main) {
+                    mainFragment?.showToast("Starting Download")
+                }
+                downloadFile(audioUrl, searchQuery, subFolder, type, track, index,mainFragment)
+            } catch (e: java.lang.IndexOutOfBoundsException) {
+                try {
+                    val audioUrl = getDownloadLink(AudioQuality.high, ytDownloader, data)
+                    withContext(Dispatchers.Main) {
+                        mainFragment?.showToast("Starting Download")
                     }
-                }catch (e:ArrayIndexOutOfBoundsException){
-                    try{
-                        val format: Format =
-                            video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
-                        val audioUrl = format.url()
-                        Log.i("DHelper Link Found", audioUrl)
-                        if (audioUrl != null) {
-                            downloadFile(audioUrl, downloadManager, details!!.title(),subFolder,type)
-                            withContext(Dispatchers.Main){
-                                mainFragment?.showToast("Download Started")
-                            }
-                        } else {
-                            Log.i("YT audio url is null", format.toString())
+                    downloadFile(audioUrl, searchQuery, subFolder, type, track, index,mainFragment)
+                } catch (e: java.lang.IndexOutOfBoundsException) {
+                    try {
+                        val audioUrl = getDownloadLink(AudioQuality.low, ytDownloader, data)
+                        withContext(Dispatchers.Main) {
+                            mainFragment?.showToast("Starting Download")
                         }
-                    }catch (e:ArrayIndexOutOfBoundsException){
-                        try{
-                            val format: Format =
-                                video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
-                            val audioUrl = format.url()
-                            Log.i("DHelper Link Found", audioUrl)
-                            if (audioUrl != null) {
-                                downloadFile(audioUrl, downloadManager, details!!.title(),subFolder,type)
-                                withContext(Dispatchers.Main){
-                                    mainFragment?.showToast("Download Started")
-                                }
-                            } else {
-                                Log.i("YT audio url is null", format.toString())
-                            }
-                        }catch(e:ArrayIndexOutOfBoundsException){
-                            Log.i("Catch",e.toString())
-                        }
+                        downloadFile(audioUrl, searchQuery, subFolder, type, track, index,mainFragment)
+                    } catch (e: java.lang.IndexOutOfBoundsException) {
+                        Log.i("Catch", e.toString())
                     }
                 }
-
-
             }
+
         }
     }
 
 
-    /**
-     * Downloading Using Android Download Manager
-     * */
-    suspend fun downloadFile(url: String, downloadManager: DownloadManager?, title: String,subFolder: String?,type: String) {
+    private fun  getDownloadLink(quality: AudioQuality ,ytDownloader: YoutubeDownloader?,data:YoutubeInterface.VideoItem): String {
+        val video = ytDownloader?.getVideo(data.id)
+        val format: Format =
+            video?.findAudioWithQuality(quality)?.get(0) as Format
+        Log.i("Format", video.findAudioWithQuality(AudioQuality.medium)?.get(0)!!.mimeType())
+        val audioUrl:String = format.url()
+        Log.i("DHelper Link Found", audioUrl)
+        return audioUrl
+    }
+
+
+    private suspend fun downloadFile(url: String, title: String, subFolder: String?, type: String, track:Track, index:Int? = null,mainFragment: MainFragment?) {
         withContext(Dispatchers.IO) {
-            val audioUri = Uri.parse(url)
-            val outputDir:String =
-                File.separator + "SpotiFlyer" + File.separator  + type + File.separator + (if(subFolder == null){""}else{subFolder  + File.separator}) + "${removeIllegalChars(title)}.mp3"
+            val outputFile:String = Environment.getExternalStorageDirectory().toString() + File.separator +
+                    DownloadHelper.defaultDir + removeIllegalChars(type) + File.separator + (if(subFolder == null){""}else{ removeIllegalChars(subFolder)  + File.separator} + removeIllegalChars(track.name!!)+".m4a")
 
-            val request = DownloadManager.Request(audioUri)
-                .setAllowedNetworkTypes(
-                    DownloadManager.Request.NETWORK_WIFI or
-                            DownloadManager.Request.NETWORK_MOBILE
+            if(!File(removeIllegalChars(outputFile.substringBeforeLast('.')) +".mp3").exists()){
+                val downloadObject = DownloadObject(
+                    track = track,
+                    url = url,
+                    outputDir = outputFile
                 )
-                .setAllowedOverRoaming(false)
-                .setTitle(title)
-                .setDescription("Spotify Downloader Working Up here...")
-                .setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC, outputDir)
-                .setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            downloadManager?.enqueue(request)
-            Log.i("DownloadManager", "Download Request Sent")
-
+                Log.i("DH",outputFile)
+                if(index==null){
+                    downloadList.add(downloadObject)
+                }else{
+                    downloadList.add(downloadObject)
+                    startService(context!!, downloadList)
+                    downloadList = arrayListOf()
+                }
+            }else{withContext(Dispatchers.Main){mainFragment?.showToast("${track.name} is already Downloaded")}}
         }
     }
 
+
+    private fun startService(context:Context,list: ArrayList<DownloadObject>) {
+        val serviceIntent = Intent(context, ForegroundService::class.java)
+        serviceIntent.putParcelableArrayListExtra("list",list)
+        ContextCompat.startForegroundService(context, serviceIntent)
+    }
 
     /**
      * Removing Illegal Chars from File Name
      * **/
-    fun removeIllegalChars(fileName: String): String? {
+    private fun removeIllegalChars(fileName: String): String? {
         val illegalCharArray = charArrayOf(
             '/',
             '\n',
@@ -161,12 +162,14 @@ interface DownloadHelper {
             '|',
             '\"',
             '.',
-            ':'
+            ':',
+            '-'
         )
         var name = fileName
         for (c in illegalCharArray) {
             name = fileName.replace(c, '_')
         }
+        name = name.replace("\\s".toRegex(), "_")
         return name
     }
 }
