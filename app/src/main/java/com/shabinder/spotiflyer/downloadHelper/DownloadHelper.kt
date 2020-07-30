@@ -59,7 +59,7 @@ object DownloadHelper {
     }
 
     suspend fun downloadTrack(
-        mainFragment: MainFragment?,
+        mainFragment: MainFragment? = null,
         type:String,
         subFolder:String?,
         ytDownloader: YoutubeDownloader?,
@@ -112,7 +112,7 @@ object DownloadHelper {
     }
 
 
-    private suspend fun downloadFile(url: String, title: String, subFolder: String?, type: String, track:Track, index:Int? = null,mainFragment: MainFragment?) {
+    private suspend fun downloadFile(url: String, title: String, subFolder: String?, type: String, track:Track, index:Int? = null,mainFragment: MainFragment? = null) {
         withContext(Dispatchers.IO) {
             val outputFile:String = Environment.getExternalStorageDirectory().toString() + File.separator +
                     DownloadHelper.defaultDir + removeIllegalChars(type) + File.separator + (if(subFolder == null){""}else{ removeIllegalChars(subFolder)  + File.separator} + removeIllegalChars(track.name!!)+".m4a")
@@ -131,7 +131,10 @@ object DownloadHelper {
                     startService(context!!, downloadList)
                     downloadList = arrayListOf()
                 }
-            }else{withContext(Dispatchers.Main){mainFragment?.showToast("${track.name} is already Downloaded")}}
+            }else{withContext(Dispatchers.Main){
+                mainFragment?.showToast("${track.name} is already Downloaded")
+                }
+            }
         }
     }
 

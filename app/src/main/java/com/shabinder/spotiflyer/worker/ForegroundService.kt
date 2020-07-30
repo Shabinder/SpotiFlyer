@@ -17,14 +17,14 @@
 
 package com.shabinder.spotiflyer.worker
 
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Environment
 import android.os.IBinder
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.arthenica.mobileffmpeg.Config
 import com.arthenica.mobileffmpeg.Config.RETURN_CODE_CANCEL
@@ -47,7 +47,7 @@ import java.io.FileInputStream
 
 class ForegroundService : Service(){
     private val tag = "Foreground Service"
-    private val channelId = "SpotiFlyer: Download Service"
+    private val channelId = "ForegroundDownloaderService"
     private var total = 0 //Total Downloads Requested
     private var converted = 0//Total Files Converted
     private var fetch:Fetch? = null
@@ -86,8 +86,39 @@ class ForegroundService : Service(){
         Fetch.Impl.setDefaultInstanceConfiguration(fetchConfiguration)
         fetch = Fetch.getDefaultInstance()
         fetch?.addListener(fetchListener)
+        startForeground()
+    }
 
-        startForeground(1, notification)
+    private fun startForeground() {
+        val channelId =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                createNotificationChannel(channelId, "Downloader Service")
+            } else {
+                // If earlier version channel ID is not used
+                // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
+                ""
+            }
+
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setOngoing(true)
+            .setContentTitle("SpotiFlyer: Downloading Your Music")
+            .setSubText("Speed: $speed KB/s ")
+            .setNotificationSilent()
+            .setOnlyAlertOnce(true)
+            .setContentText("Total: $total  Downloaded: ${total - requestMap.keys.size}  Converted:$converted ")
+            .setSmallIcon(R.drawable.down_arrowbw)
+            .build()
+        startForeground(101, notification)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel(channelId: String, channelName: String): String{
+        val chan = NotificationChannel(channelId,
+            channelName, NotificationManager.IMPORTANCE_DEFAULT)
+        chan.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        service.createNotificationChannel(chan)
+        return channelId
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -280,7 +311,7 @@ class ForegroundService : Service(){
             .setOnlyAlertOnce(true)
             .setSmallIcon(R.drawable.down_arrowbw)
             .build()
-        mNotificationManager.notify(1, notification)
+        mNotificationManager.notify(101, notification)
     }
 
     private fun setId3v1Tags(mp3File: Mp3File, track: Track): Mp3File {
