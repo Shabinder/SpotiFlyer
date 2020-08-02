@@ -10,11 +10,12 @@
 
 
 ## ScreenShots 
+Credits:Library ScreenShot taken on PowerAmp.
 <table style="width:100%">
   <tr>
     <th>1. Home Screen</th>
     <th>2. PlayList Screen</th> 
-    <th>3. Library Screen1</th>
+    <th>3. Library Screen</th>
   </tr>
   <tr>
     <td><img src="ScreenShots/HomeScreen.png"/></td>
@@ -22,6 +23,7 @@
     <td><img src="ScreenShots/LibraryScreen2.jpg"/></td>
   </tr>
 </table>
+
 
 SpotiFlyer is an **Android App**(Written in **Kotlin**), which **aims** to work as:
   - **Downloader** For Spotify:Albums, Tracks and Playlists and Even Direct Youtube Videos. 
