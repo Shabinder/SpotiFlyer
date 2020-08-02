@@ -17,28 +17,44 @@
 
 package com.shabinder.spotiflyer.downloadHelper
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Environment
 import android.util.Log
+import android.view.View
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.webkit.ValueCallback
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
+import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.fragments.MainFragment
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.Track
-import com.shabinder.spotiflyer.utils.YoutubeInterface
 import com.shabinder.spotiflyer.worker.ForegroundService
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
 object DownloadHelper {
-
+    var webView:WebView? = null
     var context : Context? = null
+    var statusBar:TextView? = null
     val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
     private var downloadList = arrayListOf<DownloadObject>()
+    var sharedViewModel:SharedViewModel? = null
+    private var isBrowserLoading = false
+    private var total = 0
+    private var Processed = 0
+    var youtubeList = mutableListOf<YoutubeRequest>()
 
     /**
      * Function To Download All Tracks Available in a List
@@ -47,108 +63,179 @@ object DownloadHelper {
         type:String,
         subFolder: String?,
         trackList: List<Track>, ytDownloader: YoutubeDownloader?) {
-        var size = trackList.size
-        trackList.forEach {
-            size--
-            if(size == 0){
-                downloadTrack(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it ,0  )
-            }else{
-                downloadTrack(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it   )
-            }
-        }
-    }
-
-    suspend fun downloadTrack(
-        mainFragment: MainFragment? = null,
-        type:String,
-        subFolder:String?,
-        ytDownloader: YoutubeDownloader?,
-        searchQuery: String,
-        track: Track,
-        index: Int? = null
-    ) {
-        withContext(Dispatchers.IO) {
-            val data: YoutubeInterface.VideoItem = YoutubeInterface.search(searchQuery)?.get(0)!!
-
-            //Fetching a Video Object.
-            try {
-                val audioUrl = getDownloadLink(AudioQuality.medium, ytDownloader, data)
-                withContext(Dispatchers.Main) {
-                    mainFragment?.showToast("Starting Download")
-                }
-                downloadFile(audioUrl, searchQuery, subFolder, type, track, index,mainFragment)
-            } catch (e: java.lang.IndexOutOfBoundsException) {
-                try {
-                    val audioUrl = getDownloadLink(AudioQuality.high, ytDownloader, data)
-                    withContext(Dispatchers.Main) {
-                        mainFragment?.showToast("Starting Download")
-                    }
-                    downloadFile(audioUrl, searchQuery, subFolder, type, track, index,mainFragment)
-                } catch (e: java.lang.IndexOutOfBoundsException) {
-                    try {
-                        val audioUrl = getDownloadLink(AudioQuality.low, ytDownloader, data)
-                        withContext(Dispatchers.Main) {
-                            mainFragment?.showToast("Starting Download")
+        withContext(Dispatchers.Main){
+            var size = trackList.size
+            total += size
+            animateStatusBar()
+            trackList.forEach {
+                size--
+                val outputFile:String = Environment.getExternalStorageDirectory().toString() + File.separator +
+                        defaultDir + removeIllegalChars(type) + File.separator + (if(subFolder == null){""}else{ removeIllegalChars(subFolder)  + File.separator} + removeIllegalChars(it.name!!)+".mp3")
+                if(File(outputFile).exists()){//Download Already Present!!
+                    Processed++
+                    updateStatusBar()
+                }else{
+                    if(isBrowserLoading){
+                        if(size == 0){
+                            youtubeList.add(YoutubeRequest(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it ,0  ))
+                        }else{
+                            youtubeList.add(YoutubeRequest(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it))
                         }
-                        downloadFile(audioUrl, searchQuery, subFolder, type, track, index,mainFragment)
-                    } catch (e: java.lang.IndexOutOfBoundsException) {
-                        Log.i("Catch", e.toString())
+                    }else{
+                        if(size == 0){
+                            getYTLink(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it ,0  )
+                        }else{
+                            getYTLink(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it)
+                        }
                     }
                 }
             }
-
         }
     }
 
 
-    private fun  getDownloadLink(quality: AudioQuality ,ytDownloader: YoutubeDownloader?,data:YoutubeInterface.VideoItem): String {
-        val video = ytDownloader?.getVideo(data.id)
-        val format: Format =
-            video?.findAudioWithQuality(quality)?.get(0) as Format
-        Log.i("Format", video.findAudioWithQuality(AudioQuality.medium)?.get(0)!!.mimeType())
-        val audioUrl:String = format.url()
-        Log.i("DHelper Link Found", audioUrl)
-        return audioUrl
+
+    //TODO CleanUp here and there!!
+    @SuppressLint("SetJavaScriptEnabled")
+    suspend fun getYTLink(mainFragment: MainFragment? = null,
+                  type:String,
+                  subFolder:String?,
+                  ytDownloader: YoutubeDownloader?,
+                  searchQuery: String,
+                  track: Track,
+                  index: Int? = null){
+        val searchText = searchQuery.replace("\\s".toRegex(), "+")
+        val url = "https://www.youtube.com/results?sp=EgIQAQ%253D%253D&q=$searchText"
+        Log.i("DH YT LINK ",url)
+        applyWebViewSettings(webView!!)
+        withContext(Dispatchers.Main){
+            isBrowserLoading = true
+            webView!!.loadUrl(url)
+            webView!!.webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    super.onPageFinished(view, url)
+                    view?.evaluateJavascript(
+                        "document.getElementsByClassName(\"yt-simple-endpoint style-scope ytd-video-renderer\")[0].href"
+                        ,object :ValueCallback<String>{
+                            override fun onReceiveValue(value: String?) {
+                                Log.i("YT-id",value.toString().replace("\"",""))
+                                val id = value!!.substringAfterLast("=", "error").replace("\"","")
+                                Log.i("YT-id",id)
+                                if(id !="error"){//Link extracting error
+                                    mainFragment?.showToast("Starting Download")
+                                    Processed++
+                                    updateStatusBar()
+                                    downloadFile(subFolder, type, track, index,ytDownloader,id)
+                                }
+                                if(youtubeList.isNotEmpty()){
+                                    val request = youtubeList[0]
+                                    sharedViewModel!!.uiScope.launch {
+                                        getYTLink(request.mainFragment,request.type,request.subFolder,request.ytDownloader,request.searchQuery,request.track,request.index)
+                                    }
+                                    youtubeList.remove(request)
+                                    if(youtubeList.size == 0){//list processing completed , webView is free again!
+                                        isBrowserLoading = false
+                                    }
+                                }
+                            }
+                    }   )
+                }
+            }
+        }
+
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    fun applyWebViewSettings(webView: WebView) {
+        val desktopUserAgent =
+            "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0"
+        val mobileUserAgent =
+            "Mozilla/5.0 (Linux; U; Android 4.4; en-us; Nexus 4 Build/JOP24G) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+
+        //Choose Mobile/Desktop client.
+        webView.settings.userAgentString = desktopUserAgent
+        webView.settings.loadWithOverviewMode = true
+        webView.settings.loadWithOverviewMode = true
+        webView.settings.builtInZoomControls = true
+        webView.settings.setSupportZoom(true)
+        webView.isScrollbarFadingEnabled = false
+        webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
+        webView.settings.displayZoomControls = false
+        webView.settings.useWideViewPort = true
+        webView.settings.javaScriptEnabled = true
+        webView.settings.loadsImagesAutomatically = false
+        webView.settings.blockNetworkImage = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            webView.settings.safeBrowsingEnabled = true
+        }
+    }
+
+    private fun updateStatusBar() {
+        statusBar!!.visibility = View.VISIBLE
+        statusBar?.text = "Total: $total  Processed: $Processed"
     }
 
 
-    private suspend fun downloadFile(url: String, title: String, subFolder: String?, type: String, track:Track, index:Int? = null,mainFragment: MainFragment? = null) {
-        withContext(Dispatchers.IO) {
-            val outputFile:String = Environment.getExternalStorageDirectory().toString() + File.separator +
-                    DownloadHelper.defaultDir + removeIllegalChars(type) + File.separator + (if(subFolder == null){""}else{ removeIllegalChars(subFolder)  + File.separator} + removeIllegalChars(track.name!!)+".m4a")
+    fun downloadFile(subFolder: String?, type: String, track:Track, index:Int? = null,ytDownloader: YoutubeDownloader?,id: String) {
+        sharedViewModel!!.uiScope.launch {
+            withContext(Dispatchers.IO) {
+                val video = ytDownloader?.getVideo(id)
+                val format:Format? =try {
+                    video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
+                }catch (e:java.lang.IndexOutOfBoundsException){
+                    try {
+                        video?.findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
+                    }catch (e:java.lang.IndexOutOfBoundsException){
+                        try{
+                            video?.findAudioWithQuality(AudioQuality.low)?.get(0) as Format
+                        }catch (e:java.lang.IndexOutOfBoundsException){
+                            Log.i("YTDownloader",e.toString())
+                            null
+                        }
+                    }
+                }
+                format?.let {
+                    val url:String = format.url()
 
-            if(!File(removeIllegalChars(outputFile.substringBeforeLast('.')) +".mp3").exists()){
-                val downloadObject = DownloadObject(
-                    track = track,
-                    url = url,
-                    outputDir = outputFile
-                )
-                Log.i("DH",outputFile)
-                if(index==null){
+                    Log.i("DHelper Link Found", url)
+
+                    val outputFile:String = Environment.getExternalStorageDirectory().toString() + File.separator +
+                            defaultDir + removeIllegalChars(type) + File.separator + (if(subFolder == null){""}else{ removeIllegalChars(subFolder)  + File.separator} + removeIllegalChars(track.name!!)+".m4a")
+
+                    val downloadObject = DownloadObject(
+                        track = track,
+                        url = url,
+                        outputDir = outputFile
+                    )
+                    Log.i("DH",outputFile)
+                    startService(context!!, downloadObject)
+
+                /*if(index==null){
                     downloadList.add(downloadObject)
                 }else{
                     downloadList.add(downloadObject)
                     startService(context!!, downloadList)
+                    Log.i("DH No of Songs", downloadList.size.toString())
                     downloadList = arrayListOf()
-                }
-            }else{withContext(Dispatchers.Main){
-                mainFragment?.showToast("${track.name} is already Downloaded")
+                }*/
+//                    downloadList.add(downloadObject)
+//                    downloadList = arrayListOf()
                 }
             }
         }
     }
 
 
-    private fun startService(context:Context,list: ArrayList<DownloadObject>) {
+    fun startService(context:Context,obj:DownloadObject? = null ) {
         val serviceIntent = Intent(context, ForegroundService::class.java)
-        serviceIntent.putParcelableArrayListExtra("list",list)
+        serviceIntent.putExtra("object",obj)
         ContextCompat.startForegroundService(context, serviceIntent)
     }
 
     /**
      * Removing Illegal Chars from File Name
      * **/
-    private fun removeIllegalChars(fileName: String): String? {
+    fun removeIllegalChars(fileName: String): String? {
         val illegalCharArray = charArrayOf(
             '/',
             '\n',
@@ -165,7 +252,6 @@ object DownloadHelper {
             '|',
             '\"',
             '.',
-            ':',
             '-',
             '\''
         )
@@ -180,6 +266,29 @@ object DownloadHelper {
         name = name.replace("\\[".toRegex(), "")
         name = name.replace("]".toRegex(), "")
         name = name.replace("\\.".toRegex(), "")
+        name = name.replace("\"".toRegex(), "")
+        name = name.replace("\'".toRegex(), "")
+        name = name.replace(":".toRegex(), "")
+        name = name.replace("\\|".toRegex(), "")
         return name
     }
+
+    private fun animateStatusBar() {
+        val anim: Animation = AlphaAnimation(0.0f, 0.9f)
+        anim.duration = 650 //You can manage the blinking time with this parameter
+        anim.startOffset = 20
+        anim.repeatMode = Animation.REVERSE
+        anim.repeatCount = Animation.INFINITE
+        statusBar?.animation = anim
+    }
+
 }
+data class YoutubeRequest(
+    val mainFragment: MainFragment? = null,
+    val type:String,
+    val subFolder:String?,
+    val ytDownloader: YoutubeDownloader?,
+    val searchQuery: String,
+    val track: Track,
+    val index: Int? = null
+)

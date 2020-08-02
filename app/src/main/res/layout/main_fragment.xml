@@ -68,7 +68,6 @@
                     android:layout_height="48dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
                     android:background="@drawable/text_background_accented"
                     android:ems="10"
                     android:hint="Link From Spotify"
@@ -78,7 +77,6 @@
                     android:textColor="@color/white"
                     android:textColorHint="@color/grey"
                     android:textSize="19sp"
-                    app:layout_constraintBottom_toTopOf="@+id/image_view"
                     app:layout_constraintEnd_toStartOf="@+id/btn_search"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -103,11 +101,11 @@
                     android:id="@+id/image_view"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="3dp"
                     android:contentDescription="Album Cover"
                     android:foreground="@drawable/gradient"
                     android:padding="20dp"
-                    android:layout_marginBottom="3dp"
                     android:paddingBottom="10dp"
                     android:src="@drawable/spotify_download"
                     android:visibility="visible"
@@ -115,7 +113,29 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_search" />
+                    app:layout_constraintTop_toBottomOf="@+id/linkSearch" />
+
+                <TextView
+                    android:id="@+id/StatusBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/text_background_accented"
+                    android:fontFamily="@font/raleway_semibold"
+                    android:foreground="@drawable/rounded_gradient"
+                    android:gravity="center"
+                    android:paddingLeft="12dp"
+                    android:paddingTop="1dp"
+                    android:paddingRight="12dp"
+                    android:paddingBottom="1dp"
+                    android:text="Total: 100 Processed: 50"
+                    android:textAlignment="center"
+                    android:textColor="@color/grey"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@+id/btn_search"
+                    app:layout_constraintStart_toStartOf="@+id/linkSearch"
+                    app:layout_constraintTop_toBottomOf="@+id/linkSearch" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -312,7 +332,15 @@
                 app:layout_constraintStart_toEndOf="@id/heart"
                 app:layout_constraintTop_toBottomOf="@+id/developer_insta" />
 
-
+            <WebView
+                android:id="@+id/webView"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

@@ -18,6 +18,7 @@
 package com.shabinder.spotiflyer
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -25,6 +26,8 @@ import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -36,7 +39,6 @@ import com.shabinder.spotiflyer.databinding.MainActivityBinding
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.utils.SpotifyService
 import com.shabinder.spotiflyer.utils.SpotifyServiceToken
-import com.shabinder.spotiflyer.utils.YoutubeInterface
 import com.shabinder.spotiflyer.utils.createDirectory
 import com.shreyaspatil.EasyUpiPayment.EasyUpiPayment
 import com.squareup.moshi.Moshi
@@ -71,6 +73,8 @@ class MainActivity : AppCompatActivity(){
         binding = DataBindingUtil.setContentView(this,R.layout.main_activity)
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         sharedPref = this.getPreferences(Context.MODE_PRIVATE)
+        //starting Notification and Downloader Service!
+        DownloadHelper.startService(this)
 
 /*        if(sharedPref?.contains("token")!! && (sharedPref?.getLong("time",System.currentTimeMillis()/1000/60/60)!! < (System.currentTimeMillis()/1000/60/60)) ){
             val savedToken = sharedPref?.getString("token","error")!!
@@ -88,6 +92,7 @@ class MainActivity : AppCompatActivity(){
         }
 
         requestPermission()
+        disableDozeMode()
         checkIfLatestVersion()
         createDir()
         setUpi()
@@ -98,10 +103,40 @@ class MainActivity : AppCompatActivity(){
         //Object to download From Youtube {"https://github.com/sealedtx/java-youtube-downloader"}
         ytDownloader = YoutubeDownloader()
         sharedViewModel.ytDownloader = ytDownloader
-        //Initialing Communication with Youtube
-        YoutubeInterface.youtubeConnector()
 
         handleIntentFromExternalActivity()
+    }
+
+    @SuppressLint("BatteryLife")
+    fun disableDozeMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val pm =
+                this.getSystemService(Context.POWER_SERVICE) as PowerManager
+            val isIgnoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(packageName)
+            if (!isIgnoringBatteryOptimizations) {
+                val intent = Intent()
+                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                intent.data = Uri.parse("package:$packageName")
+                startActivityForResult(intent, 1233)
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1233) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val pm =
+                    getSystemService(Context.POWER_SERVICE) as PowerManager
+                val isIgnoringBatteryOptimizations =
+                    pm.isIgnoringBatteryOptimizations(packageName)
+                if (isIgnoringBatteryOptimizations) {
+                    // Ignoring battery optimization
+                } else {
+                    disableDozeMode()//Again Ask For Permission!!
+                }
+            }
+        }
     }
 
     /**
@@ -253,6 +288,7 @@ class MainActivity : AppCompatActivity(){
         createDirectory(DownloadHelper.defaultDir+"Tracks/")
         createDirectory(DownloadHelper.defaultDir+"Albums/")
         createDirectory(DownloadHelper.defaultDir+"Playlists/")
+        createDirectory(DownloadHelper.defaultDir+"YT_Downloads/")
     }
 
     private fun checkIfLatestVersion() {

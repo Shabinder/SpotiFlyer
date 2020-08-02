@@ -17,6 +17,7 @@
 
 package com.shabinder.spotiflyer.fragments
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -29,6 +30,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.ValueCallback
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
@@ -45,6 +49,7 @@ import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.MainFragmentBinding
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
+import com.shabinder.spotiflyer.downloadHelper.DownloadHelper.applyWebViewSettings
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper.downloadAllTracks
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
@@ -67,23 +72,25 @@ class MainFragment : Fragment() {
     private var type:String = ""
     private var spotifyLink = ""
     private var i: Intent? = null
+    private var webView: WebView? = null
 
+
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater,R.layout.main_fragment,container,false)
+        webView = binding.webView
+        DownloadHelper.webView = binding.webView
         DownloadHelper.context = requireContext()
         sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         spotifyService =  sharedViewModel.spotifyService
+        DownloadHelper.sharedViewModel = sharedViewModel
+        DownloadHelper.statusBar = binding.StatusBar
 
-        val spanStringBuilder = SpannableStringBuilder()
-        spanStringBuilder.append(getText(R.string.d_one)).append("\n")
-        spanStringBuilder.append(getText(R.string.d_two)).append("\n")
-        spanStringBuilder.append(getText(R.string.d_three)).append("\n")
-
-        binding.usage.text = spanStringBuilder
+        setUpUsageText()
         openSpotifyButton()
         openGithubButton()
         openInstaButton()
@@ -93,127 +100,14 @@ class MainFragment : Fragment() {
         }
 
         binding.btnSearch.setOnClickListener {
-            spotifyLink = binding.linkSearch.text.toString()
-
-            val link = spotifyLink.substringAfterLast('/', "Error").substringBefore('?')
-            type = spotifyLink.substringBeforeLast('/', "Error").substringAfterLast('/')
-
-            Log.i("Fragment", "$type : $link")
-
-            if(sharedViewModel.spotifyService == null && !isOnline()){
-                (activity as MainActivity).authenticateSpotify()
+            val link = binding.linkSearch.text.toString()
+            if(link.contains("open.spotify",true)){
+                spotifySearch()
+            }
+            if(link.contains("youtube.com",true) || link.contains("youtu.be",true) ){
+                youtubeSearch()
             }
 
-            if (type == "Error" || link == "Error") {
-                showToast("Please Check Your Link!")
-            } else if(!isOnline()){
-                sharedViewModel.showAlertDialog(resources,requireContext())
-            } else {
-                adapter = TrackListAdapter()
-                binding.trackList.adapter = adapter
-                adapter.sharedViewModel = sharedViewModel
-                adapter.mainFragment = this
-                setUiVisibility()
-
-                if(mainViewModel.searchLink == spotifyLink){
-                    //it's a Device Configuration Change
-                    adapterConfig(mainViewModel.trackList)
-                    sharedViewModel.uiScope.launch {
-                        bindImage(binding.imageView,mainViewModel.coverUrl)
-                    }
-                }else{
-                    when (type) {
-                        "track" -> {
-                            mainViewModel.searchLink = spotifyLink
-                            sharedViewModel.uiScope.launch {
-                                val trackObject = sharedViewModel.getTrackDetails(link)
-                                val trackList = mutableListOf<Track>()
-                                trackList.add(trackObject!!)
-                                mainViewModel.trackList = trackList
-                                mainViewModel.coverUrl = trackObject.album!!.images?.get(0)!!.url!!
-                                bindImage(binding.imageView,mainViewModel.coverUrl)
-                                adapterConfig(trackList)
-
-                                binding.btnDownloadAll.setOnClickListener {
-                                    showToast("Starting Download in Few Seconds")
-                                    sharedViewModel.uiScope.launch {
-                                        withContext(Dispatchers.IO) {
-                                            downloadAllTracks(
-                                                "Tracks",
-                                                null,
-                                                trackList,
-                                                sharedViewModel.ytDownloader)
-                                        }
-                                    }
-                                }
-
-                            }
-                        }
-
-                        "album" -> {
-                            mainViewModel.searchLink = spotifyLink
-                            sharedViewModel.uiScope.launch {
-                                val albumObject = sharedViewModel.getAlbumDetails(link)
-                                val trackList = mutableListOf<Track>()
-                                albumObject!!.tracks?.items?.forEach { trackList.add(it) }
-                                mainViewModel.trackList = trackList
-                                mainViewModel.coverUrl = albumObject.images?.get(0)!!.url!!
-                                bindImage(binding.imageView,mainViewModel.coverUrl)
-                                adapter.isAlbum = true
-                                adapterConfig(trackList)
-                                binding.btnDownloadAll.setOnClickListener {
-                                    showToast("Starting Download in Few Seconds")
-                                    sharedViewModel.uiScope.launch {
-                                        withContext(Dispatchers.IO) {
-                                            downloadAllTracks(
-                                                "Albums",
-                                                albumObject.name,
-                                                trackList,
-                                                sharedViewModel.ytDownloader)
-                                        }
-                                    }
-                                }
-                            }
-
-
-                        }
-
-                        "playlist" -> {
-                            mainViewModel.searchLink = spotifyLink
-                            sharedViewModel.uiScope.launch {
-                                val playlistObject = sharedViewModel.getPlaylistDetails(link)
-                                val trackList = mutableListOf<Track>()
-                                playlistObject!!.tracks?.items!!.forEach { trackList.add(it.track!!) }
-                                mainViewModel.trackList = trackList
-                                mainViewModel.coverUrl =  playlistObject.images?.get(0)!!.url!!
-                                bindImage(binding.imageView,mainViewModel.coverUrl)
-                                adapterConfig(trackList)
-                                binding.btnDownloadAll.setOnClickListener {
-                                    showToast("Starting Download in Few Seconds")
-                                    sharedViewModel.uiScope.launch {
-                                        withContext(Dispatchers.IO) {
-                                            loadAllImages(trackList)
-                                            downloadAllTracks(
-                                                "Playlists",
-                                                playlistObject.name,
-                                                trackList,
-                                                sharedViewModel.ytDownloader)
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-
-                        "episode" -> {
-                            showToast("Implementation Pending")
-                        }
-                        "show" -> {
-                            showToast("Implementation Pending ")
-                        }
-                    }
-                }
-            }
         }
         handleIntent()
         //Handling Device Configuration Change
@@ -223,6 +117,173 @@ class MainFragment : Fragment() {
             setUiVisibility()
         }
         return binding.root
+    }
+
+    private fun youtubeSearch() {
+        val youtubeLink = binding.linkSearch.text.toString()
+        var title = ""
+        val link = youtubeLink.removePrefix("https://").removePrefix("http://")
+        val sampleDomain1 = "youtube.com"
+        val sampleDomain2 = "youtu.be"
+        if(!link.contains("playlist",true)){
+            var searchId = "error"
+            if(link.contains(sampleDomain1,true) ){
+                searchId =  link.substringAfterLast("=","error")
+            }
+            if(link.contains(sampleDomain2,true) && !link.contains("playlist",true) ){
+                searchId = link.substringAfterLast("/","error")
+            }
+            if(searchId != "error"){
+                val coverLink = "https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"
+                applyWebViewSettings(webView!!)
+                sharedViewModel.uiScope.launch {
+                    webView!!.loadUrl(youtubeLink)
+                    webView!!.webViewClient = object : WebViewClient() {
+                        override fun onPageFinished(view: WebView?, url: String?) {
+                            super.onPageFinished(view, url)
+                            view?.evaluateJavascript(
+                                "document.getElementsByTagName(\"h1\")[0].textContent"
+                                ,object : ValueCallback<String> {
+                                    override fun onReceiveValue(value: String?) {
+                                        title = DownloadHelper.removeIllegalChars(value.toString()).toString()
+                                        Log.i("YT-id", title)
+                                        Log.i("YT-id", value)
+                                        Log.i("YT-id", coverLink)
+                                        setUiVisibility()
+                                        bindImage(binding.imageView,coverLink)
+                                        binding.btnDownloadAll.setOnClickListener {
+                                            showToast("Starting Download in Few Seconds")
+                                            //TODO Clean This Code!
+                                            DownloadHelper.downloadFile(null,"YT_Downloads",Track(name = value,ytCoverUrl = coverLink),0,sharedViewModel.ytDownloader,searchId)
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                }
+            }
+        }else(showToast("Your Youtube Link is not of a Video!!"))
+    }
+
+    private fun spotifySearch(){
+        spotifyLink = binding.linkSearch.text.toString()
+
+        val link = spotifyLink.substringAfterLast('/', "Error").substringBefore('?')
+        type = spotifyLink.substringBeforeLast('/', "Error").substringAfterLast('/')
+
+        Log.i("Fragment", "$type : $link")
+
+        if(sharedViewModel.spotifyService == null && !isOnline()){
+            (activity as MainActivity).authenticateSpotify()
+        }
+
+        if (type == "Error" || link == "Error") {
+            showToast("Please Check Your Link!")
+        } else if(!isOnline()){
+            sharedViewModel.showAlertDialog(resources,requireContext())
+        } else {
+            adapter = TrackListAdapter()
+            binding.trackList.adapter = adapter
+            adapter.sharedViewModel = sharedViewModel
+            adapter.mainFragment = this
+            setUiVisibility()
+
+            if(mainViewModel.searchLink == spotifyLink){
+                //it's a Device Configuration Change
+                adapterConfig(mainViewModel.trackList)
+                sharedViewModel.uiScope.launch {
+                    bindImage(binding.imageView,mainViewModel.coverUrl)
+                }
+            }else{
+                when (type) {
+                    "track" -> {
+                        mainViewModel.searchLink = spotifyLink
+                        sharedViewModel.uiScope.launch {
+                            val trackObject = sharedViewModel.getTrackDetails(link)
+                            val trackList = mutableListOf<Track>()
+                            trackList.add(trackObject!!)
+                            mainViewModel.trackList = trackList
+                            mainViewModel.coverUrl = trackObject.album!!.images?.get(0)!!.url!!
+                            bindImage(binding.imageView,mainViewModel.coverUrl)
+                            adapterConfig(trackList)
+
+                            binding.btnDownloadAll.setOnClickListener {
+                                showToast("Starting Download in Few Seconds")
+                                sharedViewModel.uiScope.launch {
+                                    downloadAllTracks(
+                                        "Tracks",
+                                        null,
+                                        trackList,
+                                        sharedViewModel.ytDownloader
+                                    )
+                                }
+                            }
+
+                        }
+                    }
+
+                    "album" -> {
+                        mainViewModel.searchLink = spotifyLink
+                        sharedViewModel.uiScope.launch {
+                            val albumObject = sharedViewModel.getAlbumDetails(link)
+                            val trackList = mutableListOf<Track>()
+                            albumObject!!.tracks?.items?.forEach { trackList.add(it) }
+                            mainViewModel.trackList = trackList
+                            mainViewModel.coverUrl = albumObject.images?.get(0)!!.url!!
+                            bindImage(binding.imageView,mainViewModel.coverUrl)
+                            adapter.isAlbum = true
+                            adapterConfig(trackList)
+                            binding.btnDownloadAll.setOnClickListener {
+                                showToast("Starting Download in Few Seconds")
+                                sharedViewModel.uiScope.launch {
+                                    loadAllImages(trackList)
+                                    downloadAllTracks(
+                                        "Albums",
+                                        albumObject.name,
+                                        trackList,
+                                        sharedViewModel.ytDownloader
+                                    )
+                                }
+                            }
+                        }
+
+
+                    }
+
+                    "playlist" -> {
+                        mainViewModel.searchLink = spotifyLink
+                        sharedViewModel.uiScope.launch {
+                            val playlistObject = sharedViewModel.getPlaylistDetails(link)
+                            val trackList = mutableListOf<Track>()
+                            playlistObject!!.tracks?.items!!.forEach { trackList.add(it.track!!) }
+                            mainViewModel.trackList = trackList
+                            mainViewModel.coverUrl =  playlistObject.images?.get(0)!!.url!!
+                            bindImage(binding.imageView,mainViewModel.coverUrl)
+                            adapterConfig(trackList)
+                            binding.btnDownloadAll.setOnClickListener {
+                                showToast("Starting Download in Few Seconds")
+                                sharedViewModel.uiScope.launch {
+                                    loadAllImages(trackList)
+                                    downloadAllTracks(
+                                        "Playlists",
+                                        playlistObject.name,
+                                        trackList,
+                                        sharedViewModel.ytDownloader
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    "episode" -> {
+                        showToast("Implementation Pending")
+                    }
+                    "show" -> {
+                        showToast("Implementation Pending ")
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -350,6 +411,15 @@ class MainFragment : Fragment() {
             }
         })
     }
+
+    private fun setUpUsageText() {
+        val spanStringBuilder = SpannableStringBuilder()
+        spanStringBuilder.append(getText(R.string.d_one)).append("\n")
+        spanStringBuilder.append(getText(R.string.d_two)).append("\n")
+        spanStringBuilder.append(getText(R.string.d_three)).append("\n")
+        binding.usage.text = spanStringBuilder
+    }
+
 
     /**
      * Util. Function to create toasts!

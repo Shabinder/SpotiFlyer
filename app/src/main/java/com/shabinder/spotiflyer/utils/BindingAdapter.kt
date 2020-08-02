@@ -72,7 +72,7 @@ fun bindImage(imgView: ImageView, imgUrl: String?) {
                             try {
                                 val file = File(
                                     Environment.getExternalStorageDirectory(),
-                                    DownloadHelper.defaultDir+".Images/" + imgUrl.substringAfterLast('/') + ".jpeg"
+                                    DownloadHelper.defaultDir+".Images/" + imgUrl.substringAfterLast('/',imgUrl) + ".jpeg"
                                 ) // the File to save , append increasing numeric counter to prevent files from getting overwritten.
                                 val options = BitmapFactory.Options()
                                 options.inPreferredConfig = Bitmap.Config.ARGB_8888

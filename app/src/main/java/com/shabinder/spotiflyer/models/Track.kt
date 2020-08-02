@@ -39,4 +39,5 @@ data class Track(
     var uri: String? = null,
     var album: Album? = null,
     var external_ids: Map<String?, String?>? = null,
-    var popularity: Int? = null):Parcelable
+    var popularity: Int? = null,
+    var ytCoverUrl:String? = null):Parcelable

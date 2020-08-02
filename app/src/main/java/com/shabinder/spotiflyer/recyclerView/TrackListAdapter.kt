@@ -26,7 +26,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
-import com.shabinder.spotiflyer.downloadHelper.DownloadHelper.downloadTrack
+import com.shabinder.spotiflyer.downloadHelper.DownloadHelper.getYTLink
 import com.shabinder.spotiflyer.fragments.MainFragment
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.utils.bindImage
@@ -63,7 +63,7 @@ class TrackListAdapter:RecyclerView.Adapter<TrackListAdapter.ViewHolder>() {
         holder.duration.text = "${item.duration_ms/1000/60} minutes, ${(item.duration_ms/1000)%60} sec"
         holder.downloadBtn.setOnClickListener{
             sharedViewModel.uiScope.launch {
-                downloadTrack(mainFragment,"Tracks",null,sharedViewModel.ytDownloader,"${item.name} ${item.artists?.get(0)!!.name?:""}",track = item,index = 0)
+                getYTLink(mainFragment,"Tracks",null,sharedViewModel.ytDownloader,"${item.name} ${item.artists?.get(0)!!.name?:""}",track = item,index = 0)
             }
         }
 
