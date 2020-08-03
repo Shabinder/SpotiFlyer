@@ -230,14 +230,13 @@ class ForegroundService : Service(){
 
     /**
      * Deleting All Residual Files except Mp3 Files
-     * */
+     **/
     private fun deleteFile(dir:File) {
         Log.i(tag,"Starting Deletions in ${dir.path} ")
         val fList = dir.listFiles()
         fList?.let {
             for (file in fList) {
                 if (file.isDirectory) {
-                    Log.i(tag,"Cleaning ${file.path} Directory")
                     deleteFile(file)
                 } else if(file.isFile) {
                     if(file.path.toString().substringAfterLast(".") != "mp3"){
@@ -294,12 +293,6 @@ class ForegroundService : Service(){
             }
             Log.i(tag,"${track?.name} Download Started")
             updateNotification()
-
-            val link = "https://m.youtube.com/watch?v=shCX5YgU9yc"
-            var result = ""
-            result = link.removePrefix("https://")
-            result = link.removePrefix("http://")
-
         }
 
         override fun onWaitingNetwork(download: Download) {
@@ -325,10 +318,10 @@ class ForegroundService : Service(){
                         Log.i(tag,"${track?.name} Download Failed! Error:Fetch!!!!")
                         Log.i(tag,"${track?.name} Requesting Download thru Android DM")
                         downloadUsingDM(download.request.url,download.request.file, track!!)
+                        downloaded++
+                        requestMap.remove(download.request)
                     }
                 }
-            downloaded++
-            requestMap.remove(download.request)
             if(requestMap.keys.toList().isEmpty()) speed = 0
             updateNotification()
         }
@@ -346,12 +339,14 @@ class ForegroundService : Service(){
         }
 
         override fun onError(download: Download, error: Error, throwable: Throwable?) {
-            val track = requestMap[download.request]
-            Log.i(tag,download.error.throwable.toString())
-            Log.i(tag,"${track?.name} Requesting Download thru Android DM")
-            downloadUsingDM(download.request.url,download.request.file, track!!)
-            downloaded++
-            requestMap.remove(download.request)
+            serviceScope.launch {
+                val track = requestMap[download.request]
+                downloaded++
+                Log.i(tag,download.error.throwable.toString())
+                Log.i(tag,"${track?.name} Requesting Download thru Android DM")
+                downloadUsingDM(download.request.url,download.request.file, track!!)
+                requestMap.remove(download.request)
+            }
             updateNotification()
         }
 
