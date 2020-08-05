@@ -3,28 +3,32 @@
 # SpotiFlyer
 -Spotify Music Downloader For Android
 
-[![Build Status](https://github.com/Shabinder/SpotiFlyer/blob/master/app/build_passing.svg)](https://github.com/Shabinder/SpotiFlyer)
+[![Build Status](https://github.com/Shabinder/SpotiFlyer/blob/master/app/build_passing.svg)](https://github.com/Shabinder/SpotiFlyer/releases)
+![API](https://img.shields.io/badge/API-22%2B-brightgreen.svg)
 
-## Screen-Shots:
+
+
+
+## ScreenShots 
+Credits:Library ScreenShot taken on PowerAmp.
 <table style="width:100%">
   <tr>
-    <th>Home Screen</th>
-  </tr>
-  <tr >
-    <td><img src="ScreenShots/HomeScreen.png" width="375" height="640"/></td>
+    <th>1. Home Screen</th>
+    <th>2. PlayList Screen</th> 
+    <th>3. Library Screen</th>
   </tr>
   <tr>
- <th>PlayList Screen</th>
-  </tr>
-  <tr >
- <td><img src="ScreenShots/PlayList.png" width="375" height="640"/></td>
+    <td><img src="ScreenShots/HomeScreen.png"/></td>
+    <td><img src="ScreenShots/PlayList.png"/></td> 
+    <td><img src="ScreenShots/LibraryScreen2.jpg"/></td>
   </tr>
 </table>
 
+
 SpotiFlyer is an **Android App**(Written in **Kotlin**), which **aims** to work as:
-  - **Downloader** For Spotify:Albums, Tracks and Playlists.
+  - **Downloader** For Spotify:Albums, Tracks and Playlists and Even Direct Youtube Videos. 
   - Extension To **mute** whenever a Spotify Ad Plays.(TODO)
-  - **Save your Data** ,by not listening your Fav Songs Online again & again.
+  - **Save your Data** ,by not listening your Fav Songs Online again & again(Just Download Them!)
   - **No ADS!** 
   - Works straight out of the box and does not require you to generate or mess with your API keys (already included).
 
@@ -33,17 +37,17 @@ Downloads
 The latest release and pre-release versions are available on GitHub.
 Or to save a click, [this link](https://github.com/Shabinder/SpotiFlyer/releases/latest) should always point to the most recent release.
 
-
 ### Development
 Want to contribute? Great!
 All contributions are welcome, from code to documentation to graphics to design suggestions to bug reports. Please use GitHub to its fullest-- contribute Pull Requests, contribute tutorials or other wiki content-- whatever you have to offer, we can use it!
 
 ### Todos
  - Write **Tests**.
- - Support for **Embedding Metadata in Mp3** like AlbumArt,Title,Singer,etc.
  - Support for Podcast/Episodes and Shows.
- - Animation while Downloading and Download Manager Listener
+ - In App Animation while Downloading.
  - Implementation To mute whenever Spotify Ad Plays.
+ - Youtube Playlist Support.
+ - Modularize App Code and Implement MVVM Model to fullest.
 
 License
 ----
