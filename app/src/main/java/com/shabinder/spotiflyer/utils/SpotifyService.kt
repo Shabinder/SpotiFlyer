@@ -41,19 +41,19 @@ import retrofit2.http.*
 interface SpotifyService {
 
     @GET("playlists/{playlist_id}")
-    suspend fun getPlaylist(@Path("playlist_id") playlistId: String?): Playlist?
+    suspend fun getPlaylist(@Path("playlist_id") playlistId: String?): Playlist
 
     @GET("tracks/{id}")
-    suspend fun getTrack(@Path("id") var1: String?): Track?
+    suspend fun getTrack(@Path("id") trackId: String?): Track
 
      @GET("episodes/{id}")
-    suspend fun getEpisode(@Path("id") var1: String?): Track?
+    suspend fun getEpisode(@Path("id") episodeId: String?): Track
 
      @GET("shows/{id}")
-    suspend fun getShow(@Path("id") var1: String?): Track?
+    suspend fun getShow(@Path("id") showId: String?): Track
 
     @GET("albums/{id}")
-    suspend fun getAlbum(@Path("id") var1: String?): Album?
+    suspend fun getAlbum(@Path("id") albumId: String?): Album
 
     @GET("me")
     suspend fun getMe(): UserPrivate?

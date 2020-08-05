@@ -26,20 +26,20 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
-import com.shabinder.spotiflyer.downloadHelper.DownloadHelper.getYTLink
-import com.shabinder.spotiflyer.fragments.MainFragment
+import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper.getYTLink
 import com.shabinder.spotiflyer.models.Track
+import com.shabinder.spotiflyer.ui.spotify.SpotifyFragment
 import com.shabinder.spotiflyer.utils.bindImage
 import kotlinx.coroutines.launch
 
 
-class TrackListAdapter:RecyclerView.Adapter<TrackListAdapter.ViewHolder>() {
+class SpotifyTrackListAdapter:RecyclerView.Adapter<SpotifyTrackListAdapter.ViewHolder>() {
 
     var trackList = listOf<Track>()
     var totalItems:Int = 0
     var sharedViewModel = SharedViewModel()
     var isAlbum:Boolean = false
-    var mainFragment:MainFragment? = null
+    var spotifyFragment: SpotifyFragment? = null
 
     override fun getItemCount():Int =  totalItems
 
@@ -63,7 +63,7 @@ class TrackListAdapter:RecyclerView.Adapter<TrackListAdapter.ViewHolder>() {
         holder.duration.text = "${item.duration_ms/1000/60} minutes, ${(item.duration_ms/1000)%60} sec"
         holder.downloadBtn.setOnClickListener{
             sharedViewModel.uiScope.launch {
-                getYTLink(mainFragment,"Tracks",null,sharedViewModel.ytDownloader,"${item.name} ${item.artists?.get(0)!!.name?:""}",track = item,index = 0)
+                getYTLink(spotifyFragment,"Tracks",null,sharedViewModel.ytDownloader.value,"${item.name} ${item.artists?.get(0)!!.name?:""}",track = item)
             }
         }
 

@@ -23,8 +23,37 @@
     app:startDestination="@id/mainFragment">
 
     <fragment
-        android:id="@+id/mainFragment"
-        android:name="com.shabinder.spotiflyer.fragments.MainFragment"
+        android:id="@+id/spotifyFragment"
+        android:name="com.shabinder.spotiflyer.ui.spotify.SpotifyFragment"
         android:label="main_fragment"
-        tools:layout="@layout/main_fragment" />
+        tools:layout="@layout/spotify_fragment" >
+        <argument
+            android:name="link"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.shabinder.spotiflyer.ui.mainfragment.MainFragment"
+        android:label="MainFragment"
+        tools:layout="@layout/main_fragment">
+        <action
+            android:id="@+id/action_mainFragment_to_spotifyFragment"
+            app:destination="@id/spotifyFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_mainFragment_to_youtubeFragment"
+            app:destination="@id/youtubeFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/youtubeFragment"
+        android:name="com.shabinder.spotiflyer.ui.youtube.YoutubeFragment"
+        android:label="YoutubeFragment"
+        tools:layout="@layout/youtube_fragment">
+        <argument
+            android:name="link"
+            app:argType="string" />
+    </fragment>
 </navigation>

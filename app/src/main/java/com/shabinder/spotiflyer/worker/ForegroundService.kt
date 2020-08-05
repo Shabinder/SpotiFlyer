@@ -40,7 +40,7 @@ import com.mpatric.mp3agic.ID3v24Tag
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
-import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
+import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.Track
 import com.tonyodev.fetch2.*
@@ -74,11 +74,9 @@ class ForegroundService : Service(){
     )
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
-    private var messageSnippet1 = ""
-    private var messageSnippet2 = ""
-    private var messageSnippet3 = ""
-    private var messageSnippet4 = ""
-    var notificationLine = 1
+    var notificationLine = 0
+    val messageList = mutableListOf<String>("","","","")
+    private var pendingIntent:PendingIntent? = null
 
 
 
@@ -89,7 +87,7 @@ class ForegroundService : Service(){
     override fun onCreate() {
         super.onCreate()
         val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
+        pendingIntent = PendingIntent.getActivity(
             this,
             0, notificationIntent, 0
         )
@@ -120,18 +118,16 @@ class ForegroundService : Service(){
             }
 
         val notification = NotificationCompat.Builder(this, channelId)
-            .setOngoing(true)
-            .setContentTitle("SpotiFlyer: Downloading Your Music")
-            .setSubText("Speed: $speed KB/s ")
-            .setNotificationSilent()
-            .setOnlyAlertOnce(true)
-            .setContentText("Total: $total  Downloaded: $downloaded  Completed:$converted ")
             .setSmallIcon(R.drawable.down_arrowbw)
+            .setNotificationSilent()
+            .setSubText("Speed: $speed KB/s")
             .setStyle(NotificationCompat.InboxStyle()
-                .addLine(messageSnippet1)
-                .addLine(messageSnippet2)
-                .addLine(messageSnippet3)
-                .addLine(messageSnippet4))
+                .setBigContentTitle("Total: $total  Completed:$converted")
+                .addLine(messageList[0])
+                .addLine(messageList[1])
+                .addLine(messageList[2])
+                .addLine(messageList[3]))
+            .setContentIntent(pendingIntent)
             .build()
         startForeground(notificationId, notification)
     }
@@ -149,7 +145,7 @@ class ForegroundService : Service(){
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         // Send a notification that service is started
         Log.i(tag,"Service Started.")
-
+        startForeground()
         //do heavy work on a background thread
         //val list = intent.getSerializableExtra("list") as List<Any?>
 //        val list = intent.getParcelableArrayListExtra<DownloadObject>("list") ?: intent.extras?.getParcelableArrayList<DownloadObject>("list")
@@ -166,7 +162,7 @@ class ForegroundService : Service(){
 
                     fetch!!.enqueue(request,
                         Func {
-                            requestMap[it] = obj.track
+                            obj.track?.let { it1 -> requestMap.put(it, it1) }
                             downloadList.remove(obj)
                             Log.i(tag, "Enqueuing Download")
                         },
@@ -197,7 +193,6 @@ class ForegroundService : Service(){
         super.onDestroy()
         if(downloadMap.isEmpty() && converted == total){
             Log.i(tag,"Service destroyed.")
-            fetch?.close()
             deleteFile(parentDirectory)
             releaseWakeLock()
             stopForeground(true)
@@ -223,8 +218,11 @@ class ForegroundService : Service(){
         super.onTaskRemoved(rootIntent)
         if(downloadMap.isEmpty() && converted == total ){
             Log.i(tag,"Service Removed.")
-            fetch?.close()
-            stopSelf()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                stopForeground(true)
+            } else {
+                stopSelf()//System will automatically close it
+            }
         }
     }
 
@@ -239,7 +237,7 @@ class ForegroundService : Service(){
                 if (file.isDirectory) {
                     deleteFile(file)
                 } else if(file.isFile) {
-                    if(file.path.toString().substringAfterLast(".") != "mp3"){
+                    if(file.path.toString().substringAfterLast(".") != "mp3" && file.path.toString().substringAfterLast(".") != "jpeg"){
 //                        Log.i(tag,"deleting ${file.path}")
                         file.delete()
                     }
@@ -274,21 +272,21 @@ class ForegroundService : Service(){
         ) {
             val track  = requestMap[download.request]
             when(notificationLine){
+                0 -> {
+                    messageList[0] = "Downloading ${track?.name}"
+                    notificationLine = 1
+                }
                 1 -> {
-                    messageSnippet1 = "Downloading ${track?.name}"
+                    messageList[1] = "Downloading ${track?.name}"
                     notificationLine = 2
                 }
-                2 -> {
-                    messageSnippet2 = "Downloading ${track?.name}"
+                2-> {
+                    messageList[2] = "Downloading ${track?.name}"
                     notificationLine = 3
                 }
-                3-> {
-                    messageSnippet3 = "Downloading ${track?.name}"
-                    notificationLine = 4
-                }
-                4 -> {
-                    messageSnippet4 = "Downloading ${track?.name}"
-                    notificationLine = 1
+                3 -> {
+                    messageList[3] = "Downloading ${track?.name}"
+                    notificationLine = 0
                 }
             }
             Log.i(tag,"${track?.name} Download Started")
@@ -308,20 +306,27 @@ class ForegroundService : Service(){
         }
 
         override fun onCompleted(download: Download) {
-                val track = requestMap[download.request]
-                serviceScope.launch {
-                    try{
-                        convertToMp3(download.file, track!!)
-                        Log.i(tag,"${track.name} Download Completed")
-                    }catch (e:KotlinNullPointerException
-                    ){
-                        Log.i(tag,"${track?.name} Download Failed! Error:Fetch!!!!")
-                        Log.i(tag,"${track?.name} Requesting Download thru Android DM")
-                        downloadUsingDM(download.request.url,download.request.file, track!!)
-                        downloaded++
-                        requestMap.remove(download.request)
-                    }
+            val track = requestMap[download.request]
+
+            for (message in messageList){
+                if( message == "Downloading ${track?.name}"){
+                    messageList[messageList.indexOf(message)] = ""
                 }
+            }
+
+            serviceScope.launch {
+                try{
+                    convertToMp3(download.file, track!!)
+                    Log.i(tag,"${track.name} Download Completed")
+                }catch (e:KotlinNullPointerException
+                ){
+                    Log.i(tag,"${track?.name} Download Failed! Error:Fetch!!!!")
+                    Log.i(tag,"${track?.name} Requesting Download thru Android DM")
+                    downloadUsingDM(download.request.url,download.request.file, track!!)
+                    downloaded++
+                    requestMap.remove(download.request)
+                }
+            }
             if(requestMap.keys.toList().isEmpty()) speed = 0
             updateNotification()
         }
@@ -370,7 +375,7 @@ class ForegroundService : Service(){
     /**
     * If fetch Fails , Android Download Manager To RESCUE!!
     **/
-    fun downloadUsingDM(url:String,outputDir:String,track: Track){
+    fun downloadUsingDM(url:String, outputDir:String, track: Track){
         val uri = Uri.parse(url)
         val request = DownloadManager.Request(uri)
             .setAllowedNetworkTypes(
@@ -407,7 +412,7 @@ class ForegroundService : Service(){
     /**
      *Converting Downloaded Audio (m4a) to Mp3.( Also Applying Metadata)
      **/
-    fun convertToMp3(filePath: String,track: Track){
+    fun convertToMp3(filePath: String, track: Track){
         val m4aFile = File(filePath)
 
         FFmpeg.executeAsync(
@@ -457,17 +462,16 @@ class ForegroundService : Service(){
         val mNotificationManager: NotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("SpotiFlyer: Downloading Your Music")
-            .setContentText("Total: $total  Completed:$converted ")
-            .setSubText("Speed: $speed KB/s ")
-            .setNotificationSilent()
-            .setOnlyAlertOnce(true)
             .setSmallIcon(R.drawable.down_arrowbw)
+            .setSubText("Speed: $speed KB/s")
+            .setNotificationSilent()
             .setStyle(NotificationCompat.InboxStyle()
-                .addLine(messageSnippet1)
-                .addLine(messageSnippet2)
-                .addLine(messageSnippet3)
-                .addLine(messageSnippet4))
+                .setBigContentTitle("Total: $total  Completed:$converted")
+                .addLine(messageList[0])
+                .addLine(messageList[1])
+                .addLine(messageList[2])
+                .addLine(messageList[3]))
+            .setContentIntent(pendingIntent)
             .build()
         mNotificationManager.notify(notificationId, notification)
     }
@@ -506,7 +510,7 @@ class ForegroundService : Service(){
         track.ytCoverUrl?.let {
             val file = File(
                 Environment.getExternalStorageDirectory(),
-                DownloadHelper.defaultDir +".Images/" + it.substringAfterLast('/',it) + ".jpeg")
+                SpotifyDownloadHelper.defaultDir +".Images/" + it.substringAfterLast('/',it) + ".jpeg")
             Log.i("Mp3Tags editing Tags",file.path)
             //init array with file length
             val bytesArray = ByteArray(file.length().toInt())
@@ -518,7 +522,7 @@ class ForegroundService : Service(){
         track.album?.let {
             val file = File(
                 Environment.getExternalStorageDirectory(),
-                DownloadHelper.defaultDir +".Images/" + (it.images?.get(0)?.url!!).substringAfterLast('/') + ".jpeg")
+                SpotifyDownloadHelper.defaultDir +".Images/" + (it.images?.get(0)?.url!!).substringAfterLast('/') + ".jpeg")
             Log.i("Mp3Tags editing Tags",file.path)
             //init array with file length
             val bytesArray = ByteArray(file.length().toInt())

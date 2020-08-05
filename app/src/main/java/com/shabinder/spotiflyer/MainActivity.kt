@@ -36,7 +36,7 @@ import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.databinding.MainActivityBinding
-import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
+import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper
 import com.shabinder.spotiflyer.utils.SpotifyService
 import com.shabinder.spotiflyer.utils.SpotifyServiceToken
 import com.shabinder.spotiflyer.utils.createDirectory
@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity(){
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         sharedPref = this.getPreferences(Context.MODE_PRIVATE)
         //starting Notification and Downloader Service!
-        DownloadHelper.startService(this)
+        SpotifyDownloadHelper.startService(this)
 
 /*        if(sharedPref?.contains("token")!! && (sharedPref?.getLong("time",System.currentTimeMillis()/1000/60/60)!! < (System.currentTimeMillis()/1000/60/60)) ){
             val savedToken = sharedPref?.getString("token","error")!!
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(){
             implementSpotifyService(savedToken)
         }else{authenticateSpotify()}*/
 
-        if(sharedViewModel.spotifyService == null){
+        if(sharedViewModel.spotifyService.value == null){
             authenticateSpotify()
         }else{
             implementSpotifyService(sharedViewModel.accessToken.value!!)
@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity(){
 
         //Object to download From Youtube {"https://github.com/sealedtx/java-youtube-downloader"}
         ytDownloader = YoutubeDownloader()
-        sharedViewModel.ytDownloader = ytDownloader
+        sharedViewModel.ytDownloader.value = ytDownloader
 
         handleIntentFromExternalActivity()
     }
@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity(){
                 .build()
 
         spotifyService = retrofit.create(SpotifyService::class.java)
-        sharedViewModel.spotifyService = spotifyService
+        sharedViewModel.spotifyService.value = spotifyService
     }
 
     private fun getSpotifyToken(){
@@ -283,12 +283,12 @@ class MainActivity : AppCompatActivity(){
     }
 
     private fun createDir() {
-        createDirectory(DownloadHelper.defaultDir)
-        createDirectory(DownloadHelper.defaultDir+".Images/")
-        createDirectory(DownloadHelper.defaultDir+"Tracks/")
-        createDirectory(DownloadHelper.defaultDir+"Albums/")
-        createDirectory(DownloadHelper.defaultDir+"Playlists/")
-        createDirectory(DownloadHelper.defaultDir+"YT_Downloads/")
+        createDirectory(SpotifyDownloadHelper.defaultDir)
+        createDirectory(SpotifyDownloadHelper.defaultDir+".Images/")
+        createDirectory(SpotifyDownloadHelper.defaultDir+"Tracks/")
+        createDirectory(SpotifyDownloadHelper.defaultDir+"Albums/")
+        createDirectory(SpotifyDownloadHelper.defaultDir+"Playlists/")
+        createDirectory(SpotifyDownloadHelper.defaultDir+"YT_Downloads/")
     }
 
     private fun checkIfLatestVersion() {

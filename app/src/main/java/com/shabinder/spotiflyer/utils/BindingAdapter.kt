@@ -30,7 +30,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.shabinder.spotiflyer.R
-import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
+import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -72,7 +72,7 @@ fun bindImage(imgView: ImageView, imgUrl: String?) {
                             try {
                                 val file = File(
                                     Environment.getExternalStorageDirectory(),
-                                    DownloadHelper.defaultDir+".Images/" + imgUrl.substringAfterLast('/',imgUrl) + ".jpeg"
+                                    SpotifyDownloadHelper.defaultDir+".Images/" + imgUrl.substringAfterLast('/',imgUrl) + ".jpeg"
                                 ) // the File to save , append increasing numeric counter to prevent files from getting overwritten.
                                 val options = BitmapFactory.Options()
                                 options.inPreferredConfig = Bitmap.Config.ARGB_8888

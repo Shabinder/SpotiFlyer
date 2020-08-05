@@ -35,25 +35,25 @@ import com.github.kiulian.downloader.YoutubeDownloader
 import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.shabinder.spotiflyer.SharedViewModel
-import com.shabinder.spotiflyer.fragments.MainFragment
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.Track
+import com.shabinder.spotiflyer.ui.spotify.SpotifyFragment
 import com.shabinder.spotiflyer.worker.ForegroundService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-object DownloadHelper {
+object SpotifyDownloadHelper {
     var webView:WebView? = null
     var context : Context? = null
     var statusBar:TextView? = null
     val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
-    private var downloadList = arrayListOf<DownloadObject>()
     var sharedViewModel:SharedViewModel? = null
     private var isBrowserLoading = false
     private var total = 0
     private var Processed = 0
+    private var listProcessed:Boolean = false
     var youtubeList = mutableListOf<YoutubeRequest>()
 
     /**
@@ -64,32 +64,27 @@ object DownloadHelper {
         subFolder: String?,
         trackList: List<Track>, ytDownloader: YoutubeDownloader?) {
         withContext(Dispatchers.Main){
-            var size = trackList.size
-            total += size
-            animateStatusBar()
+            total += trackList.size // Adding New Download List Count to StatusBar
             trackList.forEach {
-                size--
                 val outputFile:String = Environment.getExternalStorageDirectory().toString() + File.separator +
                         defaultDir + removeIllegalChars(type) + File.separator + (if(subFolder == null){""}else{ removeIllegalChars(subFolder)  + File.separator} + removeIllegalChars(it.name!!)+".mp3")
                 if(File(outputFile).exists()){//Download Already Present!!
                     Processed++
-                    updateStatusBar()
                 }else{
-                    if(isBrowserLoading){
-                        if(size == 0){
-                            youtubeList.add(YoutubeRequest(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it ,0  ))
-                        }else{
+                    if(isBrowserLoading){//WebView Busy!!
+                        if (listProcessed){//Previous List request progress check
+                            getYTLink(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it)
+                            listProcessed = false//Notifying A list Processing Started
+                        }else{//Adding Requests to a Queue
                             youtubeList.add(YoutubeRequest(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it))
                         }
                     }else{
-                        if(size == 0){
-                            getYTLink(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it ,0  )
-                        }else{
-                            getYTLink(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it)
-                        }
+                        getYTLink(null,type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it)
                     }
                 }
+                updateStatusBar()
             }
+            animateStatusBar()
         }
     }
 
@@ -97,13 +92,12 @@ object DownloadHelper {
 
     //TODO CleanUp here and there!!
     @SuppressLint("SetJavaScriptEnabled")
-    suspend fun getYTLink(mainFragment: MainFragment? = null,
-                  type:String,
-                  subFolder:String?,
-                  ytDownloader: YoutubeDownloader?,
-                  searchQuery: String,
-                  track: Track,
-                  index: Int? = null){
+    suspend fun getYTLink(spotifyFragment: SpotifyFragment? = null,
+                          type:String,
+                          subFolder:String?,
+                          ytDownloader: YoutubeDownloader?,
+                          searchQuery: String,
+                          track: Track){
         val searchText = searchQuery.replace("\\s".toRegex(), "+")
         val url = "https://www.youtube.com/results?sp=EgIQAQ%253D%253D&q=$searchText"
         Log.i("DH YT LINK ",url)
@@ -122,15 +116,16 @@ object DownloadHelper {
                                 val id = value!!.substringAfterLast("=", "error").replace("\"","")
                                 Log.i("YT-id",id)
                                 if(id !="error"){//Link extracting error
-                                    mainFragment?.showToast("Starting Download")
+                                    spotifyFragment?.showToast("Starting Download")
                                     Processed++
+                                    if(Processed == total)listProcessed = true //List Processesd
                                     updateStatusBar()
-                                    downloadFile(subFolder, type, track, index,ytDownloader,id)
+                                    downloadFile(subFolder, type, track,ytDownloader,id)
                                 }
                                 if(youtubeList.isNotEmpty()){
                                     val request = youtubeList[0]
                                     sharedViewModel!!.uiScope.launch {
-                                        getYTLink(request.mainFragment,request.type,request.subFolder,request.ytDownloader,request.searchQuery,request.track,request.index)
+                                        getYTLink(request.spotifyFragment,request.type,request.subFolder,request.ytDownloader,request.searchQuery,request.track)
                                     }
                                     youtubeList.remove(request)
                                     if(youtubeList.size == 0){//list processing completed , webView is free again!
@@ -145,41 +140,17 @@ object DownloadHelper {
 
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    fun applyWebViewSettings(webView: WebView) {
-        val desktopUserAgent =
-            "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0"
-        val mobileUserAgent =
-            "Mozilla/5.0 (Linux; U; Android 4.4; en-us; Nexus 4 Build/JOP24G) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
-
-        //Choose Mobile/Desktop client.
-        webView.settings.userAgentString = desktopUserAgent
-        webView.settings.loadWithOverviewMode = true
-        webView.settings.loadWithOverviewMode = true
-        webView.settings.builtInZoomControls = true
-        webView.settings.setSupportZoom(true)
-        webView.isScrollbarFadingEnabled = false
-        webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
-        webView.settings.displayZoomControls = false
-        webView.settings.useWideViewPort = true
-        webView.settings.javaScriptEnabled = true
-        webView.settings.loadsImagesAutomatically = false
-        webView.settings.blockNetworkImage = true
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            webView.settings.safeBrowsingEnabled = true
-        }
-    }
-
     private fun updateStatusBar() {
         statusBar!!.visibility = View.VISIBLE
         statusBar?.text = "Total: $total  Processed: $Processed"
     }
 
 
-    fun downloadFile(subFolder: String?, type: String, track:Track, index:Int? = null,ytDownloader: YoutubeDownloader?,id: String) {
+    fun downloadFile(subFolder: String?, type: String, track:Track, ytDownloader: YoutubeDownloader?, id: String) {
         sharedViewModel!!.uiScope.launch {
             withContext(Dispatchers.IO) {
                 val video = ytDownloader?.getVideo(id)
+                val detail = video?.details()
                 val format:Format? =try {
                     video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
                 }catch (e:java.lang.IndexOutOfBoundsException){
@@ -196,9 +167,7 @@ object DownloadHelper {
                 }
                 format?.let {
                     val url:String = format.url()
-
-                    Log.i("DHelper Link Found", url)
-
+//                    Log.i("DHelper Link Found", url)
                     val outputFile:String = Environment.getExternalStorageDirectory().toString() + File.separator +
                             defaultDir + removeIllegalChars(type) + File.separator + (if(subFolder == null){""}else{ removeIllegalChars(subFolder)  + File.separator} + removeIllegalChars(track.name!!)+".m4a")
 
@@ -209,17 +178,6 @@ object DownloadHelper {
                     )
                     Log.i("DH",outputFile)
                     startService(context!!, downloadObject)
-
-                /*if(index==null){
-                    downloadList.add(downloadObject)
-                }else{
-                    downloadList.add(downloadObject)
-                    startService(context!!, downloadList)
-                    Log.i("DH No of Songs", downloadList.size.toString())
-                    downloadList = arrayListOf()
-                }*/
-//                    downloadList.add(downloadObject)
-//                    downloadList = arrayListOf()
                 }
             }
         }
@@ -281,10 +239,33 @@ object DownloadHelper {
         anim.repeatCount = Animation.INFINITE
         statusBar?.animation = anim
     }
+    @SuppressLint("SetJavaScriptEnabled")
+    fun applyWebViewSettings(webView: WebView) {
+        val desktopUserAgent =
+            "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0"
+        val mobileUserAgent =
+            "Mozilla/5.0 (Linux; U; Android 4.4; en-us; Nexus 4 Build/JOP24G) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
 
+        //Choose Mobile/Desktop client.
+        webView.settings.userAgentString = desktopUserAgent
+        webView.settings.loadWithOverviewMode = true
+        webView.settings.loadWithOverviewMode = true
+        webView.settings.builtInZoomControls = true
+        webView.settings.setSupportZoom(true)
+        webView.isScrollbarFadingEnabled = false
+        webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
+        webView.settings.displayZoomControls = false
+        webView.settings.useWideViewPort = true
+        webView.settings.javaScriptEnabled = true
+        webView.settings.loadsImagesAutomatically = false
+        webView.settings.blockNetworkImage = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            webView.settings.safeBrowsingEnabled = true
+        }
+    }
 }
 data class YoutubeRequest(
-    val mainFragment: MainFragment? = null,
+    val spotifyFragment: SpotifyFragment? = null,
     val type:String,
     val subFolder:String?,
     val ytDownloader: YoutubeDownloader?,

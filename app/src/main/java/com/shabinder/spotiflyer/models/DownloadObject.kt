@@ -22,7 +22,8 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class DownloadObject(
-    var track: Track,
+    var ytVideo: YTTrack?=null,
+    var track: Track?=null,
     var url:String,
     var outputDir:String
 ):Parcelable

@@ -24,9 +24,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.shabinder.spotiflyer.models.Album
-import com.shabinder.spotiflyer.models.Playlist
-import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.utils.SpotifyService
 import com.shreyaspatil.EasyUpiPayment.EasyUpiPayment
 import kotlinx.coroutines.CoroutineScope
@@ -36,28 +33,17 @@ import java.io.File
 
 class SharedViewModel : ViewModel() {
     var intentString = ""
-    var accessToken = MutableLiveData<String>().apply { value = "" }
-    var spotifyService : SpotifyService? = null
-    var ytDownloader : YoutubeDownloader? = null
-    var isConnected = MutableLiveData<Boolean>().apply { value = false }
+    var spotifyService = MutableLiveData<SpotifyService>()
+    var ytDownloader = MutableLiveData<YoutubeDownloader>()
     var easyUpiPayment: EasyUpiPayment? = null
+    var accessToken = MutableLiveData<String>().apply { value = "" }
+    var isConnected = MutableLiveData<Boolean>().apply { value = false }
     val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator + ".Images" + File.separator
 
 
     private var viewModelJob = Job()
 
     val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-
-    suspend fun getTrackDetails(trackLink:String): Track?{
-        return spotifyService?.getTrack(trackLink)
-    }
-    suspend fun getAlbumDetails(albumLink:String): Album?{
-        return spotifyService?.getAlbum(albumLink)
-    }
-    suspend fun getPlaylistDetails(link:String): Playlist?{
-        return spotifyService?.getPlaylist(link)
-    }
-
 
     override fun onCleared() {
         super.onCleared()

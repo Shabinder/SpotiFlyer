@@ -19,7 +19,8 @@
     <string name="app_name">SpotiFlyer</string>
     <string name="d_one"><b><i>Usage Instructions:</i></b></string>
     <string name="d_two"><b>1. Paste</b>, Your Copied Link in Search Box at Top.</string>
-    <string name="d_three"><b>2. Share directly</b> from <b>Spotify</b> App to this App.</string>
+    <string name="d_three">or Open platform using <b>Logo Button Above.</b></string>
+    <string name="d_four"><b>2. Share directly</b> to this App.</string>
     <string name="spotify_not_installed">It Seems you don\'t have Spotify Installed</string>
     <string name="spotify_web_link">Open Spotify Web Player</string>
     <string name="title"><b>No</b> Internet Connectivity!</string>
