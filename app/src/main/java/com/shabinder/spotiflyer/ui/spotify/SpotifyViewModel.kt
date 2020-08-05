@@ -36,7 +36,7 @@ class SpotifyViewModel: ViewModel() {
     var subFolder:String = ""
     var trackList = MutableLiveData<List<Track>>()
     private val loading = "Loading"
-    var title = MutableLiveData<String>().apply { value = "\"SpotiFlyer\"" }
+    var title = MutableLiveData<String>().apply { value = loading }
     var coverUrl = MutableLiveData<String>().apply { value = loading }
     var spotifyService : SpotifyService? = null
     var ytDownloader : YoutubeDownloader? = null
