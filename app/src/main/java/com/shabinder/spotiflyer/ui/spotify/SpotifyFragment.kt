@@ -18,7 +18,10 @@
 package com.shabinder.spotiflyer.ui.spotify
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Environment
@@ -47,6 +50,7 @@ import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.recyclerView.SpotifyTrackListAdapter
 import com.shabinder.spotiflyer.utils.bindImage
 import com.shabinder.spotiflyer.utils.copyTo
+import com.shabinder.spotiflyer.utils.rotateAnim
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -60,6 +64,8 @@ class SpotifyFragment : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var adapterSpotify:SpotifyTrackListAdapter
     private var webView: WebView? = null
+    private var intentFilter:IntentFilter? = null
+    private var updateUIReceiver: BroadcastReceiver? = null
 
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -71,6 +77,7 @@ class SpotifyFragment : Fragment() {
         adapterSpotify = SpotifyTrackListAdapter()
         initializeAll()
         initializeLiveDataObservers()
+        initializeBroadcast()
 
         val args = SpotifyFragmentArgs.fromBundle(requireArguments())
         val spotifyLink = args.link
@@ -95,6 +102,19 @@ class SpotifyFragment : Fragment() {
                 spotifyViewModel.spotifySearch(type,link)
                 if(type=="album")adapterSpotify.isAlbum = true
                 binding.btnDownloadAllSpotify.setOnClickListener {
+                    for (track in spotifyViewModel.trackList.value!!){
+                        if(track.downloaded != "Downloaded"){
+                            track.downloaded = "Downloading"
+                        }
+                    }
+                    binding.btnDownloadAllSpotify.visibility = View.GONE
+                    binding.downloadingFabSpotify.visibility = View.VISIBLE
+                    rotateAnim(binding.downloadingFabSpotify)
+                    for (track in spotifyViewModel.trackList.value!!){
+                        if(track.downloaded != "Downloaded"){
+                            adapterSpotify.notifyItemChanged(spotifyViewModel.trackList.value!!.indexOf(track))
+                        }
+                    }
                     showToast("Starting Download in Few Seconds")
                     loadAllImages(spotifyViewModel.trackList.value!!)
                     spotifyViewModel.uiScope.launch {
@@ -109,6 +129,41 @@ class SpotifyFragment : Fragment() {
             }
         }
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initializeBroadcast()
+    }
+
+    private fun initializeBroadcast() {
+        intentFilter = IntentFilter()
+        intentFilter?.addAction("track_download_completed")
+
+        updateUIReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                //UI update here
+                if (intent != null){
+                    val track = intent.getParcelableExtra<Track?>("track")
+                    track?.let {
+                        val position: Int = spotifyViewModel.trackList.value?.indexOf(track)!!
+                        Log.i("Track","Download Completed Intent :$position")
+                        track.downloaded = "Downloaded"
+                        if(position != -1) {
+                            spotifyViewModel.trackList.value?.set(position, track)
+                            adapterSpotify.notifyItemChanged(position)
+                            checkIfAllDownloaded()
+                        }
+                    }
+                }
+            }
+        }
+        requireActivity().registerReceiver(updateUIReceiver, intentFilter)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        requireActivity().unregisterReceiver(updateUIReceiver)
     }
 
     /**
@@ -127,8 +182,9 @@ class SpotifyFragment : Fragment() {
          **/
         spotifyViewModel.trackList.observe(viewLifecycleOwner, Observer {
             if (it.isNotEmpty()){
-                Log.i("SpotifyFragment","TrackList Fetched!")
+                Log.i("SpotifyFragment","TrackList Updated")
                 adapterConfig(it)
+                checkIfAllDownloaded()
             }
         })
 
@@ -138,6 +194,19 @@ class SpotifyFragment : Fragment() {
         spotifyViewModel.title.observe(viewLifecycleOwner, Observer {
             binding.titleViewSpotify.text = it
         })
+    }
+
+    private fun checkIfAllDownloaded() {
+        var allDownloaded = true
+        for (track in spotifyViewModel.trackList.value!!){
+            if (track.downloaded != "Downloaded")allDownloaded = false
+        }
+        if(allDownloaded){
+            binding.downloadingFabSpotify.setImageResource(R.drawable.ic_tick)
+            binding.btnDownloadAllSpotify.visibility = View.GONE
+            binding.downloadingFabSpotify.visibility = View.VISIBLE
+            binding.downloadingFabSpotify.clearAnimation()
+        }
     }
 
     /**
@@ -155,7 +224,7 @@ class SpotifyFragment : Fragment() {
         })
         SpotifyDownloadHelper.webView = binding.webViewSpotify
         SpotifyDownloadHelper.context = requireContext()
-        SpotifyDownloadHelper.sharedViewModel = sharedViewModel
+        SpotifyDownloadHelper.spotifyViewModel = spotifyViewModel
         SpotifyDownloadHelper.statusBar = binding.StatusBarSpotify
         binding.trackListSpotify.adapter = adapterSpotify
     }
@@ -214,11 +283,9 @@ class SpotifyFragment : Fragment() {
      * Configure Recycler View Adapter
      **/
     private fun adapterConfig(trackList: List<Track>){
-        adapterSpotify.trackList = trackList
-        adapterSpotify.totalItems = trackList.size
         adapterSpotify.spotifyFragment = this
-        adapterSpotify.sharedViewModel = sharedViewModel
-        adapterSpotify.notifyDataSetChanged()
+        adapterSpotify.spotifyViewModel = spotifyViewModel
+        adapterSpotify.submitList(trackList)
     }
 
 

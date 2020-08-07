@@ -98,9 +98,15 @@ class ForegroundService : Service(){
                 .setDownloadConcurrentLimit(4)
                 .build()
 
-        fetch = Fetch.Impl.getInstance(fetchConfiguration)
+        Fetch.setDefaultInstanceConfiguration(fetchConfiguration)
+
+        fetch = Fetch.getDefaultInstance()
 //        fetch?.enableLogging(true)
         fetch?.addListener(fetchListener)
+        //clearing all not completed Downloads
+        //Starting fresh
+        fetch?.removeAll()
+
         startForeground()
     }
 
@@ -218,11 +224,11 @@ class ForegroundService : Service(){
         super.onTaskRemoved(rootIntent)
         if(downloadMap.isEmpty() && converted == total ){
             Log.i(tag,"Service Removed.")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                stopForeground(true)
-            } else {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                stopForeground(true)
+//            } else {
                 stopSelf()//System will automatically close it
-            }
+//            }
         }
     }
 
@@ -307,12 +313,17 @@ class ForegroundService : Service(){
 
         override fun onCompleted(download: Download) {
             val track = requestMap[download.request]
-
             for (message in messageList){
                 if( message == "Downloading ${track?.name}"){
                     messageList[messageList.indexOf(message)] = ""
                 }
             }
+            //Notify Download Completed
+            val intent = Intent()
+                .setAction("track_download_completed")
+                .putExtra("track",track)
+            this@ForegroundService.sendBroadcast(intent)
+
 
             serviceScope.launch {
                 try{

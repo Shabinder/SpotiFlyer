@@ -34,7 +34,6 @@
         android:background="@drawable/btn_design"
         android:drawableEnd="@drawable/ic_arrow_slim"
         android:drawablePadding="4dp"
-        android:drawableTint="@color/black"
         android:padding="12dp"
         android:text="Download All  |"
         android:textColor="@color/black"
@@ -42,6 +41,21 @@
         android:visibility="visible"
         app:layout_anchor="@+id/appbar_spotify"
         app:layout_anchorGravity="bottom|center" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/downloading_fab_spotify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/black"
+        android:scaleType="fitCenter"
+        android:visibility="gone"
+        app:borderWidth="0dp"
+        app:layout_anchor="@+id/appbar_spotify"
+        app:layout_anchorGravity="bottom|center"
+        app:maxImageSize="38dp"
+        app:rippleColor="@color/colorPrimaryDark"
+        app:srcCompat="@drawable/ic_refresh"
+        app:tint="@null" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar_spotify"
@@ -105,7 +119,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginBottom="22dp"
                     android:background="#00000000"
                     android:fontFamily="@font/raleway_semibold"
                     android:gravity="end"
@@ -143,6 +157,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="gone"/>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

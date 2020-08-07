@@ -25,16 +25,18 @@ import com.shabinder.spotiflyer.models.Album
 import com.shabinder.spotiflyer.models.Playlist
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.utils.SpotifyService
+import com.shabinder.spotiflyer.utils.finalOutputDir
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.io.File
 
 class SpotifyViewModel: ViewModel() {
 
     var folderType:String = ""
     var subFolder:String = ""
-    var trackList = MutableLiveData<List<Track>>()
+    var trackList = MutableLiveData<MutableList<Track>>()
     private val loading = "Loading"
     var title = MutableLiveData<String>().apply { value = loading }
     var coverUrl = MutableLiveData<String>().apply { value = loading }
@@ -50,42 +52,57 @@ class SpotifyViewModel: ViewModel() {
             "track" -> {
                 uiScope.launch {
                     val trackObject = getTrackDetails(link)
+                    folderType = "Tracks"
                     val tempTrackList = mutableListOf<Track>()
-                    tempTrackList.add(trackObject!!)
+                    if(File(finalOutputDir(trackObject?.name!!,folderType,subFolder)).exists()){//Download Already Present!!
+                        trackObject.downloaded = "Downloaded"
+                    }
+                    tempTrackList.add(trackObject)
                     trackList.value = tempTrackList
                     title.value = trackObject.name
                     coverUrl.value = trackObject.album!!.images?.get(0)!!.url!!
-                    folderType = "Tracks"
                 }
             }
 
             "album" -> {
                 uiScope.launch {
                     val albumObject = getAlbumDetails(link)
+                    folderType = "Albums"
+                    subFolder = albumObject?.name!!
                     val tempTrackList = mutableListOf<Track>()
-                    albumObject!!.tracks?.items?.forEach { tempTrackList.add(it) }
+                    albumObject.tracks?.items?.forEach {
+                        if(File(finalOutputDir(it.name!!,folderType,subFolder)).exists()){//Download Already Present!!
+                            it.downloaded = "Downloaded"
+                        }
+                        tempTrackList.add(it)
+                    }
                     trackList.value = tempTrackList
                     title.value = albumObject.name
                     coverUrl.value = albumObject.images?.get(0)!!.url!!
-                    folderType = "Albums"
-                    subFolder = albumObject.name!!
                 }
             }
 
             "playlist" -> {
                 uiScope.launch {
                     val playlistObject = getPlaylistDetails(link)
+                    folderType = "Playlists"
+                    subFolder = playlistObject?.name!!
                     val tempTrackList = mutableListOf<Track>()
-                    playlistObject!!.tracks?.items?.forEach {
-                        it.track?.let { it1 -> tempTrackList.add(it1) }
+                    playlistObject.tracks?.items?.forEach {
+                        it.track?.let {
+                            it1 -> if(File(finalOutputDir(it1.name!!,folderType,subFolder)).exists()){//Download Already Present!!
+                            it1.downloaded = "Downloaded"
+                            Log.i("ViewModel123","${it1.name} Downloaded")
+                            }
+                            tempTrackList.add(it1)
+                        }
                     }
+                    Log.i("ViewModel",tempTrackList.size.toString())
+                    Log.i("ViewModel",playlistObject.tracks?.items?.size.toString())
                     trackList.value = tempTrackList
-                    Log.i("VIEW MODEL",playlistObject.tracks?.items!!.toString())
-                    Log.i("VIEW MODEL",trackList.value?.size.toString())
                     title.value = playlistObject.name
                     coverUrl.value =  playlistObject.images?.get(0)!!.url!!
-                    folderType = "Playlists"
-                    subFolder = playlistObject.name!!
+
                 }
             }
             "episode" -> {//TODO

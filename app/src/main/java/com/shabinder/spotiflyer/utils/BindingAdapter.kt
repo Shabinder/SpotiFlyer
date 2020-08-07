@@ -21,6 +21,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
 import android.util.Log
+import android.view.View
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
+import android.view.animation.RotateAnimation
 import android.widget.ImageView
 import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
@@ -38,6 +42,25 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
+
+fun finalOutputDir(itemName:String,type:String, subFolder:String?=null): String{
+    return Environment.getExternalStorageDirectory().toString() + File.separator +
+            SpotifyDownloadHelper.defaultDir + SpotifyDownloadHelper.removeIllegalChars(type) + File.separator +
+            (if(subFolder == null){""}else{ SpotifyDownloadHelper.removeIllegalChars(subFolder) + File.separator}
+                    + SpotifyDownloadHelper.removeIllegalChars(itemName) +".mp3")
+}
+
+fun rotateAnim(view: View){
+    val rotate = RotateAnimation(
+        0F, 360F,
+        Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f
+    )
+    rotate.duration = 1000
+    rotate.repeatCount = Animation.INFINITE
+    rotate.repeatMode = Animation.INFINITE
+    rotate.interpolator = LinearInterpolator()
+    view.animation = rotate
+}
 
 
 @BindingAdapter("imageUrl")

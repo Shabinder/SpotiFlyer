@@ -20,59 +20,84 @@ package com.shabinder.spotiflyer.recyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.Toast
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.shabinder.spotiflyer.R
-import com.shabinder.spotiflyer.SharedViewModel
+import com.shabinder.spotiflyer.databinding.TrackListItemBinding
+import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper.context
 import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper.getYTLink
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.ui.spotify.SpotifyFragment
+import com.shabinder.spotiflyer.ui.spotify.SpotifyViewModel
 import com.shabinder.spotiflyer.utils.bindImage
+import com.shabinder.spotiflyer.utils.rotateAnim
 import kotlinx.coroutines.launch
 
 
-class SpotifyTrackListAdapter:RecyclerView.Adapter<SpotifyTrackListAdapter.ViewHolder>() {
+class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHolder>(SpotifyTrackDiffCallback()) {
 
-    var trackList = listOf<Track>()
-    var totalItems:Int = 0
-    var sharedViewModel = SharedViewModel()
+    var spotifyViewModel = SpotifyViewModel()
     var isAlbum:Boolean = false
     var spotifyFragment: SpotifyFragment? = null
 
-    override fun getItemCount():Int =  totalItems
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
 
-        val view = layoutInflater.inflate(R.layout.track_list_item,parent,false)
-        return ViewHolder(view)
+        val binding = TrackListItemBinding.inflate(layoutInflater,parent,false)
+//        val view = layoutInflater.inflate(R.layout.track_list_item,parent,false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = trackList[position]
-        if(totalItems == 1 || isAlbum){holder.coverImage.visibility = View.GONE}else{
-            sharedViewModel.uiScope.launch {
-                bindImage(holder.coverImage, item.album!!.images?.get(0)?.url)
+        val item = getItem(position)
+        if(itemCount ==1 || isAlbum){
+            holder.binding.imageUrl.visibility = View.GONE}else{
+            spotifyViewModel.uiScope.launch {
+                bindImage(holder.binding.imageUrl, item.album!!.images?.get(0)?.url)
             }
         }
 
-        holder.trackName.text = "${if(item.name!!.length > 17){"${item.name!!.subSequence(0,16)}..."}else{item.name}}"
-        holder.artistName.text = "${item.artists?.get(0)?.name?:""}..."
-        holder.duration.text = "${item.duration_ms/1000/60} minutes, ${(item.duration_ms/1000)%60} sec"
-        holder.downloadBtn.setOnClickListener{
-            sharedViewModel.uiScope.launch {
-                getYTLink(spotifyFragment,"Tracks",null,sharedViewModel.ytDownloader.value,"${item.name} ${item.artists?.get(0)!!.name?:""}",track = item)
+        holder.binding.trackName.text = "${if(item.name!!.length > 17){"${item.name!!.subSequence(0,16)}..."}else{item.name}}"
+        holder.binding.artist.text = "${item.artists?.get(0)?.name?:""}..."
+        holder.binding.duration.text = "${item.duration_ms/1000/60} minutes, ${(item.duration_ms/1000)%60} sec"
+        when (item.downloaded) {
+            "Downloaded" -> {
+                holder.binding.btnDownload.setImageResource(R.drawable.ic_tick)
+                holder.binding.btnDownload.clearAnimation()
+            }
+            "Downloading" -> {
+                holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
+                rotateAnim(holder.binding.btnDownload)
+            }
+            "notDownloaded" -> {
+                holder.binding.btnDownload.setImageResource(R.drawable.ic_arrow)
+                holder.binding.btnDownload.clearAnimation()
+                holder.binding.btnDownload.setOnClickListener{
+                    Toast.makeText(context,"Starting Download",Toast.LENGTH_SHORT).show()
+                    holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
+                    rotateAnim(it)
+                    item.downloaded = "Downloading"
+                    spotifyViewModel.uiScope.launch {
+                        getYTLink(spotifyFragment,"Tracks",null,spotifyViewModel.ytDownloader,"${item.name} ${item.artists?.get(0)!!.name?:""}",track = item)
+                    }
+                    notifyItemChanged(position)
+                }
             }
         }
-
     }
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
-        val trackName:TextView = itemView.findViewById(R.id.track_name)
-        val artistName:TextView = itemView.findViewById(R.id.artist)
-        val duration:TextView = itemView.findViewById(R.id.duration)
-        val downloadBtn:ImageButton = itemView.findViewById(R.id.btn_download)
-        val coverImage:ImageView = itemView.findViewById(R.id.imageUrl)
-        }
+    class ViewHolder(val binding: TrackListItemBinding) : RecyclerView.ViewHolder(binding.root)
+}
+
+class SpotifyTrackDiffCallback: DiffUtil.ItemCallback<Track>(){
+    override fun areItemsTheSame(oldItem: Track, newItem: Track): Boolean {
+        return oldItem.name == newItem.name
+    }
+
+    override fun areContentsTheSame(oldItem: Track, newItem: Track): Boolean {
+        return oldItem == newItem //Downloaded Check
+    }
+
 }

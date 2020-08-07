@@ -34,10 +34,10 @@ import androidx.core.content.ContextCompat
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
-import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.ui.spotify.SpotifyFragment
+import com.shabinder.spotiflyer.ui.spotify.SpotifyViewModel
 import com.shabinder.spotiflyer.worker.ForegroundService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,7 +49,7 @@ object SpotifyDownloadHelper {
     var context : Context? = null
     var statusBar:TextView? = null
     val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
-    var sharedViewModel:SharedViewModel? = null
+    var spotifyViewModel: SpotifyViewModel? = null
     private var isBrowserLoading = false
     private var total = 0
     private var Processed = 0
@@ -66,9 +66,7 @@ object SpotifyDownloadHelper {
         withContext(Dispatchers.Main){
             total += trackList.size // Adding New Download List Count to StatusBar
             trackList.forEach {
-                val outputFile:String = Environment.getExternalStorageDirectory().toString() + File.separator +
-                        defaultDir + removeIllegalChars(type) + File.separator + (if(subFolder == null){""}else{ removeIllegalChars(subFolder)  + File.separator} + removeIllegalChars(it.name!!)+".mp3")
-                if(File(outputFile).exists()){//Download Already Present!!
+                if(it.downloaded == "Downloaded"){//Download Already Present!!
                     Processed++
                 }else{
                     if(isBrowserLoading){//WebView Busy!!
@@ -124,7 +122,7 @@ object SpotifyDownloadHelper {
                                 }
                                 if(youtubeList.isNotEmpty()){
                                     val request = youtubeList[0]
-                                    sharedViewModel!!.uiScope.launch {
+                                    spotifyViewModel!!.uiScope.launch {
                                         getYTLink(request.spotifyFragment,request.type,request.subFolder,request.ytDownloader,request.searchQuery,request.track)
                                     }
                                     youtubeList.remove(request)
@@ -147,7 +145,7 @@ object SpotifyDownloadHelper {
 
 
     fun downloadFile(subFolder: String?, type: String, track:Track, ytDownloader: YoutubeDownloader?, id: String) {
-        sharedViewModel!!.uiScope.launch {
+        spotifyViewModel!!.uiScope.launch {
             withContext(Dispatchers.IO) {
                 val video = ytDownloader?.getVideo(id)
                 val detail = video?.details()
