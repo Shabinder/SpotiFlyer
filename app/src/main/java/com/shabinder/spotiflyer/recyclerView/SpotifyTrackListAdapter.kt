@@ -27,9 +27,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.databinding.TrackListItemBinding
 import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper.context
-import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper.getYTLink
+import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper.downloadAllTracks
 import com.shabinder.spotiflyer.models.Track
-import com.shabinder.spotiflyer.ui.spotify.SpotifyFragment
 import com.shabinder.spotiflyer.ui.spotify.SpotifyViewModel
 import com.shabinder.spotiflyer.utils.bindImage
 import com.shabinder.spotiflyer.utils.rotateAnim
@@ -40,7 +39,6 @@ class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
 
     var spotifyViewModel = SpotifyViewModel()
     var isAlbum:Boolean = false
-    var spotifyFragment: SpotifyFragment? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -81,7 +79,9 @@ class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
                     rotateAnim(it)
                     item.downloaded = "Downloading"
                     spotifyViewModel.uiScope.launch {
-                        getYTLink(spotifyFragment,"Tracks",null,spotifyViewModel.ytDownloader,"${item.name} ${item.artists?.get(0)!!.name?:""}",track = item)
+                        val itemList = mutableListOf<Track>()
+                        itemList.add(item)
+                        downloadAllTracks(spotifyViewModel.folderType,spotifyViewModel.subFolder,itemList,spotifyViewModel.ytDownloader)
                     }
                     notifyItemChanged(position)
                 }
