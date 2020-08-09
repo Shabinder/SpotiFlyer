@@ -18,10 +18,7 @@
 package com.shabinder.spotiflyer
 
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
-import android.os.Build
+import dagger.hilt.android.HiltAndroidApp
 
 /*
  * Copyright (C)  2020  Shabinder Singh
@@ -40,24 +37,10 @@ import android.os.Build
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class App:Application() {
-    private val channelId = "ForegroundServiceChannel"
-
-    override fun onCreate() {
-        super.onCreate()
-        createNotificationChannel()
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val serviceChannel = NotificationChannel(
-                channelId,
-                "ForeGround Service Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.createNotificationChannel(serviceChannel)
-        }
-
+@HiltAndroidApp
+class App:Application(){
+    companion object{
+        const val clientId:String = "694d8bf4f6ec420fa66ea7fb4c68f89d"
+        const val clientSecret:String = "02ca2d4021a7452dae2328b47a6e8fe8"
     }
 }

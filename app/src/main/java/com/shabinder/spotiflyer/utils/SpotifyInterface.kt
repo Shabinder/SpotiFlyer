@@ -17,7 +17,10 @@
 
 package com.shabinder.spotiflyer.utils
 
-import com.shabinder.spotiflyer.models.*
+import com.shabinder.spotiflyer.models.Album
+import com.shabinder.spotiflyer.models.Playlist
+import com.shabinder.spotiflyer.models.Token
+import com.shabinder.spotiflyer.models.Track
 import retrofit2.http.*
 
 /*
@@ -54,13 +57,9 @@ interface SpotifyService {
 
     @GET("albums/{id}")
     suspend fun getAlbum(@Path("id") albumId: String?): Album
-
-    @GET("me")
-    suspend fun getMe(): UserPrivate?
-
 }
 
-interface SpotifyServiceToken{
+interface SpotifyServiceTokenRequest{
 
     @POST("api/token")
     @FormUrlEncoded

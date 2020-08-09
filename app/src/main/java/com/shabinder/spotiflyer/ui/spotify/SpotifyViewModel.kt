@@ -18,21 +18,21 @@
 package com.shabinder.spotiflyer.ui.spotify
 
 import android.util.Log
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.github.kiulian.downloader.YoutubeDownloader
+import com.shabinder.spotiflyer.database.DatabaseDAO
+import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.Album
 import com.shabinder.spotiflyer.models.Playlist
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.utils.SpotifyService
 import com.shabinder.spotiflyer.utils.finalOutputDir
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.File
 
-class SpotifyViewModel: ViewModel() {
+class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) :
+    ViewModel(){
 
     var folderType:String = ""
     var subFolder:String = ""
@@ -41,7 +41,6 @@ class SpotifyViewModel: ViewModel() {
     var title = MutableLiveData<String>().apply { value = loading }
     var coverUrl = MutableLiveData<String>().apply { value = loading }
     var spotifyService : SpotifyService? = null
-    var ytDownloader : YoutubeDownloader? = null
 
     private var viewModelJob = Job()
     val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -61,6 +60,17 @@ class SpotifyViewModel: ViewModel() {
                     trackList.value = tempTrackList
                     title.value = trackObject.name
                     coverUrl.value = trackObject.album!!.images?.get(0)!!.url!!
+                    withContext(Dispatchers.IO){
+                        databaseDAO.insert(DownloadRecord(
+                            type = "Track",
+                            name = title.value!!,
+                            link = "https://open.spotify.com/$type/$link",
+                            coverUrl = coverUrl.value!!,
+                            totalFiles = tempTrackList.size,
+                            downloaded = trackObject.downloaded =="Downloaded",
+                            directory = finalOutputDir(trackObject.name!!,folderType,subFolder)
+                        ))
+                    }
                 }
             }
 
@@ -79,6 +89,17 @@ class SpotifyViewModel: ViewModel() {
                     trackList.value = tempTrackList
                     title.value = albumObject.name
                     coverUrl.value = albumObject.images?.get(0)!!.url!!
+                    withContext(Dispatchers.IO){
+                        databaseDAO.insert(DownloadRecord(
+                            type = "Album",
+                            name = title.value!!,
+                            link = "https://open.spotify.com/$type/$link",
+                            coverUrl = coverUrl.value!!,
+                            totalFiles = tempTrackList.size,
+                            downloaded = File(finalOutputDir(type = folderType,subFolder = subFolder)).listFiles()?.size == tempTrackList.size,
+                            directory = finalOutputDir(type = folderType,subFolder = subFolder)
+                        ))
+                    }
                 }
             }
 
@@ -92,17 +113,24 @@ class SpotifyViewModel: ViewModel() {
                         it.track?.let {
                             it1 -> if(File(finalOutputDir(it1.name!!,folderType,subFolder)).exists()){//Download Already Present!!
                             it1.downloaded = "Downloaded"
-                            Log.i("ViewModel123","${it1.name} Downloaded")
                             }
                             tempTrackList.add(it1)
                         }
                     }
-                    Log.i("ViewModel",tempTrackList.size.toString())
-                    Log.i("ViewModel",playlistObject.tracks?.items?.size.toString())
                     trackList.value = tempTrackList
                     title.value = playlistObject.name
                     coverUrl.value =  playlistObject.images?.get(0)!!.url!!
-
+                    withContext(Dispatchers.IO){
+                        databaseDAO.insert(DownloadRecord(
+                            type = "Playlist",
+                            name = title.value!!,
+                            link = "https://open.spotify.com/$type/$link",
+                            coverUrl = coverUrl.value!!,
+                            totalFiles = tempTrackList.size,
+                            downloaded = File(finalOutputDir(type = folderType,subFolder = subFolder)).listFiles()?.size == tempTrackList.size,
+                            directory = finalOutputDir(type = folderType,subFolder = subFolder)
+                        ))
+                    }
                 }
             }
             "episode" -> {//TODO

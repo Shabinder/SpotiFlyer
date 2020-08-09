@@ -17,8 +17,6 @@
 
 package com.shabinder.spotiflyer.ui.youtube
 
-import android.content.Context
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +26,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.YoutubeFragmentBinding
@@ -35,7 +34,10 @@ import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.recyclerView.YoutubeTrackListAdapter
 import com.shabinder.spotiflyer.utils.bindImage
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class YoutubeFragment : Fragment() {
 
     private lateinit var binding:YoutubeFragmentBinding
@@ -44,7 +46,7 @@ class YoutubeFragment : Fragment() {
     private lateinit var adapter : YoutubeTrackListAdapter
     private val sampleDomain1 = "youtube.com"
     private val sampleDomain2 = "youtu.be"
-
+    @Inject lateinit var ytDownloader: YoutubeDownloader
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,9 +59,7 @@ class YoutubeFragment : Fragment() {
         YTDownloadHelper.context = requireContext()
         YTDownloadHelper.statusBar = binding.StatusBarYoutube
         binding.trackListYoutube.adapter = adapter
-        sharedViewModel.ytDownloader.observe(viewLifecycleOwner, Observer {
-            youtubeViewModel.ytDownloader = it
-        })
+
         initializeLiveDataObservers()
 
         val args = YoutubeFragmentArgs.fromBundle(requireArguments())
@@ -79,10 +79,10 @@ class YoutubeFragment : Fragment() {
                 searchId = link.substringAfterLast("/","error")
             }
             if(searchId != "error") {
-//                val coverUrl = "https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"
-            youtubeViewModel.getYTTrack(searchId)
+            youtubeViewModel.getYTTrack(searchId,ytDownloader)
                 binding.btnDownloadAllYoutube.setOnClickListener {
-                    //TODO
+                    YTDownloadHelper.downloadFile(null,"YT_Downloads",
+                        youtubeViewModel.ytTrack.value!!,youtubeViewModel.format.value)
                 }
             }else{showToast("Your Youtube Link is not of a Video!!")}
         }else(showToast("Your Youtube Link is not of a Video!!"))
@@ -122,7 +122,6 @@ class YoutubeFragment : Fragment() {
      * Configure Recycler View Adapter
      **/
     private fun adapterConfig(list:List<Track>){
-        adapter.sharedViewModel = sharedViewModel
         adapter.submitList(list)
     }
 
@@ -133,13 +132,4 @@ class YoutubeFragment : Fragment() {
         Toast.makeText(context,message, Toast.LENGTH_SHORT).show()
     }
 
-    /**
-     * Util. Function To Check Connection Status
-     **/
-    private fun isNotOnline(): Boolean {
-        val cm =
-            requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val netInfo = cm.activeNetworkInfo
-        return netInfo != null && netInfo.isConnectedOrConnecting
-    }
 }

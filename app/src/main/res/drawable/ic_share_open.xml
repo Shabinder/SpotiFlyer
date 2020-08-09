@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-
 <!--
   ~ Copyright (C)  2020  Shabinder Singh
   ~
@@ -17,13 +15,9 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<resources>
-    <color name="colorPrimary">#FC5C7D</color>
-    <color name="colorPrimaryDark">#CE1CFF</color>
-    <color name="colorAccent">#799BFF</color>
-    <color name="white">#FFFFFF</color>
-    <color name="grey">#99FFFFFF</color>
-    <color name="black">#000000</color>
-
-
-</resources>
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="30dp"
+    android:height="30dp" android:viewportWidth="512" android:viewportHeight="512">
+    <path android:fillColor="#FF3C64" android:pathData="m304,232a24,24 0,0 1,-16.971 -40.971l160,-160a24,24 0,0 1,33.942 33.942l-160,160a23.926,23.926 0,0 1,-16.971 7.029z"/>
+    <path android:fillColor="#FF3B63" android:pathData="m464,200a24,24 0,0 1,-24 -24v-104h-104a24,24 0,0 1,0 -48h128a24,24 0,0 1,24 24v128a24,24 0,0 1,-24 24z"/>
+    <path android:fillColor="#CE1CFF" android:pathData="m464,488h-416a24,24 0,0 1,-24 -24v-416a24,24 0,0 1,24 -24h176a24,24 0,0 1,0 48h-152v368h368v-152a24,24 0,0 1,48 0v176a24,24 0,0 1,-24 24z"/>
+</vector>

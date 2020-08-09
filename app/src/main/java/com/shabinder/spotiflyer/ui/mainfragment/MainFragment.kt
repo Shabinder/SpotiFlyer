@@ -34,12 +34,17 @@ import androidx.navigation.fragment.findNavController
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.MainFragmentBinding
+import com.shreyaspatil.EasyUpiPayment.EasyUpiPayment
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    private lateinit var viewModel: MainViewModel
+    private lateinit var mainViewModel: MainViewModel
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var binding: MainFragmentBinding
+    @Inject lateinit var easyUpiPayment: EasyUpiPayment
 
 
     override fun onCreateView(
@@ -47,7 +52,6 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater,R.layout.main_fragment,container,false)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         initializeAll()
 
         binding.btnSearch.setOnClickListener {
@@ -62,18 +66,26 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
+
     private fun initializeAll() {
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
-        setUpUsageText()
         openYTButton()
         openSpotifyButton()
         openGithubButton()
         openInstaButton()
         openLinkedInButton()
+        historyButton()
+        binding.usage.text = usageText()
         binding.btnDonate.setOnClickListener {
-            sharedViewModel.easyUpiPayment?.startPayment()
+            easyUpiPayment.startPayment()
         }
+    }
 
+    private fun historyButton() {
+        binding.btnHistory.setOnClickListener {
+            findNavController().navigate(MainFragmentDirections.actionMainFragmentToDownloadRecord())
+        }
     }
 
     /**
@@ -91,16 +103,6 @@ class MainFragment : Fragment() {
             }
         })
     }
-
-    private fun setUpUsageText() {
-        val spanStringBuilder = SpannableStringBuilder()
-        spanStringBuilder.append(getText(R.string.d_one)).append("\n")
-        spanStringBuilder.append(getText(R.string.d_two)).append("\n")
-        spanStringBuilder.append(getText(R.string.d_three)).append("\n")
-        spanStringBuilder.append(getText(R.string.d_four)).append("\n")
-        binding.usage.text = spanStringBuilder
-    }
-
 
     /**
      * Implementing buttons
@@ -161,5 +163,11 @@ class MainFragment : Fragment() {
             startActivity(intent)
         }
     }
-
+    private fun usageText(): SpannableStringBuilder {
+        return SpannableStringBuilder()
+            .append(getText(R.string.d_one)).append("\n")
+            .append(getText(R.string.d_two)).append("\n")
+            .append(getText(R.string.d_three)).append("\n")
+            .append(getText(R.string.d_four)).append("\n")
+    }
 }

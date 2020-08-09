@@ -23,17 +23,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.github.kiulian.downloader.model.formats.Format
-import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.TrackListItemBinding
 import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.utils.bindImage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class YoutubeTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHolder>(YouTubeTrackDiffCallback()) {
 
     var format:Format? = null
-    var sharedViewModel = SharedViewModel()
+    private val adapterScope = CoroutineScope(Dispatchers.Default)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -49,7 +50,7 @@ class YoutubeTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
         val item = getItem(position)
         if(itemCount == 1){
             holder.binding.imageUrl.visibility = View.GONE}else{
-            sharedViewModel.uiScope.launch {
+            adapterScope.launch {
                 bindImage(holder.binding.imageUrl, item.ytCoverUrl)
             }
         }
@@ -58,7 +59,7 @@ class YoutubeTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
         holder.binding.artist.text = "${item.artists?.get(0)?.name?:""}..."
         holder.binding.duration.text =  "${item.duration_ms/1000/60} minutes, ${(item.duration_ms/1000)%60} sec"
         holder.binding.btnDownload.setOnClickListener{
-            sharedViewModel.uiScope.launch {
+            adapterScope.launch {
                 YTDownloadHelper.downloadFile(null,"YT_Downloads",item,format)
             }
         }
@@ -72,5 +73,4 @@ class YouTubeTrackDiffCallback: DiffUtil.ItemCallback<Track>(){
     override fun areContentsTheSame(oldItem: Track, newItem: Track): Boolean {
         return oldItem == newItem
     }
-
 }

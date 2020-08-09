@@ -31,7 +31,7 @@ class SplashScreen : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash_screen)
 
-        val splashTimeout = 500
+        val splashTimeout = 400
         val homeIntent = Intent(this@SplashScreen, MainActivity::class.java)
         Handler().postDelayed({
             //TODO:Bring Initial Setup here

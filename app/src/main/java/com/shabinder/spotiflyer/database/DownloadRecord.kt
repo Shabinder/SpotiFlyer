@@ -27,7 +27,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 @Entity(
     tableName = "download_record_table",
-    indices = [Index(value = ["id","link"], unique = true)]
+    indices = [Index(value = ["link"], unique = true)]
 )
 data class DownloadRecord(
 

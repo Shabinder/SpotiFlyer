@@ -41,6 +41,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
@@ -51,18 +52,23 @@ import com.shabinder.spotiflyer.recyclerView.SpotifyTrackListAdapter
 import com.shabinder.spotiflyer.utils.bindImage
 import com.shabinder.spotiflyer.utils.copyTo
 import com.shabinder.spotiflyer.utils.rotateAnim
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
+import javax.inject.Inject
 
 @Suppress("DEPRECATION")
+
+@AndroidEntryPoint
 class SpotifyFragment : Fragment() {
     private lateinit var binding:SpotifyFragmentBinding
     private lateinit var spotifyViewModel: SpotifyViewModel
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var adapterSpotify:SpotifyTrackListAdapter
+    @Inject lateinit var ytDownloader:YoutubeDownloader
     private var webView: WebView? = null
     private var intentFilter:IntentFilter? = null
     private var updateUIReceiver: BroadcastReceiver? = null
@@ -87,7 +93,7 @@ class SpotifyFragment : Fragment() {
 
         Log.i("Fragment", "$type : $link")
 
-        if(sharedViewModel.spotifyService.value == null && isNotOnline()){//Authentication pending!!
+        if(sharedViewModel.spotifyService.value == null){//Authentication pending!!
             (activity as MainActivity).authenticateSpotify()
         }
         if(!isNotOnline()){//Device Offline
@@ -122,7 +128,7 @@ class SpotifyFragment : Fragment() {
                             spotifyViewModel.folderType,
                             spotifyViewModel.subFolder,
                             spotifyViewModel.trackList.value!!,
-                            spotifyViewModel.ytDownloader
+                            ytDownloader
                         )
                     }
                 }
@@ -219,9 +225,6 @@ class SpotifyFragment : Fragment() {
         sharedViewModel.spotifyService.observe(viewLifecycleOwner, Observer {
             spotifyViewModel.spotifyService = it
         })
-        sharedViewModel.ytDownloader.observe(viewLifecycleOwner, Observer {
-            spotifyViewModel.ytDownloader = it
-        })
         SpotifyDownloadHelper.webView = binding.webViewSpotify
         SpotifyDownloadHelper.context = requireContext()
         SpotifyDownloadHelper.spotifyViewModel = spotifyViewModel
@@ -283,7 +286,7 @@ class SpotifyFragment : Fragment() {
      * Configure Recycler View Adapter
      **/
     private fun adapterConfig(trackList: List<Track>){
-        adapterSpotify.spotifyFragment = this
+        adapterSpotify.ytDownloader = ytDownloader
         adapterSpotify.spotifyViewModel = spotifyViewModel
         adapterSpotify.submitList(trackList)
     }

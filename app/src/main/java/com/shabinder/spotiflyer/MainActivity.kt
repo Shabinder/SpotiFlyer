@@ -22,7 +22,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -34,15 +33,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.UpdateFrom
-import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.databinding.MainActivityBinding
 import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper
 import com.shabinder.spotiflyer.utils.SpotifyService
-import com.shabinder.spotiflyer.utils.SpotifyServiceToken
+import com.shabinder.spotiflyer.utils.SpotifyServiceTokenRequest
 import com.shabinder.spotiflyer.utils.createDirectory
-import com.shreyaspatil.EasyUpiPayment.EasyUpiPayment
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -50,40 +47,39 @@ import okhttp3.Request
 import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Inject
 
 
 @Suppress("DEPRECATION")
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(){
-    private lateinit var binding: MainActivityBinding
-    private var ytDownloader : YoutubeDownloader? = null
     private var spotifyService : SpotifyService? = null
-    private var spotifyServiceToken : SpotifyServiceToken? = null
-//    private val redirectUri = "spotiflyer://callback"
-    private val clientId:String = "694d8bf4f6ec420fa66ea7fb4c68f89d"
-    private val clientSecret:String = "02ca2d4021a7452dae2328b47a6e8fe8"
     private var isConnected: Boolean = false
     private var sharedPref :SharedPreferences? = null
-    private var easyUpiPayment:EasyUpiPayment? = null
     private var token :String =""
+    private lateinit var binding: MainActivityBinding
     private lateinit var sharedViewModel: SharedViewModel
+    @Inject lateinit var spotifyServiceTokenRequest: SpotifyServiceTokenRequest
+    @Inject lateinit var moshi: Moshi
 
+    companion object{
+        private var instance = MainActivity()
+        fun getInstance():MainActivity{
+            return instance
+        }
+    }
+    init {
+        instance = this
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.main_activity)
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         sharedPref = this.getPreferences(Context.MODE_PRIVATE)
+
         //starting Notification and Downloader Service!
         SpotifyDownloadHelper.startService(this)
-
-/*        if(sharedPref?.contains("token")!! && (sharedPref?.getLong("time",System.currentTimeMillis()/1000/60/60)!! < (System.currentTimeMillis()/1000/60/60)) ){
-            val savedToken = sharedPref?.getString("token","error")!!
-            sharedViewModel.accessToken.value = savedToken
-            Log.i("SharedPrefs Token:",savedToken)
-            token = savedToken
-
-            implementSpotifyService(savedToken)
-        }else{authenticateSpotify()}*/
 
         if(sharedViewModel.spotifyService.value == null){
             authenticateSpotify()
@@ -94,15 +90,10 @@ class MainActivity : AppCompatActivity(){
         requestPermission()
         disableDozeMode()
         checkIfLatestVersion()
-        createDir()
-        setUpi()
-        isConnected = isOnline()
+        createDirectories()
+        isConnected = sharedViewModel.isOnline(this)
         sharedViewModel.isConnected.value = isConnected
         Log.i("Connection Status",isConnected.toString())
-
-        //Object to download From Youtube {"https://github.com/sealedtx/java-youtube-downloader"}
-        ytDownloader = YoutubeDownloader()
-        sharedViewModel.ytDownloader.value = ytDownloader
 
         handleIntentFromExternalActivity()
     }
@@ -157,10 +148,6 @@ class MainActivity : AppCompatActivity(){
             }
         })
 
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-
         val retrofit = Retrofit.Builder()
                 .baseUrl("https://api.spotify.com/v1/")
                 .client(httpClient.build())
@@ -171,45 +158,15 @@ class MainActivity : AppCompatActivity(){
         sharedViewModel.spotifyService.value = spotifyService
     }
 
-    private fun getSpotifyToken(){
-        val httpClient2: OkHttpClient.Builder = OkHttpClient.Builder()
-        httpClient2.addInterceptor(object : Interceptor {
-            override fun intercept(chain: Interceptor.Chain): Response {
-                val request: Request =
-                    chain.request().newBuilder().addHeader(
-                        "Authorization",
-                        "Basic ${android.util.Base64.encodeToString("$clientId:$clientSecret".toByteArray(),android.util.Base64.NO_WRAP)}"
-                    ).build()
-                return chain.proceed(request)
-            }
-        })
-
-        val moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-
-        val retrofit2 = Retrofit.Builder()
-            .baseUrl("https://accounts.spotify.com/")
-            .client(httpClient2.build())
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-
-        spotifyServiceToken = retrofit2.create(SpotifyServiceToken::class.java)
-
-    }
 
     fun authenticateSpotify() {
-        if (spotifyServiceToken == null) {
-            getSpotifyToken()
-        }
         sharedViewModel.uiScope.launch {
             if (isConnected) {
                 Log.i("Post Request", "Made")
-                token = spotifyServiceToken!!.getToken()!!.access_token
+                token = spotifyServiceTokenRequest.getToken()!!.access_token
                 implementSpotifyService(token)
                 Log.i("Post Request", token)
                 sharedViewModel.accessToken.value = token
-                saveToken(token)
             }else{
                 Log.i("network", "unavailable")
 //                sharedViewModel.showAlertDialog(resources,this@MainActivity)
@@ -217,15 +174,6 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
-    private fun saveToken(token:String) {
-        with (sharedPref?.edit()) {
-            this?.let {
-                putString("token", token)
-                putLong("time",(System.currentTimeMillis()/1000/60/60))
-                commit()
-            }
-        }
-    }
 
     private fun handleIntentFromExternalActivity() {
         if (intent?.action == Intent.ACTION_SEND) {
@@ -236,13 +184,6 @@ class MainActivity : AppCompatActivity(){
                 }
             }
         }
-    }
-
-    private fun isOnline(): Boolean {
-        val cm =
-            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val netInfo = cm.activeNetworkInfo
-        return netInfo != null && netInfo.isConnectedOrConnecting
     }
 
     private fun requestPermission() {
@@ -267,22 +208,7 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
-    private fun setUpi() {
-        easyUpiPayment = EasyUpiPayment.Builder()
-            .with(this)
-            .setPayeeVpa("technoshab@paytm")
-            .setPayeeName("Shabinder Singh")
-            .setTransactionId("UNIQUE_TRANSACTION_ID")
-            .setTransactionRefId("UNIQUE_TRANSACTION_REF_ID")
-            .setDescription("Thanks for donating")
-            .setAmount("39.00")
-            .build()
-
-        sharedViewModel.easyUpiPayment = easyUpiPayment
-
-    }
-
-    private fun createDir() {
+    private fun createDirectories() {
         createDirectory(SpotifyDownloadHelper.defaultDir)
         createDirectory(SpotifyDownloadHelper.defaultDir+".Images/")
         createDirectory(SpotifyDownloadHelper.defaultDir+"Tracks/")
@@ -308,55 +234,4 @@ class MainActivity : AppCompatActivity(){
             }
         appUpdater.start()
     }
-
-
-    /*
-    private fun authenticateSpotify() {
-        val builder =  AuthenticationRequest.Builder(clientId,AuthenticationResponse.Type.TOKEN,redirectUri)
-            .setScopes(arrayOf("user-read-private"))
-//            .setScopes(arrayOf("user-read-private","streaming","user-read-email","user-modify-playback-state","user-top-read","user-library-modify","user-read-currently-playing","user-library-read","user-read-recently-played"))
-        val request: AuthenticationRequest = builder.build()
-        AuthenticationClient.openLoginActivity(this, LoginActivity.REQUEST_CODE, request)
-    }*/
-
-    /*override fun onActivityResult(
-      requestCode: Int,
-      resultCode: Int,
-      intent: Intent?
-  ) {
-      super.onActivityResult(requestCode, resultCode, intent)
-      // Check if result comes from the correct activity
-      if (requestCode == LoginActivity.REQUEST_CODE) {
-          val response = AuthenticationClient.getResponse(resultCode, intent)
-          when (response.type) {
-              AuthenticationResponse.Type.TOKEN -> {
-                  Log.i("Network",response.accessToken.toString())
-                  token = response.accessToken
-                  sharedViewModel.accessToken = response.accessToken
-
-                  //Implementing My Own Spotify Requests
-                  implementSpotifyService(token)
-
-                  sharedViewModel.uiScope.launch {
-                      val me = spotifyService?.getMe()?.display_name
-                      sharedViewModel.userName.value = "Logged in as: $me"
-                      Log.i("Network","Hello, " + me!!)
-                  }
-
-                  sharedViewModel.userName.observe(this, Observer {
-                      binding.message.text = it
-                  })
-              }
-              AuthenticationResponse.Type.ERROR -> {
-                  Log.i("Network",response.error.toString())
-              }
-              else -> {
-                  Log.i("Network","Something Weird Happened While Authenticating")
-              }
-          }
-      }
-  }
-*/
-
-
 }

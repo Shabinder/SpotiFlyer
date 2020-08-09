@@ -18,34 +18,37 @@
 package com.shabinder.spotiflyer.ui.youtube
 
 import android.util.Log
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
+import com.shabinder.spotiflyer.database.DatabaseDAO
+import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.Artist
 import com.shabinder.spotiflyer.models.Track
+import com.shabinder.spotiflyer.utils.finalOutputDir
 import kotlinx.coroutines.*
 
-class YoutubeViewModel : ViewModel() {
+class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) :
+    ViewModel(){
 
     val ytTrack = MutableLiveData<Track>()
     val format = MutableLiveData<Format>()
     private val loading = "Loading"
     var title = MutableLiveData<String>().apply { value = "\"Loading!\"" }
     var coverUrl = MutableLiveData<String>().apply { value = loading }
-    var ytDownloader: YoutubeDownloader? = null
-
 
     private var viewModelJob = Job()
     val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
 
-    fun getYTTrack(searchId:String) {
+    fun getYTTrack(searchId:String,ytDownloader:YoutubeDownloader) {
         uiScope.launch {
             withContext(Dispatchers.IO){
                 Log.i("YT View Model",searchId)
-                val video = ytDownloader?.getVideo(searchId)
+                val video = ytDownloader.getVideo(searchId)
                 val detail = video?.details()
                 val name = detail?.title()?.replace(detail.author()!!.toUpperCase(),"",true) ?: detail?.title()
                 Log.i("YT View Model",detail.toString())
@@ -75,6 +78,17 @@ class YoutubeViewModel : ViewModel() {
                         }
                     }
                 })
+                withContext(Dispatchers.IO){
+                    databaseDAO.insert(DownloadRecord(
+                        type = "Track",
+                        name = if(name.length > 17){"${name.subSequence(0,16)}..."}else{name},
+                        link = "https://www.youtube.com/watch?v=$searchId",
+                        coverUrl = "https://i.ytimg.com/vi/$searchId/maxresdefault.jpg",
+                        totalFiles = 1,
+                        downloaded = false,
+                        directory = finalOutputDir(type = "YT_Downloads")
+                    ))
+                }
             }
         }
     }

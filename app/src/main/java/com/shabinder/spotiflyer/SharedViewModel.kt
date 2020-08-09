@@ -19,13 +19,12 @@ package com.shabinder.spotiflyer
 
 import android.content.Context
 import android.content.res.Resources
+import android.net.ConnectivityManager
 import android.os.Environment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.github.kiulian.downloader.YoutubeDownloader
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shabinder.spotiflyer.utils.SpotifyService
-import com.shreyaspatil.EasyUpiPayment.EasyUpiPayment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -34,8 +33,6 @@ import java.io.File
 class SharedViewModel : ViewModel() {
     var intentString = ""
     var spotifyService = MutableLiveData<SpotifyService>()
-    var ytDownloader = MutableLiveData<YoutubeDownloader>()
-    var easyUpiPayment: EasyUpiPayment? = null
     var accessToken = MutableLiveData<String>().apply { value = "" }
     var isConnected = MutableLiveData<Boolean>().apply { value = false }
     val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator + ".Images" + File.separator
@@ -58,5 +55,11 @@ class SharedViewModel : ViewModel() {
                 // Respond to neutral button press
             }
             .show()
+    }
+    fun isOnline(context: Context): Boolean {
+        val cm =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val netInfo = cm.activeNetworkInfo
+        return netInfo != null && netInfo.isConnectedOrConnecting
     }
 }

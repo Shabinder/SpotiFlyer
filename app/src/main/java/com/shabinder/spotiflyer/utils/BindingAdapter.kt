@@ -43,11 +43,11 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 
-fun finalOutputDir(itemName:String,type:String, subFolder:String?=null): String{
+fun finalOutputDir(itemName:String? = null,type:String, subFolder:String?=null,extension:String? = ".mp3"): String{
     return Environment.getExternalStorageDirectory().toString() + File.separator +
             SpotifyDownloadHelper.defaultDir + SpotifyDownloadHelper.removeIllegalChars(type) + File.separator +
             (if(subFolder == null){""}else{ SpotifyDownloadHelper.removeIllegalChars(subFolder) + File.separator}
-                    + SpotifyDownloadHelper.removeIllegalChars(itemName) +".mp3")
+                    + itemName?.let { SpotifyDownloadHelper.removeIllegalChars(it) + extension})
 }
 
 fun rotateAnim(view: View){

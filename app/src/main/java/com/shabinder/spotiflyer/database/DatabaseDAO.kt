@@ -25,7 +25,7 @@ interface DatabaseDAO {
     suspend fun insert(record: DownloadRecord)
 
     @Update
-    fun update(record: DownloadRecord)
+    suspend fun update(record: DownloadRecord)
 
     @Query("SELECT * from download_record_table ORDER BY id DESC")
     suspend fun getRecord():List<DownloadRecord>

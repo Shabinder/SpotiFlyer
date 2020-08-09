@@ -46,6 +46,11 @@
             app:destination="@id/youtubeFragment"
             app:enterAnim="@android:anim/slide_in_left"
             app:exitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_mainFragment_to_downloadRecord"
+            app:destination="@id/downloadRecord"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/youtubeFragment"
@@ -55,5 +60,21 @@
         <argument
             android:name="link"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/downloadRecord"
+        android:name="com.shabinder.spotiflyer.ui.downloadrecord.DownloadRecordFragment"
+        android:label="DownloadRecord"
+        tools:layout="@layout/download_record_fragment">
+        <action
+            android:id="@+id/action_downloadRecord_to_spotifyFragment"
+            app:destination="@id/spotifyFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_downloadRecord_to_youtubeFragment"
+            app:destination="@id/youtubeFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"/>
     </fragment>
 </navigation>

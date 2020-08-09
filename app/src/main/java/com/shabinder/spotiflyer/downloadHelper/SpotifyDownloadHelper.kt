@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Environment
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -126,13 +127,19 @@ object SpotifyDownloadHelper {
                                         isBrowserLoading = false
                                         listProcessed = true
                                     }
+                                }else{//YT List Empty....Maybe it was one Single Download
+                                    Handler().postDelayed({//Delay of 1.5 sec
+                                        if(youtubeList.isEmpty()){//Lets Make It sure , There are No more Downloads In Queue.....
+                                            isBrowserLoading = false
+                                            listProcessed = true
+                                        }
+                                    },1500)
                                 }
                             }
                     }   )
                 }
             }
         }
-
     }
 
     private fun updateStatusBar() {

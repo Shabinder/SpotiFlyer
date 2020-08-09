@@ -24,10 +24,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
-import android.os.Build
-import android.os.Environment
-import android.os.IBinder
-import android.os.PowerManager
+import android.os.*
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -198,10 +195,12 @@ class ForegroundService : Service(){
     override fun onDestroy() {
         super.onDestroy()
         if(downloadMap.isEmpty() && converted == total){
-            Log.i(tag,"Service destroyed.")
-            deleteFile(parentDirectory)
-            releaseWakeLock()
-            stopForeground(true)
+            Handler().postDelayed({
+                Log.i(tag,"Service destroyed.")
+                deleteFile(parentDirectory)
+                releaseWakeLock()
+                stopForeground(true)
+            },2000)
         }
     }
 
@@ -224,11 +223,11 @@ class ForegroundService : Service(){
         super.onTaskRemoved(rootIntent)
         if(downloadMap.isEmpty() && converted == total ){
             Log.i(tag,"Service Removed.")
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                stopForeground(true)
-//            } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                stopForeground(true)
+            } else {
                 stopSelf()//System will automatically close it
-//            }
+            }
         }
     }
 
@@ -243,7 +242,7 @@ class ForegroundService : Service(){
                 if (file.isDirectory) {
                     deleteFile(file)
                 } else if(file.isFile) {
-                    if(file.path.toString().substringAfterLast(".") != "mp3" && file.path.toString().substringAfterLast(".") != "jpeg"){
+                    if(file.path.toString().substringAfterLast(".") != "mp3"){
 //                        Log.i(tag,"deleting ${file.path}")
                         file.delete()
                     }
@@ -427,7 +426,7 @@ class ForegroundService : Service(){
         val m4aFile = File(filePath)
 
         FFmpeg.executeAsync(
-            "-i $filePath -b:a 160k -vn ${filePath.substringBeforeLast('.') + ".mp3"}"
+            "-i $filePath -y -b:a 160k -vn ${filePath.substringBeforeLast('.') + ".mp3"}"
         ) { _, returnCode ->
             when (returnCode) {
                 RETURN_CODE_SUCCESS -> {

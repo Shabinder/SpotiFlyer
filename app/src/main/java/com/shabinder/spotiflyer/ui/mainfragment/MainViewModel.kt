@@ -17,8 +17,11 @@
 
 package com.shabinder.spotiflyer.ui.mainfragment
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
+import com.shabinder.spotiflyer.database.DatabaseDAO
 
-class MainViewModel : ViewModel() {
-    // TODO: Implement the ViewModel
+class MainViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) :
+    ViewModel(){
+//TODO Refactoring Code Up here
 }

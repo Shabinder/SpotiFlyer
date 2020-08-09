@@ -37,7 +37,6 @@
             android:textColorHint="@color/grey"
             android:textSize="19sp"
             app:layout_constraintEnd_toStartOf="@+id/btn_search"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -54,9 +53,9 @@
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/linkSearch"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/linkSearch"
             app:layout_constraintTop_toTopOf="@+id/linkSearch" />
+
 
         <ImageView
             android:id="@+id/appLogo"
@@ -72,6 +71,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linkSearch" />
+
+        <ImageButton
+            android:id="@+id/btn_history"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/transparent"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@+id/appLogo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_history" />
 
         <TextView
             android:id="@+id/appName"
@@ -270,5 +281,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/heart" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

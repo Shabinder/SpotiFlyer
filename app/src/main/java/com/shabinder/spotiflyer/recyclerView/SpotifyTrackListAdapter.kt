@@ -24,6 +24,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.databinding.TrackListItemBinding
 import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper.context
@@ -37,15 +38,14 @@ import kotlinx.coroutines.launch
 
 class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHolder>(SpotifyTrackDiffCallback()) {
 
-    var spotifyViewModel = SpotifyViewModel()
+    var spotifyViewModel : SpotifyViewModel? = null
     var isAlbum:Boolean = false
+    var ytDownloader: YoutubeDownloader? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-
         val binding = TrackListItemBinding.inflate(layoutInflater,parent,false)
-//        val view = layoutInflater.inflate(R.layout.track_list_item,parent,false)
         return ViewHolder(binding)
     }
 
@@ -53,7 +53,7 @@ class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
         val item = getItem(position)
         if(itemCount ==1 || isAlbum){
             holder.binding.imageUrl.visibility = View.GONE}else{
-            spotifyViewModel.uiScope.launch {
+            spotifyViewModel!!.uiScope.launch {
                 bindImage(holder.binding.imageUrl, item.album!!.images?.get(0)?.url)
             }
         }
@@ -78,12 +78,12 @@ class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
                     holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
                     rotateAnim(it)
                     item.downloaded = "Downloading"
-                    spotifyViewModel.uiScope.launch {
+                    spotifyViewModel!!.uiScope.launch {
                         val itemList = mutableListOf<Track>()
                         itemList.add(item)
-                        downloadAllTracks(spotifyViewModel.folderType,spotifyViewModel.subFolder,itemList,spotifyViewModel.ytDownloader)
+                        downloadAllTracks(spotifyViewModel!!.folderType,spotifyViewModel!!.subFolder,itemList,ytDownloader)
                     }
-                    notifyItemChanged(position)
+                    notifyItemChanged(position)//start showing anim!
                 }
             }
         }
@@ -99,5 +99,4 @@ class SpotifyTrackDiffCallback: DiffUtil.ItemCallback<Track>(){
     override fun areContentsTheSame(oldItem: Track, newItem: Track): Boolean {
         return oldItem == newItem //Downloaded Check
     }
-
 }

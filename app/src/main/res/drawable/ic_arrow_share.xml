@@ -16,16 +16,16 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
-    android:width="36dp" android:height="36dp"
+    android:width="38dp" android:height="38dp"
     android:viewportWidth="512" android:viewportHeight="512">
-    <path android:pathData="m512,256c0,141.387 -114.613,256 -256,256s-256,-114.613 -256,-256 114.613,-256 256,-256 256,114.613 256,256zM512,256">
+    <path android:pathData="m48,496a32.036,32.036 0,0 1,-32 -32,351.731 351.731,0 0,1 352,-351.995l-51.2,-38.4a32,32 0,1 1,38.4 -51.2l128,96a32,32 0,0 1,0 51.2l-128,96a31.736,31.736 0,0 1,-19.18 6.395,32 32,0 0,1 -19.22,-57.6l51.2,-38.4a288,288 0,0 0,-288 288,32.036 32.036,0 0,1 -32,32zM368,128a335.73,335.73 0,0 0,-336 336,16 16,0 0,0 32,0 304,304 0,0 1,304 -304h24a8,8 0,0 1,4.8 14.4l-70.4,52.8a16,16 0,1 0,19.2 25.6l128,-96a16,16 0,0 0,0 -25.6l-128,-96a16,16 0,1 0,-19.2 25.6l70.4,52.8a8,8 0,0 1,-4.8 14.4z">
         <aapt:attr name="android:fillColor">
-            <gradient android:endX="512" android:endY="256"
-                android:startX="0" android:startY="256" android:type="linear">
-                <item android:color="#748AFF" android:offset="0"/>
-                <item android:color="#FF3C64" android:offset="1"/>
+            <gradient android:endX="256" android:endY="16"
+                android:startX="256" android:startY="496" android:type="linear">
+                <item android:color="#8497FA" android:offset="0"/>
+                <item android:color="#CE1CFF" android:offset="0.6"/>
+                <item android:color="#FC5C7D" android:offset="0.9"/>
             </gradient>
         </aapt:attr>
     </path>
-    <path android:fillColor="#000000" android:pathData="m175,395.246c-4.035,0 -7.902,-1.629 -10.727,-4.512l-81,-82.832c-5.789,-5.922 -5.684,-15.418 0.238,-21.211 5.922,-5.793 15.418,-5.688 21.211,0.238l70.273,71.859 232.277,-237.523c5.793,-5.922 15.289,-6.027 21.211,-0.234 5.926,5.789 6.031,15.289 0.238,21.211l-243,248.492c-2.82,2.883 -6.688,4.512 -10.723,4.512zM175,395.246"/>
 </vector>
