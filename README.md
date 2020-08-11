@@ -8,21 +8,31 @@
 
 
 
-
 ## ScreenShots 
-Credits:Library ScreenShot taken on PowerAmp.
 <table style="width:100%">
   <tr>
     <th>1. Home Screen</th>
     <th>2. PlayList Screen</th> 
-    <th>3. Library Screen</th>
   </tr>
   <tr>
     <td><img src="ScreenShots/HomeScreen.png"/></td>
     <td><img src="ScreenShots/PlayList.png"/></td> 
-    <td><img src="ScreenShots/LibraryScreen2.jpg"/></td>
   </tr>
 </table>
+
+<table style="width:100%">
+  <tr>
+    <th>3. History Screen</th>
+    <th>4. Library Screen</th> 
+    <th>5. Notification </th> 
+  </tr>
+  <tr>
+    <td><img src="ScreenShots/DownloadHistory.png"/></td>
+    <td><img src="ScreenShots/LibraryScreen2.jpg"/></td> 
+    <td><img src="ScreenShots/Notification.png"/></td> 
+  </tr>
+</table>
+
 
 
 SpotiFlyer is an **Android App**(Written in **Kotlin**), which **aims** to work as:
@@ -43,11 +53,10 @@ All contributions are welcome, from code to documentation to graphics to design 
 
 ### Todos
  - Write **Tests**.
- - Support for Podcast/Episodes and Shows.
- - In App Animation while Downloading.
+ - Support for Podcasts/Episodes and Shows.
  - Implementation To mute whenever Spotify Ad Plays.
  - Youtube Playlist Support.
- - Modularize App Code and Implement MVVM Model to fullest.
+ - Gaana Platform Support
 
 License
 ----
@@ -56,6 +65,13 @@ This program is free software: you can redistribute it and/or modify it under th
 
 ***Free Software, Hell Yeah!***
 
+
+Credits
+----
+ - Library ScreenShot taken on [PowerAmp](https://play.google.com/store/apps/details?id=com.maxmpz.audioplayer&hl=en_IN).
+ - Some Logos are Based on Logos by [Freepik](https://www.freepik.com/).
+  
+  
 Disclaimer
 ----
 Downloading copyright songs may be illegal in your country. This tool is for educational purposes only and was created only to show how Spotify's API can be exploited to download music from YouTube. Please support the artists by buying their music.
