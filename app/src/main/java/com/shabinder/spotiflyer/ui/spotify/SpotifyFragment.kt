@@ -36,6 +36,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -96,7 +97,7 @@ class SpotifyFragment : Fragment() {
         if(sharedViewModel.spotifyService.value == null){//Authentication pending!!
             (activity as MainActivity).authenticateSpotify()
         }
-        if(!isNotOnline()){//Device Offline
+        if(!isOnline()){//Device Offline
             sharedViewModel.showAlertDialog(resources,requireContext())
         }else if (type == "Error" || link == "Error") {//Incorrect Link
             showToast("Please Check Your Link!")
@@ -179,14 +180,14 @@ class SpotifyFragment : Fragment() {
         /**
          * CoverUrl Binding Observer!
          **/
-        spotifyViewModel.coverUrl.observe(viewLifecycleOwner, Observer {
+        spotifyViewModel.coverUrl.observe(viewLifecycleOwner, {
             if(it!="Loading") bindImage(binding.spotifyCoverImage,it)
         })
 
         /**
          * TrackList Binding Observer!
          **/
-        spotifyViewModel.trackList.observe(viewLifecycleOwner, Observer {
+        spotifyViewModel.trackList.observe(viewLifecycleOwner, {
             if (it.isNotEmpty()){
                 Log.i("SpotifyFragment","TrackList Updated")
                 adapterConfig(it)
@@ -197,8 +198,16 @@ class SpotifyFragment : Fragment() {
         /**
          * Title Binding Observer!
          **/
-        spotifyViewModel.title.observe(viewLifecycleOwner, Observer {
+        spotifyViewModel.title.observe(viewLifecycleOwner, {
             binding.titleViewSpotify.text = it
+        })
+
+        sharedViewModel.intentString.observe(viewLifecycleOwner,{
+        //Waiting for Authentication to Finish with Spotify()Access Token Observe
+            if(it != "" && it!=SpotifyFragmentArgs.fromBundle(requireArguments()).link){
+                //New Intent Received , Time TO RELOAD
+                (activity as MainActivity).onBackPressed()
+            }
         })
     }
 
@@ -230,6 +239,7 @@ class SpotifyFragment : Fragment() {
         SpotifyDownloadHelper.spotifyViewModel = spotifyViewModel
         SpotifyDownloadHelper.statusBar = binding.StatusBarSpotify
         binding.trackListSpotify.adapter = adapterSpotify
+        (binding.trackListSpotify.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     }
 
     /**
@@ -237,7 +247,7 @@ class SpotifyFragment : Fragment() {
      **/
     private fun loadAllImages(trackList: List<Track>) {
         trackList.forEach {
-            val imgUrl = it.album!!.images?.get(0)?.url
+            val imgUrl = it.album?.images?.get(0)?.url
             imgUrl?.let {
                 val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
                 Glide
@@ -295,14 +305,14 @@ class SpotifyFragment : Fragment() {
     /**
      * Util. Function to create toasts!
      **/
-    fun showToast(message:String){
+    private fun showToast(message:String){
         Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
     }
 
     /**
      * Util. Function To Check Connection Status
      **/
-    private fun isNotOnline(): Boolean {
+    private fun isOnline(): Boolean {
         val cm =
             requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val netInfo = cm.activeNetworkInfo

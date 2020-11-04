@@ -17,10 +17,14 @@
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <EditText
             android:id="@+id/linkSearch"
@@ -163,13 +167,14 @@
 
         <TextView
             android:id="@+id/usage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginEnd="24dp"
             android:text="Usage Instructions!"
             android:textAlignment="center"
             android:textColor="#D0838383"
             android:textSize="14sp"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="@+id/developer_insta_spotify"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btn_linkedin"
@@ -283,4 +288,5 @@
             app:layout_constraintStart_toEndOf="@+id/heart" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
 </layout>

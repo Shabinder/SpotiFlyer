@@ -29,6 +29,7 @@ import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.github.javiersantos.appupdater.AppUpdater
@@ -37,7 +38,7 @@ import com.shabinder.spotiflyer.databinding.MainActivityBinding
 import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper
 import com.shabinder.spotiflyer.utils.SpotifyService
 import com.shabinder.spotiflyer.utils.SpotifyServiceTokenRequest
-import com.shabinder.spotiflyer.utils.createDirectory
+import com.shabinder.spotiflyer.utils.createDirectories
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -62,20 +63,12 @@ class MainActivity : AppCompatActivity(){
     @Inject lateinit var spotifyServiceTokenRequest: SpotifyServiceTokenRequest
     @Inject lateinit var moshi: Moshi
 
-    companion object{
-        private var instance = MainActivity()
-        fun getInstance():MainActivity{
-            return instance
-        }
-    }
-    init {
-        instance = this
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,R.layout.main_activity)
+        binding = DataBindingUtil.setContentView(this, R.layout.main_activity)
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
+        //Enabling Dark Mode
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         sharedPref = this.getPreferences(Context.MODE_PRIVATE)
 
         //starting Notification and Downloader Service!
@@ -93,9 +86,15 @@ class MainActivity : AppCompatActivity(){
         createDirectories()
         isConnected = sharedViewModel.isOnline(this)
         sharedViewModel.isConnected.value = isConnected
-        Log.i("Connection Status",isConnected.toString())
+        Log.i("Connection Status", isConnected.toString())
 
         handleIntentFromExternalActivity()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.i("NEW INTENT", "Received")
+        handleIntentFromExternalActivity(intent)
     }
 
     @SuppressLint("BatteryLife")
@@ -133,7 +132,7 @@ class MainActivity : AppCompatActivity(){
     /**
      * Adding my own new Spotify Web Api Requests!
      * */
-    private fun implementSpotifyService(token:String) {
+    private fun implementSpotifyService(token: String) {
         val httpClient: OkHttpClient.Builder = OkHttpClient.Builder()
         httpClient.addInterceptor(object : Interceptor {
 
@@ -175,12 +174,12 @@ class MainActivity : AppCompatActivity(){
     }
 
 
-    private fun handleIntentFromExternalActivity() {
+    private fun handleIntentFromExternalActivity(intent: Intent? = getIntent()) {
         if (intent?.action == Intent.ACTION_SEND) {
             if ("text/plain" == intent.type) {
                 intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-                    Log.i("Intent Received",it)
-                    sharedViewModel.intentString = it
+                    Log.i("Intent Received", it)
+                    sharedViewModel.intentString.value = it
                 }
             }
         }
@@ -195,8 +194,8 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
-    override fun onSaveInstanceState(savedInstanceState:Bundle) {
-        savedInstanceState.putString("token",token)
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        savedInstanceState.putString("token", token)
         super.onSaveInstanceState(savedInstanceState)
     }
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -206,15 +205,6 @@ class MainActivity : AppCompatActivity(){
             implementSpotifyService(savedInstanceState.getString("token")!!)
             super.onRestoreInstanceState(savedInstanceState)
         }
-    }
-
-    private fun createDirectories() {
-        createDirectory(SpotifyDownloadHelper.defaultDir)
-        createDirectory(SpotifyDownloadHelper.defaultDir+".Images/")
-        createDirectory(SpotifyDownloadHelper.defaultDir+"Tracks/")
-        createDirectory(SpotifyDownloadHelper.defaultDir+"Albums/")
-        createDirectory(SpotifyDownloadHelper.defaultDir+"Playlists/")
-        createDirectory(SpotifyDownloadHelper.defaultDir+"YT_Downloads/")
     }
 
     private fun checkIfLatestVersion() {
@@ -233,5 +223,15 @@ class MainActivity : AppCompatActivity(){
                 dialog.dismiss()
             }
         appUpdater.start()
+    }
+
+    companion object{
+        private var instance = MainActivity()
+        fun getInstance():MainActivity{
+            return instance
+        }
+    }
+    init {
+        instance = this
     }
 }

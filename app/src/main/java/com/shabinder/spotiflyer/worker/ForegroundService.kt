@@ -42,7 +42,6 @@ import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.Track
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
-import com.tonyodev.fetch2core.Func
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -123,9 +122,9 @@ class ForegroundService : Service(){
         val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.down_arrowbw)
             .setNotificationSilent()
-            .setSubText("Speed: $speed KB/s")
+            .setSubText("Total: $total  Completed:$converted")
             .setStyle(NotificationCompat.InboxStyle()
-                .setBigContentTitle("Total: $total  Completed:$converted")
+                .setBigContentTitle("Speed: $speed KB/s")
                 .addLine(messageList[0])
                 .addLine(messageList[1])
                 .addLine(messageList[2])
@@ -164,12 +163,12 @@ class ForegroundService : Service(){
                     request.networkType = NetworkType.ALL
 
                     fetch!!.enqueue(request,
-                        Func {
+                        {
                             obj.track?.let { it1 -> requestMap.put(it, it1) }
                             downloadList.remove(obj)
                             Log.i(tag, "Enqueuing Download")
                         },
-                        Func {
+                        {
                             Log.i(tag, "Enqueuing Error:${it.throwable.toString()}")}
                     )
             }
@@ -337,7 +336,7 @@ class ForegroundService : Service(){
                     requestMap.remove(download.request)
                 }
             }
-            if(requestMap.keys.toList().isEmpty()) speed = 0
+            speed = 0
             updateNotification()
         }
 
@@ -473,10 +472,10 @@ class ForegroundService : Service(){
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.down_arrowbw)
-            .setSubText("Speed: $speed KB/s")
+            .setSubText("Total: $total  Completed:$converted")
             .setNotificationSilent()
             .setStyle(NotificationCompat.InboxStyle()
-                .setBigContentTitle("Total: $total  Completed:$converted")
+                .setBigContentTitle("Speed: $speed KB/s")
                 .addLine(messageList[0])
                 .addLine(messageList[1])
                 .addLine(messageList[2])

@@ -15,17 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.models
+package com.shabinder.spotiflyer.utils
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper
 
-@Parcelize
-data class PagingObjectTrack(
-    var href: String? = null,
-    var items: List<Track>? = null,
-    var limit: Int = 0,
-    var next: String? = null,
-    var offset: Int = 0,
-    var previous: String? = null,
-    var total: Int = 0):Parcelable
+fun createDirectories() {
+    createDirectory(SpotifyDownloadHelper.defaultDir)
+    createDirectory(SpotifyDownloadHelper.defaultDir + ".Images/")
+    createDirectory(SpotifyDownloadHelper.defaultDir + "Tracks/")
+    createDirectory(SpotifyDownloadHelper.defaultDir + "Albums/")
+    createDirectory(SpotifyDownloadHelper.defaultDir + "Playlists/")
+    createDirectory(SpotifyDownloadHelper.defaultDir + "YT_Downloads/")
+}
+fun getEmojiByUnicode(unicode: Int): String? {
+    return String(Character.toChars(unicode))
+}

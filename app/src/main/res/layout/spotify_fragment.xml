@@ -81,7 +81,7 @@
                     android:id="@+id/spotify_cover_image"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginTop="23dp"
+                    android:layout_marginTop="28dp"
                     android:layout_marginBottom="3dp"
                     android:contentDescription="Album Cover"
                     android:padding="15dp"
@@ -98,15 +98,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="2dp"
+                    android:layout_marginTop="2dp"
                     android:background="@drawable/text_background_accented"
                     android:fontFamily="@font/raleway_semibold"
                     android:foreground="@drawable/rounded_gradient"
                     android:gravity="center"
                     android:paddingLeft="12dp"
-                    android:paddingTop="1dp"
+                    android:paddingTop="2dp"
                     android:paddingRight="12dp"
-                    android:paddingBottom="1dp"
-                    android:text="Total: 100 Processed: 50"
+                    android:paddingBottom="2dp"
+                    android:text="Total : 1000"
                     android:textAlignment="center"
                     android:textColor="@color/grey"
                     android:textSize="16sp"
@@ -154,9 +155,11 @@
 
     <WebView
         android:id="@+id/webView_spotify"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"/>
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_gravity="bottom"
+        android:visibility="gone"
+        app:layout_anchorGravity="bottom"/>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

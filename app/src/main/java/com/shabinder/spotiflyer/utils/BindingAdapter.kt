@@ -17,8 +17,6 @@
 
 package com.shabinder.spotiflyer.utils
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Environment
 import android.util.Log
 import android.view.View
@@ -40,7 +38,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileInputStream
 import java.io.IOException
 
 fun finalOutputDir(itemName:String? = null,type:String, subFolder:String?=null,extension:String? = ".mp3"): String{
@@ -68,7 +65,7 @@ fun bindImage(imgView: ImageView, imgUrl: String?) {
     imgUrl?.let {
         val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
         Glide
-            .with(imgView.context)
+            .with(imgView)
             .asFile()
             .load(imgUri)
             .placeholder(R.drawable.ic_song_placeholder)
@@ -97,12 +94,12 @@ fun bindImage(imgView: ImageView, imgUrl: String?) {
                                     Environment.getExternalStorageDirectory(),
                                     SpotifyDownloadHelper.defaultDir+".Images/" + imgUrl.substringAfterLast('/',imgUrl) + ".jpeg"
                                 ) // the File to save , append increasing numeric counter to prevent files from getting overwritten.
-                                val options = BitmapFactory.Options()
-                                options.inPreferredConfig = Bitmap.Config.ARGB_8888
-                                val bitmap = BitmapFactory.decodeStream(FileInputStream(resource), null, options)
                                 resource?.copyTo(file)
                                 withContext(Dispatchers.Main){
-                                    imgView.setImageBitmap(bitmap)
+                                    Glide.with(imgView)
+                                        .load(file)
+                                        .placeholder(R.drawable.ic_song_placeholder)
+                                        .into(imgView)
 //                                    Log.i("Glide","imageSaved")
                                 }
                             } catch (e: IOException) {

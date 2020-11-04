@@ -18,8 +18,8 @@
 
 <AppUpdater>
     <update>
-        <latestVersion>1.4</latestVersion>
-        <latestVersionCode>5</latestVersionCode>
-        <url>https://github.com/Shabinder/SpotiFlyer/releases</url>
+        <latestVersion>1.5</latestVersion>
+        <latestVersionCode>6</latestVersionCode>
+        <url>https://github.com/Shabinder/SpotiFlyer/releases/download/1.5/SpotiFlyer-v1.5.apk</url>
     </update>
 </AppUpdater>

@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.Album
+import com.shabinder.spotiflyer.models.Image
 import com.shabinder.spotiflyer.models.Playlist
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.utils.SpotifyService
@@ -78,23 +79,24 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                 uiScope.launch {
                     val albumObject = getAlbumDetails(link)
                     folderType = "Albums"
-                    subFolder = albumObject?.name!!
+                    subFolder = albumObject?.name.toString()
                     val tempTrackList = mutableListOf<Track>()
-                    albumObject.tracks?.items?.forEach {
+                    albumObject?.tracks?.items?.forEach {
                         if(File(finalOutputDir(it.name!!,folderType,subFolder)).exists()){//Download Already Present!!
                             it.downloaded = "Downloaded"
                         }
+                        it.album = Album(images = listOf(Image(url = albumObject.images?.get(0)?.url)))
                         tempTrackList.add(it)
                     }
                     trackList.value = tempTrackList
-                    title.value = albumObject.name
-                    coverUrl.value = albumObject.images?.get(0)!!.url!!
+                    title.value = albumObject?.name
+                    coverUrl.value = albumObject?.images?.get(0)?.url
                     withContext(Dispatchers.IO){
                         databaseDAO.insert(DownloadRecord(
                             type = "Album",
                             name = title.value!!,
                             link = "https://open.spotify.com/$type/$link",
-                            coverUrl = coverUrl.value!!,
+                            coverUrl = coverUrl.value.toString(),
                             totalFiles = tempTrackList.size,
                             downloaded = File(finalOutputDir(type = folderType,subFolder = subFolder)).listFiles()?.size == tempTrackList.size,
                             directory = finalOutputDir(type = folderType,subFolder = subFolder)
@@ -107,9 +109,10 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                 uiScope.launch {
                     val playlistObject = getPlaylistDetails(link)
                     folderType = "Playlists"
-                    subFolder = playlistObject?.name!!
+                    subFolder = playlistObject?.name.toString()
                     val tempTrackList = mutableListOf<Track>()
-                    playlistObject.tracks?.items?.forEach {
+                    Log.i("Tracks Fetched",playlistObject?.tracks?.items?.size.toString())
+                    playlistObject?.tracks?.items?.forEach {
                         it.track?.let {
                             it1 -> if(File(finalOutputDir(it1.name!!,folderType,subFolder)).exists()){//Download Already Present!!
                             it1.downloaded = "Downloaded"
@@ -118,8 +121,8 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                         }
                     }
                     trackList.value = tempTrackList
-                    title.value = playlistObject.name
-                    coverUrl.value =  playlistObject.images?.get(0)!!.url!!
+                    title.value = playlistObject?.name
+                    coverUrl.value =  playlistObject?.images?.get(0)!!.url!!
                     withContext(Dispatchers.IO){
                         databaseDAO.insert(DownloadRecord(
                             type = "Playlist",

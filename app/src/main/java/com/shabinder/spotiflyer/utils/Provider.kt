@@ -23,7 +23,7 @@ import com.shabinder.spotiflyer.App
 import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecordDatabase
-import com.shreyaspatil.EasyUpiPayment.EasyUpiPayment
+import com.shreyaspatil.easyupipayment.EasyUpiPayment
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -34,7 +34,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
@@ -53,14 +52,13 @@ object Provider {
     @Provides
     @Singleton
     fun provideUpi():EasyUpiPayment {
-        return EasyUpiPayment.Builder()
-            .with(MainActivity.getInstance())
+        return EasyUpiPayment.Builder(MainActivity.getInstance())
             .setPayeeVpa("technoshab@paytm")
             .setPayeeName("Shabinder Singh")
             .setTransactionId("UNIQUE_TRANSACTION_ID")
             .setTransactionRefId("UNIQUE_TRANSACTION_REF_ID")
             .setDescription("Thanks for donating")
-            .setAmount("39.00")
+            .setAmount("49.00")
             .build()
     }
 
@@ -82,15 +80,13 @@ object Provider {
     @Singleton
     fun getSpotifyTokenInterface():SpotifyServiceTokenRequest{
         val httpClient2: OkHttpClient.Builder = OkHttpClient.Builder()
-        httpClient2.addInterceptor(object : Interceptor {
-            override fun intercept(chain: Interceptor.Chain): Response {
-                val request: Request =
-                    chain.request().newBuilder().addHeader(
-                        "Authorization",
-                        "Basic ${android.util.Base64.encodeToString("${App.clientId}:${App.clientSecret}".toByteArray(),android.util.Base64.NO_WRAP)}"
-                    ).build()
-                return chain.proceed(request)
-            }
+        httpClient2.addInterceptor(Interceptor { chain ->
+            val request: Request =
+                chain.request().newBuilder().addHeader(
+                    "Authorization",
+                    "Basic ${android.util.Base64.encodeToString("${App.clientId}:${App.clientSecret}".toByteArray(),android.util.Base64.NO_WRAP)}"
+                ).build()
+            chain.proceed(request)
         })
 
         val retrofit = Retrofit.Builder()

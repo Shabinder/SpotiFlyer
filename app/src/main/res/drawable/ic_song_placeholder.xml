@@ -1,3 +1,20 @@
+<!--
+  ~ Copyright (C)  2020  Shabinder Singh
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="42dp"
     android:height="42dp" android:viewportWidth="512" android:viewportHeight="512">
     <path android:fillColor="#A3FFFFFF" android:pathData="m511.739,103.734 l-257,50.947v233.725c-10.733,-7.199 -23.633,-11.406 -37.5,-11.406 -37.22,0 -67.5,30.28 -67.5,67.5s30.28,67.5 67.5,67.5c34.684,0 63.329,-26.299 67.073,-60h0.427v-182.682l197,-39.053v98.141c-10.733,-7.199 -23.633,-11.406 -37.5,-11.406 -37.22,0 -67.5,30.28 -67.5,67.5s30.28,67.5 67.5,67.5c39.927,0 71.547,-34.762 67.073,-75h0.427zM217.239,482c-20.678,0 -37.5,-16.822 -37.5,-37.5s16.822,-37.5 37.5,-37.5 37.5,16.822 37.5,37.5 -16.822,37.5 -37.5,37.5zM444.239,422c-20.678,0 -37.5,-16.822 -37.5,-37.5s16.822,-37.5 37.5,-37.5 37.5,16.822 37.5,37.5 -16.822,37.5 -37.5,37.5zM481.739,199.682 L284.739,238.735v-59.416l197,-39.053z"/>

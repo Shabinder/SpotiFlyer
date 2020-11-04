@@ -31,7 +31,7 @@ import kotlinx.coroutines.Job
 import java.io.File
 
 class SharedViewModel : ViewModel() {
-    var intentString = ""
+    var intentString = MutableLiveData<String>().apply { value = "" }
     var spotifyService = MutableLiveData<SpotifyService>()
     var accessToken = MutableLiveData<String>().apply { value = "" }
     var isConnected = MutableLiveData<Boolean>().apply { value = false }

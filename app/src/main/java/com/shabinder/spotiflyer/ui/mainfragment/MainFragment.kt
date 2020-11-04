@@ -28,13 +28,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.MainFragmentBinding
-import com.shreyaspatil.EasyUpiPayment.EasyUpiPayment
+import com.shreyaspatil.easyupipayment.EasyUpiPayment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -92,7 +91,17 @@ class MainFragment : Fragment() {
      * Handle Intent If there is any!
      **/
     private fun handleIntent() {
-        sharedViewModel.accessToken.observe(viewLifecycleOwner, Observer {
+        sharedViewModel.intentString.observe(viewLifecycleOwner,{
+            //Waiting for Authentication to Finish with Spotify()Access Token Observe
+            if(sharedViewModel.accessToken.value != ""){
+                if(it != ""){
+                    binding.linkSearch.setText(sharedViewModel.intentString.value)
+                    binding.btnSearch.performClick()
+                    sharedViewModel.intentString.value = ""
+                }
+            }
+        })/*
+        sharedViewModel.accessToken.observe(viewLifecycleOwner, {
             //Waiting for Authentication to Finish with Spotify()Access Token Observe
             if (it != ""){
                 if(sharedViewModel.intentString != ""){
@@ -101,7 +110,7 @@ class MainFragment : Fragment() {
                     sharedViewModel.intentString = ""
                 }
             }
-        })
+        })*/
     }
 
     /**

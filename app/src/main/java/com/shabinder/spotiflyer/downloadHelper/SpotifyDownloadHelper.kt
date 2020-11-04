@@ -27,7 +27,6 @@ import android.util.Log
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.webkit.ValueCallback
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
@@ -38,6 +37,7 @@ import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.ui.spotify.SpotifyViewModel
+import com.shabinder.spotiflyer.utils.getEmojiByUnicode
 import com.shabinder.spotiflyer.worker.ForegroundService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,6 +53,7 @@ object SpotifyDownloadHelper {
     private var isBrowserLoading = false
     private var total = 0
     private var Processed = 0
+    private var notFound = 0
     private var listProcessed:Boolean = false
     var youtubeList = mutableListOf<YoutubeRequest>()
 
@@ -107,36 +108,40 @@ object SpotifyDownloadHelper {
                     super.onPageFinished(view, url)
                     view?.evaluateJavascript(
                         "document.getElementsByClassName(\"yt-simple-endpoint style-scope ytd-video-renderer\")[0].href"
-                        ,object :ValueCallback<String>{
-                            override fun onReceiveValue(value: String?) {
-                                Log.i("YT-id",value.toString().replace("\"",""))
-                                val id = value!!.substringAfterLast("=", "error").replace("\"","")
-                                Log.i("YT-id",id)
-                                if(id !="error"){//Link extracting error
-                                    Processed++
-                                    updateStatusBar()
-                                    downloadFile(subFolder, type, track,ytDownloader,id)
-                                }
-                                if(youtubeList.isNotEmpty()){
-                                    val request = youtubeList[0]
-                                    spotifyViewModel!!.uiScope.launch {
-                                        getYTLink(request.type,request.subFolder,request.ytDownloader,request.searchQuery,request.track)
-                                    }
-                                    youtubeList.remove(request)
-                                    if(youtubeList.size == 0){//list processing completed , webView is free again!
-                                        isBrowserLoading = false
-                                        listProcessed = true
-                                    }
-                                }else{//YT List Empty....Maybe it was one Single Download
-                                    Handler().postDelayed({//Delay of 1.5 sec
-                                        if(youtubeList.isEmpty()){//Lets Make It sure , There are No more Downloads In Queue.....
-                                            isBrowserLoading = false
-                                            listProcessed = true
-                                        }
-                                    },1500)
-                                }
+                    ) { value ->
+                        Log.i("YT-id Link", value.toString().replace("\"", ""))
+                        val id = value!!.substringAfterLast("=", "error").replace("\"", "")
+                        Log.i("YT-ID", id)
+                        if (id != "error") {//Link extracting error
+                            Processed++
+                            downloadFile(subFolder, type, track, ytDownloader, id)
+                        }else notFound++
+                        updateStatusBar()
+                        if (youtubeList.isNotEmpty()) {
+                            val request = youtubeList[0]
+                            spotifyViewModel!!.uiScope.launch {
+                                getYTLink(
+                                    request.type,
+                                    request.subFolder,
+                                    request.ytDownloader,
+                                    request.searchQuery,
+                                    request.track
+                                )
                             }
-                    }   )
+                            youtubeList.remove(request)
+                            if (youtubeList.size == 0) {//list processing completed , webView is free again!
+                                isBrowserLoading = false
+                                listProcessed = true
+                            }
+                        } else {//YT List Empty....Maybe it was one Single Download
+                            Handler().postDelayed({//Delay of 1.5 sec
+                                if (youtubeList.isEmpty()) {//Lets Make It sure , There are No more Downloads In Queue.....
+                                    isBrowserLoading = false
+                                    listProcessed = true
+                                }
+                            }, 1500)
+                        }
+                    }
                 }
             }
         }
@@ -144,42 +149,51 @@ object SpotifyDownloadHelper {
 
     private fun updateStatusBar() {
         statusBar!!.visibility = View.VISIBLE
-        statusBar?.text = "Total: $total  Processed: $Processed"
+        statusBar?.text = "Total: $total  ${getEmojiByUnicode(0x2705)}: $Processed   ${getEmojiByUnicode(0x274C)}: $notFound"
     }
 
 
     fun downloadFile(subFolder: String?, type: String, track:Track, ytDownloader: YoutubeDownloader?, id: String) {
         spotifyViewModel!!.uiScope.launch {
             withContext(Dispatchers.IO) {
-                val video = ytDownloader?.getVideo(id)
-                val detail = video?.details()
-                val format:Format? =try {
-                    video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
-                }catch (e:java.lang.IndexOutOfBoundsException){
-                    try {
-                        video?.findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
-                    }catch (e:java.lang.IndexOutOfBoundsException){
-                        try{
-                            video?.findAudioWithQuality(AudioQuality.low)?.get(0) as Format
-                        }catch (e:java.lang.IndexOutOfBoundsException){
-                            Log.i("YTDownloader",e.toString())
-                            null
+                try {
+                    val video = ytDownloader?.getVideo(id)
+                    val detail = video?.details()
+                    val format: Format? = try {
+                        video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
+                    } catch (e: java.lang.IndexOutOfBoundsException) {
+                        try {
+                            video?.findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
+                        } catch (e: java.lang.IndexOutOfBoundsException) {
+                            try {
+                                video?.findAudioWithQuality(AudioQuality.low)?.get(0) as Format
+                            } catch (e: java.lang.IndexOutOfBoundsException) {
+                                Log.i("YTDownloader", e.toString())
+                                null
+                            }
                         }
                     }
-                }
-                format?.let {
-                    val url:String = format.url()
-//                    Log.i("DHelper Link Found", url)
-                    val outputFile:String = Environment.getExternalStorageDirectory().toString() + File.separator +
-                            defaultDir + removeIllegalChars(type) + File.separator + (if(subFolder == null){""}else{ removeIllegalChars(subFolder)  + File.separator} + removeIllegalChars(track.name!!)+".m4a")
+                    format?.let {
+                        val url: String = format.url()
+                        Log.i("DHelper Link Found", url)
+                        val outputFile: String =
+                            Environment.getExternalStorageDirectory().toString() + File.separator +
+                                    defaultDir + removeIllegalChars(type) + File.separator + (if (subFolder == null) {
+                                ""
+                            } else {
+                                removeIllegalChars(subFolder) + File.separator
+                            } + removeIllegalChars(track.name!!) + ".m4a")
 
-                    val downloadObject = DownloadObject(
-                        track = track,
-                        url = url,
-                        outputDir = outputFile
-                    )
-                    Log.i("DH",outputFile)
-                    startService(context!!, downloadObject)
+                        val downloadObject = DownloadObject(
+                            track = track,
+                            url = url,
+                            outputDir = outputFile
+                        )
+                        Log.i("DH", outputFile)
+                        startService(context!!, downloadObject)
+                    }
+                }catch (e: com.github.kiulian.downloader.YoutubeException){
+                    Log.i("DH", "Error- Maybe Network")
                 }
             }
         }

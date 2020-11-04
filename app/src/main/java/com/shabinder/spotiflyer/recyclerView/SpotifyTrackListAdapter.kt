@@ -54,6 +54,7 @@ class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
         if(itemCount ==1 || isAlbum){
             holder.binding.imageUrl.visibility = View.GONE}else{
             spotifyViewModel!!.uiScope.launch {
+                //Placeholder Set
                 bindImage(holder.binding.imageUrl, item.album!!.images?.get(0)?.url)
             }
         }
