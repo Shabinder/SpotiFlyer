@@ -258,13 +258,12 @@ object SpotifyDownloadHelper {
     @SuppressLint("SetJavaScriptEnabled")
     fun applyWebViewSettings(webView: WebView) {
         val desktopUserAgent =
-            "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0"
+            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:82.0) Gecko/20100101 Firefox/82.0"
         val mobileUserAgent =
             "Mozilla/5.0 (Linux; U; Android 4.4; en-us; Nexus 4 Build/JOP24G) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
 
         //Choose Mobile/Desktop client.
         webView.settings.userAgentString = desktopUserAgent
-        webView.settings.loadWithOverviewMode = true
         webView.settings.loadWithOverviewMode = true
         webView.settings.builtInZoomControls = true
         webView.settings.setSupportZoom(true)

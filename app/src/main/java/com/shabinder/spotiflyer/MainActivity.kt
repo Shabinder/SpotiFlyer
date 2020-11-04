@@ -45,11 +45,9 @@ import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Inject
-
 
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
@@ -134,17 +132,13 @@ class MainActivity : AppCompatActivity(){
      * */
     private fun implementSpotifyService(token: String) {
         val httpClient: OkHttpClient.Builder = OkHttpClient.Builder()
-        httpClient.addInterceptor(object : Interceptor {
-
-            override fun intercept(chain: Interceptor.Chain): Response {
-                val request: Request =
-                    chain.request().newBuilder().addHeader(
-                        "Authorization",
-                        "Bearer $token"
-                    ).build()
-                return chain.proceed(request)
-
-            }
+        httpClient.addInterceptor(Interceptor { chain ->
+            val request: Request =
+                chain.request().newBuilder().addHeader(
+                    "Authorization",
+                    "Bearer $token"
+                ).build()
+            chain.proceed(request)
         })
 
         val retrofit = Retrofit.Builder()
