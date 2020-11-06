@@ -30,12 +30,13 @@ import kotlinx.coroutines.launch
 class DownloadRecordViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) :
     ViewModel(){
     private var viewModelJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    private val uiScope = CoroutineScope(Dispatchers.Default + viewModelJob)
     var spotifyList = mutableListOf<DownloadRecord>()
     var ytList = mutableListOf<DownloadRecord>()
     val downloadRecordList = MutableLiveData<MutableList<DownloadRecord>>().apply {
         value = mutableListOf()
     }
+
     init {
         getDownloadRecordList()
     }

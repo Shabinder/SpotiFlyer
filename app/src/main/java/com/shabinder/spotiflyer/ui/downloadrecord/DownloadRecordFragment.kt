@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayout
 import com.shabinder.spotiflyer.R
@@ -46,7 +45,8 @@ class DownloadRecordFragment : Fragment() {
         downloadRecordViewModel = ViewModelProvider(this).get(DownloadRecordViewModel::class.java)
         adapter = DownloadRecordAdapter()
         binding.downloadRecordList.adapter = adapter
-        downloadRecordViewModel.downloadRecordList.observe(viewLifecycleOwner, Observer {
+
+        downloadRecordViewModel.downloadRecordList.observe(viewLifecycleOwner, {
             if(it.isNotEmpty()){
                 downloadRecordViewModel.spotifyList = mutableListOf()
                 downloadRecordViewModel.ytList = mutableListOf()
@@ -56,7 +56,6 @@ class DownloadRecordFragment : Fragment() {
                 }
                 if(binding.tabLayout.selectedTabPosition == 0) adapter.submitList(downloadRecordViewModel.spotifyList)
                 else adapter.submitList(downloadRecordViewModel.ytList)
-//                adapter.notifyDataSetChanged()
             }
         })
 
@@ -67,7 +66,6 @@ class DownloadRecordFragment : Fragment() {
                 if(tab?.text == "Spotify"){
                     adapter.submitList(downloadRecordViewModel.spotifyList)
                 } else adapter.submitList(downloadRecordViewModel.ytList)
-//                adapter.notifyDataSetChanged()
             }
 
             override fun onTabReselected(tab: TabLayout.Tab?) {
@@ -75,7 +73,7 @@ class DownloadRecordFragment : Fragment() {
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
-                // Handle tab unselect
+                // Handle tab unselected
             }
         })
 

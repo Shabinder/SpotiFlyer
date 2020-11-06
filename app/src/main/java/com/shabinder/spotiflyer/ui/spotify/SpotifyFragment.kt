@@ -108,6 +108,7 @@ class SpotifyFragment : Fragment() {
             else{
                 spotifyViewModel.spotifySearch(type,link)
                 if(type=="album")adapterSpotify.isAlbum = true
+
                 binding.btnDownloadAllSpotify.setOnClickListener {
                     for (track in spotifyViewModel.trackList.value!!){
                         if(track.downloaded != "Downloaded"){
@@ -116,6 +117,8 @@ class SpotifyFragment : Fragment() {
                     }
                     binding.btnDownloadAllSpotify.visibility = View.GONE
                     binding.downloadingFabSpotify.visibility = View.VISIBLE
+
+
                     rotateAnim(binding.downloadingFabSpotify)
                     for (track in spotifyViewModel.trackList.value!!){
                         if(track.downloaded != "Downloaded"){
@@ -123,7 +126,7 @@ class SpotifyFragment : Fragment() {
                         }
                     }
                     showToast("Starting Download in Few Seconds")
-                    loadAllImages(spotifyViewModel.trackList.value!!)
+                    spotifyViewModel.uiScope.launch(Dispatchers.Default){loadAllImages(spotifyViewModel.trackList.value!!)}
                     spotifyViewModel.uiScope.launch {
                         SpotifyDownloadHelper.downloadAllTracks(
                             spotifyViewModel.folderType,
@@ -212,15 +215,15 @@ class SpotifyFragment : Fragment() {
     }
 
     private fun checkIfAllDownloaded() {
-        var allDownloaded = true
-        for (track in spotifyViewModel.trackList.value!!){
-            if (track.downloaded != "Downloaded")allDownloaded = false
-        }
-        if(allDownloaded){
-            binding.downloadingFabSpotify.setImageResource(R.drawable.ic_tick)
+        if(!spotifyViewModel.trackList.value!!.any { it.downloaded != "Downloaded" }){
+            //All Tracks Downloaded
             binding.btnDownloadAllSpotify.visibility = View.GONE
-            binding.downloadingFabSpotify.visibility = View.VISIBLE
-            binding.downloadingFabSpotify.clearAnimation()
+            binding.downloadingFabSpotify.apply{
+                setImageResource(R.drawable.ic_tick)
+                visibility = View.VISIBLE
+                clearAnimation()
+                keepScreenOn = false
+            }
         }
     }
 
@@ -245,7 +248,7 @@ class SpotifyFragment : Fragment() {
     /**
      * Function to fetch all Images for using in mp3 tag.
      **/
-    private fun loadAllImages(trackList: List<Track>) {
+    private suspend fun loadAllImages(trackList: List<Track>) {
         trackList.forEach {
             val imgUrl = it.album?.images?.get(0)?.url
             imgUrl?.let {

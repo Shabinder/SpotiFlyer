@@ -35,6 +35,9 @@ import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.MainFragmentBinding
 import com.shreyaspatil.easyupipayment.EasyUpiPayment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -92,25 +95,20 @@ class MainFragment : Fragment() {
      **/
     private fun handleIntent() {
         sharedViewModel.intentString.observe(viewLifecycleOwner,{
-            //Waiting for Authentication to Finish with Spotify()Access Token Observe
-            if(sharedViewModel.accessToken.value != ""){
-                if(it != ""){
-                    binding.linkSearch.setText(sharedViewModel.intentString.value)
-                    binding.btnSearch.performClick()
-                    sharedViewModel.intentString.value = ""
+            if(it != ""){
+                sharedViewModel.uiScope.launch(Dispatchers.IO) {
+                    while (sharedViewModel.accessToken.value == "") {
+                        //Waiting for Authentication to Finish
+                        Thread.sleep(1000)
+                    }
+                    withContext(Dispatchers.Main){
+                        binding.linkSearch.setText(sharedViewModel.intentString.value)
+                        binding.btnSearch.performClick()
+                        sharedViewModel.intentString.value = ""
+                    }
                 }
             }
-        })/*
-        sharedViewModel.accessToken.observe(viewLifecycleOwner, {
-            //Waiting for Authentication to Finish with Spotify()Access Token Observe
-            if (it != ""){
-                if(sharedViewModel.intentString != ""){
-                    binding.linkSearch.setText(sharedViewModel.intentString)
-                    binding.btnSearch.performClick()
-                    sharedViewModel.intentString = ""
-                }
-            }
-        })*/
+        })
     }
 
     /**

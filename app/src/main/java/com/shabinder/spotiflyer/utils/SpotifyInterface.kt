@@ -17,10 +17,7 @@
 
 package com.shabinder.spotiflyer.utils
 
-import com.shabinder.spotiflyer.models.Album
-import com.shabinder.spotiflyer.models.Playlist
-import com.shabinder.spotiflyer.models.Token
-import com.shabinder.spotiflyer.models.Track
+import com.shabinder.spotiflyer.models.*
 import retrofit2.http.*
 
 /*
@@ -45,6 +42,13 @@ interface SpotifyService {
 
     @GET("playlists/{playlist_id}")
     suspend fun getPlaylist(@Path("playlist_id") playlistId: String?): Playlist
+
+    @GET("playlists/{playlist_id}/tracks")
+    suspend fun getPlaylistTracks(
+        @Path("playlist_id") playlistId: String?,
+        @Query("offset") offset: Int = 0,
+        @Query("limit") limit: Int = 100
+    ): PagingObjectPlaylistTrack
 
     @GET("tracks/{id}")
     suspend fun getTrack(@Path("id") trackId: String?): Track

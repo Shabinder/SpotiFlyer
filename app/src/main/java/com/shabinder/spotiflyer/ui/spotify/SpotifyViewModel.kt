@@ -23,10 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
-import com.shabinder.spotiflyer.models.Album
-import com.shabinder.spotiflyer.models.Image
-import com.shabinder.spotiflyer.models.Playlist
-import com.shabinder.spotiflyer.models.Track
+import com.shabinder.spotiflyer.models.*
 import com.shabinder.spotiflyer.utils.SpotifyService
 import com.shabinder.spotiflyer.utils.finalOutputDir
 import kotlinx.coroutines.*
@@ -114,12 +111,23 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                     Log.i("Tracks Fetched",playlistObject?.tracks?.items?.size.toString())
                     playlistObject?.tracks?.items?.forEach {
                         it.track?.let {
-                            it1 -> if(File(finalOutputDir(it1.name!!,folderType,subFolder)).exists()){//Download Already Present!!
+                                it1 -> if(File(finalOutputDir(it1.name!!,folderType,subFolder)).exists()){//Download Already Present!!
                             it1.downloaded = "Downloaded"
-                            }
+                        }
                             tempTrackList.add(it1)
                         }
                     }
+                    var moreTracksAvailable = !playlistObject?.tracks?.next.isNullOrBlank()
+
+                    while(moreTracksAvailable){
+                        //Check For More Tracks If available
+                        val moreTracks = getPlaylistTrackDetails(link,offset = tempTrackList.size)
+                        moreTracks?.items?.forEach{
+                            it.track?.let { it1 -> tempTrackList.add(it1) }
+                        }
+                        moreTracksAvailable = !moreTracks?.next.isNullOrBlank()
+                    }
+                    Log.i("Total Tracks Fetched",tempTrackList.size.toString())
                     trackList.value = tempTrackList
                     title.value = playlistObject?.name
                     coverUrl.value =  playlistObject?.images?.get(0)!!.url!!
@@ -154,6 +162,10 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
     private suspend fun getPlaylistDetails(link:String): Playlist?{
         Log.i("Requesting","https://api.spotify.com/v1/playlists/$link")
         return spotifyService?.getPlaylist(link)
+    }
+    private suspend fun getPlaylistTrackDetails(link:String,offset:Int = 0,limit:Int = 100): PagingObjectPlaylistTrack?{
+        Log.i("Requesting","https://api.spotify.com/v1/playlists/$link/tracks?offset=$offset&limit=$limit")
+        return spotifyService?.getPlaylistTracks(link, offset, limit)
     }
 
     override fun onCleared() {
