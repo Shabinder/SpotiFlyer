@@ -29,7 +29,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
@@ -50,6 +49,7 @@ import com.shabinder.spotiflyer.databinding.SpotifyFragmentBinding
 import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.recyclerView.SpotifyTrackListAdapter
+import com.shabinder.spotiflyer.utils.YoutubeMusicApi
 import com.shabinder.spotiflyer.utils.bindImage
 import com.shabinder.spotiflyer.utils.copyTo
 import com.shabinder.spotiflyer.utils.rotateAnim
@@ -70,7 +70,7 @@ class SpotifyFragment : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var adapterSpotify:SpotifyTrackListAdapter
     @Inject lateinit var ytDownloader:YoutubeDownloader
-    private var webView: WebView? = null
+    @Inject lateinit var youtubeMusicApi: YoutubeMusicApi
     private var intentFilter:IntentFilter? = null
     private var updateUIReceiver: BroadcastReceiver? = null
 
@@ -88,7 +88,7 @@ class SpotifyFragment : Fragment() {
 
         val args = SpotifyFragmentArgs.fromBundle(requireArguments())
         val spotifyLink = args.link
-
+        
         val link = spotifyLink.substringAfterLast('/', "Error").substringBefore('?')
         val type = spotifyLink.substringBeforeLast('/', "Error").substringAfterLast('/')
 
@@ -231,14 +231,13 @@ class SpotifyFragment : Fragment() {
      * Basic Initialization
      **/
     private fun initializeAll() {
-        webView = binding.webViewSpotify
         sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
         spotifyViewModel = ViewModelProvider(this).get(SpotifyViewModel::class.java)
         sharedViewModel.spotifyService.observe(viewLifecycleOwner, Observer {
             spotifyViewModel.spotifyService = it
         })
-        SpotifyDownloadHelper.webView = binding.webViewSpotify
         SpotifyDownloadHelper.context = requireContext()
+        SpotifyDownloadHelper.youtubeMusicApi = youtubeMusicApi
         SpotifyDownloadHelper.spotifyViewModel = spotifyViewModel
         SpotifyDownloadHelper.statusBar = binding.StatusBarSpotify
         binding.trackListSpotify.adapter = adapterSpotify

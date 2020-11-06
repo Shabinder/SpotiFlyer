@@ -69,9 +69,6 @@ class MainActivity : AppCompatActivity(){
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         sharedPref = this.getPreferences(Context.MODE_PRIVATE)
 
-        //starting Notification and Downloader Service!
-        SpotifyDownloadHelper.startService(this)
-
         if(sharedViewModel.spotifyService.value == null){
             authenticateSpotify()
         }else{
@@ -85,6 +82,9 @@ class MainActivity : AppCompatActivity(){
         isConnected = sharedViewModel.isOnline(this)
         sharedViewModel.isConnected.value = isConnected
         Log.i("Connection Status", isConnected.toString())
+
+        //starting Notification and Downloader Service!
+        SpotifyDownloadHelper.startService(this)
 
         handleIntentFromExternalActivity()
     }

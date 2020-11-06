@@ -17,18 +17,13 @@
 
 package com.shabinder.spotiflyer.downloadHelper
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Environment
-import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.github.kiulian.downloader.YoutubeDownloader
@@ -37,25 +32,27 @@ import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.ui.spotify.SpotifyViewModel
+import com.shabinder.spotiflyer.utils.YoutubeMusicApi
 import com.shabinder.spotiflyer.utils.getEmojiByUnicode
+import com.shabinder.spotiflyer.utils.makeJsonBody
 import com.shabinder.spotiflyer.worker.ForegroundService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.File
 
 object SpotifyDownloadHelper {
-    var webView:WebView? = null
     var context : Context? = null
     var statusBar:TextView? = null
+    var youtubeMusicApi:YoutubeMusicApi? = null
     val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
     var spotifyViewModel: SpotifyViewModel? = null
-    private var isBrowserLoading = false
-    private var total = 0
-    private var Processed = 0
-    private var notFound = 0
-    private var listProcessed:Boolean = false
-    var youtubeList = mutableListOf<YoutubeRequest>()
+    var total = 0
+    var Processed = 0
+    var notFound = 0
 
     /**
      * Function To Download All Tracks Available in a List
@@ -70,16 +67,9 @@ object SpotifyDownloadHelper {
                 if(it.downloaded == "Downloaded"){//Download Already Present!!
                     Processed++
                 }else{
-                    if(isBrowserLoading){//WebView Busy!!
-                        if (listProcessed){//Previous List request progress check
-                            getYTLink(type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it)
-                            listProcessed = false//Notifying A list Processing Started
-                        }else{//Adding Requests to a Queue
-                            youtubeList.add(YoutubeRequest(type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it))
-                        }
-                    }else{
-                        getYTLink(type,subFolder,ytDownloader,"${it.name} ${it.artists?.get(0)?.name ?:""}", it)
-                    }
+                    val artistsList = mutableListOf<String>()
+                    it.artists?.forEach { artist -> artistsList.add(artist!!.name!!) }
+                    searchYTMusic(type,subFolder,ytDownloader,"${it.name} - ${artistsList.joinToString(",")}", it)
                 }
                 updateStatusBar()
             }
@@ -88,66 +78,32 @@ object SpotifyDownloadHelper {
     }
 
 
-
-    //TODO CleanUp here and there!!
-    @SuppressLint("SetJavaScriptEnabled")
-    suspend fun getYTLink(type:String,
-                          subFolder:String?,
-                          ytDownloader: YoutubeDownloader?,
-                          searchQuery: String,
-                          track: Track){
-        isBrowserLoading = true // Notify Web View Started Loading
-        val searchText = searchQuery.replace("\\s".toRegex(), "+")
-        val url = "https://www.youtube.com/results?sp=EgIQAQ%253D%253D&q=$searchText"
-        Log.i("DH YT LINK ",url)
-        applyWebViewSettings(webView!!)
-        withContext(Dispatchers.Main){
-            webView!!.loadUrl(url)
-            webView!!.webViewClient = object : WebViewClient() {
-                override fun onPageFinished(view: WebView?, url: String?) {
-                    super.onPageFinished(view, url)
-                    view?.evaluateJavascript(
-                        "document.getElementsByClassName(\"yt-simple-endpoint style-scope ytd-video-renderer\")[0].href"
-                    ) { value ->
-                        Log.i("YT-id Link", value.toString().replace("\"", ""))
-                        val id = value!!.substringAfterLast("=", "error").replace("\"", "")
-                        Log.i("YT-ID", id)
-                        if (id != "error") {//Link extracting error
-                            Processed++
-                            downloadFile(subFolder, type, track, ytDownloader, id)
-                        }else notFound++
-                        updateStatusBar()
-                        if (youtubeList.isNotEmpty()) {
-                            val request = youtubeList[0]
-                            spotifyViewModel!!.uiScope.launch {
-                                getYTLink(
-                                    request.type,
-                                    request.subFolder,
-                                    request.ytDownloader,
-                                    request.searchQuery,
-                                    request.track
-                                )
-                            }
-                            youtubeList.remove(request)
-                            if (youtubeList.size == 0) {//list processing completed , webView is free again!
-                                isBrowserLoading = false
-                                listProcessed = true
-                            }
-                        } else {//YT List Empty....Maybe it was one Single Download
-                            Handler().postDelayed({//Delay of 1.5 sec
-                                if (youtubeList.isEmpty()) {//Lets Make It sure , There are No more Downloads In Queue.....
-                                    isBrowserLoading = false
-                                    listProcessed = true
-                                }
-                            }, 1500)
-                        }
+    suspend fun searchYTMusic(type:String,
+                              subFolder:String?,
+                              ytDownloader: YoutubeDownloader?,
+                              searchQuery: String,
+                              track: Track){
+        val jsonBody = makeJsonBody(searchQuery.trim())
+        youtubeMusicApi?.getYoutubeMusicResponse(jsonBody)?.enqueue(
+            object : Callback<String>{
+                override fun onResponse(call: Call<String>, response: Response<String>) {
+                    spotifyViewModel?.uiScope?.launch {
+                        Log.i("YT API BODY",response.body().toString())
+                        Log.i("YT Search Query",searchQuery)
+                        getYTLink(type,subFolder,ytDownloader,response.body().toString(),track)
                     }
                 }
+
+                override fun onFailure(call: Call<String>, t: Throwable) {
+                    Log.i("YT API Fail",t.message.toString())
+                }
             }
-        }
+        )
+
     }
 
-    private fun updateStatusBar() {
+
+    fun updateStatusBar() {
         statusBar!!.visibility = View.VISIBLE
         statusBar?.text = "Total: $total  ${getEmojiByUnicode(0x2705)}: $Processed   ${getEmojiByUnicode(0x274C)}: $notFound"
     }
@@ -158,7 +114,6 @@ object SpotifyDownloadHelper {
             withContext(Dispatchers.IO) {
                 try {
                     val video = ytDownloader?.getVideo(id)
-                    val detail = video?.details()
                     val format: Format? = try {
                         video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
                     } catch (e: java.lang.IndexOutOfBoundsException) {
@@ -191,18 +146,21 @@ object SpotifyDownloadHelper {
                         )
                         Log.i("DH", outputFile)
                         startService(context!!, downloadObject)
+                        Processed++
+                        spotifyViewModel?.uiScope?.launch(Dispatchers.Main) {
+                            updateStatusBar()
+                        }
                     }
                 }catch (e: com.github.kiulian.downloader.YoutubeException){
-                    Log.i("DH", "Error- Maybe Network")
+                    Log.i("DH", e.message)
                 }
             }
         }
     }
 
-
     fun startService(context:Context,obj:DownloadObject? = null ) {
         val serviceIntent = Intent(context, ForegroundService::class.java)
-        serviceIntent.putExtra("object",obj)
+        obj?.let {  serviceIntent.putExtra("object",it) }
         ContextCompat.startForegroundService(context, serviceIntent)
     }
 
@@ -255,35 +213,4 @@ object SpotifyDownloadHelper {
         anim.repeatCount = Animation.INFINITE
         statusBar?.animation = anim
     }
-    @SuppressLint("SetJavaScriptEnabled")
-    fun applyWebViewSettings(webView: WebView) {
-        val desktopUserAgent =
-            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:82.0) Gecko/20100101 Firefox/82.0"
-        val mobileUserAgent =
-            "Mozilla/5.0 (Linux; U; Android 4.4; en-us; Nexus 4 Build/JOP24G) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
-
-        //Choose Mobile/Desktop client.
-        webView.settings.userAgentString = desktopUserAgent
-        webView.settings.loadWithOverviewMode = true
-        webView.settings.builtInZoomControls = true
-        webView.settings.setSupportZoom(true)
-        webView.isScrollbarFadingEnabled = false
-        webView.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY
-        webView.settings.displayZoomControls = false
-        webView.settings.useWideViewPort = true
-        webView.settings.javaScriptEnabled = true
-        webView.settings.loadsImagesAutomatically = false
-        webView.settings.blockNetworkImage = true
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            webView.settings.safeBrowsingEnabled = true
-        }
-    }
 }
-data class YoutubeRequest(
-    val type:String,
-    val subFolder:String?,
-    val ytDownloader: YoutubeDownloader?,
-    val searchQuery: String,
-    val track: Track,
-    val index: Int? = null
-)

@@ -17,6 +17,7 @@
 
 package com.shabinder.spotiflyer.worker
 
+import android.annotation.SuppressLint
 import android.app.*
 import android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
 import android.content.BroadcastReceiver
@@ -144,33 +145,29 @@ class ForegroundService : Service(){
         return channelId
     }
 
+    @SuppressLint("WakelockTimeout")
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         // Send a notification that service is started
         Log.i(tag,"Service Started.")
         startForeground()
-        //do heavy work on a background thread
-        //val list = intent.getSerializableExtra("list") as List<Any?>
-//        val list = intent.getParcelableArrayListExtra<DownloadObject>("list") ?: intent.extras?.getParcelableArrayList<DownloadObject>("list")
-//        Log.i(tag,"Intent List Size: ${list!!.size}")
-        val obj = intent.getParcelableExtra<DownloadObject>("object") ?: intent.extras?.getParcelable<DownloadObject>("object")
+        val obj:DownloadObject? = intent.getParcelableExtra("object") ?: intent.extras?.getParcelable("object")
         obj?.let {
             total ++
-//        Log.i(tag,"Intent List Size: ${list!!.size}")
             updateNotification()
             serviceScope.launch {
-                    val request= Request(obj.url, obj.outputDir)
-                    request.priority = Priority.NORMAL
-                    request.networkType = NetworkType.ALL
+                val request= Request(obj.url, obj.outputDir)
+                request.priority = Priority.NORMAL
+                request.networkType = NetworkType.ALL
 
-                    fetch!!.enqueue(request,
-                        {
-                            obj.track?.let { it1 -> requestMap.put(it, it1) }
-                            downloadList.remove(obj)
-                            Log.i(tag, "Enqueuing Download")
-                        },
-                        {
-                            Log.i(tag, "Enqueuing Error:${it.throwable.toString()}")}
-                    )
+                fetch!!.enqueue(request,
+                    {
+                        obj.track?.let { it1 -> requestMap.put(it, it1) }
+                        downloadList.remove(obj)
+                        Log.i(tag, "Enqueuing Download")
+                    },
+                    {
+                        Log.i(tag, "Enqueuing Error:${it.throwable.toString()}")}
+                )
             }
         }
 
@@ -316,12 +313,6 @@ class ForegroundService : Service(){
                     messageList[messageList.indexOf(message)] = ""
                 }
             }
-            //Notify Download Completed
-            val intent = Intent()
-                .setAction("track_download_completed")
-                .putExtra("track",track)
-            this@ForegroundService.sendBroadcast(intent)
-
 
             serviceScope.launch {
                 try{
@@ -457,11 +448,17 @@ class ForegroundService : Service(){
         newFile.renameTo(file)
         converted++
         updateNotification()
+
+        //Notify Download Completed
+        val intent = Intent()
+            .setAction("track_download_completed")
+            .putExtra("track",track)
+        this@ForegroundService.sendBroadcast(intent)
+
         //All tasks completed (REST IN PEACE)
         if(converted == total){
             onDestroy()
         }
-
     }
 
     /**

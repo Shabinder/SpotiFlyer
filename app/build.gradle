@@ -115,10 +115,13 @@ dependencies {
     implementation 'com.squareup.moshi:moshi:1.11.0'
     implementation 'com.squareup.moshi:moshi-kotlin:1.11.0'
     implementation "com.squareup.retrofit2:converter-moshi:2.9.0"
+    implementation "com.squareup.retrofit2:converter-scalars:2.9.0"
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.beust:klaxon:5.4'
 
     implementation 'com.mpatric:mp3agic:0.9.1'
     implementation 'com.shreyaspatil:EasyUpiPayment:3.0.0'
-    implementation 'com.github.sealedtx:java-youtube-downloader:2.4.2'
+    implementation 'com.github.sealedtx:java-youtube-downloader:2.4.3'
     implementation "androidx.tonyodev.fetch2:xfetch2:3.1.5"
     implementation 'com.github.javiersantos:AppUpdater:2.7'
 

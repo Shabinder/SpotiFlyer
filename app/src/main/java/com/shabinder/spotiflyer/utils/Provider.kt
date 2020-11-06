@@ -35,7 +35,9 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Singleton
 
 @InstallIn(ApplicationComponent::class)
@@ -95,6 +97,19 @@ object Provider {
             .addConverterFactory(MoshiConverterFactory.create(getMoshi()))
             .build()
         return retrofit.create(SpotifyServiceTokenRequest::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun getYoutubeMusicApi():YoutubeMusicApi{
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://music.youtube.com/youtubei/v1/")
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        return retrofit.create(YoutubeMusicApi::class.java)
     }
 
 }
