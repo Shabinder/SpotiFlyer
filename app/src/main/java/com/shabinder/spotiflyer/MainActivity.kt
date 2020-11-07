@@ -35,10 +35,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.shabinder.spotiflyer.databinding.MainActivityBinding
-import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper
+import com.shabinder.spotiflyer.utils.Provider.activity
 import com.shabinder.spotiflyer.utils.SpotifyService
 import com.shabinder.spotiflyer.utils.SpotifyServiceTokenRequest
 import com.shabinder.spotiflyer.utils.createDirectories
+import com.shabinder.spotiflyer.utils.startService
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -84,7 +85,7 @@ class MainActivity : AppCompatActivity(){
         Log.i("Connection Status", isConnected.toString())
 
         //starting Notification and Downloader Service!
-        SpotifyDownloadHelper.startService(this)
+        startService(this)
 
         handleIntentFromExternalActivity()
     }
@@ -227,5 +228,6 @@ class MainActivity : AppCompatActivity(){
     }
     init {
         instance = this
+        activity = this
     }
 }

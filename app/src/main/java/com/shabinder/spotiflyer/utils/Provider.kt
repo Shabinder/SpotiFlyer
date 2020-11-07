@@ -18,6 +18,7 @@
 package com.shabinder.spotiflyer.utils
 
 import android.content.Context
+import android.os.Environment
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.App
 import com.shabinder.spotiflyer.MainActivity
@@ -38,11 +39,16 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import java.io.File
 import javax.inject.Singleton
 
 @InstallIn(ApplicationComponent::class)
 @Module
 object Provider {
+
+    lateinit var activity: MainActivity
+    val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
+
 
     @Provides
     fun databaseDAO(@ApplicationContext appContext: Context):DatabaseDAO{
@@ -50,6 +56,11 @@ object Provider {
     }
 
 
+    @Provides
+    @Singleton
+    fun getYTDownloader():YoutubeDownloader{
+        return YoutubeDownloader()
+    }
 
     @Provides
     @Singleton
@@ -70,12 +81,6 @@ object Provider {
         return Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
             .build()
-    }
-
-    @Provides
-    @Singleton
-    fun getYTDownloader():YoutubeDownloader{
-        return YoutubeDownloader()
     }
 
     @Provides

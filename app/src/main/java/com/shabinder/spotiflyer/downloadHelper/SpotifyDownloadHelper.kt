@@ -17,25 +17,20 @@
 
 package com.shabinder.spotiflyer.downloadHelper
 
-import android.content.Context
-import android.content.Intent
+import android.annotation.SuppressLint
 import android.os.Environment
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import com.github.kiulian.downloader.YoutubeDownloader
-import com.github.kiulian.downloader.model.formats.Format
-import com.github.kiulian.downloader.model.quality.AudioQuality
-import com.shabinder.spotiflyer.models.DownloadObject
-import com.shabinder.spotiflyer.models.Track
-import com.shabinder.spotiflyer.ui.spotify.SpotifyViewModel
-import com.shabinder.spotiflyer.utils.YoutubeMusicApi
-import com.shabinder.spotiflyer.utils.getEmojiByUnicode
-import com.shabinder.spotiflyer.utils.makeJsonBody
-import com.shabinder.spotiflyer.worker.ForegroundService
+import android.widget.Toast
+import com.shabinder.spotiflyer.SharedViewModel
+import com.shabinder.spotiflyer.models.*
+import com.shabinder.spotiflyer.utils.*
+import com.shabinder.spotiflyer.utils.Provider.activity
+import com.shabinder.spotiflyer.utils.Provider.defaultDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,13 +40,13 @@ import retrofit2.Response
 import java.io.File
 
 object SpotifyDownloadHelper {
-    var context : Context? = null
+
     var statusBar:TextView? = null
     var youtubeMusicApi:YoutubeMusicApi? = null
-    val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
-    var spotifyViewModel: SpotifyViewModel? = null
-    var total = 0
-    var Processed = 0
+    var sharedViewModel: SharedViewModel? = null
+
+    private var total = 0
+    private var processed = 0
     var notFound = 0
 
     /**
@@ -60,16 +55,94 @@ object SpotifyDownloadHelper {
     suspend fun downloadAllTracks(
         type:String,
         subFolder: String?,
-        trackList: List<Track>, ytDownloader: YoutubeDownloader?) {
+        trackList: List<Track>) {
+        val downloadList = ArrayList<DownloadObject>()
+
         withContext(Dispatchers.Main){
             total += trackList.size // Adding New Download List Count to StatusBar
-            trackList.forEach {
-                if(it.downloaded == "Downloaded"){//Download Already Present!!
-                    Processed++
+            trackList.forEachIndexed { index, it ->
+                if(it.downloaded == DownloadStatus.Downloaded){//Download Already Present!!
+                    processed++
+                    if(index == (trackList.size-1)){//LastElement
+                        Handler().postDelayed({
+                            //Delay is Added ,if a request is in processing it may finish
+                            Log.i("Spotify Helper","Download Request Sent")
+                            sharedViewModel?.uiScope?.launch (Dispatchers.Main){
+                                Toast.makeText(activity,"Download Started, Now You can leave the App!", Toast.LENGTH_SHORT).show()
+                            }
+                            startService(activity,downloadList)
+                        },5000)
+                    }
                 }else{
                     val artistsList = mutableListOf<String>()
                     it.artists?.forEach { artist -> artistsList.add(artist!!.name!!) }
-                    searchYTMusic(type,subFolder,ytDownloader,"${it.name} - ${artistsList.joinToString(",")}", it)
+                    val searchQuery = "${it.name} - ${artistsList.joinToString(",")}"
+
+                    val jsonBody = makeJsonBody(searchQuery.trim())
+                    youtubeMusicApi?.getYoutubeMusicResponse(jsonBody)?.enqueue(
+                        object : Callback<String>{
+                            override fun onResponse(call: Call<String>, response: Response<String>) {
+                                sharedViewModel?.uiScope?.launch {
+                                    val videoId = sortByBestMatch(
+                                        getYTTracks(response.body().toString()),
+                                        trackName = it.name.toString(),
+                                        trackArtists = artistsList,
+                                        trackDurationSec = (it.duration_ms/1000).toInt()
+                                    ).keys.firstOrNull()
+                                    Log.i("Spotify Helper Video ID",videoId ?: "Not Found")
+
+                                    if(videoId.isNullOrBlank()) {notFound++ ; updateStatusBar()}
+                                    else {//Found Youtube Video ID
+                                        val trackDetails = TrackDetails(
+                                            title = it.name.toString(),
+                                            artists = artistsList,
+                                            durationSec = (it.duration_ms/1000).toInt(),
+                                            albumArt = File(
+                                                Environment.getExternalStorageDirectory(),
+                                                defaultDir +".Images/" + (it.album?.images?.get(0)?.url.toString()).substringAfterLast('/') + ".jpeg"),
+                                            albumName = it.album?.name,
+                                            year = it.album?.release_date,
+                                            comment = "Genres:${it.album?.genres?.joinToString()}",
+                                            trackUrl = it.href,
+                                            source = Source.Spotify
+                                        )
+
+                                        val outputFile: String =
+                                            Environment.getExternalStorageDirectory().toString() + File.separator +
+                                                    defaultDir +
+                                                    removeIllegalChars(type) + File.separator +
+                                                    (if (subFolder == null) { "" }
+                                                    else { removeIllegalChars(subFolder) + File.separator }
+                                                            + removeIllegalChars(it.name!!) + ".m4a")
+
+                                        val downloadObject = DownloadObject(
+                                            trackDetails = trackDetails,
+                                            ytVideoId = videoId,
+                                            outputFile = outputFile
+                                        )
+                                        processed++
+                                        sharedViewModel?.uiScope?.launch(Dispatchers.Main) {
+                                            updateStatusBar()
+                                        }
+                                        downloadList.add(downloadObject)
+                                        if(index == (trackList.size-1)){//LastElement
+                                            Handler().postDelayed({
+                                                //Delay is Added ,if a request is in processing it may finish
+                                                Log.i("Spotify Helper","Download Request Sent")
+                                                sharedViewModel?.uiScope?.launch (Dispatchers.Main){
+                                                    Toast.makeText(activity,"Download Started, Now You can leave the App!", Toast.LENGTH_SHORT).show()
+                                                }
+                                                startService(activity,downloadList)
+                                            },5000)
+                                        }
+                                    }
+                                }
+                            }
+                            override fun onFailure(call: Call<String>, t: Throwable) {
+                                Log.i("YT API Req. Fail",t.message.toString())
+                            }
+                        }
+                    )
                 }
                 updateStatusBar()
             }
@@ -77,140 +150,18 @@ object SpotifyDownloadHelper {
         }
     }
 
-
-    suspend fun searchYTMusic(type:String,
-                              subFolder:String?,
-                              ytDownloader: YoutubeDownloader?,
-                              searchQuery: String,
-                              track: Track){
-        val jsonBody = makeJsonBody(searchQuery.trim())
-        youtubeMusicApi?.getYoutubeMusicResponse(jsonBody)?.enqueue(
-            object : Callback<String>{
-                override fun onResponse(call: Call<String>, response: Response<String>) {
-                    spotifyViewModel?.uiScope?.launch {
-                        Log.i("YT API BODY",response.body().toString())
-                        Log.i("YT Search Query",searchQuery)
-                        getYTLink(type,subFolder,ytDownloader,response.body().toString(),track)
-                    }
-                }
-
-                override fun onFailure(call: Call<String>, t: Throwable) {
-                    Log.i("YT API Fail",t.message.toString())
-                }
-            }
-        )
-
-    }
-
-
-    fun updateStatusBar() {
-        statusBar!!.visibility = View.VISIBLE
-        statusBar?.text = "Total: $total  ${getEmojiByUnicode(0x2705)}: $Processed   ${getEmojiByUnicode(0x274C)}: $notFound"
-    }
-
-
-    fun downloadFile(subFolder: String?, type: String, track:Track, ytDownloader: YoutubeDownloader?, id: String) {
-        spotifyViewModel!!.uiScope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    val video = ytDownloader?.getVideo(id)
-                    val format: Format? = try {
-                        video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
-                    } catch (e: java.lang.IndexOutOfBoundsException) {
-                        try {
-                            video?.findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
-                        } catch (e: java.lang.IndexOutOfBoundsException) {
-                            try {
-                                video?.findAudioWithQuality(AudioQuality.low)?.get(0) as Format
-                            } catch (e: java.lang.IndexOutOfBoundsException) {
-                                Log.i("YTDownloader", e.toString())
-                                null
-                            }
-                        }
-                    }
-                    format?.let {
-                        val url: String = format.url()
-                        Log.i("DHelper Link Found", url)
-                        val outputFile: String =
-                            Environment.getExternalStorageDirectory().toString() + File.separator +
-                                    defaultDir + removeIllegalChars(type) + File.separator + (if (subFolder == null) {
-                                ""
-                            } else {
-                                removeIllegalChars(subFolder) + File.separator
-                            } + removeIllegalChars(track.name!!) + ".m4a")
-
-                        val downloadObject = DownloadObject(
-                            track = track,
-                            url = url,
-                            outputDir = outputFile
-                        )
-                        Log.i("DH", outputFile)
-                        startService(context!!, downloadObject)
-                        Processed++
-                        spotifyViewModel?.uiScope?.launch(Dispatchers.Main) {
-                            updateStatusBar()
-                        }
-                    }
-                }catch (e: com.github.kiulian.downloader.YoutubeException){
-                    Log.i("DH", e.message)
-                }
-            }
-        }
-    }
-
-    fun startService(context:Context,obj:DownloadObject? = null ) {
-        val serviceIntent = Intent(context, ForegroundService::class.java)
-        obj?.let {  serviceIntent.putExtra("object",it) }
-        ContextCompat.startForegroundService(context, serviceIntent)
-    }
-
-    /**
-     * Removing Illegal Chars from File Name
-     * **/
-    fun removeIllegalChars(fileName: String): String? {
-        val illegalCharArray = charArrayOf(
-            '/',
-            '\n',
-            '\r',
-            '\t',
-            '\u0000',
-            '\u000C',
-            '`',
-            '?',
-            '*',
-            '\\',
-            '<',
-            '>',
-            '|',
-            '\"',
-            '.',
-            '-',
-            '\''
-        )
-
-        var name = fileName
-        for (c in illegalCharArray) {
-            name = fileName.replace(c, '_')
-        }
-        name = name.replace("\\s".toRegex(), "_")
-        name = name.replace("\\)".toRegex(), "")
-        name = name.replace("\\(".toRegex(), "")
-        name = name.replace("\\[".toRegex(), "")
-        name = name.replace("]".toRegex(), "")
-        name = name.replace("\\.".toRegex(), "")
-        name = name.replace("\"".toRegex(), "")
-        name = name.replace("\'".toRegex(), "")
-        name = name.replace(":".toRegex(), "")
-        name = name.replace("\\|".toRegex(), "")
-        return name
-    }
-
     private fun animateStatusBar() {
-        val anim: Animation = AlphaAnimation(0.0f, 0.9f)
-        anim.duration = 650 //You can manage the blinking time with this parameter
+        val anim: Animation = AlphaAnimation(0.3f, 0.9f)
+        anim.duration = 1500 //You can manage the blinking time with this parameter
         anim.startOffset = 20
         anim.repeatMode = Animation.REVERSE
         anim.repeatCount = Animation.INFINITE
         statusBar?.animation = anim
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun updateStatusBar() {
+        statusBar!!.visibility = View.VISIBLE
+        statusBar?.text = "Total: $total  ${getEmojiByUnicode(0x2705)}: $processed   ${getEmojiByUnicode(0x274C)}: $notFound"
     }
 }

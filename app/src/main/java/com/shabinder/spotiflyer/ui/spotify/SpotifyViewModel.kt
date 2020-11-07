@@ -52,7 +52,7 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                     folderType = "Tracks"
                     val tempTrackList = mutableListOf<Track>()
                     if(File(finalOutputDir(trackObject?.name!!,folderType,subFolder)).exists()){//Download Already Present!!
-                        trackObject.downloaded = "Downloaded"
+                        trackObject.downloaded = DownloadStatus.Downloaded
                     }
                     tempTrackList.add(trackObject)
                     trackList.value = tempTrackList
@@ -65,7 +65,7 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                             link = "https://open.spotify.com/$type/$link",
                             coverUrl = coverUrl.value!!,
                             totalFiles = tempTrackList.size,
-                            downloaded = trackObject.downloaded =="Downloaded",
+                            downloaded = trackObject.downloaded == DownloadStatus.Downloaded,
                             directory = finalOutputDir(trackObject.name!!,folderType,subFolder)
                         ))
                     }
@@ -80,7 +80,7 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                     val tempTrackList = mutableListOf<Track>()
                     albumObject?.tracks?.items?.forEach {
                         if(File(finalOutputDir(it.name!!,folderType,subFolder)).exists()){//Download Already Present!!
-                            it.downloaded = "Downloaded"
+                            it.downloaded = DownloadStatus.Downloaded
                         }
                         it.album = Album(images = listOf(Image(url = albumObject.images?.get(0)?.url)))
                         tempTrackList.add(it)
@@ -112,7 +112,7 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                     playlistObject?.tracks?.items?.forEach {
                         it.track?.let {
                                 it1 -> if(File(finalOutputDir(it1.name!!,folderType,subFolder)).exists()){//Download Already Present!!
-                            it1.downloaded = "Downloaded"
+                            it1.downloaded = DownloadStatus.Downloaded
                         }
                             tempTrackList.add(it1)
                         }
@@ -130,13 +130,13 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                     Log.i("Total Tracks Fetched",tempTrackList.size.toString())
                     trackList.value = tempTrackList
                     title.value = playlistObject?.name
-                    coverUrl.value =  playlistObject?.images?.get(0)!!.url!!
+                    coverUrl.value =  playlistObject?.images?.get(0)?.url.toString()
                     withContext(Dispatchers.IO){
                         databaseDAO.insert(DownloadRecord(
                             type = "Playlist",
-                            name = title.value!!,
+                            name = title.value.toString(),
                             link = "https://open.spotify.com/$type/$link",
-                            coverUrl = coverUrl.value!!,
+                            coverUrl = coverUrl.value.toString(),
                             totalFiles = tempTrackList.size,
                             downloaded = File(finalOutputDir(type = folderType,subFolder = subFolder)).listFiles()?.size == tempTrackList.size,
                             directory = finalOutputDir(type = folderType,subFolder = subFolder)

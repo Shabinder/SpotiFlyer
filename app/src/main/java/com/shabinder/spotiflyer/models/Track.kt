@@ -31,7 +31,6 @@ data class Track(
     var explicit: Boolean? = null,
     var external_urls: Map<String?, String?>? = null,
     var href: String? = null,
-    var id: String? = null,
     var name: String? = null,
     var preview_url: String? = null,
     var track_number: Int = 0,
@@ -40,5 +39,5 @@ data class Track(
     var album: Album? = null,
     var external_ids: Map<String?, String?>? = null,
     var popularity: Int? = null,
-    var ytCoverUrl:String? = null,
-    var downloaded:String? = "notDownloaded"):Parcelable
+    var downloaded:DownloadStatus? = DownloadStatus.NotDownloaded):Parcelable
+

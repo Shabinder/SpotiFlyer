@@ -17,34 +17,26 @@
 
 package com.shabinder.spotiflyer.downloadHelper
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
-import com.github.kiulian.downloader.YoutubeDownloader
-import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper.downloadFile
-import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper.notFound
-import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.models.YoutubeTrack
+import me.xdrop.fuzzywuzzy.FuzzySearch
+import kotlin.math.absoluteValue
 
 /*
-* Thanks and credits To https://github.com/spotDL/spotify-downloader
+* Thanks To https://github.com/spotDL/spotify-downloader
 * */
-fun getYTLink(type:String,
-              subFolder:String?,
-              ytDownloader: YoutubeDownloader?,
-              response: String,
-              track: Track
-){
-    //TODO Download File
+fun getYTTracks(response: String):List<YoutubeTrack>{
     val youtubeTracks = mutableListOf<YoutubeTrack>()
-    val parser: Parser = Parser.default()
+
     val stringBuilder: StringBuilder = StringBuilder(response)
-    val responseObj: JsonObject = parser.parse(stringBuilder) as JsonObject
+    val responseObj: JsonObject = Parser.default().parse(stringBuilder) as JsonObject
     val contentBlocks = responseObj.obj("contents")?.obj("sectionListRenderer")?.array<JsonObject>("contents")
     val resultBlocks = mutableListOf<JsonArray<JsonObject>>()
     if (contentBlocks != null) {
-        Log.i("Total Content Blocks:", contentBlocks.size.toString())
         for (cBlock in contentBlocks){
             /**
              *Ignore user-suggestion
@@ -109,8 +101,6 @@ fun getYTLink(type:String,
         ! we do so only if their Type is 'Song' or 'Video
         */
 
-        val simplifiedResults = mutableListOf<JsonObject>()
-
         for(result in resultBlocks){
 
             // Blindly gather available details
@@ -126,7 +116,7 @@ fun getYTLink(type:String,
             ! other constituents of a result block will lead to errors, hence the 'in
             ! result[:-1] ,i.e., skip last element in array '
             */
-            for(detail in result.subList(0,result.size-2)){
+            for(detail in result.subList(0,result.size-1)){
                 if(detail.obj("musicResponsiveListItemFlexColumnRenderer")?.size!! < 2) continue
 
                 // if not a dummy, collect All Variables
@@ -138,7 +128,7 @@ fun getYTLink(type:String,
                         )
                     }
             }
-
+            //Log.i("Text Api",availableDetails.toString())
             /*
             ! Filter Out non-Song/Video results and incomplete results here itself
             ! From what we know about detail order, note that [1] - indicate result type
@@ -146,14 +136,7 @@ fun getYTLink(type:String,
             if ( availableDetails.size > 1 && availableDetails[1] in listOf("Song","Video") ){
 
                 // skip if result is in hours instead of minutes (no song is that long)
-//                if(availableDetails[4].split(':').size != 2) continue TODO
-
-                /*
-                ! grab position of result
-                ! This helps for those oddball cases where 2+ results are rated equally,
-                ! lower position --> better match
-                */
-                val resultPosition = resultBlocks.indexOf(result)
+                if(availableDetails[4].split(':').size != 2) continue //Has Been Giving Issues
 
                 /*
                 ! grab Video ID
@@ -168,23 +151,86 @@ fun getYTLink(type:String,
                     name = availableDetails[0],
                     type = availableDetails[1],
                     artist = availableDetails[2],
+                    duration = availableDetails[4],
                     videoId = videoId
                 )
                 youtubeTracks.add(ytTrack)
             }
         }
     }
-    //Songs First, Videos Later
-    youtubeTracks.sortWith { o1: YoutubeTrack, o2: YoutubeTrack -> o1.type.toString().compareTo(o2.type.toString()) }
 
-    if(youtubeTracks.firstOrNull()?.videoId.isNullOrBlank()) notFound++
-    else downloadFile(
-        subFolder,
-        type,
-        track,
-        ytDownloader,
-        id = youtubeTracks[0].videoId.toString()
-    )
-    Log.i("DHelper YT ID", youtubeTracks.firstOrNull()?.videoId ?: "Not Found")
-    SpotifyDownloadHelper.updateStatusBar()
+    return youtubeTracks
+}
+
+@SuppressLint("DefaultLocale")
+fun sortByBestMatch(ytTracks:List<YoutubeTrack>,
+                    trackName:String,
+                    trackArtists:List<String>,
+                    trackDurationSec:Int,
+                    ):Map<String,Int>{
+    /*
+    * "linksWithMatchValue" is map with Youtube VideoID and its rating/match with 100 as Max Value
+    **/
+    val linksWithMatchValue = mutableMapOf<String,Int>()
+
+    for (result in ytTracks){
+
+        // LoweCasing Name to match Properly
+        // most song results on youtube go by $artist - $songName or artist1/artist2
+        var hasCommonWord = false
+
+        val resultName = result.name?.toLowerCase()?.replace("-"," ")?.replace("/"," ") ?: ""
+        val trackNameWords = trackName.toLowerCase().split(" ")
+
+        for (nameWord in trackNameWords){
+            if (nameWord.isNotBlank() && FuzzySearch.partialRatio(nameWord,resultName) > 85) hasCommonWord = true
+        }
+
+        // Skip this Result if No Word is Common in Name
+        if (!hasCommonWord) {
+            Log.i("YT Api Removing", result.toString())
+            continue
+        }
+
+
+        // Find artist match
+        // Will Be Using Fuzzy Search Because YT Spelling might be mucked up
+        // match  = (no of artist names in result) / (no. of artist names on spotify) * 100
+        var artistMatchNumber = 0
+
+        if(result.type == "Song"){
+            for (artist in trackArtists){
+                if(FuzzySearch.ratio(artist.toLowerCase(),result.artist?.toLowerCase()) > 85)
+                    artistMatchNumber++
+            }
+        }else{//i.e. is a Video
+            for (artist in trackArtists) {
+                if(FuzzySearch.partialRatio(artist.toLowerCase(),result.name?.toLowerCase()) > 85)
+                    artistMatchNumber++
+            }
+        }
+
+        if(artistMatchNumber == 0) {
+            Log.i("YT Api Removing", result.toString())
+            continue
+        }
+
+        val artistMatch = (artistMatchNumber / trackArtists.size ) * 100
+
+        // Duration Match
+        /*! time match = 100 - (delta(duration)**2 / original duration * 100)
+        ! difference in song duration (delta) is usually of the magnitude of a few
+        ! seconds, we need to amplify the delta if it is to have any meaningful impact
+        ! wen we calculate the avg match value*/
+        val difference = result.duration?.split(":")?.get(0)?.toInt()?.times(60)
+            ?.plus(result.duration?.split(":")?.get(1)?.toInt()?:0)
+            ?.minus(trackDurationSec)?.absoluteValue ?: 0
+        val nonMatchValue :Float= ((difference*difference).toFloat()/trackDurationSec.toFloat())
+        val durationMatch = 100 - (nonMatchValue*100)
+
+        val avgMatch = (artistMatch + durationMatch)/2
+        linksWithMatchValue[result.videoId.toString()] = avgMatch.toInt()
+    }
+    Log.i("YT Api Result", "$trackName - $linksWithMatchValue")
+    return linksWithMatchValue.toList().sortedByDescending { it.second }.toMap()
 }

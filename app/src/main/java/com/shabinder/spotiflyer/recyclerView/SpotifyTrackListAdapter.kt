@@ -17,6 +17,7 @@
 
 package com.shabinder.spotiflyer.recyclerView
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,13 +25,14 @@ import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.databinding.TrackListItemBinding
-import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper.context
 import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper.downloadAllTracks
+import com.shabinder.spotiflyer.models.DownloadStatus
+import com.shabinder.spotiflyer.models.Source
 import com.shabinder.spotiflyer.models.Track
 import com.shabinder.spotiflyer.ui.spotify.SpotifyViewModel
+import com.shabinder.spotiflyer.utils.Provider.activity
 import com.shabinder.spotiflyer.utils.bindImage
 import com.shabinder.spotiflyer.utils.rotateAnim
 import kotlinx.coroutines.launch
@@ -40,7 +42,6 @@ class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
 
     var spotifyViewModel : SpotifyViewModel? = null
     var isAlbum:Boolean = false
-    var ytDownloader: YoutubeDownloader? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -49,13 +50,14 @@ class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
         return ViewHolder(binding)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         if(itemCount ==1 || isAlbum){
             holder.binding.imageUrl.visibility = View.GONE}else{
             spotifyViewModel!!.uiScope.launch {
                 //Placeholder Set
-                bindImage(holder.binding.imageUrl, item.album!!.images?.get(0)?.url)
+                bindImage(holder.binding.imageUrl, item.album?.images?.get(0)?.url,Source.Spotify)
             }
         }
 
@@ -63,26 +65,26 @@ class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
         holder.binding.artist.text = "${item.artists?.get(0)?.name?:""}..."
         holder.binding.duration.text = "${item.duration_ms/1000/60} minutes, ${(item.duration_ms/1000)%60} sec"
         when (item.downloaded) {
-            "Downloaded" -> {
+            DownloadStatus.Downloaded -> {
                 holder.binding.btnDownload.setImageResource(R.drawable.ic_tick)
                 holder.binding.btnDownload.clearAnimation()
             }
-            "Downloading" -> {
+            DownloadStatus.Downloading -> {
                 holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
                 rotateAnim(holder.binding.btnDownload)
             }
-            "notDownloaded" -> {
+            DownloadStatus.NotDownloaded -> {
                 holder.binding.btnDownload.setImageResource(R.drawable.ic_arrow)
                 holder.binding.btnDownload.clearAnimation()
                 holder.binding.btnDownload.setOnClickListener{
-                    Toast.makeText(context,"Starting Download",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity,"Processing!",Toast.LENGTH_SHORT).show()
                     holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
                     rotateAnim(it)
-                    item.downloaded = "Downloading"
+                    item.downloaded = DownloadStatus.Downloading
                     spotifyViewModel!!.uiScope.launch {
                         val itemList = mutableListOf<Track>()
                         itemList.add(item)
-                        downloadAllTracks(spotifyViewModel!!.folderType,spotifyViewModel!!.subFolder,itemList,ytDownloader)
+                        downloadAllTracks(spotifyViewModel!!.folderType,spotifyViewModel!!.subFolder,itemList)
                     }
                     notifyItemChanged(position)//start showing anim!
                 }

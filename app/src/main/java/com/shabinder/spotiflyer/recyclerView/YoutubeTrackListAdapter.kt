@@ -22,18 +22,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.github.kiulian.downloader.model.formats.Format
 import com.shabinder.spotiflyer.databinding.TrackListItemBinding
-import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
-import com.shabinder.spotiflyer.models.Track
+import com.shabinder.spotiflyer.models.Source
+import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.utils.bindImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class YoutubeTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHolder>(YouTubeTrackDiffCallback()) {
+class YoutubeTrackListAdapter: ListAdapter<TrackDetails,SpotifyTrackListAdapter.ViewHolder>(YouTubeTrackDiffCallback()) {
 
-    var format:Format? = null
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
     override fun onCreateViewHolder(
@@ -51,26 +49,31 @@ class YoutubeTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
         if(itemCount == 1){
             holder.binding.imageUrl.visibility = View.GONE}else{
             adapterScope.launch {
-                bindImage(holder.binding.imageUrl, item.ytCoverUrl)
+                bindImage(holder.binding.imageUrl,
+                    "https://i.ytimg.com/vi/${item.albumArt.absolutePath.substringAfterLast("/")
+                        .substringBeforeLast(".")}/maxresdefault.jpg"
+                    ,
+                    Source.YouTube
+                )
             }
         }
 
-        holder.binding.trackName.text = "${if(item.name!!.length > 17){"${item.name!!.subSequence(0,16)}..."}else{item.name}}"
-        holder.binding.artist.text = "${item.artists?.get(0)?.name?:""}..."
-        holder.binding.duration.text =  "${item.duration_ms/1000/60} minutes, ${(item.duration_ms/1000)%60} sec"
+        holder.binding.trackName.text = "${if(item.title.length > 17){"${item.title.subSequence(0,16)}..."}else{item.title}}"
+        holder.binding.artist.text = "${item.artists.get(0)}..."
+        holder.binding.duration.text =  "${item.durationSec/60} minutes, ${item.durationSec%60} sec"
         holder.binding.btnDownload.setOnClickListener{
             adapterScope.launch {
-                YTDownloadHelper.downloadFile(null,"YT_Downloads",item,format)
+//                YTDownloadHelper.downloadFile(null,"YT_Downloads",item,format)
             }
         }
     }
 }
-class YouTubeTrackDiffCallback: DiffUtil.ItemCallback<Track>(){
-    override fun areItemsTheSame(oldItem: Track, newItem: Track): Boolean {
-        return oldItem.name == newItem.name
+class YouTubeTrackDiffCallback: DiffUtil.ItemCallback<TrackDetails>(){
+    override fun areItemsTheSame(oldItem: TrackDetails, newItem: TrackDetails): Boolean {
+        return oldItem.title == newItem.title
     }
 
-    override fun areContentsTheSame(oldItem: Track, newItem: Track): Boolean {
+    override fun areContentsTheSame(oldItem: TrackDetails, newItem: TrackDetails): Boolean {
         return oldItem == newItem
     }
 }

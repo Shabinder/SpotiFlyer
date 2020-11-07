@@ -24,41 +24,33 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
-import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.SpotifyFragmentBinding
 import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper
+import com.shabinder.spotiflyer.models.DownloadStatus
+import com.shabinder.spotiflyer.models.Source
 import com.shabinder.spotiflyer.models.Track
+import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.recyclerView.SpotifyTrackListAdapter
 import com.shabinder.spotiflyer.utils.YoutubeMusicApi
 import com.shabinder.spotiflyer.utils.bindImage
-import com.shabinder.spotiflyer.utils.copyTo
+import com.shabinder.spotiflyer.utils.loadAllImages
 import com.shabinder.spotiflyer.utils.rotateAnim
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.IOException
 import javax.inject.Inject
 
 @Suppress("DEPRECATION")
@@ -69,7 +61,6 @@ class SpotifyFragment : Fragment() {
     private lateinit var spotifyViewModel: SpotifyViewModel
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var adapterSpotify:SpotifyTrackListAdapter
-    @Inject lateinit var ytDownloader:YoutubeDownloader
     @Inject lateinit var youtubeMusicApi: YoutubeMusicApi
     private var intentFilter:IntentFilter? = null
     private var updateUIReceiver: BroadcastReceiver? = null
@@ -109,30 +100,34 @@ class SpotifyFragment : Fragment() {
                 spotifyViewModel.spotifySearch(type,link)
                 if(type=="album")adapterSpotify.isAlbum = true
 
-                binding.btnDownloadAllSpotify.setOnClickListener {
-                    for (track in spotifyViewModel.trackList.value!!){
-                        if(track.downloaded != "Downloaded"){
-                            track.downloaded = "Downloading"
-                        }
-                    }
-                    binding.btnDownloadAllSpotify.visibility = View.GONE
-                    binding.downloadingFabSpotify.visibility = View.VISIBLE
+                binding.btnDownloadAll.setOnClickListener {
 
+                    binding.btnDownloadAll.visibility = View.GONE
+                    binding.downloadingFab.visibility = View.VISIBLE
 
-                    rotateAnim(binding.downloadingFabSpotify)
+                    rotateAnim(binding.downloadingFab)
                     for (track in spotifyViewModel.trackList.value!!){
-                        if(track.downloaded != "Downloaded"){
+                        if(track.downloaded != DownloadStatus.Downloaded){
+                            track.downloaded = DownloadStatus.Downloading
                             adapterSpotify.notifyItemChanged(spotifyViewModel.trackList.value!!.indexOf(track))
                         }
                     }
-                    showToast("Starting Download in Few Seconds")
-                    spotifyViewModel.uiScope.launch(Dispatchers.Default){loadAllImages(spotifyViewModel.trackList.value!!)}
+                    showToast("Processing!")
+                    sharedViewModel.uiScope.launch(Dispatchers.Default){
+                        val urlList = arrayListOf<String>()
+                        spotifyViewModel.trackList.value?.forEach { urlList.add(it.album?.images?.get(0)?.url.toString()) }
+                        //Appending Source
+                        urlList.add("spotify")
+                        loadAllImages(
+                            requireActivity(),
+                            urlList
+                        )
+                    }
                     spotifyViewModel.uiScope.launch {
                         SpotifyDownloadHelper.downloadAllTracks(
                             spotifyViewModel.folderType,
                             spotifyViewModel.subFolder,
                             spotifyViewModel.trackList.value!!,
-                            ytDownloader
                         )
                     }
                 }
@@ -154,15 +149,18 @@ class SpotifyFragment : Fragment() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 //UI update here
                 if (intent != null){
-                    val track = intent.getParcelableExtra<Track?>("track")
-                    track?.let {
-                        val position: Int = spotifyViewModel.trackList.value?.indexOf(track)!!
+                    val trackDetails = intent.getParcelableExtra<TrackDetails?>("track")
+                    trackDetails?.let {
+                        val position: Int = spotifyViewModel.trackList.value?.map { it.name }?.indexOf(trackDetails.title) ?: -1
                         Log.i("Track","Download Completed Intent :$position")
-                        track.downloaded = "Downloaded"
                         if(position != -1) {
-                            spotifyViewModel.trackList.value?.set(position, track)
-                            adapterSpotify.notifyItemChanged(position)
-                            checkIfAllDownloaded()
+                            val track = spotifyViewModel.trackList.value?.get(position)
+                            track?.let{
+                                it.downloaded = DownloadStatus.Downloaded
+                                spotifyViewModel.trackList.value?.set(position, it)
+                                adapterSpotify.notifyItemChanged(position)
+                                checkIfAllDownloaded()
+                            }
                         }
                     }
                 }
@@ -184,7 +182,7 @@ class SpotifyFragment : Fragment() {
          * CoverUrl Binding Observer!
          **/
         spotifyViewModel.coverUrl.observe(viewLifecycleOwner, {
-            if(it!="Loading") bindImage(binding.spotifyCoverImage,it)
+            if(it!="Loading") bindImage(binding.coverImage,it,Source.Spotify)
         })
 
         /**
@@ -202,7 +200,7 @@ class SpotifyFragment : Fragment() {
          * Title Binding Observer!
          **/
         spotifyViewModel.title.observe(viewLifecycleOwner, {
-            binding.titleViewSpotify.text = it
+            binding.titleView.text = it
         })
 
         sharedViewModel.intentString.observe(viewLifecycleOwner,{
@@ -215,10 +213,10 @@ class SpotifyFragment : Fragment() {
     }
 
     private fun checkIfAllDownloaded() {
-        if(!spotifyViewModel.trackList.value!!.any { it.downloaded != "Downloaded" }){
+        if(!spotifyViewModel.trackList.value!!.any { it.downloaded != DownloadStatus.Downloaded }){
             //All Tracks Downloaded
-            binding.btnDownloadAllSpotify.visibility = View.GONE
-            binding.downloadingFabSpotify.apply{
+            binding.btnDownloadAll.visibility = View.GONE
+            binding.downloadingFab.apply{
                 setImageResource(R.drawable.ic_tick)
                 visibility = View.VISIBLE
                 clearAnimation()
@@ -236,69 +234,17 @@ class SpotifyFragment : Fragment() {
         sharedViewModel.spotifyService.observe(viewLifecycleOwner, Observer {
             spotifyViewModel.spotifyService = it
         })
-        SpotifyDownloadHelper.context = requireContext()
         SpotifyDownloadHelper.youtubeMusicApi = youtubeMusicApi
-        SpotifyDownloadHelper.spotifyViewModel = spotifyViewModel
-        SpotifyDownloadHelper.statusBar = binding.StatusBarSpotify
-        binding.trackListSpotify.adapter = adapterSpotify
-        (binding.trackListSpotify.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-    }
-
-    /**
-     * Function to fetch all Images for using in mp3 tag.
-     **/
-    private suspend fun loadAllImages(trackList: List<Track>) {
-        trackList.forEach {
-            val imgUrl = it.album?.images?.get(0)?.url
-            imgUrl?.let {
-                val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
-                Glide
-                    .with(requireContext())
-                    .asFile()
-                    .load(imgUri)
-                    .listener(object: RequestListener<File> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<File>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            Log.i("Glide","LoadFailed")
-                            return false
-                        }
-
-                        override fun onResourceReady(
-                            resource: File?,
-                            model: Any?,
-                            target: Target<File>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            sharedViewModel.uiScope.launch {
-                                withContext(Dispatchers.IO){
-                                    try {
-                                        val file = File(
-                                            Environment.getExternalStorageDirectory(),
-                                            SpotifyDownloadHelper.defaultDir+".Images/" + imgUrl.substringAfterLast('/') + ".jpeg"
-                                        )
-                                        resource?.copyTo(file)
-                                    } catch (e: IOException) {
-                                        e.printStackTrace()
-                                    }
-                                }
-                            }
-                            return false
-                        }
-                    }).submit()
-            }
-        }
+        SpotifyDownloadHelper.sharedViewModel = sharedViewModel
+        SpotifyDownloadHelper.statusBar = binding.statusBar
+        binding.trackList.adapter = adapterSpotify
+        (binding.trackList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     }
 
     /**
      * Configure Recycler View Adapter
      **/
     private fun adapterConfig(trackList: List<Track>){
-        adapterSpotify.ytDownloader = ytDownloader
         adapterSpotify.spotifyViewModel = spotifyViewModel
         adapterSpotify.submitList(trackList)
     }
@@ -320,4 +266,5 @@ class SpotifyFragment : Fragment() {
         val netInfo = cm.activeNetworkInfo
         return netInfo != null && netInfo.isConnectedOrConnecting
     }
+
 }
