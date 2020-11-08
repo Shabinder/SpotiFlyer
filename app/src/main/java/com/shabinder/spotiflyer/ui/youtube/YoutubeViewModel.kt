@@ -32,6 +32,7 @@ import com.shabinder.spotiflyer.models.Source
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.utils.Provider
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
+import com.shabinder.spotiflyer.utils.Provider.showToast
 import com.shabinder.spotiflyer.utils.finalOutputDir
 import com.shabinder.spotiflyer.utils.removeIllegalChars
 import kotlinx.coroutines.*
@@ -41,10 +42,11 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
 
     /*
     * YT Album Art Schema
-    * Normal Url: https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"
+    * HI-RES Url: https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"
+    * Normal Url: https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
     * */
 
-    val ytTrackList = MutableLiveData<List<TrackDetails>>()
+    val ytTrackList = MutableLiveData<MutableList<TrackDetails>>()
     val format = MutableLiveData<Format>()
     private val loading = "Loading"
     var title = MutableLiveData<String>().apply { value = "\"Loading!\"" }
@@ -56,81 +58,101 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
 
 
     fun getYTPlaylist(searchId:String, ytDownloader:YoutubeDownloader){
-        uiScope.launch(Dispatchers.IO) {
-            Log.i("YT Playlist",searchId)
-            val playlist = ytDownloader.getPlaylist(searchId)
-            val playlistDetails = playlist.details()
-            val name = playlistDetails.title()
-            subFolder = removeIllegalChars(name).toString()
-            val videos = playlist.videos()
-            coverUrl.postValue("https://i.ytimg.com/vi/${videos.firstOrNull()?.videoId()}/maxresdefault.jpg")
-            title.postValue(
-                if(name.length > 17){"${name.subSequence(0,16)}..."}else{name}
-            )
-            ytTrackList.postValue(videos.map {
-                TrackDetails(
-                    title = it.title(),
-                    artists = listOf(it.author().toString()),
-                    durationSec = it.lengthSeconds(),
-                    albumArt = File(
-                        Environment.getExternalStorageDirectory(),
-                        defaultDir +".Images/" + it.videoId() + ".jpeg"
-                    ),
-                    source = Source.YouTube,
-                    downloaded = if(File(finalOutputDir(itemName = removeIllegalChars(name),type = folderType,subFolder = subFolder)).exists())
-                        DownloadStatus.Downloaded
-                    else DownloadStatus.NotDownloaded
+        try{
+            uiScope.launch(Dispatchers.IO) {
+                Log.i("YT Playlist",searchId)
+                val playlist = ytDownloader.getPlaylist(searchId)
+                val playlistDetails = playlist.details()
+                val name = playlistDetails.title()
+                subFolder = removeIllegalChars(name).toString()
+                val videos = playlist.videos()
+                coverUrl.postValue("https://i.ytimg.com/vi/${videos.firstOrNull()?.videoId()}/hqdefault.jpg")
+                title.postValue(
+                    if(name.length > 17){"${name.subSequence(0,16)}..."}else{name}
                 )
-            })
+                ytTrackList.postValue(videos.map {
+                    TrackDetails(
+                        title = it.title(),
+                        artists = listOf(it.author().toString()),
+                        durationSec = it.lengthSeconds(),
+                        albumArt = File(
+                            Environment.getExternalStorageDirectory(),
+                            defaultDir + ".Images/" + it.videoId() + ".jpeg"
+                        ),
+                        source = Source.YouTube,
+                        downloaded = if (File(
+                                finalOutputDir(
+                                    itemName = it.title(),
+                                    type = folderType,
+                                    subFolder = subFolder
+                                )
+                            ).exists()
+                        )
+                            DownloadStatus.Downloaded
+                        else {
+                            DownloadStatus.NotDownloaded
+                        }
+                    )
+                }.toMutableList())
 
                 withContext(Dispatchers.IO){
-                databaseDAO.insert(DownloadRecord(
-                    type = "PlayList",
-                    name = if(name.length > 17){"${name.subSequence(0,16)}..."}else{name},
-                    link = "https://www.youtube.com/playlist?list=$searchId",
-                    coverUrl = "https://i.ytimg.com/vi/${videos.firstOrNull()?.videoId()}/maxresdefault.jpg",
-                    totalFiles = videos.size,
-                    directory = finalOutputDir(itemName = removeIllegalChars(name),type = folderType,subFolder = subFolder),
-                    downloaded = File(finalOutputDir(itemName = removeIllegalChars(name),type = folderType,subFolder = subFolder)).exists()
-                ))
+                    databaseDAO.insert(DownloadRecord(
+                        type = "PlayList",
+                        name = if(name.length > 17){"${name.subSequence(0,16)}..."}else{name},
+                        link = "https://www.youtube.com/playlist?list=$searchId",
+                        coverUrl = "https://i.ytimg.com/vi/${videos.firstOrNull()?.videoId()}/hqdefault.jpg",
+                        totalFiles = videos.size,
+                        directory = finalOutputDir(itemName = removeIllegalChars(name),type = folderType,subFolder = subFolder),
+                        downloaded = File(finalOutputDir(itemName = removeIllegalChars(name),type = folderType,subFolder = subFolder)).exists()
+                    ))
+                }
             }
+        }catch (e:com.github.kiulian.downloader.YoutubeException.BadPageException){
+            showToast("An Error Occurred While Processing!")
         }
+
     }
 
     @SuppressLint("DefaultLocale")
     fun getYTTrack(searchId:String, ytDownloader:YoutubeDownloader) {
-        uiScope.launch(Dispatchers.IO) {
-            Log.i("YT Video",searchId)
-            val video = ytDownloader.getVideo(searchId)
-            coverUrl.postValue("https://i.ytimg.com/vi/$searchId/maxresdefault.jpg")
-            val detail = video?.details()
-            val name = detail?.title()?.replace(detail.author()!!.toUpperCase(),"",true) ?: detail?.title() ?: ""
-            Log.i("YT View Model",detail.toString())
-            ytTrackList.postValue(listOf(TrackDetails(
-                title = name,
-                artists = listOf(detail?.author().toString()),
-                durationSec = detail?.lengthSeconds()?:0,
-                albumArt = File(
-                    Environment.getExternalStorageDirectory(),
-                    Provider.defaultDir +".Images/" + searchId + ".jpeg"
-                ),
-                source = Source.YouTube
-            )))
-            title.postValue(
-                if(name.length > 17){"${name.subSequence(0,16)}..."}else{name}
-            )
+        try{
+            uiScope.launch(Dispatchers.IO) {
+                Log.i("YT Video",searchId)
+                val video = ytDownloader.getVideo(searchId)
+                coverUrl.postValue("https://i.ytimg.com/vi/$searchId/hqdefault.jpg")
+                val detail = video?.details()
+                val name = detail?.title()?.replace(detail.author()!!.toUpperCase(),"",true) ?: detail?.title() ?: ""
+                Log.i("YT View Model",detail.toString())
+                ytTrackList.postValue(
+                    listOf(TrackDetails(
+                        title = name,
+                        artists = listOf(detail?.author().toString()),
+                        durationSec = detail?.lengthSeconds()?:0,
+                        albumArt = File(
+                            Environment.getExternalStorageDirectory(),
+                            Provider.defaultDir +".Images/" + searchId + ".jpeg"
+                        ),
+                        source = Source.YouTube
+                    )).toMutableList()
+                )
+                title.postValue(
+                    if(name.length > 17){"${name.subSequence(0,16)}..."}else{name}
+                )
 
-            withContext(Dispatchers.IO){
-                databaseDAO.insert(DownloadRecord(
-                    type = "Track",
-                    name = if(name.length > 17){"${name.subSequence(0,16)}..."}else{name},
-                    link = "https://www.youtube.com/watch?v=$searchId",
-                    coverUrl = "https://i.ytimg.com/vi/$searchId/maxresdefault.jpg",
-                    totalFiles = 1,
-                    downloaded = false,
-                    directory = finalOutputDir(type = "YT_Downloads")
-                ))
+                withContext(Dispatchers.IO){
+                    databaseDAO.insert(DownloadRecord(
+                        type = "Track",
+                        name = if(name.length > 17){"${name.subSequence(0,16)}..."}else{name},
+                        link = "https://www.youtube.com/watch?v=$searchId",
+                        coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
+                        totalFiles = 1,
+                        downloaded = false,
+                        directory = finalOutputDir(type = "YT_Downloads")
+                    ))
+                }
             }
+        } catch (e:com.github.kiulian.downloader.YoutubeException){
+            showToast("An Error Occurred While Processing!")
         }
     }
 }

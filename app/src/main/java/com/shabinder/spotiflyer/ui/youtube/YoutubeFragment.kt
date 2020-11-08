@@ -17,7 +17,12 @@
 
 package com.shabinder.spotiflyer.ui.youtube
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,6 +57,8 @@ class YoutubeFragment : Fragment() {
     private lateinit var adapter : YoutubeTrackListAdapter
     private val sampleDomain1 = "youtube.com"
     private val sampleDomain2 = "youtu.be"
+    private var intentFilter: IntentFilter? = null
+    private var updateUIReceiver: BroadcastReceiver? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,10 +67,11 @@ class YoutubeFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater,R.layout.youtube_fragment,container,false)
         youtubeViewModel = ViewModelProvider(this).get(YoutubeViewModel::class.java)
         sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
-        adapter = YoutubeTrackListAdapter()
+        adapter = YoutubeTrackListAdapter(youtubeViewModel)
         binding.trackList.adapter = adapter
 
         initializeLiveDataObservers()
+        initializeBroadcast()
 
         val args = YoutubeFragmentArgs.fromBundle(requireArguments())
         val link = args.link
@@ -89,6 +97,10 @@ class YoutubeFragment : Fragment() {
                 youtubeViewModel.getYTTrack(searchId,ytDownloader)
             }else{showToast("Your Youtube Link is not of a Video!!")}
         }
+
+        /*
+        * Download All Tracks
+        * */
         binding.btnDownloadAll.setOnClickListener {
             binding.btnDownloadAll.visibility = View.GONE
             binding.downloadingFab.visibility = View.VISIBLE
@@ -105,7 +117,7 @@ class YoutubeFragment : Fragment() {
             sharedViewModel.uiScope.launch(Dispatchers.Default){
                 val urlList = arrayListOf<String>()
                 youtubeViewModel.ytTrackList.value?.forEach { urlList.add("https://i.ytimg.com/vi/${it.albumArt.absolutePath.substringAfterLast("/")
-                    .substringBeforeLast(".")}/maxresdefault.jpg")}
+                    .substringBeforeLast(".")}/hqdefault.jpg")}
                 //Appending Source
                 urlList.add("youtube")
                 loadAllImages(
@@ -122,7 +134,56 @@ class YoutubeFragment : Fragment() {
             }
         }
     }
+    override fun onResume() {
+        super.onResume()
+        initializeBroadcast()
+    }
 
+    private fun initializeBroadcast() {
+        intentFilter = IntentFilter()
+        intentFilter?.addAction("track_download_completed")
+
+        updateUIReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                //UI update here
+                if (intent != null){
+                    val trackDetails = intent.getParcelableExtra<TrackDetails?>("track")
+                    trackDetails?.let {
+                        val position: Int = youtubeViewModel.ytTrackList.value?.map { it.title }?.indexOf(trackDetails.title) ?: -1
+                        Log.i("Track","Download Completed Intent :$position")
+                        if(position != -1) {
+                            val track = youtubeViewModel.ytTrackList.value?.get(position)
+                            track?.let{
+                                it.downloaded = DownloadStatus.Downloaded
+                                youtubeViewModel.ytTrackList.value?.set(position, it)
+                                adapter.notifyItemChanged(position)
+                                checkIfAllDownloaded()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        requireActivity().registerReceiver(updateUIReceiver, intentFilter)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        requireActivity().unregisterReceiver(updateUIReceiver)
+    }
+
+    private fun checkIfAllDownloaded() {
+        if(!youtubeViewModel.ytTrackList.value!!.any { it.downloaded != DownloadStatus.Downloaded }){
+            //All Tracks Downloaded
+            binding.btnDownloadAll.visibility = View.GONE
+            binding.downloadingFab.apply{
+                setImageResource(R.drawable.ic_tick)
+                visibility = View.VISIBLE
+                clearAnimation()
+                keepScreenOn = false
+            }
+        }
+    }
     private fun initializeLiveDataObservers() {
         /**
          * CoverUrl Binding Observer!

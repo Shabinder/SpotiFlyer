@@ -44,7 +44,7 @@ class DownloadRecordAdapter: ListAdapter<DownloadRecord,DownloadRecordAdapter.Vi
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         adapterScope.launch {
-            bindImage(holder.binding.coverUrl,item.coverUrl)
+            bindImage(holder.binding.coverUrl,item.coverUrl,null)
         }
         holder.binding.itemName.text = item.name
         holder.binding.totalItems.text = "Tracks: ${item.totalFiles}"

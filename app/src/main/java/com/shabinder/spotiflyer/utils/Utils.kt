@@ -28,7 +28,6 @@ import android.view.animation.RotateAnimation
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -77,8 +76,7 @@ fun rotateAnim(view: View){
     view.animation = rotate
 }
 
-@BindingAdapter("imageUrl")
-fun bindImage(imgView: ImageView, imgUrl: String?,source: Source) {
+fun bindImage(imgView: ImageView, imgUrl: String?,source: Source?) {
     imgUrl?.let {
         val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
         Glide
@@ -122,6 +120,10 @@ fun bindImage(imgView: ImageView, imgUrl: String?,source: Source) {
                                             defaultDir+".Images/" + imgUrl.substringBeforeLast('/',imgUrl).substringAfterLast('/',imgUrl) + ".jpeg"
                                         )
                                     }
+                                    else ->  File(
+                                        Environment.getExternalStorageDirectory(),
+                                        defaultDir+".Images/" + imgUrl.substringAfterLast('/',imgUrl) + ".jpeg"
+                                    )
                                 }
                                  // the File to save , append increasing numeric counter to prevent files from getting overwritten.
                                 resource?.copyTo(file)

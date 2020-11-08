@@ -48,8 +48,8 @@ object YTDownloadHelper {
 
             val downloadObject = DownloadObject(
                 trackDetails = it,
-                ytVideoId = "https://i.ytimg.com/vi/${it.albumArt.absolutePath.substringAfterLast("/")
-                    .substringBeforeLast(".")}/maxresdefault.jpg",
+                ytVideoId = it.albumArt.absolutePath.substringAfterLast("/")
+                    .substringBeforeLast("."),
                 outputFile = outputFile
             )
 

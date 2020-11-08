@@ -19,6 +19,7 @@ package com.shabinder.spotiflyer.utils
 
 import android.content.Context
 import android.os.Environment
+import android.widget.Toast
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.App
 import com.shabinder.spotiflyer.MainActivity
@@ -117,4 +118,7 @@ object Provider {
         return retrofit.create(YoutubeMusicApi::class.java)
     }
 
+    fun showToast(string: String,long:Boolean=false){
+        Toast.makeText(activity,string,if(long)Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
+    }
 }

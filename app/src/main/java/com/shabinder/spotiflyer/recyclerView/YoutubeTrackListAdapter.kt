@@ -20,19 +20,22 @@ package com.shabinder.spotiflyer.recyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.databinding.TrackListItemBinding
+import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
+import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.Source
 import com.shabinder.spotiflyer.models.TrackDetails
+import com.shabinder.spotiflyer.ui.youtube.YoutubeViewModel
+import com.shabinder.spotiflyer.utils.Provider
 import com.shabinder.spotiflyer.utils.bindImage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.shabinder.spotiflyer.utils.rotateAnim
 import kotlinx.coroutines.launch
 
-class YoutubeTrackListAdapter: ListAdapter<TrackDetails,SpotifyTrackListAdapter.ViewHolder>(YouTubeTrackDiffCallback()) {
-
-    private val adapterScope = CoroutineScope(Dispatchers.Default)
+class YoutubeTrackListAdapter(private val youtubeViewModel :YoutubeViewModel): ListAdapter<TrackDetails,SpotifyTrackListAdapter.ViewHolder>(YouTubeTrackDiffCallback()) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -48,24 +51,50 @@ class YoutubeTrackListAdapter: ListAdapter<TrackDetails,SpotifyTrackListAdapter.
         val item = getItem(position)
         if(itemCount == 1){
             holder.binding.imageUrl.visibility = View.GONE}else{
-            adapterScope.launch {
+            youtubeViewModel.uiScope.launch {
                 bindImage(holder.binding.imageUrl,
                     "https://i.ytimg.com/vi/${item.albumArt.absolutePath.substringAfterLast("/")
-                        .substringBeforeLast(".")}/maxresdefault.jpg"
+                        .substringBeforeLast(".")}/hqdefault.jpg"
                     ,
                     Source.YouTube
                 )
             }
         }
 
+        when (item.downloaded) {
+            DownloadStatus.Downloaded -> {
+                holder.binding.btnDownload.setImageResource(R.drawable.ic_tick)
+                holder.binding.btnDownload.clearAnimation()
+            }
+            DownloadStatus.Downloading -> {
+                holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
+                rotateAnim(holder.binding.btnDownload)
+            }
+            DownloadStatus.NotDownloaded -> {
+                holder.binding.btnDownload.setImageResource(R.drawable.ic_arrow)
+                holder.binding.btnDownload.clearAnimation()
+                holder.binding.btnDownload.setOnClickListener{
+                    Toast.makeText(Provider.activity,"Processing!", Toast.LENGTH_SHORT).show()
+                    holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
+                    rotateAnim(it)
+                    item.downloaded = DownloadStatus.Downloading
+                    youtubeViewModel.uiScope.launch {
+                        val itemList = mutableListOf<TrackDetails>()
+                        itemList.add(item)
+                        YTDownloadHelper.downloadYTTracks(
+                            youtubeViewModel.folderType,
+                            youtubeViewModel.subFolder,
+                            itemList
+                        )
+                    }
+                    notifyItemChanged(position)//start showing anim!
+                }
+            }
+        }
+
         holder.binding.trackName.text = "${if(item.title.length > 17){"${item.title.subSequence(0,16)}..."}else{item.title}}"
         holder.binding.artist.text = "${item.artists.get(0)}..."
         holder.binding.duration.text =  "${item.durationSec/60} minutes, ${item.durationSec%60} sec"
-        holder.binding.btnDownload.setOnClickListener{
-            adapterScope.launch {
-//                YTDownloadHelper.downloadFile(null,"YT_Downloads",item,format)
-            }
-        }
     }
 }
 class YouTubeTrackDiffCallback: DiffUtil.ItemCallback<TrackDetails>(){
