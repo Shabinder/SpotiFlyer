@@ -21,7 +21,6 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimaryDark">#000000</item>
         <item name="colorPrimary">#FC5C7D</item>
-        <item name="android:background">#000000</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="colorAccent">#6A82FB</item>
         <item name="android:outlineAmbientShadowColor" tools:targetApi="p">#A9B200FF</item>
@@ -29,7 +28,7 @@
         <!-- Text Appearances !-->
         <!-- use our brand's custom TextAppearance4 !-->
         <item name="textAppearanceHeadline4">@style/TextAppearance.AppTheme.Headline4</item>
-        <!-- use default Body2 text apperance !-->
+        <!-- use default Body2 text appearance !-->
         <item name="textAppearanceBody2">@style/TextAppearance.MaterialComponents.Body2</item>
     </style>
 
@@ -38,18 +37,22 @@
         <item name="shapeAppearanceMediumComponent">@style/CutShapeAppearance</item>
         <item name="buttonBarPositiveButtonStyle">@style/Alert.Button.Positive</item>
         <item name="buttonBarNeutralButtonStyle">@style/Alert.Button.Neutral</item>
+        <item name="android:textSize">22sp</item>
+        <item name="fontFamily">@font/amita</item>
     </style>
     <style name="CutShapeAppearance" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="background">@color/white</item>
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">20dp</item>
+        <item name="cornerSize">8dp</item>
     </style>
 
     <style name="Alert.Button.Positive" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="backgroundTint">@color/colorPrimary</item>
-        <item name="rippleColor">@color/colorPrimaryDark</item>
+        <item name="rippleColor">@color/cardview_dark_background</item>
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textSize">14sp</item>
+        <item name="android:layout_marginEnd">4dp</item>
+        <item name="android:layout_marginBottom">2dp</item>
         <item name="android:textAllCaps">false</item>
     </style>
 

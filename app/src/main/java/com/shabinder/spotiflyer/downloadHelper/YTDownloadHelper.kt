@@ -24,7 +24,9 @@ import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.utils.Provider.activity
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
+import com.shabinder.spotiflyer.utils.isOnline
 import com.shabinder.spotiflyer.utils.removeIllegalChars
+import com.shabinder.spotiflyer.utils.showNoConnectionAlert
 import com.shabinder.spotiflyer.utils.startService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -38,6 +40,10 @@ object YTDownloadHelper {
     ){
         val downloadList = ArrayList<DownloadObject>()
         tracks.forEach {
+            if(!isOnline()){
+                showNoConnectionAlert()
+                return
+            }
             val outputFile: String =
                 Environment.getExternalStorageDirectory().toString() + File.separator +
                         defaultDir +

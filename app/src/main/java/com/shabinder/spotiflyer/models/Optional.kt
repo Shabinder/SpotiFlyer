@@ -17,11 +17,7 @@
 
 package com.shabinder.spotiflyer.models
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.serialization.Serializable
 
-@Parcelize
-data class Image(
-    var width: Int? = null,
-    var height: Int? = null,
-    var url: String? = null):Parcelable
+@Serializable
+data class Optional<T>(val value: T?)

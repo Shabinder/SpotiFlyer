@@ -24,17 +24,15 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.kiulian.downloader.YoutubeDownloader
-import com.github.kiulian.downloader.model.formats.Format
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.DownloadStatus
-import com.shabinder.spotiflyer.models.Source
 import com.shabinder.spotiflyer.models.TrackDetails
-import com.shabinder.spotiflyer.utils.Provider
+import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
-import com.shabinder.spotiflyer.utils.Provider.showToast
 import com.shabinder.spotiflyer.utils.finalOutputDir
 import com.shabinder.spotiflyer.utils.removeIllegalChars
+import com.shabinder.spotiflyer.utils.showMessage
 import kotlinx.coroutines.*
 import java.io.File
 
@@ -47,7 +45,6 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
     * */
 
     val ytTrackList = MutableLiveData<MutableList<TrackDetails>>()
-    val format = MutableLiveData<Format>()
     private val loading = "Loading"
     var title = MutableLiveData<String>().apply { value = "\"Loading!\"" }
     var coverUrl = MutableLiveData<String>().apply { value = loading }
@@ -108,7 +105,7 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                 }
             }
         }catch (e:com.github.kiulian.downloader.YoutubeException.BadPageException){
-            showToast("An Error Occurred While Processing!")
+            showMessage("An Error Occurred While Processing!")
         }
 
     }
@@ -124,16 +121,18 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                 val name = detail?.title()?.replace(detail.author()!!.toUpperCase(),"",true) ?: detail?.title() ?: ""
                 Log.i("YT View Model",detail.toString())
                 ytTrackList.postValue(
-                    listOf(TrackDetails(
+                    listOf(
+                        TrackDetails(
                         title = name,
                         artists = listOf(detail?.author().toString()),
                         durationSec = detail?.lengthSeconds()?:0,
                         albumArt = File(
                             Environment.getExternalStorageDirectory(),
-                            Provider.defaultDir +".Images/" + searchId + ".jpeg"
+                            defaultDir +".Images/" + searchId + ".jpeg"
                         ),
                         source = Source.YouTube
-                    )).toMutableList()
+                    )
+                    ).toMutableList()
                 )
                 title.postValue(
                     if(name.length > 17){"${name.subSequence(0,16)}..."}else{name}
@@ -152,7 +151,7 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                 }
             }
         } catch (e:com.github.kiulian.downloader.YoutubeException){
-            showToast("An Error Occurred While Processing!")
+            showMessage("An Error Occurred While Processing!")
         }
     }
 }

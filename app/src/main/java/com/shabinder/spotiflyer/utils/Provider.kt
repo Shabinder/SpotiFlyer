@@ -19,12 +19,14 @@ package com.shabinder.spotiflyer.utils
 
 import android.content.Context
 import android.os.Environment
-import android.widget.Toast
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.App
 import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecordDatabase
+import com.shabinder.spotiflyer.networking.GaanaInterface
+import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
+import com.shabinder.spotiflyer.networking.YoutubeMusicApi
 import com.shreyaspatil.easyupipayment.EasyUpiPayment
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -37,11 +39,11 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.File
 import javax.inject.Singleton
+
 
 @InstallIn(ApplicationComponent::class)
 @Module
@@ -66,7 +68,7 @@ object Provider {
     @Provides
     @Singleton
     fun provideUpi():EasyUpiPayment {
-        return EasyUpiPayment.Builder(MainActivity.getInstance())
+        return EasyUpiPayment.Builder(activity)
             .setPayeeVpa("technoshab@paytm")
             .setPayeeName("Shabinder Singh")
             .setTransactionId("UNIQUE_TRANSACTION_ID")
@@ -86,39 +88,59 @@ object Provider {
 
     @Provides
     @Singleton
-    fun getSpotifyTokenInterface():SpotifyServiceTokenRequest{
+    fun getSpotifyTokenInterface(moshi: Moshi): SpotifyServiceTokenRequest {
         val httpClient2: OkHttpClient.Builder = OkHttpClient.Builder()
-        httpClient2.addInterceptor(Interceptor { chain ->
+            .addInterceptor(Interceptor { chain ->
             val request: Request =
-                chain.request().newBuilder().addHeader(
+                chain.request().newBuilder()
+                    .addHeader(
                     "Authorization",
-                    "Basic ${android.util.Base64.encodeToString("${App.clientId}:${App.clientSecret}".toByteArray(),android.util.Base64.NO_WRAP)}"
+                    "Basic ${
+                        android.util.Base64.encodeToString(
+                            "${App.clientId}:${App.clientSecret}".toByteArray(),
+                            android.util.Base64.NO_WRAP
+                        )
+                    }"
                 ).build()
             chain.proceed(request)
-        })
+        }).addInterceptor(NetworkInterceptor())
 
         val retrofit = Retrofit.Builder()
             .baseUrl("https://accounts.spotify.com/")
             .client(httpClient2.build())
-            .addConverterFactory(MoshiConverterFactory.create(getMoshi()))
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
         return retrofit.create(SpotifyServiceTokenRequest::class.java)
     }
 
     @Provides
     @Singleton
-    fun getYoutubeMusicApi():YoutubeMusicApi{
+    fun okHttpClient():OkHttpClient{
+        return OkHttpClient.Builder()
+            .addInterceptor(NetworkInterceptor())
+            .build()
+    }
 
+    @Provides
+    @Singleton
+    fun getGaanaInterface(moshi: Moshi,okHttpClient: OkHttpClient):GaanaInterface{
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://api.gaana.com/")
+            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+        return retrofit.create(GaanaInterface::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun getYoutubeMusicApi(moshi: Moshi): YoutubeMusicApi {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://music.youtube.com/youtubei/v1/")
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
-
         return retrofit.create(YoutubeMusicApi::class.java)
     }
 
-    fun showToast(string: String,long:Boolean=false){
-        Toast.makeText(activity,string,if(long)Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
-    }
 }

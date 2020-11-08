@@ -85,7 +85,7 @@ fun getYTTracks(response: String):List<YoutubeTrack>{
         ! Songs details are ALWAYS in the following order:
         !       0 - Name
         !       1 - Type (Song)
-        !       2 - Artist
+        !       2 - com.shabinder.spotiflyer.models.gaana.Artist
         !       3 - Album
         !       4 - Duration (mm:ss)
         !

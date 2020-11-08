@@ -27,7 +27,11 @@ import android.view.animation.Animation
 import android.widget.TextView
 import android.widget.Toast
 import com.shabinder.spotiflyer.SharedViewModel
-import com.shabinder.spotiflyer.models.*
+import com.shabinder.spotiflyer.models.DownloadObject
+import com.shabinder.spotiflyer.models.DownloadStatus
+import com.shabinder.spotiflyer.models.TrackDetails
+import com.shabinder.spotiflyer.networking.YoutubeMusicApi
+import com.shabinder.spotiflyer.networking.makeJsonBody
 import com.shabinder.spotiflyer.utils.*
 import com.shabinder.spotiflyer.utils.Provider.activity
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
@@ -39,10 +43,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 
-object SpotifyDownloadHelper {
+object DownloadHelper {
 
     var statusBar:TextView? = null
-    var youtubeMusicApi:YoutubeMusicApi? = null
+    var youtubeMusicApi: YoutubeMusicApi? = null
     var sharedViewModel: SharedViewModel? = null
 
     private var total = 0
@@ -55,12 +59,16 @@ object SpotifyDownloadHelper {
     suspend fun downloadAllTracks(
         type:String,
         subFolder: String?,
-        trackList: List<Track>) {
+        trackList: List<TrackDetails>) {
+        resetStatusBar()// For New Download Request's Status
         val downloadList = ArrayList<DownloadObject>()
-
         withContext(Dispatchers.Main){
             total += trackList.size // Adding New Download List Count to StatusBar
             trackList.forEachIndexed { index, it ->
+                if(!isOnline()){
+                    showNoConnectionAlert()
+                    return@withContext
+                }
                 if(it.downloaded == DownloadStatus.Downloaded){//Download Already Present!!
                     processed++
                     if(index == (trackList.size-1)){//LastElement
@@ -74,49 +82,32 @@ object SpotifyDownloadHelper {
                         },5000)
                     }
                 }else{
-                    val artistsList = mutableListOf<String>()
-                    it.artists?.forEach { artist -> artistsList.add(artist!!.name!!) }
-                    val searchQuery = "${it.name} - ${artistsList.joinToString(",")}"
-
-                    val jsonBody = makeJsonBody(searchQuery.trim())
+                    val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
+                    val jsonBody = makeJsonBody(searchQuery.trim()).toJsonString()
                     youtubeMusicApi?.getYoutubeMusicResponse(jsonBody)?.enqueue(
                         object : Callback<String>{
                             override fun onResponse(call: Call<String>, response: Response<String>) {
                                 sharedViewModel?.uiScope?.launch {
                                     val videoId = sortByBestMatch(
                                         getYTTracks(response.body().toString()),
-                                        trackName = it.name.toString(),
-                                        trackArtists = artistsList,
-                                        trackDurationSec = (it.duration_ms/1000).toInt()
+                                        trackName = it.title,
+                                        trackArtists = it.artists,
+                                        trackDurationSec = it.durationSec
                                     ).keys.firstOrNull()
                                     Log.i("Spotify Helper Video ID",videoId ?: "Not Found")
 
                                     if(videoId.isNullOrBlank()) {notFound++ ; updateStatusBar()}
                                     else {//Found Youtube Video ID
-                                        val trackDetails = TrackDetails(
-                                            title = it.name.toString(),
-                                            artists = artistsList,
-                                            durationSec = (it.duration_ms/1000).toInt(),
-                                            albumArt = File(
-                                                Environment.getExternalStorageDirectory(),
-                                                defaultDir +".Images/" + (it.album?.images?.get(0)?.url.toString()).substringAfterLast('/') + ".jpeg"),
-                                            albumName = it.album?.name,
-                                            year = it.album?.release_date,
-                                            comment = "Genres:${it.album?.genres?.joinToString()}",
-                                            trackUrl = it.href,
-                                            source = Source.Spotify
-                                        )
-
                                         val outputFile: String =
                                             Environment.getExternalStorageDirectory().toString() + File.separator +
                                                     defaultDir +
                                                     removeIllegalChars(type) + File.separator +
                                                     (if (subFolder == null) { "" }
                                                     else { removeIllegalChars(subFolder) + File.separator }
-                                                            + removeIllegalChars(it.name!!) + ".m4a")
+                                                            + removeIllegalChars(it.title) + ".m4a")
 
                                         val downloadObject = DownloadObject(
-                                            trackDetails = trackDetails,
+                                            trackDetails = it,
                                             ytVideoId = videoId,
                                             outputFile = outputFile
                                         )
@@ -148,6 +139,13 @@ object SpotifyDownloadHelper {
             }
             animateStatusBar()
         }
+    }
+
+    private fun resetStatusBar() {
+        total = 0
+        processed = 0
+        notFound = 0
+        updateStatusBar()
     }
 
     private fun animateStatusBar() {

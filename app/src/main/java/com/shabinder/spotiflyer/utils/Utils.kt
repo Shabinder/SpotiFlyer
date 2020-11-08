@@ -19,6 +19,9 @@ package com.shabinder.spotiflyer.utils
 
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Environment
 import android.util.Log
 import android.view.View
@@ -33,9 +36,12 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.models.DownloadObject
-import com.shabinder.spotiflyer.models.Source
+import com.shabinder.spotiflyer.models.spotify.Source
+import com.shabinder.spotiflyer.utils.Provider.activity
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
 import com.shabinder.spotiflyer.worker.ForegroundService
 import kotlinx.coroutines.CoroutineScope
@@ -64,6 +70,48 @@ fun finalOutputDir(itemName:String? = null,type:String, subFolder:String?=null,e
                     + itemName?.let { removeIllegalChars(it) + extension})
 }
 
+/**
+ * Util. Function To Check Connection Status
+ **/
+@Suppress("DEPRECATION")
+fun isOnline(): Boolean {
+    var result = false
+    val connectivityManager =
+        activity.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+    connectivityManager?.let {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            it.getNetworkCapabilities(connectivityManager.activeNetwork)?.apply {
+                result = when {
+                    hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                    hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                    hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ->  true
+                    else -> false
+                }
+            }
+        } else {
+            val netInfo =
+                (activity.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo
+            result = netInfo != null && netInfo.isConnected
+        }
+    }
+    return result
+}
+
+fun showMessage(message: String, long: Boolean = false){
+    CoroutineScope(Dispatchers.Main).launch{
+        Snackbar.make(
+            activity.snackBarAnchor,
+            message,
+            if (long) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT
+        ).also { snackbar ->
+            snackbar.setAction("Ok") {
+                snackbar.dismiss()
+            }
+        }.show()
+    }
+}
+
+
 fun rotateAnim(view: View){
     val rotate = RotateAnimation(
         0F, 360F,
@@ -76,6 +124,18 @@ fun rotateAnim(view: View){
     view.animation = rotate
 }
 
+fun showNoConnectionAlert(){
+    CoroutineScope(Dispatchers.Main).launch {
+        activity.apply {
+            MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
+                .setTitle(resources.getString(R.string.title))
+                .setMessage(resources.getString(R.string.supporting_text))
+                .setPositiveButton(resources.getString(R.string.cancel)) { _, _ ->
+                    // Respond to neutral button press
+                }.show()
+        }
+    }
+}
 fun bindImage(imgView: ImageView, imgUrl: String?,source: Source?) {
     imgUrl?.let {
         val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()

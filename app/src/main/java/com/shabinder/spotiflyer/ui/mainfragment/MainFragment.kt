@@ -25,14 +25,18 @@ import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.MainFragmentBinding
+import com.shabinder.spotiflyer.utils.Provider
+import com.shabinder.spotiflyer.utils.isOnline
+import com.shabinder.spotiflyer.utils.showMessage
+import com.shabinder.spotiflyer.utils.showNoConnectionAlert
 import com.shreyaspatil.easyupipayment.EasyUpiPayment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -55,14 +59,20 @@ class MainFragment : Fragment() {
     ): View? {
         binding = DataBindingUtil.inflate(inflater,R.layout.main_fragment,container,false)
         initializeAll()
-
         binding.btnSearch.setOnClickListener {
+            if(!isOnline()){
+                showNoConnectionAlert()
+                return@setOnClickListener
+            }
             val link = binding.linkSearch.text.toString()
             if (link.contains("spotify",true)){
+                if(sharedViewModel.spotifyService.value == null){//Authentication pending!!
+                    (activity as MainActivity).authenticateSpotify()
+                }
                 findNavController().navigate(MainFragmentDirections.actionMainFragmentToSpotifyFragment(link))
             }else if(link.contains("youtube.com",true) || link.contains("youtu.be",true) ){
                 findNavController().navigate(MainFragmentDirections.actionMainFragmentToYoutubeFragment(link))
-            }else{Toast.makeText(context,"Link is Not Valid",Toast.LENGTH_SHORT).show()}
+            }else showMessage("Link is Not Valid",true)
         }
         handleIntent()
         return binding.root
@@ -97,10 +107,15 @@ class MainFragment : Fragment() {
         sharedViewModel.intentString.observe(viewLifecycleOwner,{
             if(it != ""){
                 sharedViewModel.uiScope.launch(Dispatchers.IO) {
-                    while (sharedViewModel.accessToken.value == "") {
-                        //Waiting for Authentication to Finish
-                        Thread.sleep(1000)
+                    if(sharedViewModel.spotifyService.value == null){
+                        //Not Authenticated Yet
+                        Provider.activity.authenticateSpotify()
+                        while (sharedViewModel.spotifyService.value == null) {
+                            //Waiting for Authentication to Finish
+                            Thread.sleep(1000)
+                        }
                     }
+
                     withContext(Dispatchers.Main){
                         binding.linkSearch.setText(sharedViewModel.intentString.value)
                         binding.btnSearch.performClick()

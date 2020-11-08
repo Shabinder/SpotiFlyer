@@ -15,24 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer
+package com.shabinder.spotiflyer.models.spotify
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.shabinder.spotiflyer.networking.SpotifyService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
-class SharedViewModel : ViewModel() {
-    var intentString = MutableLiveData<String>().apply { value = "" }
-    var spotifyService = MutableLiveData<SpotifyService>()
-
-    private var viewModelJob = Job()
-    val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
-    }
-}
+@Parcelize
+data class PagingObjectTrack(
+    var href: String? = null,
+    var items: List<Track>? = null,
+    var limit: Int = 0,
+    var next: String? = null,
+    var offset: Int = 0,
+    var previous: String? = null,
+    var total: Int = 0):Parcelable

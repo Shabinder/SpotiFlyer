@@ -22,6 +22,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:id="@+id/main"
     android:layout_width="match_parent"
+    android:background="@color/black"
     android:layout_height="match_parent"
     android:layout_marginTop="25dp"
     android:fitsSystemWindows="true"
@@ -74,9 +75,9 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/topLayout"
                 android:layout_width="match_parent"
+                android:background="@color/black"
                 android:foreground="@drawable/gradient"
                 android:layout_height="match_parent">
-
 
                 <ImageView
                     android:id="@+id/cover_image"

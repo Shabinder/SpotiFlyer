@@ -15,16 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.models
+package com.shabinder.spotiflyer.models.gaana
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
-
-@Parcelize
-data class Artist(
-    var external_urls: Map<String?, String?>? = null,
-    var href: String? = null,
-    var id: String? = null,
-    var name: String? = null,
-    var type: String? = null,
-    var uri: String? = null):Parcelable
+data class GaanaArtistDetails(
+    val artist : List<Artist>,
+    val count : Int,
+)

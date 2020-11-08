@@ -15,12 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.models
+package com.shabinder.spotiflyer.models.gaana
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
-
-@Parcelize
-data class Followers(
-    var href: String? = null,
-    var total: Int? = null):Parcelable
+data class GaanaPlaylist (
+	val tags : String,
+	val fromCache : Int,
+	val modified_on : String,
+	val count : Int,
+	val created_on : String,
+	val favorite_count : Int,
+	val tracks : List<Tracks>,
+)

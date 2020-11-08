@@ -15,25 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.models
+package com.shabinder.spotiflyer.models.spotify
 
 import android.os.Parcelable
-import com.squareup.moshi.Json
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Playlist(
-    @Json(name = "collaborative")var is_collaborative: Boolean? = null,
-    var description: String? = null,
-    var external_urls: Map<String?, String?>? = null,
-    var followers: Followers? = null,
-    var href: String? = null,
-    var id: String? = null,
-    var images: List<Image?>? = null,
-    var name: String? = null,
-    var owner: UserPublic? = null,
-    @Json(name = "public")var is_public: Boolean? = null,
-    var snapshot_id: String? = null,
-    var tracks: PagingObjectPlaylistTrack? = null,
-    var type: String? = null,
-    var uri: String? = null): Parcelable
+data class Copyright(
+    var text: String? = null,
+    var type: String? = null):Parcelable

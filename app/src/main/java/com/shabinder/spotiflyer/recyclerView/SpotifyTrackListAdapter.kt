@@ -18,6 +18,7 @@
 package com.shabinder.spotiflyer.recyclerView
 
 import android.annotation.SuppressLint
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,22 +28,20 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.databinding.TrackListItemBinding
-import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper.downloadAllTracks
+import com.shabinder.spotiflyer.downloadHelper.DownloadHelper.downloadAllTracks
 import com.shabinder.spotiflyer.models.DownloadStatus
-import com.shabinder.spotiflyer.models.Source
-import com.shabinder.spotiflyer.models.Track
+import com.shabinder.spotiflyer.models.TrackDetails
+import com.shabinder.spotiflyer.models.spotify.Source
+import com.shabinder.spotiflyer.models.spotify.Track
 import com.shabinder.spotiflyer.ui.spotify.SpotifyViewModel
+import com.shabinder.spotiflyer.utils.*
 import com.shabinder.spotiflyer.utils.Provider.activity
-import com.shabinder.spotiflyer.utils.bindImage
-import com.shabinder.spotiflyer.utils.rotateAnim
 import kotlinx.coroutines.launch
+import java.io.File
 
+class SpotifyTrackListAdapter(private val spotifyViewModel : SpotifyViewModel): ListAdapter<Track,SpotifyTrackListAdapter.ViewHolder>(SpotifyTrackDiffCallback()) {
 
-class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHolder>(SpotifyTrackDiffCallback()) {
-
-    var spotifyViewModel : SpotifyViewModel? = null
     var isAlbum:Boolean = false
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -55,9 +54,9 @@ class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
         val item = getItem(position)
         if(itemCount ==1 || isAlbum){
             holder.binding.imageUrl.visibility = View.GONE}else{
-            spotifyViewModel!!.uiScope.launch {
+            spotifyViewModel.uiScope.launch {
                 //Placeholder Set
-                bindImage(holder.binding.imageUrl, item.album?.images?.get(0)?.url,Source.Spotify)
+                bindImage(holder.binding.imageUrl, item.album?.images?.get(0)?.url, Source.Spotify)
             }
         }
 
@@ -77,14 +76,35 @@ class SpotifyTrackListAdapter: ListAdapter<Track,SpotifyTrackListAdapter.ViewHol
                 holder.binding.btnDownload.setImageResource(R.drawable.ic_arrow)
                 holder.binding.btnDownload.clearAnimation()
                 holder.binding.btnDownload.setOnClickListener{
+                    if(!isOnline()){
+                        showNoConnectionAlert()
+                        return@setOnClickListener
+                    }
                     Toast.makeText(activity,"Processing!",Toast.LENGTH_SHORT).show()
                     holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
                     rotateAnim(it)
                     item.downloaded = DownloadStatus.Downloading
-                    spotifyViewModel!!.uiScope.launch {
-                        val itemList = mutableListOf<Track>()
-                        itemList.add(item)
-                        downloadAllTracks(spotifyViewModel!!.folderType,spotifyViewModel!!.subFolder,itemList)
+                    spotifyViewModel.uiScope.launch {
+                        val itemList = mutableListOf<TrackDetails>()
+                        itemList.add(item.let { track ->
+                            val artistsList = mutableListOf<String>()
+                            track.artists?.forEach { artist -> artistsList.add(artist!!.name!!) }
+                            TrackDetails(
+                                title = track.name.toString(),
+                                artists = artistsList,
+                                durationSec = (track.duration_ms/1000).toInt(),
+                                albumArt = File(
+                                    Environment.getExternalStorageDirectory(),
+                                    Provider.defaultDir +".Images/" + (track.album?.images?.get(0)?.url.toString()).substringAfterLast('/') + ".jpeg"),
+                                albumName = track.album?.name,
+                                year = track.album?.release_date,
+                                comment = "Genres:${track.album?.genres?.joinToString()}",
+                                trackUrl = track.href,
+                                source = Source.Spotify
+                            )
+                        }
+                        )
+                        downloadAllTracks(spotifyViewModel.folderType,spotifyViewModel.subFolder,itemList)
                     }
                     notifyItemChanged(position)//start showing anim!
                 }

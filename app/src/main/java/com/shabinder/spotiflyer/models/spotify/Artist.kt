@@ -15,28 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.models
+package com.shabinder.spotiflyer.models.spotify
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Episodes(
-    var audio_preview_url:String?,
-    var description:String?,
-    var duration_ms:Int?,
-    var explicit:Boolean?,
-    var external_urls:Map<String,String>?,
-    var href:String?,
-    var id:String?,
-    var images:List<Image?>?,
-    var is_externally_hosted:Boolean?,
-    var is_playable:Boolean?,
-    var language:String?,
-    var languages:List<String?>?,
-    var name:String?,
-    var release_date:String?,
-    var release_date_precision:String?,
-    var type:String?,
-    var uri:String
-): Parcelable
+data class Artist(
+    var external_urls: Map<String?, String?>? = null,
+    var href: String? = null,
+    var id: String? = null,
+    var name: String? = null,
+    var type: String? = null,
+    var uri: String? = null):Parcelable

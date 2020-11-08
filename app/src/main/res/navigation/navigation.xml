@@ -26,7 +26,7 @@
         android:id="@+id/spotifyFragment"
         android:name="com.shabinder.spotiflyer.ui.spotify.SpotifyFragment"
         android:label="main_fragment"
-        tools:layout="@layout/spotify_fragment" >
+        tools:layout="@layout/track_list_fragment" >
         <argument
             android:name="link"
             app:argType="string" />
@@ -56,7 +56,7 @@
         android:id="@+id/youtubeFragment"
         android:name="com.shabinder.spotiflyer.ui.youtube.YoutubeFragment"
         android:label="YoutubeFragment"
-        tools:layout="@layout/youtube_fragment">
+        tools:layout="@layout/track_list_fragment">
         <argument
             android:name="link"
             app:argType="string" />

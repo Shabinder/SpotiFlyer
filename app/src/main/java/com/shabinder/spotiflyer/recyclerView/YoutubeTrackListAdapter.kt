@@ -20,19 +20,16 @@ package com.shabinder.spotiflyer.recyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.databinding.TrackListItemBinding
 import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
-import com.shabinder.spotiflyer.models.Source
 import com.shabinder.spotiflyer.models.TrackDetails
+import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.ui.youtube.YoutubeViewModel
-import com.shabinder.spotiflyer.utils.Provider
-import com.shabinder.spotiflyer.utils.bindImage
-import com.shabinder.spotiflyer.utils.rotateAnim
+import com.shabinder.spotiflyer.utils.*
 import kotlinx.coroutines.launch
 
 class YoutubeTrackListAdapter(private val youtubeViewModel :YoutubeViewModel): ListAdapter<TrackDetails,SpotifyTrackListAdapter.ViewHolder>(YouTubeTrackDiffCallback()) {
@@ -74,7 +71,11 @@ class YoutubeTrackListAdapter(private val youtubeViewModel :YoutubeViewModel): L
                 holder.binding.btnDownload.setImageResource(R.drawable.ic_arrow)
                 holder.binding.btnDownload.clearAnimation()
                 holder.binding.btnDownload.setOnClickListener{
-                    Toast.makeText(Provider.activity,"Processing!", Toast.LENGTH_SHORT).show()
+                    if(!isOnline()){
+                        showNoConnectionAlert()
+                        return@setOnClickListener
+                    }
+                    showMessage("Processing!")
                     holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
                     rotateAnim(it)
                     item.downloaded = DownloadStatus.Downloading

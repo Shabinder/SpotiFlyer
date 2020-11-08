@@ -18,6 +18,7 @@
 package com.shabinder.spotiflyer.models
 
 import android.os.Parcelable
+import com.shabinder.spotiflyer.models.spotify.Source
 import kotlinx.android.parcel.Parcelize
 import java.io.File
 
@@ -39,8 +40,8 @@ data class TrackDetails(
     var lyrics:String?=null,
     var trackUrl:String?=null,
     var albumArt: File,
-    var source:Source,
-    var downloaded:DownloadStatus = DownloadStatus.NotDownloaded
+    var source: Source,
+    var downloaded: DownloadStatus = DownloadStatus.NotDownloaded
 ):Parcelable
 
 enum class DownloadStatus{

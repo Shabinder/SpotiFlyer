@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.utils
+package com.shabinder.spotiflyer.networking
 
 import com.beust.klaxon.JsonObject
 import retrofit2.Call
@@ -25,21 +25,12 @@ import retrofit2.http.POST
 
 
 const val apiKey = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30"
-/*val body = """{
-   "context": {
-      "client": {
-         "clientName": "WEB_REMIX",
-         "clientVersion": "0.1"
-      }
-   },
-   "query": "songSearchQuery"
-}"""*/
+
 interface YoutubeMusicApi {
 
     @Headers("Content-Type: application/json", "Referer: https://music.youtube.com/search")
     @POST("search?alt=json&key=$apiKey")
-    fun getYoutubeMusicResponse(@Body text: JsonObject): Call<String>
-
+    fun getYoutubeMusicResponse(@Body text: String): Call<String>
 }
 
 fun makeJsonBody(query: String):JsonObject{

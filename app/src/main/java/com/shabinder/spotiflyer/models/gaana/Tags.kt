@@ -15,24 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer
+package com.shabinder.spotiflyer.models.gaana
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.shabinder.spotiflyer.networking.SpotifyService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-
-class SharedViewModel : ViewModel() {
-    var intentString = MutableLiveData<String>().apply { value = "" }
-    var spotifyService = MutableLiveData<SpotifyService>()
-
-    private var viewModelJob = Job()
-    val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
-    }
-}
+data class Tags (
+	val tag_id : Int,
+	val tag_name : String
+)

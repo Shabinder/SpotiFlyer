@@ -15,24 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer
+package com.shabinder.spotiflyer.models.spotify
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.shabinder.spotiflyer.networking.SpotifyService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
-class SharedViewModel : ViewModel() {
-    var intentString = MutableLiveData<String>().apply { value = "" }
-    var spotifyService = MutableLiveData<SpotifyService>()
-
-    private var viewModelJob = Job()
-    val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
-    }
-}
+@Parcelize
+data class Episodes(
+    var audio_preview_url:String?,
+    var description:String?,
+    var duration_ms:Int?,
+    var explicit:Boolean?,
+    var external_urls:Map<String,String>?,
+    var href:String?,
+    var id:String?,
+    var images:List<Image?>?,
+    var is_externally_hosted:Boolean?,
+    var is_playable:Boolean?,
+    var language:String?,
+    var languages:List<String?>?,
+    var name:String?,
+    var release_date:String?,
+    var release_date_precision:String?,
+    var type:String?,
+    var uri:String
+): Parcelable

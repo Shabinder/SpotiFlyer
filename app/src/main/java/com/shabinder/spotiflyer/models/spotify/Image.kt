@@ -15,17 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.models
+package com.shabinder.spotiflyer.models.spotify
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class PagingObjectPlaylistTrack(
-    var href: String? = null,
-    var items: List<PlaylistTrack>? = null,
-    var limit: Int = 0,
-    var next: String? = null,
-    var offset: Int = 0,
-    var previous: String? = null,
-    var total: Int = 0): Parcelable
+data class Image(
+    var width: Int? = null,
+    var height: Int? = null,
+    var url: String? = null):Parcelable

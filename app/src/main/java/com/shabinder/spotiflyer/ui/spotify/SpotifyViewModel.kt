@@ -23,8 +23,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
-import com.shabinder.spotiflyer.models.*
-import com.shabinder.spotiflyer.utils.SpotifyService
+import com.shabinder.spotiflyer.models.DownloadStatus
+import com.shabinder.spotiflyer.models.spotify.*
+import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.utils.finalOutputDir
 import kotlinx.coroutines.*
 import java.io.File
@@ -153,19 +154,19 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
 
     private suspend fun getTrackDetails(trackLink:String): Track?{
         Log.i("Requesting","https://api.spotify.com/v1/tracks/$trackLink")
-        return spotifyService?.getTrack(trackLink)
+        return spotifyService?.getTrack(trackLink)?.value
     }
     private suspend fun getAlbumDetails(albumLink:String): Album?{
         Log.i("Requesting","https://api.spotify.com/v1/albums/$albumLink")
-        return spotifyService?.getAlbum(albumLink)
+        return spotifyService?.getAlbum(albumLink)?.value
     }
     private suspend fun getPlaylistDetails(link:String): Playlist?{
         Log.i("Requesting","https://api.spotify.com/v1/playlists/$link")
-        return spotifyService?.getPlaylist(link)
+        return spotifyService?.getPlaylist(link)?.value
     }
     private suspend fun getPlaylistTrackDetails(link:String,offset:Int = 0,limit:Int = 100): PagingObjectPlaylistTrack?{
         Log.i("Requesting","https://api.spotify.com/v1/playlists/$link/tracks?offset=$offset&limit=$limit")
-        return spotifyService?.getPlaylistTracks(link, offset, limit)
+        return spotifyService?.getPlaylistTracks(link, offset, limit)?.value
     }
 
     override fun onCleared() {

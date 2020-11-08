@@ -71,7 +71,7 @@ class ForegroundService : Service(){
     private lateinit var downloadManager : DownloadManager
     private var serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
-    private val requestMap = mutableMapOf<Request,TrackDetails>()
+    private val requestMap = mutableMapOf<Request, TrackDetails>()
     private var speed :Long = 0
     private var defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
     private val parentDirectory = File(Environment.getExternalStorageDirectory(),
@@ -458,7 +458,7 @@ class ForegroundService : Service(){
     }
 
     /**
-     *Modifying Mp3 Tags with MetaData!
+     *Modifying Mp3 com.shabinder.spotiflyer.models.gaana.Tags with MetaData!
      **/
     private fun setId3v1Tags(mp3File: Mp3File, track: TrackDetails): Mp3File {
         val id3v1Tag = ID3v1Tag().apply {

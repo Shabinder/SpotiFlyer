@@ -15,9 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.models
+package com.shabinder.spotiflyer.models.spotify
 
 import android.os.Parcelable
+import com.shabinder.spotiflyer.models.DownloadStatus
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -39,5 +40,6 @@ data class Track(
     var album: Album? = null,
     var external_ids: Map<String?, String?>? = null,
     var popularity: Int? = null,
-    var downloaded:DownloadStatus? = DownloadStatus.NotDownloaded):Parcelable
+    var downloaded: DownloadStatus? = DownloadStatus.NotDownloaded
+):Parcelable
 

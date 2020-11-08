@@ -15,17 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.models
+package com.shabinder.spotiflyer.models.gaana
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import com.squareup.moshi.Json
 
-@Parcelize
-data class PagingObjectTrack(
-    var href: String? = null,
-    var items: List<Track>? = null,
-    var limit: Int = 0,
-    var next: String? = null,
-    var offset: Int = 0,
-    var previous: String? = null,
-    var total: Int = 0):Parcelable
+data class Tracks (
+    val tags : List<Tags>,
+    val seokey : String,
+    val albumseokey : String,
+    val track_title : String,
+    val album_title : String,
+    val language : String,
+    @Json(name = "artwork_large") val artworkLink : String,
+    val artist : List<Artist>,
+    @Json(name = "gener") val genre : List<Genre>,
+    val lyrics_url : String,
+    val youtube_id : String,
+    val total_favourite_count : Int,
+    val release_date : String,
+    val play_ct : String,
+    val secondary_language : String,
+)

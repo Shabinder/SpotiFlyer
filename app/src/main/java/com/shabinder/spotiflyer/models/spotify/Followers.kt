@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.models
+package com.shabinder.spotiflyer.models.spotify
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Copyright(
-    var text: String? = null,
-    var type: String? = null):Parcelable
+data class Followers(
+    var href: String? = null,
+    var total: Int? = null):Parcelable

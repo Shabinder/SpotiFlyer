@@ -23,7 +23,7 @@
     <data>
         <variable
             name="track"
-            type="com.shabinder.spotiflyer.models.Track" />
+            type="com.shabinder.spotiflyer.models.spotify.Track" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
