@@ -159,14 +159,14 @@ class GaanaViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) 
     private fun List<GaanaTrack>.toTrackDetailsList() = this.map {
         TrackDetails(
             title = it.track_title,
-            artists = it.artist.map { artist -> artist.name },
+            artists = it.artist.map { artist -> artist?.name.toString() },
             durationSec = it.duration,
             albumArt = File(
                 Environment.getExternalStorageDirectory(),
                 Provider.defaultDir +".Images/" + (it.artworkLink.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg"),
             albumName = it.album_title,
             year = it.release_date,
-            comment = "Genres:${it.genre.map { genre -> genre.name }.reduceOrNull { acc, s -> acc + s  }}",
+            comment = "Genres:${it.genre?.map { genre -> genre?.name }?.reduceOrNull { acc, s -> acc + s  }}",
             trackUrl = it.lyrics_url,
             downloaded = it.downloaded ?: DownloadStatus.NotDownloaded,
             source = Source.Gaana,
