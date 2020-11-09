@@ -41,13 +41,12 @@ import com.google.android.material.snackbar.Snackbar
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.utils.Provider.activity
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
+import com.shabinder.spotiflyer.utils.Provider.mainActivity
 import com.shabinder.spotiflyer.worker.ForegroundService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 
@@ -77,7 +76,7 @@ fun finalOutputDir(itemName:String? = null,type:String, subFolder:String?=null,e
 fun isOnline(): Boolean {
     var result = false
     val connectivityManager =
-        activity.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        mainActivity.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
     connectivityManager?.let {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             it.getNetworkCapabilities(connectivityManager.activeNetwork)?.apply {
@@ -90,7 +89,7 @@ fun isOnline(): Boolean {
             }
         } else {
             val netInfo =
-                (activity.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo
+                (mainActivity.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo
             result = netInfo != null && netInfo.isConnected
         }
     }
@@ -100,12 +99,12 @@ fun isOnline(): Boolean {
 fun showMessage(message: String, long: Boolean = false){
     CoroutineScope(Dispatchers.Main).launch{
         Snackbar.make(
-            activity.snackBarAnchor,
+            mainActivity.snackBarAnchor,
             message,
             if (long) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT
-        ).also { snackbar ->
-            snackbar.setAction("Ok") {
-                snackbar.dismiss()
+        ).apply {
+            setAction("Ok") {
+                dismiss()
             }
         }.show()
     }
@@ -126,7 +125,7 @@ fun rotateAnim(view: View){
 
 fun showNoConnectionAlert(){
     CoroutineScope(Dispatchers.Main).launch {
-        activity.apply {
+        mainActivity.apply {
             MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
                 .setTitle(resources.getString(R.string.title))
                 .setMessage(resources.getString(R.string.supporting_text))
@@ -187,13 +186,10 @@ fun bindImage(imgView: ImageView, imgUrl: String?,source: Source?) {
                                 }
                                  // the File to save , append increasing numeric counter to prevent files from getting overwritten.
                                 resource?.copyTo(file)
-                                withContext(Dispatchers.Main){
-                                    Glide.with(imgView)
-                                        .load(file)
-                                        .placeholder(R.drawable.ic_song_placeholder)
-                                        .into(imgView)
-//                                    Log.i("Glide","imageSaved")
-                                }
+                                Glide.with(imgView)
+                                    .load(file)
+                                    .placeholder(R.drawable.ic_song_placeholder)
+                                    .into(imgView)
                             } catch (e: IOException) {
                                 e.printStackTrace()
                             }

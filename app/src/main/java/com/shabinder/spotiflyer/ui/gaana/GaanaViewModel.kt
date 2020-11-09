@@ -18,7 +18,18 @@
 package com.shabinder.spotiflyer.ui.gaana
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.ViewModel
 import com.shabinder.spotiflyer.database.DatabaseDAO
+import com.shabinder.spotiflyer.networking.GaanaInterface
+import com.shabinder.spotiflyer.utils.BaseViewModel
 
-class GaanaViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : ViewModel()
+class GaanaViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : BaseViewModel(){
+
+    override var folderType:String = ""
+    override var subFolder:String = ""
+    var gaanaInterface : GaanaInterface? = null
+
+    fun gaanaSearch(type:String,link:String){
+
+    }
+
+}

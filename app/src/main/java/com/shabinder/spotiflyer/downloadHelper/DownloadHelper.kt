@@ -33,8 +33,8 @@ import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.networking.YoutubeMusicApi
 import com.shabinder.spotiflyer.networking.makeJsonBody
 import com.shabinder.spotiflyer.utils.*
-import com.shabinder.spotiflyer.utils.Provider.activity
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
+import com.shabinder.spotiflyer.utils.Provider.mainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -76,9 +76,9 @@ object DownloadHelper {
                             //Delay is Added ,if a request is in processing it may finish
                             Log.i("Spotify Helper","Download Request Sent")
                             sharedViewModel?.uiScope?.launch (Dispatchers.Main){
-                                Toast.makeText(activity,"Download Started, Now You can leave the App!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(mainActivity,"Download Started, Now You can leave the App!", Toast.LENGTH_SHORT).show()
                             }
-                            startService(activity,downloadList)
+                            startService(mainActivity,downloadList)
                         },5000)
                     }
                 }else{
@@ -121,9 +121,9 @@ object DownloadHelper {
                                                 //Delay is Added ,if a request is in processing it may finish
                                                 Log.i("Spotify Helper","Download Request Sent")
                                                 sharedViewModel?.uiScope?.launch (Dispatchers.Main){
-                                                    Toast.makeText(activity,"Download Started, Now You can leave the App!", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(mainActivity,"Download Started, Now You can leave the App!", Toast.LENGTH_SHORT).show()
                                                 }
-                                                startService(activity,downloadList)
+                                                startService(mainActivity,downloadList)
                                             },5000)
                                         }
                                     }

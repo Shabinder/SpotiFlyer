@@ -23,15 +23,6 @@
     app:startDestination="@id/mainFragment">
 
     <fragment
-        android:id="@+id/spotifyFragment"
-        android:name="com.shabinder.spotiflyer.ui.spotify.SpotifyFragment"
-        android:label="main_fragment"
-        tools:layout="@layout/track_list_fragment" >
-        <argument
-            android:name="link"
-            app:argType="string" />
-    </fragment>
-    <fragment
         android:id="@+id/mainFragment"
         android:name="com.shabinder.spotiflyer.ui.mainfragment.MainFragment"
         android:label="MainFragment"
@@ -51,16 +42,11 @@
             app:destination="@id/downloadRecord"
             app:enterAnim="@android:anim/slide_in_left"
             app:exitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_mainFragment_to_gaanaFragment"
+            app:destination="@id/gaanaFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/youtubeFragment"
-        android:name="com.shabinder.spotiflyer.ui.youtube.YoutubeFragment"
-        android:label="YoutubeFragment"
-        tools:layout="@layout/track_list_fragment">
-        <argument
-            android:name="link"
-            app:argType="string" />
-    </fragment>
+
     <fragment
         android:id="@+id/downloadRecord"
         android:name="com.shabinder.spotiflyer.ui.downloadrecord.DownloadRecordFragment"
@@ -76,5 +62,35 @@
             app:destination="@id/youtubeFragment"
             app:enterAnim="@android:anim/slide_in_left"
             app:exitAnim="@android:anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_downloadRecord_to_gaanaFragment"
+            app:destination="@id/gaanaFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/spotifyFragment"
+        android:name="com.shabinder.spotiflyer.ui.spotify.SpotifyFragment"
+        android:label="main_fragment"
+        tools:layout="@layout/track_list_fragment" >
+        <argument
+            android:name="link"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/youtubeFragment"
+        android:name="com.shabinder.spotiflyer.ui.youtube.YoutubeFragment"
+        android:label="YoutubeFragment"
+        tools:layout="@layout/track_list_fragment">
+        <argument
+            android:name="link"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/gaanaFragment"
+        android:name="com.shabinder.spotiflyer.ui.gaana.GaanaFragment"
+        android:label="GaanaFragment"
+        tools:layout="@layout/track_list_fragment">
+        <argument
+            android:name="link"
+            app:argType="string" />
     </fragment>
 </navigation>

@@ -18,5 +18,5 @@
 package com.shabinder.spotiflyer.models.gaana
 
 data class GaanaSong(
-    val tracks : List<Tracks>
+    val tracks : List<GaanaTrack>
 )

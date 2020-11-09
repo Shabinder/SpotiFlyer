@@ -37,7 +37,7 @@ import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.recyclerView.YoutubeTrackListAdapter
+import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
 import com.shabinder.spotiflyer.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +51,7 @@ class YoutubeFragment : Fragment() {
     private lateinit var viewModel: YoutubeViewModel
     private lateinit var sharedViewModel: SharedViewModel
     @Inject lateinit var ytDownloader: YoutubeDownloader
-    private lateinit var adapter : YoutubeTrackListAdapter
+    private lateinit var adapter : TrackListAdapter
     private var intentFilter: IntentFilter? = null
     private var updateUIReceiver: BroadcastReceiver? = null
     private val sampleDomain2 = "youtu.be"
@@ -64,7 +64,7 @@ class YoutubeFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater,R.layout.track_list_fragment,container,false)
         viewModel = ViewModelProvider(this).get(YoutubeViewModel::class.java)
         sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
-        adapter = YoutubeTrackListAdapter(viewModel)
+        adapter = TrackListAdapter(viewModel)
         binding.trackList.adapter = adapter
 
         initializeLiveDataObservers()
@@ -108,16 +108,16 @@ class YoutubeFragment : Fragment() {
 
             rotateAnim(binding.downloadingFab)
 
-            for (track in viewModel.ytTrackList.value?: listOf()){
+            for (track in viewModel.trackList.value?: listOf()){
                 if(track.downloaded != DownloadStatus.Downloaded){
                     track.downloaded = DownloadStatus.Downloading
-                    adapter.notifyItemChanged(viewModel.ytTrackList.value!!.indexOf(track))
+                    adapter.notifyItemChanged(viewModel.trackList.value!!.indexOf(track))
                 }
             }
             showMessage("Processing!")
             sharedViewModel.uiScope.launch(Dispatchers.Default){
                 val urlList = arrayListOf<String>()
-                viewModel.ytTrackList.value?.forEach { urlList.add("https://i.ytimg.com/vi/${it.albumArt.absolutePath.substringAfterLast("/")
+                viewModel.trackList.value?.forEach { urlList.add("https://i.ytimg.com/vi/${it.albumArt.absolutePath.substringAfterLast("/")
                     .substringBeforeLast(".")}/hqdefault.jpg")}
                 //Appending Source
                 urlList.add("youtube")
@@ -130,7 +130,7 @@ class YoutubeFragment : Fragment() {
                 YTDownloadHelper.downloadYTTracks(
                     type = viewModel.folderType,
                     subFolder = viewModel.subFolder,
-                    tracks =  viewModel.ytTrackList.value ?: listOf()
+                    tracks =  viewModel.trackList.value ?: listOf()
                 )
             }
         }
@@ -150,13 +150,13 @@ class YoutubeFragment : Fragment() {
                 if (intent != null){
                     val trackDetails = intent.getParcelableExtra<TrackDetails?>("track")
                     trackDetails?.let {
-                        val position: Int = viewModel.ytTrackList.value?.map { it.title }?.indexOf(trackDetails.title) ?: -1
+                        val position: Int = viewModel.trackList.value?.map { it.title }?.indexOf(trackDetails.title) ?: -1
                         Log.i("Track","Download Completed Intent :$position")
                         if(position != -1) {
-                            val track = viewModel.ytTrackList.value?.get(position)
+                            val track = viewModel.trackList.value?.get(position)
                             track?.let{
                                 it.downloaded = DownloadStatus.Downloaded
-                                viewModel.ytTrackList.value?.set(position, it)
+                                viewModel.trackList.value?.set(position, it)
                                 adapter.notifyItemChanged(position)
                                 checkIfAllDownloaded()
                             }
@@ -174,7 +174,7 @@ class YoutubeFragment : Fragment() {
     }
 
     private fun checkIfAllDownloaded() {
-        if(!viewModel.ytTrackList.value!!.any { it.downloaded != DownloadStatus.Downloaded }){
+        if(!viewModel.trackList.value!!.any { it.downloaded != DownloadStatus.Downloaded }){
             //All Tracks Downloaded
             binding.btnDownloadAll.visibility = View.GONE
             binding.downloadingFab.apply{
@@ -195,7 +195,7 @@ class YoutubeFragment : Fragment() {
         /**
          * TrackList Binding Observer!
          **/
-        viewModel.ytTrackList.observe(viewLifecycleOwner, {
+        viewModel.trackList.observe(viewLifecycleOwner, {
             adapter.submitList(it)
         })
 

@@ -22,8 +22,8 @@ import android.util.Log
 import android.widget.Toast
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.TrackDetails
-import com.shabinder.spotiflyer.utils.Provider.activity
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
+import com.shabinder.spotiflyer.utils.Provider.mainActivity
 import com.shabinder.spotiflyer.utils.isOnline
 import com.shabinder.spotiflyer.utils.removeIllegalChars
 import com.shabinder.spotiflyer.utils.showNoConnectionAlert
@@ -63,8 +63,8 @@ object YTDownloadHelper {
         }
         Log.i("YT Downloader Helper","Download Request Sent")
         withContext(Dispatchers.Main){
-            Toast.makeText(activity,"Download Started, Now You can leave the App!", Toast.LENGTH_SHORT).show()
-            startService(activity,downloadList)
+            Toast.makeText(mainActivity,"Download Started, Now You can leave the App!", Toast.LENGTH_SHORT).show()
+            startService(mainActivity,downloadList)
         }
     }
 }

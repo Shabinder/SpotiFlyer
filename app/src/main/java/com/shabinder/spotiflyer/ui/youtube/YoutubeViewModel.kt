@@ -21,38 +21,31 @@ import android.annotation.SuppressLint
 import android.os.Environment
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
+import com.shabinder.spotiflyer.utils.BaseViewModel
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
 import com.shabinder.spotiflyer.utils.finalOutputDir
 import com.shabinder.spotiflyer.utils.removeIllegalChars
 import com.shabinder.spotiflyer.utils.showMessage
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
-class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : ViewModel(){
-
+class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : BaseViewModel(){
     /*
     * YT Album Art Schema
     * HI-RES Url: https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"
     * Normal Url: https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
     * */
 
-    val ytTrackList = MutableLiveData<MutableList<TrackDetails>>()
-    private val loading = "Loading"
-    var title = MutableLiveData<String>().apply { value = "\"Loading!\"" }
-    var coverUrl = MutableLiveData<String>().apply { value = loading }
-    val folderType = "YT_Downloads"
-    var subFolder = ""
-    private var viewModelJob = Job()
-    val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-
+    override var folderType = "YT_Downloads"
+    override var subFolder = ""
 
     fun getYTPlaylist(searchId:String, ytDownloader:YoutubeDownloader){
         try{
@@ -67,7 +60,7 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                 title.postValue(
                     if(name.length > 17){"${name.subSequence(0,16)}..."}else{name}
                 )
-                ytTrackList.postValue(videos.map {
+                this@YoutubeViewModel.trackList.postValue(videos.map {
                     TrackDetails(
                         title = it.title(),
                         artists = listOf(it.author().toString()),
@@ -77,13 +70,13 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                             defaultDir + ".Images/" + it.videoId() + ".jpeg"
                         ),
                         source = Source.YouTube,
+                        albumArtURL = "https://i.ytimg.com/vi/${it.videoId()}/hqdefault.jpg",
                         downloaded = if (File(
-                                finalOutputDir(
-                                    itemName = it.title(),
-                                    type = folderType,
-                                    subFolder = subFolder
-                                )
-                            ).exists()
+                            finalOutputDir(
+                                itemName = it.title(),
+                                type = folderType,
+                                subFolder = subFolder
+                            )).exists()
                         )
                             DownloadStatus.Downloaded
                         else {
@@ -120,17 +113,18 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                 val detail = video?.details()
                 val name = detail?.title()?.replace(detail.author()!!.toUpperCase(),"",true) ?: detail?.title() ?: ""
                 Log.i("YT View Model",detail.toString())
-                ytTrackList.postValue(
+                this@YoutubeViewModel.trackList.postValue(
                     listOf(
                         TrackDetails(
-                        title = name,
-                        artists = listOf(detail?.author().toString()),
-                        durationSec = detail?.lengthSeconds()?:0,
-                        albumArt = File(
-                            Environment.getExternalStorageDirectory(),
-                            defaultDir +".Images/" + searchId + ".jpeg"
-                        ),
-                        source = Source.YouTube
+                            title = name,
+                            artists = listOf(detail?.author().toString()),
+                            durationSec = detail?.lengthSeconds()?:0,
+                            albumArt = File(
+                                Environment.getExternalStorageDirectory(),
+                                "$defaultDir.Images/$searchId.jpeg"
+                            ),
+                            source = Source.YouTube,
+                            albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
                     )
                     ).toMutableList()
                 )

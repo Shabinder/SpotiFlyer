@@ -40,6 +40,7 @@ data class TrackDetails(
     var lyrics:String?=null,
     var trackUrl:String?=null,
     var albumArt: File,
+    var albumArtURL: String,
     var source: Source,
     var downloaded: DownloadStatus = DownloadStatus.NotDownloaded
 ):Parcelable

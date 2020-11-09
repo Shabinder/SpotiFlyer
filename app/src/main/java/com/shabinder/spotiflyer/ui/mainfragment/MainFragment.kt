@@ -65,19 +65,60 @@ class MainFragment : Fragment() {
                 return@setOnClickListener
             }
             val link = binding.linkSearch.text.toString()
-            if (link.contains("spotify",true)){
-                if(sharedViewModel.spotifyService.value == null){//Authentication pending!!
-                    (activity as MainActivity).authenticateSpotify()
+            when{
+                //SPOTIFY
+                link.contains("spotify",true) -> {
+                    if(sharedViewModel.spotifyService.value == null){//Authentication pending!!
+                        (activity as MainActivity).authenticateSpotify()
+                    }
+                    findNavController().navigate(MainFragmentDirections.actionMainFragmentToSpotifyFragment(link))
                 }
-                findNavController().navigate(MainFragmentDirections.actionMainFragmentToSpotifyFragment(link))
-            }else if(link.contains("youtube.com",true) || link.contains("youtu.be",true) ){
-                findNavController().navigate(MainFragmentDirections.actionMainFragmentToYoutubeFragment(link))
-            }else showMessage("Link is Not Valid",true)
+
+                //YOUTUBE
+                link.contains("youtube.com",true) || link.contains("youtu.be",true) -> {
+                    findNavController().navigate(MainFragmentDirections.actionMainFragmentToYoutubeFragment(link))
+                }
+
+                //GAANA
+                link.contains("gaana",true) -> {
+                    findNavController().navigate(MainFragmentDirections.actionMainFragmentToGaanaFragment(link))
+                }
+
+                else -> showMessage("Link is Not Valid",true)
+            }
         }
         handleIntent()
         return binding.root
     }
 
+    /**
+     * Handle Intent If there is any!
+     **/
+    private fun handleIntent() {
+        sharedViewModel.intentString.observe(viewLifecycleOwner,{ it?.let {
+            sharedViewModel.uiScope.launch(Dispatchers.IO) {
+                //Wait for any Authentication to Finish ,
+                // this Wait prevents from multiple Authentication Requests
+                Thread.sleep(1000)
+                if(sharedViewModel.spotifyService.value == null){
+                    //Not Authenticated Yet
+                    Provider.mainActivity.authenticateSpotify()
+                    while (sharedViewModel.spotifyService.value == null) {
+                        //Waiting for Authentication to Finish
+                        Thread.sleep(1000)
+                    }
+                }
+
+                withContext(Dispatchers.Main){
+                    binding.linkSearch.setText(sharedViewModel.intentString.value)
+                    binding.btnSearch.performClick()
+                    //Intent Consumed
+                    sharedViewModel.intentString.value = null
+                }
+            }
+        }
+        })
+    }
 
     private fun initializeAll() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -94,44 +135,14 @@ class MainFragment : Fragment() {
         }
     }
 
+    /**
+     * Implementing buttons
+     **/
     private fun historyButton() {
         binding.btnHistory.setOnClickListener {
             findNavController().navigate(MainFragmentDirections.actionMainFragmentToDownloadRecord())
         }
     }
-
-    /**
-     * Handle Intent If there is any!
-     **/
-    private fun handleIntent() {
-        sharedViewModel.intentString.observe(viewLifecycleOwner,{
-            if(it != ""){
-                sharedViewModel.uiScope.launch(Dispatchers.IO) {
-                    //Wait for any Authentication to Finish ,
-                    // this Wait prevents from multiple Authentication Requests
-                    Thread.sleep(1000)
-                    if(sharedViewModel.spotifyService.value == null){
-                        //Not Authenticated Yet
-                        Provider.activity.authenticateSpotify()
-                        while (sharedViewModel.spotifyService.value == null) {
-                            //Waiting for Authentication to Finish
-                            Thread.sleep(1000)
-                        }
-                    }
-
-                    withContext(Dispatchers.Main){
-                        binding.linkSearch.setText(sharedViewModel.intentString.value)
-                        binding.btnSearch.performClick()
-                        sharedViewModel.intentString.value = ""
-                    }
-                }
-            }
-        })
-    }
-
-    /**
-     * Implementing buttons
-     **/
     private fun openSpotifyButton() {
         val manager: PackageManager = requireActivity().packageManager
         try {

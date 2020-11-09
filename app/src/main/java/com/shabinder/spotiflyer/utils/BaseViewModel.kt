@@ -15,21 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer
+package com.shabinder.spotiflyer.utils
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.shabinder.spotiflyer.networking.SpotifyService
+import com.shabinder.spotiflyer.models.TrackDetails
+import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 
-class SharedViewModel : ViewModel() {
-    var intentString = MutableLiveData<String>()
-    var spotifyService = MutableLiveData<SpotifyService>()
+abstract class BaseViewModel:ViewModel() {
+    abstract var folderType:String
+    abstract var subFolder:String
+    open val trackList = MutableLiveData<MutableList<TrackDetails>>()
+    private val viewModelJob:CompletableJob = Job()
+    open val uiScope = CoroutineScope(Dispatchers.Default + viewModelJob)
 
-    private var viewModelJob = Job()
-    val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    private val loading = "Loading!"
+    open var title = MutableLiveData<String>().apply { value = loading }
+    open var coverUrl = MutableLiveData<String>().apply { value = loading }
 
     override fun onCleared() {
         super.onCleared()

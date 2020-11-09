@@ -49,7 +49,7 @@ import javax.inject.Singleton
 @Module
 object Provider {
 
-    val activity: MainActivity = MainActivity.getInstance()
+    val mainActivity: MainActivity = MainActivity.getInstance()
     val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
 
 
@@ -68,7 +68,7 @@ object Provider {
     @Provides
     @Singleton
     fun provideUpi():EasyUpiPayment {
-        return EasyUpiPayment.Builder(activity)
+        return EasyUpiPayment.Builder(mainActivity)
             .setPayeeVpa("technoshab@paytm")
             .setPayeeName("Shabinder Singh")
             .setTransactionId("UNIQUE_TRANSACTION_ID")

@@ -22,39 +22,35 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.databinding.TrackListItemBinding
+import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.ui.youtube.YoutubeViewModel
 import com.shabinder.spotiflyer.utils.*
 import kotlinx.coroutines.launch
 
-class YoutubeTrackListAdapter(private val youtubeViewModel :YoutubeViewModel): ListAdapter<TrackDetails,SpotifyTrackListAdapter.ViewHolder>(YouTubeTrackDiffCallback()) {
+class TrackListAdapter(private val viewModel :BaseViewModel): ListAdapter<TrackDetails, TrackListAdapter.ViewHolder>(TrackDiffCallback()) {
+
+    var source:Source =Source.Spotify
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): SpotifyTrackListAdapter.ViewHolder {
+    ): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = TrackListItemBinding.inflate(layoutInflater,parent,false)
-//        val view = layoutInflater.inflate(R.layout.track_list_item,parent,false)
-        return SpotifyTrackListAdapter.ViewHolder(binding)
+        return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: SpotifyTrackListAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        if(itemCount == 1){
-            holder.binding.imageUrl.visibility = View.GONE}else{
-            youtubeViewModel.uiScope.launch {
-                bindImage(holder.binding.imageUrl,
-                    "https://i.ytimg.com/vi/${item.albumArt.absolutePath.substringAfterLast("/")
-                        .substringBeforeLast(".")}/hqdefault.jpg"
-                    ,
-                    Source.YouTube
-                )
+        if(itemCount == 1){ holder.binding.imageUrl.visibility = View.GONE}else{
+            viewModel.uiScope.launch {
+                bindImage(holder.binding.imageUrl,item.albumArtURL, source)
             }
         }
 
@@ -79,14 +75,25 @@ class YoutubeTrackListAdapter(private val youtubeViewModel :YoutubeViewModel): L
                     holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
                     rotateAnim(it)
                     item.downloaded = DownloadStatus.Downloading
-                    youtubeViewModel.uiScope.launch {
-                        val itemList = mutableListOf<TrackDetails>()
-                        itemList.add(item)
-                        YTDownloadHelper.downloadYTTracks(
-                            youtubeViewModel.folderType,
-                            youtubeViewModel.subFolder,
-                            itemList
-                        )
+                    when(source){
+                        Source.Spotify -> {
+                            viewModel.uiScope.launch {
+                                DownloadHelper.downloadAllTracks(
+                                    viewModel.folderType,
+                                    viewModel.subFolder,
+                                    listOf(item)
+                                )
+                            }
+                        }
+                        Source.YouTube -> {
+                            viewModel.uiScope.launch {
+                                YTDownloadHelper.downloadYTTracks(
+                                    viewModel.folderType,
+                                    viewModel.subFolder,
+                                    listOf(item)
+                                )
+                            }
+                        }
                     }
                     notifyItemChanged(position)//start showing anim!
                 }
@@ -97,8 +104,15 @@ class YoutubeTrackListAdapter(private val youtubeViewModel :YoutubeViewModel): L
         holder.binding.artist.text = "${item.artists.get(0)}..."
         holder.binding.duration.text =  "${item.durationSec/60} minutes, ${item.durationSec%60} sec"
     }
+
+    class ViewHolder(val binding: TrackListItemBinding) : RecyclerView.ViewHolder(binding.root)
+
+    fun submitList(list: MutableList<TrackDetails>?, source: Source) {
+        super.submitList(list)
+        this.source = source
+    }
 }
-class YouTubeTrackDiffCallback: DiffUtil.ItemCallback<TrackDetails>(){
+class TrackDiffCallback: DiffUtil.ItemCallback<TrackDetails>(){
     override fun areItemsTheSame(oldItem: TrackDetails, newItem: TrackDetails): Boolean {
         return oldItem.title == newItem.title
     }

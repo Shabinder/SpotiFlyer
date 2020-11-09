@@ -17,9 +17,10 @@
 
 package com.shabinder.spotiflyer.models.gaana
 
+import com.shabinder.spotiflyer.models.DownloadStatus
 import com.squareup.moshi.Json
 
-data class Tracks (
+data class GaanaTrack (
     val tags : List<Tags>,
     val seokey : String,
     val albumseokey : String,
@@ -35,4 +36,5 @@ data class Tracks (
     val release_date : String,
     val play_ct : String,
     val secondary_language : String,
+    var downloaded: DownloadStatus? = DownloadStatus.NotDownloaded
 )

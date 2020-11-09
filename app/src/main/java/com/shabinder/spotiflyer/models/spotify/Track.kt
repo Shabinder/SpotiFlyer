@@ -40,6 +40,6 @@ data class Track(
     var album: Album? = null,
     var external_ids: Map<String?, String?>? = null,
     var popularity: Int? = null,
-    var downloaded: DownloadStatus? = DownloadStatus.NotDownloaded
+    var downloaded: DownloadStatus = DownloadStatus.NotDownloaded
 ):Parcelable
 

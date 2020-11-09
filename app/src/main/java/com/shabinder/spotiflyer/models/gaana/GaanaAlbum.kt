@@ -18,7 +18,7 @@
 package com.shabinder.spotiflyer.models.gaana
 
 data class GaanaAlbum (
-    val tracks : List<Tracks>,
+    val tracks : List<GaanaTrack>,
     val count : Int,
     val custom_artworks : CustomArtworks,
     val release_year : Int,
