@@ -17,55 +17,38 @@
 
 package com.shabinder.spotiflyer.ui.gaana
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
-import com.shabinder.spotiflyer.databinding.TrackListFragmentBinding
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
-import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.networking.GaanaInterface
-import com.shabinder.spotiflyer.networking.YoutubeMusicApi
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
 import com.shabinder.spotiflyer.utils.*
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@AndroidEntryPoint
-class GaanaFragment : Fragment() {
+class GaanaFragment : BaseFragment() {
 
-    private lateinit var binding: TrackListFragmentBinding
-    private lateinit var sharedViewModel: SharedViewModel
-    @Inject lateinit var youtubeMusicApi: YoutubeMusicApi
-    private lateinit var viewModel: GaanaViewModel
-    private lateinit var adapter: TrackListAdapter
-    @Inject lateinit var gaanaInterface: GaanaInterface
-    private var intentFilter: IntentFilter? = null
-    private var updateUIReceiver: BroadcastReceiver? = null
+    override lateinit var baseViewModel: BaseViewModel
+    override lateinit var adapter: TrackListAdapter
+    override var source: Source = Source.Gaana
+    private val viewModel:GaanaViewModel
+        get() = baseViewModel as GaanaViewModel
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding =  DataBindingUtil.inflate(inflater,R.layout.track_list_fragment, container, false)
+        super.onCreateView(inflater, container, savedInstanceState)
+
         initializeAll()
-        initializeLiveDataObservers()
-        initializeBroadcast()
 
         val gaanaLink = GaanaFragmentArgs.fromBundle(requireArguments()).link.substringAfter("gaana.com/")
         //Link Schema: https://gaana.com/type/link
@@ -92,16 +75,16 @@ class GaanaFragment : Fragment() {
                     binding.downloadingFab.visibility = View.VISIBLE
 
                     rotateAnim(binding.downloadingFab)
-                    for (track in viewModel.trackList.value!!){
+                    for (track in baseViewModel.trackList.value!!){
                         if(track.downloaded != DownloadStatus.Downloaded){
                             track.downloaded = DownloadStatus.Downloading
-                            adapter.notifyItemChanged(viewModel.trackList.value!!.indexOf(track))
+                            adapter.notifyItemChanged(baseViewModel.trackList.value!!.indexOf(track))
                         }
                     }
                     showMessage("Processing!")
                     sharedViewModel.uiScope.launch(Dispatchers.Default){
                         val urlList = arrayListOf<String>()
-                        viewModel.trackList.value?.forEach { urlList.add(it.albumArtURL) }
+                        baseViewModel.trackList.value?.forEach { urlList.add(it.albumArtURL) }
                         //Appending Source
                         urlList.add("gaana")
                         loadAllImages(
@@ -109,19 +92,18 @@ class GaanaFragment : Fragment() {
                             urlList
                         )
                     }
-                    viewModel.uiScope.launch {
-                        val finalList = viewModel.trackList.value
+                    baseViewModel.uiScope.launch {
+                        val finalList = baseViewModel.trackList.value
                         if(finalList.isNullOrEmpty())showMessage("Not Downloading Any Song")
                         DownloadHelper.downloadAllTracks(
-                            viewModel.folderType,
-                            viewModel.subFolder,
+                            baseViewModel.folderType,
+                            baseViewModel.subFolder,
                             finalList ?: listOf(),
                         )
                     }
                 }
             }
         }
-
         return binding.root
     }
 
@@ -130,7 +112,7 @@ class GaanaFragment : Fragment() {
      **/
     private fun initializeAll() {
         sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
-        viewModel = ViewModelProvider(this).get(GaanaViewModel::class.java)
+        baseViewModel = ViewModelProvider(this).get(GaanaViewModel::class.java)
         viewModel.gaanaInterface = gaanaInterface
         adapter = TrackListAdapter(viewModel)
         DownloadHelper.youtubeMusicApi = youtubeMusicApi
@@ -140,73 +122,5 @@ class GaanaFragment : Fragment() {
         (binding.trackList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     }
 
-    /**
-     *Live Data Observers
-     **/
-    private fun initializeLiveDataObservers() {
-        viewModel.trackList.observe(viewLifecycleOwner, {
-            if (it.isNotEmpty()){
-                Log.i("GaanaFragment","TrackList Updated")
-                adapter.submitList(it,Source.Gaana)
-                checkIfAllDownloaded()
-            }
-        })
 
-        viewModel.coverUrl.observe(viewLifecycleOwner, {
-            if(it!="Loading") bindImage(binding.coverImage,it, Source.Gaana)
-        })
-
-        viewModel.title.observe(viewLifecycleOwner, {
-            binding.titleView.text = it
-        })
-    }
-
-    private fun checkIfAllDownloaded() {
-        if(!viewModel.trackList.value!!.any { it.downloaded != DownloadStatus.Downloaded }){
-            //All Tracks Downloaded
-            binding.btnDownloadAll.visibility = View.GONE
-            binding.downloadingFab.apply{
-                setImageResource(R.drawable.ic_tick)
-                visibility = View.VISIBLE
-                clearAnimation()
-            }
-        }
-    }
-    private fun initializeBroadcast() {
-        intentFilter = IntentFilter()
-        intentFilter?.addAction("track_download_completed")
-
-        updateUIReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                //UI update here
-                if (intent != null){
-                    val trackDetails = intent.getParcelableExtra<TrackDetails?>("track")
-                    trackDetails?.let {
-                        val position: Int = viewModel.trackList.value?.map { it.title }?.indexOf(trackDetails.title) ?: -1
-                        Log.i("Track","Download Completed Intent :$position")
-                        if(position != -1) {
-                            val track = viewModel.trackList.value?.get(position)
-                            track?.let{
-                                it.downloaded = DownloadStatus.Downloaded
-                                viewModel.trackList.value?.set(position, it)
-                                adapter.notifyItemChanged(position)
-                                checkIfAllDownloaded()
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        requireActivity().registerReceiver(updateUIReceiver, intentFilter)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        initializeBroadcast()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        requireActivity().unregisterReceiver(updateUIReceiver)
-    }
 }

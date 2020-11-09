@@ -18,47 +18,31 @@
 package com.shabinder.spotiflyer.ui.spotify
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.shabinder.spotiflyer.MainActivity
-import com.shabinder.spotiflyer.R
-import com.shabinder.spotiflyer.SharedViewModel
-import com.shabinder.spotiflyer.databinding.TrackListFragmentBinding
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
-import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.networking.YoutubeMusicApi
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
 import com.shabinder.spotiflyer.utils.*
 import com.shabinder.spotiflyer.utils.Provider.mainActivity
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @Suppress("DEPRECATION")
+class SpotifyFragment : BaseFragment() {
 
-@AndroidEntryPoint
-class SpotifyFragment : Fragment() {
-    private lateinit var binding:TrackListFragmentBinding
-    private lateinit var sharedViewModel: SharedViewModel
-    @Inject lateinit var youtubeMusicApi: YoutubeMusicApi
-    private lateinit var viewModel: SpotifyViewModel
-    private lateinit var adapter:TrackListAdapter
-    private var intentFilter:IntentFilter? = null
-    private var updateUIReceiver: BroadcastReceiver? = null
+    override lateinit var baseViewModel: BaseViewModel
+    override lateinit var adapter: TrackListAdapter
+    override var source: Source = Source.Spotify
+    private val viewModel: SpotifyViewModel
+        get() = baseViewModel as SpotifyViewModel
 
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -66,13 +50,11 @@ class SpotifyFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater,R.layout.track_list_fragment,container,false)
+        super.onCreateView(inflater, container, savedInstanceState)
         initializeAll()
-        initializeLiveDataObservers()
-        initializeBroadcast()
 
         val spotifyLink = SpotifyFragmentArgs.fromBundle(requireArguments()).link.substringAfter("open.spotify.com/")
-        
+
         val link = spotifyLink.substringAfterLast('/', "Error").substringBefore('?')
         val type = spotifyLink.substringBeforeLast('/', "Error").substringAfterLast('/')
 
@@ -142,87 +124,15 @@ class SpotifyFragment : Fragment() {
      * Basic Initialization
      **/
     private fun initializeAll() {
-        sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
-        viewModel = ViewModelProvider(this).get(SpotifyViewModel::class.java)
+        baseViewModel = ViewModelProvider(this).get(SpotifyViewModel::class.java)
+        adapter = TrackListAdapter(viewModel)
         sharedViewModel.spotifyService.observe(viewLifecycleOwner, {
             viewModel.spotifyService = it
         })
-        adapter = TrackListAdapter(viewModel)
         DownloadHelper.youtubeMusicApi = youtubeMusicApi
         DownloadHelper.sharedViewModel = sharedViewModel
         DownloadHelper.statusBar = binding.statusBar
         binding.trackList.adapter = adapter
         (binding.trackList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-    }
-
-
-    /**
-     *Live Data Observers
-     **/
-    private fun initializeLiveDataObservers() {
-        viewModel.trackList.observe(viewLifecycleOwner, {
-            if (it.isNotEmpty()){
-                Log.i("SpotifyFragment","TrackList Updated")
-                adapter.submitList(it,Source.Spotify)
-                checkIfAllDownloaded()
-            }
-        })
-
-        viewModel.coverUrl.observe(viewLifecycleOwner, {
-            if(it!="Loading") bindImage(binding.coverImage,it, Source.Spotify)
-        })
-
-        viewModel.title.observe(viewLifecycleOwner, {
-            binding.titleView.text = it
-        })
-    }
-
-    private fun checkIfAllDownloaded() {
-        if(!viewModel.trackList.value!!.any { it.downloaded != DownloadStatus.Downloaded }){
-            //All Tracks Downloaded
-            binding.btnDownloadAll.visibility = View.GONE
-            binding.downloadingFab.apply{
-                setImageResource(R.drawable.ic_tick)
-                visibility = View.VISIBLE
-                clearAnimation()
-            }
-        }
-    }
-    private fun initializeBroadcast() {
-        intentFilter = IntentFilter()
-        intentFilter?.addAction("track_download_completed")
-
-        updateUIReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                //UI update here
-                if (intent != null){
-                    val trackDetails = intent.getParcelableExtra<TrackDetails?>("track")
-                    trackDetails?.let {
-                        val position: Int = viewModel.trackList.value?.map { it.title }?.indexOf(trackDetails.title) ?: -1
-                        Log.i("Track","Download Completed Intent :$position")
-                        if(position != -1) {
-                            val track = viewModel.trackList.value?.get(position)
-                            track?.let{
-                                it.downloaded = DownloadStatus.Downloaded
-                                viewModel.trackList.value?.set(position, it)
-                                adapter.notifyItemChanged(position)
-                                checkIfAllDownloaded()
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        requireActivity().registerReceiver(updateUIReceiver, intentFilter)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        initializeBroadcast()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        requireActivity().unregisterReceiver(updateUIReceiver)
     }
 }

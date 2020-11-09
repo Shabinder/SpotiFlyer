@@ -76,7 +76,7 @@ object DownloadHelper {
                             //Delay is Added ,if a request is in processing it may finish
                             Log.i("Spotify Helper","Download Request Sent")
                             sharedViewModel?.uiScope?.launch (Dispatchers.Main){
-                                Toast.makeText(mainActivity,"Download Started, Now You can leave the App!", Toast.LENGTH_SHORT).show()
+                                showMessage("Download Started, Now You can leave the App!")
                             }
                             startService(mainActivity,downloadList)
                         },5000)

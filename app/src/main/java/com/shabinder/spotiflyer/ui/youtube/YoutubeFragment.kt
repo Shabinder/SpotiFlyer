@@ -17,43 +17,26 @@
 
 package com.shabinder.spotiflyer.ui.youtube
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.github.kiulian.downloader.YoutubeDownloader
-import com.shabinder.spotiflyer.R
-import com.shabinder.spotiflyer.SharedViewModel
-import com.shabinder.spotiflyer.databinding.TrackListFragmentBinding
 import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
-import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
 import com.shabinder.spotiflyer.utils.*
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@AndroidEntryPoint
-class YoutubeFragment : Fragment() {
+class YoutubeFragment : BaseFragment() {
 
-    private lateinit var binding: TrackListFragmentBinding
-    private lateinit var viewModel: YoutubeViewModel
-    private lateinit var sharedViewModel: SharedViewModel
-    @Inject lateinit var ytDownloader: YoutubeDownloader
-    private lateinit var adapter : TrackListAdapter
-    private var intentFilter: IntentFilter? = null
-    private var updateUIReceiver: BroadcastReceiver? = null
+    override lateinit var baseViewModel: BaseViewModel
+    override lateinit var adapter : TrackListAdapter
+    override var source: Source = Source.YouTube
+    private val viewModel: YoutubeViewModel
+        get() = baseViewModel as YoutubeViewModel
     private val sampleDomain2 = "youtu.be"
     private val sampleDomain1 = "youtube.com"
 
@@ -61,14 +44,10 @@ class YoutubeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater,R.layout.track_list_fragment,container,false)
-        viewModel = ViewModelProvider(this).get(YoutubeViewModel::class.java)
-        sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
+        super.onCreateView(inflater, container, savedInstanceState)
+        baseViewModel = ViewModelProvider(this).get(YoutubeViewModel::class.java)
         adapter = TrackListAdapter(viewModel)
         binding.trackList.adapter = adapter
-
-        initializeLiveDataObservers()
-        initializeBroadcast()
 
         val args = YoutubeFragmentArgs.fromBundle(requireArguments())
         val link = args.link
@@ -134,77 +113,5 @@ class YoutubeFragment : Fragment() {
                 )
             }
         }
-    }
-    override fun onResume() {
-        super.onResume()
-        initializeBroadcast()
-    }
-
-    private fun initializeBroadcast() {
-        intentFilter = IntentFilter()
-        intentFilter?.addAction("track_download_completed")
-
-        updateUIReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                //UI update here
-                if (intent != null){
-                    val trackDetails = intent.getParcelableExtra<TrackDetails?>("track")
-                    trackDetails?.let {
-                        val position: Int = viewModel.trackList.value?.map { it.title }?.indexOf(trackDetails.title) ?: -1
-                        Log.i("Track","Download Completed Intent :$position")
-                        if(position != -1) {
-                            val track = viewModel.trackList.value?.get(position)
-                            track?.let{
-                                it.downloaded = DownloadStatus.Downloaded
-                                viewModel.trackList.value?.set(position, it)
-                                adapter.notifyItemChanged(position)
-                                checkIfAllDownloaded()
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        requireActivity().registerReceiver(updateUIReceiver, intentFilter)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        requireActivity().unregisterReceiver(updateUIReceiver)
-    }
-
-    private fun checkIfAllDownloaded() {
-        if(!viewModel.trackList.value!!.any { it.downloaded != DownloadStatus.Downloaded }){
-            //All Tracks Downloaded
-            binding.btnDownloadAll.visibility = View.GONE
-            binding.downloadingFab.apply{
-                setImageResource(R.drawable.ic_tick)
-                visibility = View.VISIBLE
-                clearAnimation()
-            }
-        }
-    }
-    private fun initializeLiveDataObservers() {
-        /**
-         * CoverUrl Binding Observer!
-         **/
-        viewModel.coverUrl.observe(viewLifecycleOwner, {
-            if(it!="Loading") bindImage(binding.coverImage,it, Source.YouTube)
-        })
-
-        /**
-         * TrackList Binding Observer!
-         **/
-        viewModel.trackList.observe(viewLifecycleOwner, {
-            adapter.submitList(it,Source.YouTube)
-        })
-
-        /**
-         * Title Binding Observer!
-         **/
-        viewModel.title.observe(viewLifecycleOwner, {
-            binding.titleView.text = it
-        })
-
     }
 }

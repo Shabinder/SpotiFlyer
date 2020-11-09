@@ -29,6 +29,7 @@ abstract class BaseViewModel:ViewModel() {
     abstract var folderType:String
     abstract var subFolder:String
     open val trackList = MutableLiveData<MutableList<TrackDetails>>()
+
     private val viewModelJob:CompletableJob = Job()
     open val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 

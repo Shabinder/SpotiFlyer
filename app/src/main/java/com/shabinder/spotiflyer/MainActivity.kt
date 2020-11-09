@@ -69,12 +69,12 @@ class MainActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         binding = DataBindingUtil.setContentView(this, R.layout.main_activity)
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         navController = findNavController(R.id.navHostFragment)
         snackBarAnchor = binding.snackBarPosition
         //Enabling Dark Mode
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
         authenticateSpotify()
 
@@ -145,10 +145,10 @@ class MainActivity : AppCompatActivity(){
         }).addInterceptor(NetworkInterceptor())
 
         val retrofit = Retrofit.Builder()
-                .baseUrl("https://api.spotify.com/v1/")
-                .client(httpClient.build())
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
-                .build()
+            .baseUrl("https://api.spotify.com/v1/")
+            .client(httpClient.build())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
 
         spotifyService = retrofit.create(SpotifyService::class.java)
         sharedViewModel.spotifyService.value = spotifyService
