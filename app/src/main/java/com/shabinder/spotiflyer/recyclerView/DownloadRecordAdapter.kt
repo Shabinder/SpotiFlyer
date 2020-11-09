@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.databinding.DownloadRecordItemBinding
+import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.ui.downloadrecord.DownloadRecordFragmentDirections
 import com.shabinder.spotiflyer.utils.bindImage
 import kotlinx.coroutines.CoroutineScope
@@ -34,6 +35,8 @@ import kotlinx.coroutines.launch
 class DownloadRecordAdapter: ListAdapter<DownloadRecord,DownloadRecordAdapter.ViewHolder>(DownloadRecordDiffCallback())  {
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
+    //Remember To change when Submitting a Different List / Or Use New Submit List Fun
+    var source:Source = Source.Spotify
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -44,7 +47,7 @@ class DownloadRecordAdapter: ListAdapter<DownloadRecord,DownloadRecordAdapter.Vi
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         adapterScope.launch {
-            bindImage(holder.binding.coverUrl,item.coverUrl,null)
+            bindImage(holder.binding.coverUrl,item.coverUrl,source)
         }
         holder.binding.itemName.text = item.name
         holder.binding.totalItems.text = "Tracks: ${item.totalFiles}"
@@ -58,6 +61,11 @@ class DownloadRecordAdapter: ListAdapter<DownloadRecord,DownloadRecordAdapter.Vi
     }
 }
     class ViewHolder(val binding: DownloadRecordItemBinding) : RecyclerView.ViewHolder(binding.root)
+
+    fun submitList(list: MutableList<DownloadRecord>?,source: Source) {
+        super.submitList(list)
+        this.source = source
+    }
 }
 
 class DownloadRecordDiffCallback: DiffUtil.ItemCallback<DownloadRecord>(){
