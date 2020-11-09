@@ -130,6 +130,7 @@ object DownloadHelper {
                                 }
                             }
                             override fun onFailure(call: Call<String>, t: Throwable) {
+                                if(t.message.toString().contains("Failed to connect")) showMessage("Failed, Check Your Internet Connection!")
                                 Log.i("YT API Req. Fail",t.message.toString())
                             }
                         }

@@ -630,9 +630,9 @@ class ForegroundService : Service(){
                                             )
                                         }
                                         "gaana" -> {
-                                                File(
-                                                    Environment.getExternalStorageDirectory(),
-                                                    Provider.defaultDir +".Images/" + (url.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg")
+                                            File(
+                                                Environment.getExternalStorageDirectory(),
+                                                Provider.defaultDir +".Images/" + (url.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg")
                                         }
                                         else -> File(
                                             Environment.getExternalStorageDirectory(),

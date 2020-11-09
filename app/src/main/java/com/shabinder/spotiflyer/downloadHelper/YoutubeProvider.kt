@@ -128,12 +128,12 @@ fun getYTTracks(response: String):List<YoutubeTrack>{
                         )
                     }
             }
-            //Log.i("Text Api",availableDetails.toString())
+            Log.i("Text Api",availableDetails.toString())
             /*
             ! Filter Out non-Song/Video results and incomplete results here itself
             ! From what we know about detail order, note that [1] - indicate result type
             */
-            if ( availableDetails.size > 1 && availableDetails[1] in listOf("Song","Video") ){
+            if ( availableDetails.size == 5 && availableDetails[1] in listOf("Song","Video") ){
 
                 // skip if result is in hours instead of minutes (no song is that long)
                 if(availableDetails[4].split(':').size != 2) continue //Has Been Giving Issues
