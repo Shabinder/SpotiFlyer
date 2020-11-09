@@ -196,7 +196,7 @@ class YoutubeFragment : Fragment() {
          * TrackList Binding Observer!
          **/
         viewModel.trackList.observe(viewLifecycleOwner, {
-            adapter.submitList(it)
+            adapter.submitList(it,Source.YouTube)
         })
 
         /**

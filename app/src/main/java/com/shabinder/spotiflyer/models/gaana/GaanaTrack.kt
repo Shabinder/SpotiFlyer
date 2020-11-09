@@ -21,12 +21,13 @@ import com.shabinder.spotiflyer.models.DownloadStatus
 import com.squareup.moshi.Json
 
 data class GaanaTrack (
-    val tags : List<Tags>,
+    val tags : List<Tags?>?,
     val seokey : String,
     val albumseokey : String,
     val track_title : String,
     val album_title : String,
     val language : String,
+    val duration: Int,
     @Json(name = "artwork_large") val artworkLink : String,
     val artist : List<Artist>,
     @Json(name = "gener") val genre : List<Genre>,
@@ -35,6 +36,6 @@ data class GaanaTrack (
     val total_favourite_count : Int,
     val release_date : String,
     val play_ct : String,
-    val secondary_language : String,
+    val secondary_language : String?,
     var downloaded: DownloadStatus? = DownloadStatus.NotDownloaded
 )

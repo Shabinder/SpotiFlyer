@@ -179,6 +179,11 @@ fun bindImage(imgView: ImageView, imgUrl: String?,source: Source?) {
                                             defaultDir+".Images/" + imgUrl.substringBeforeLast('/',imgUrl).substringAfterLast('/',imgUrl) + ".jpeg"
                                         )
                                     }
+                                    Source.Gaana -> {
+                                        File(
+                                            Environment.getExternalStorageDirectory(),
+                                            Provider.defaultDir +".Images/" + (imgUrl.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg")
+                                    }
                                     else ->  File(
                                         Environment.getExternalStorageDirectory(),
                                         defaultDir+".Images/" + imgUrl.substringAfterLast('/',imgUrl) + ".jpeg"

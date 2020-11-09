@@ -125,7 +125,7 @@ object Provider {
     @Singleton
     fun getGaanaInterface(moshi: Moshi,okHttpClient: OkHttpClient):GaanaInterface{
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://api.gaana.com/")
+            .baseUrl("https://api.gaana.com/")
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()

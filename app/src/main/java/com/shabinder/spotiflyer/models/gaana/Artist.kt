@@ -17,8 +17,11 @@
 
 package com.shabinder.spotiflyer.models.gaana
 
+import com.squareup.moshi.Json
+
 data class Artist (
 	val popularity : Int,
 	val seokey : String,
 	val name : String,
+	@Json(name = "artwork_175x175")var artworkLink :String?
 )

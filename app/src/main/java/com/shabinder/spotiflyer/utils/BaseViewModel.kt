@@ -30,7 +30,7 @@ abstract class BaseViewModel:ViewModel() {
     abstract var subFolder:String
     open val trackList = MutableLiveData<MutableList<TrackDetails>>()
     private val viewModelJob:CompletableJob = Job()
-    open val uiScope = CoroutineScope(Dispatchers.Default + viewModelJob)
+    open val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     private val loading = "Loading!"
     open var title = MutableLiveData<String>().apply { value = loading }

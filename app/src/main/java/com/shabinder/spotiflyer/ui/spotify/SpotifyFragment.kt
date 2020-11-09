@@ -163,7 +163,7 @@ class SpotifyFragment : Fragment() {
         viewModel.trackList.observe(viewLifecycleOwner, {
             if (it.isNotEmpty()){
                 Log.i("SpotifyFragment","TrackList Updated")
-                adapter.submitList(it)
+                adapter.submitList(it,Source.Spotify)
                 checkIfAllDownloaded()
             }
         })

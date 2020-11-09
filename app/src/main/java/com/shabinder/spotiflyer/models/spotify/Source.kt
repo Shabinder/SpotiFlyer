@@ -20,4 +20,5 @@ package com.shabinder.spotiflyer.models.spotify
 enum class Source {
     Spotify,
     YouTube,
+    Gaana,
 }

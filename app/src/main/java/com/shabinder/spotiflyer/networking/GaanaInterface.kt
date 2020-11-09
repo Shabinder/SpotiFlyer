@@ -31,7 +31,7 @@ interface GaanaInterface {
     *
     * subtype : ["most_popular_playlist" , "playlist_home_featured" ,"playlist_detail" ,"user_playlist" ,"topCharts"]
     **/
-    @GET
+    @GET(".")
     suspend fun getGaanaPlaylist(
         @Query("type") type: String = "playlist",
         @Query("subtype") subtype: String = "playlist_detail",
@@ -46,7 +46,7 @@ interface GaanaInterface {
     *
     * subtype : ["most_popular" , "new_release" ,"featured_album" ,"similar_album" ,"all_albums", "album" ,"album_detail" ,"album_detail_info"]
     **/
-    @GET
+    @GET(".")
     suspend fun getGaanaAlbum(
         @Query("type") type: String = "album",
         @Query("subtype") subtype: String = "album_detail",
@@ -61,7 +61,7 @@ interface GaanaInterface {
     *
     * subtype : ["most_popular" , "hot_songs" ,"recommendation" ,"song_detail"]
     **/
-    @GET
+    @GET(".")
     suspend fun getGaanaSong(
         @Query("type") type: String = "song",
         @Query("subtype") subtype: String = "song_detail",
@@ -75,7 +75,7 @@ interface GaanaInterface {
     *
     * subtype : ["most_popular" , "artist_list" ,"artist_track_listing" ,"artist_album" ,"similar_artist","artist_details" ,"artist_details_info"]
     **/
-    @GET
+    @GET(".")
     suspend fun getGaanaArtistDetails(
         @Query("type") type: String = "artist",
         @Query("subtype") subtype: String = "artist_details_info",
@@ -88,7 +88,7 @@ interface GaanaInterface {
     *
     * subtype : ["most_popular" , "artist_list" ,"artist_track_listing" ,"artist_album" ,"similar_artist","artist_details" ,"artist_details_info"]
     **/
-    @GET
+    @GET(".")
     suspend fun getGaanaArtistTracks(
         @Query("type") type: String = "artist",
         @Query("subtype") subtype: String = "artist_track_listing",

@@ -49,6 +49,7 @@ import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.TrackDetails
+import com.shabinder.spotiflyer.utils.Provider
 import com.shabinder.spotiflyer.utils.copyTo
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
@@ -627,6 +628,11 @@ class ForegroundService : Service(){
                                                 Environment.getExternalStorageDirectory(),
                                                 defaultDir +".Images/" + url.substringBeforeLast('/',url).substringAfterLast('/',url) + ".jpeg"
                                             )
+                                        }
+                                        "gaana" -> {
+                                                File(
+                                                    Environment.getExternalStorageDirectory(),
+                                                    Provider.defaultDir +".Images/" + (url.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg")
                                         }
                                         else -> File(
                                             Environment.getExternalStorageDirectory(),

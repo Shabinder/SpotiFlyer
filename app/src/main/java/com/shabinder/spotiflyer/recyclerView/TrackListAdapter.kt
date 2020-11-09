@@ -76,18 +76,18 @@ class TrackListAdapter(private val viewModel :BaseViewModel): ListAdapter<TrackD
                     rotateAnim(it)
                     item.downloaded = DownloadStatus.Downloading
                     when(source){
-                        Source.Spotify -> {
+                        Source.YouTube -> {
                             viewModel.uiScope.launch {
-                                DownloadHelper.downloadAllTracks(
+                                YTDownloadHelper.downloadYTTracks(
                                     viewModel.folderType,
                                     viewModel.subFolder,
                                     listOf(item)
                                 )
                             }
                         }
-                        Source.YouTube -> {
+                        else -> {
                             viewModel.uiScope.launch {
-                                YTDownloadHelper.downloadYTTracks(
+                                DownloadHelper.downloadAllTracks(
                                     viewModel.folderType,
                                     viewModel.subFolder,
                                     listOf(item)

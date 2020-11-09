@@ -18,8 +18,7 @@
 package com.shabinder.spotiflyer.models.gaana
 
 data class GaanaPlaylist (
-    val tags : String,
-    val fromCache : Int,
+    val tags : String?,
     val modified_on : String,
     val count : Int,
     val created_on : String,
