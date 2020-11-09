@@ -46,7 +46,6 @@
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/downloading_fab"
         android:layout_width="wrap_content"
-        android:keepScreenOn="true"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/black"
         android:scaleType="fitCenter"

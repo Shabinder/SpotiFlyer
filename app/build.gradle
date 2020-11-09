@@ -123,7 +123,7 @@ dependencies {
 
     implementation 'com.mpatric:mp3agic:0.9.1'
     implementation 'com.shreyaspatil:EasyUpiPayment:3.0.0'
-    implementation 'com.github.sealedtx:java-youtube-downloader:2.4.3'
+    implementation 'com.github.sealedtx:java-youtube-downloader:2.4.4'
     implementation "androidx.tonyodev.fetch2:xfetch2:3.1.5"
     implementation 'com.github.javiersantos:AppUpdater:2.7'
 

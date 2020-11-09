@@ -21,7 +21,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -33,13 +32,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.shabinder.spotiflyer.databinding.MainActivityBinding
 import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
 import com.shabinder.spotiflyer.utils.NetworkInterceptor
-import com.shabinder.spotiflyer.utils.Provider.activity
 import com.shabinder.spotiflyer.utils.createDirectories
 import com.shabinder.spotiflyer.utils.isOnline
 import com.shabinder.spotiflyer.utils.startService
@@ -53,25 +53,28 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Inject
 
+/*
+* This is App's God Activity
+* */
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(){
     private var spotifyService : SpotifyService? = null
-    private var sharedPref :SharedPreferences? = null
     private lateinit var binding: MainActivityBinding
     lateinit var snackBarAnchor: View
     private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var navController: NavController
     @Inject lateinit var moshi: Moshi
     @Inject lateinit var spotifyServiceTokenRequest: SpotifyServiceTokenRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.main_activity)
-        snackBarAnchor = binding.snackBarPosition
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
+        navController = findNavController(R.id.navHostFragment)
+        snackBarAnchor = binding.snackBarPosition
         //Enabling Dark Mode
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        sharedPref = this.getPreferences(Context.MODE_PRIVATE)
 
         authenticateSpotify()
 
@@ -89,7 +92,8 @@ class MainActivity : AppCompatActivity(){
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        Log.i("NEW INTENT", "Received")
+        //Return to MainFragment For Further Processing of this Intent
+        navController.popBackStack(R.id.mainFragment,false)
         handleIntentFromExternalActivity(intent)
     }
 
@@ -100,9 +104,10 @@ class MainActivity : AppCompatActivity(){
                 this.getSystemService(Context.POWER_SERVICE) as PowerManager
             val isIgnoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(packageName)
             if (!isIgnoringBatteryOptimizations) {
-                val intent = Intent()
-                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-                intent.data = Uri.parse("package:$packageName")
+                val intent = Intent().apply{
+                    action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                    data = Uri.parse("package:$packageName")
+                }
                 startActivityForResult(intent, 1233)
             }
         }
@@ -188,6 +193,8 @@ class MainActivity : AppCompatActivity(){
             .setUpdateFrom(UpdateFrom.XML)
             .setUpdateXML("https://raw.githubusercontent.com/Shabinder/SpotiFlyer/master/app/src/main/res/xml/app_update.xml")
             .setCancelable(false)
+            .setButtonDoNotShowAgain("Remind Later")
+            .setButtonDoNotShowAgainClickListener { dialog, _ -> dialog.dismiss()  }
             .setButtonUpdateClickListener { _, _ ->
                 val uri: Uri =
                     Uri.parse("http://github.com/Shabinder/SpotiFlyer/releases")
@@ -200,7 +207,12 @@ class MainActivity : AppCompatActivity(){
         appUpdater.start()
     }
 
+    companion object{
+        private lateinit var instance: MainActivity
+        fun getInstance():MainActivity = instance
+    }
+
     init {
-        activity = this
+        instance = this
     }
 }

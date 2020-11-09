@@ -181,7 +181,6 @@ class YoutubeFragment : Fragment() {
                 setImageResource(R.drawable.ic_tick)
                 visibility = View.VISIBLE
                 clearAnimation()
-                keepScreenOn = false
             }
         }
     }

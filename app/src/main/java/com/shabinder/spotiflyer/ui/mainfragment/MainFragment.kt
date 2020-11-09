@@ -107,6 +107,9 @@ class MainFragment : Fragment() {
         sharedViewModel.intentString.observe(viewLifecycleOwner,{
             if(it != ""){
                 sharedViewModel.uiScope.launch(Dispatchers.IO) {
+                    //Wait for any Authentication to Finish ,
+                    // this Wait prevents from multiple Authentication Requests
+                    Thread.sleep(1000)
                     if(sharedViewModel.spotifyService.value == null){
                         //Not Authenticated Yet
                         Provider.activity.authenticateSpotify()

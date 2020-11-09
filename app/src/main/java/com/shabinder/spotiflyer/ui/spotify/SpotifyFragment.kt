@@ -173,16 +173,6 @@ class SpotifyFragment : Fragment() {
      *Live Data Observers
      **/
     private fun initializeLiveDataObservers() {
-        /**
-         * CoverUrl Binding Observer!
-         **/
-        viewModel.coverUrl.observe(viewLifecycleOwner, {
-            if(it!="Loading") bindImage(binding.coverImage,it, Source.Spotify)
-        })
-
-        /**
-         * TrackList Binding Observer!
-         **/
         viewModel.trackList.observe(viewLifecycleOwner, {
             if (it.isNotEmpty()){
                 Log.i("SpotifyFragment","TrackList Updated")
@@ -191,19 +181,12 @@ class SpotifyFragment : Fragment() {
             }
         })
 
-        /**
-         * Title Binding Observer!
-         **/
-        viewModel.title.observe(viewLifecycleOwner, {
-            binding.titleView.text = it
+        viewModel.coverUrl.observe(viewLifecycleOwner, {
+            if(it!="Loading") bindImage(binding.coverImage,it, Source.Spotify)
         })
 
-        sharedViewModel.intentString.observe(viewLifecycleOwner,{
-        //Waiting for Authentication to Finish with Spotify()Access Token Observe
-            if(it != "" && it!=SpotifyFragmentArgs.fromBundle(requireArguments()).link){
-                //New Intent Received , Time TO RELOAD
-                (activity as MainActivity).onBackPressed()
-            }
+        viewModel.title.observe(viewLifecycleOwner, {
+            binding.titleView.text = it
         })
     }
 
@@ -215,7 +198,6 @@ class SpotifyFragment : Fragment() {
                 setImageResource(R.drawable.ic_tick)
                 visibility = View.VISIBLE
                 clearAnimation()
-                keepScreenOn = false
             }
         }
     }

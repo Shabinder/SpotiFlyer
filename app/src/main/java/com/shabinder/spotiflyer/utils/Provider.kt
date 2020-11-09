@@ -49,7 +49,7 @@ import javax.inject.Singleton
 @Module
 object Provider {
 
-    lateinit var activity: MainActivity
+    val activity: MainActivity = MainActivity.getInstance()
     val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
 
 
