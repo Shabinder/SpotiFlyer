@@ -16,97 +16,84 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:layout_marginBottom="12dp"
+    android:background="#000000">
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <data>
-        <variable
-            name="track"
-            type="com.shabinder.spotiflyer.models.Track" />
-    </data>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/imageUrl"
+        android:layout_width="100dp"
         android:layout_height="80dp"
-        android:background="#000000"
-        android:layout_marginBottom="12dp"
-        >
+        android:contentDescription="Track Image"
+        android:scaleType="centerInside"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/artist"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_song_placeholder" />
 
-        <ImageView
-            android:id="@+id/imageUrl"
-            android:layout_width="100dp"
-            android:layout_height="80dp"
-            android:contentDescription="Track Image"
-            android:scaleType="centerInside"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/artist"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_song_placeholder" />
+    <TextView
+        android:id="@+id/track_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="14dp"
+        android:fontFamily="@font/raleway_semibold"
+        android:letterSpacing="0.04"
+        android:lines="1"
+        android:text="The Spectre"
+        android:textAllCaps="false"
+        android:textAppearance="@style/TextAppearance.AppTheme.Headline4"
+        android:textColor="#9AB3FF"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/btn_download"
+        app:layout_constraintStart_toStartOf="@+id/artist"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/track_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="14dp"
-            android:fontFamily="@font/raleway_semibold"
-            android:letterSpacing="0.04"
-            android:lines="1"
-            android:text="The Spectre"
-            android:textAllCaps="false"
-            android:textAppearance="@style/TextAppearance.AppTheme.Headline4"
-            android:textColor="#9AB3FF"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@+id/btn_download"
-            app:layout_constraintStart_toStartOf="@+id/artist"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/artist"
-            style="@style/TextAppearance.AppCompat.Body2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:paddingLeft="9dp"
-            android:text="Alan Walker"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/duration"
-            app:layout_constraintStart_toEndOf="@+id/imageUrl"
-            app:layout_constraintTop_toBottomOf="@+id/track_name" />
+    <TextView
+        android:id="@+id/artist"
+        style="@style/TextAppearance.AppCompat.Body2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:paddingLeft="9dp"
+        android:text="Alan Walker"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/duration"
+        app:layout_constraintStart_toEndOf="@+id/imageUrl"
+        app:layout_constraintTop_toBottomOf="@+id/track_name" />
 
 
-        <TextView
-            android:id="@+id/duration"
-            style="@style/TextAppearance.AppCompat.Body2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="3dp"
-            android:paddingLeft="9dp"
-            android:text="4 minutes, 20 sec"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/artist"
-            app:layout_constraintEnd_toStartOf="@+id/btn_download"
-            app:layout_constraintStart_toEndOf="@+id/artist"
-            app:layout_constraintTop_toTopOf="@+id/artist" />
+    <TextView
+        android:id="@+id/duration"
+        style="@style/TextAppearance.AppCompat.Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="3dp"
+        android:paddingLeft="9dp"
+        android:text="4 minutes, 20 sec"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/artist"
+        app:layout_constraintEnd_toStartOf="@+id/btn_download"
+        app:layout_constraintStart_toEndOf="@+id/artist"
+        app:layout_constraintTop_toTopOf="@+id/artist" />
 
-        <ImageButton
-            android:id="@+id/btn_download"
-            android:layout_width="60dp"
-            android:layout_height="0dp"
-            android:backgroundTint="@color/black"
-            android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_arrow" />
+    <ImageButton
+        android:id="@+id/btn_download"
+        android:layout_width="60dp"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/black"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_arrow" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</layout>
-
+</androidx.constraintlayout.widget.ConstraintLayout>

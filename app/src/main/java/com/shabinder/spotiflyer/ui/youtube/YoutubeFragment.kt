@@ -21,46 +21,39 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.navArgs
 import com.github.kiulian.downloader.YoutubeDownloader
-import com.shabinder.spotiflyer.R
-import com.shabinder.spotiflyer.SharedViewModel
-import com.shabinder.spotiflyer.databinding.YoutubeFragmentBinding
 import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
-import com.shabinder.spotiflyer.models.Track
-import com.shabinder.spotiflyer.recyclerView.YoutubeTrackListAdapter
-import com.shabinder.spotiflyer.utils.bindImage
+import com.shabinder.spotiflyer.models.DownloadStatus
+import com.shabinder.spotiflyer.models.spotify.Source
+import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
+import com.shabinder.spotiflyer.utils.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@AndroidEntryPoint
-class YoutubeFragment : Fragment() {
+private const val sampleDomain2 = "youtu.be"
+private const val sampleDomain1 = "youtube.com"
 
-    private lateinit var binding:YoutubeFragmentBinding
-    private lateinit var youtubeViewModel: YoutubeViewModel
-    private lateinit var sharedViewModel: SharedViewModel
-    private lateinit var adapter : YoutubeTrackListAdapter
-    private val sampleDomain1 = "youtube.com"
-    private val sampleDomain2 = "youtu.be"
+@AndroidEntryPoint
+class YoutubeFragment : TrackListFragment<YoutubeViewModel,YoutubeFragmentArgs>() {
+
     @Inject lateinit var ytDownloader: YoutubeDownloader
+    override lateinit var viewModel: YoutubeViewModel
+    override lateinit var adapter : TrackListAdapter
+    override var source: Source = Source.YouTube
+    override val args: YoutubeFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater,R.layout.youtube_fragment,container,false)
-        youtubeViewModel = ViewModelProvider(this).get(YoutubeViewModel::class.java)
-        sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
-        adapter = YoutubeTrackListAdapter()
-        YTDownloadHelper.context = requireContext()
-        YTDownloadHelper.statusBar = binding.StatusBarYoutube
-        binding.trackListYoutube.adapter = adapter
-
-        initializeLiveDataObservers()
+        super.onCreateView(inflater, container, savedInstanceState)
+        this.viewModel = ViewModelProvider(this).get(YoutubeViewModel::class.java)
+        adapter = TrackListAdapter(this.viewModel)
+        binding.trackList.adapter = adapter
 
         val args = YoutubeFragmentArgs.fromBundle(requireArguments())
         val link = args.link
@@ -70,7 +63,11 @@ class YoutubeFragment : Fragment() {
 
     private fun youtubeSearch(linkSearch:String) {
         val link = linkSearch.removePrefix("https://").removePrefix("http://")
-        if(!link.contains("playlist",true)){
+        if(link.contains("playlist",true) || link.contains("list",true)){
+            // Given Link is of a Playlist
+            val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&")
+            this.viewModel.getYTPlaylist(playlistId,ytDownloader)
+        }else{//Given Link is of a Video
             var searchId = "error"
             if(link.contains(sampleDomain1,true) ){
                 searchId =  link.substringAfterLast("=","error")
@@ -79,57 +76,48 @@ class YoutubeFragment : Fragment() {
                 searchId = link.substringAfterLast("/","error")
             }
             if(searchId != "error") {
-            youtubeViewModel.getYTTrack(searchId,ytDownloader)
-                binding.btnDownloadAllYoutube.setOnClickListener {
-                    YTDownloadHelper.downloadFile(null,"YT_Downloads",
-                        youtubeViewModel.ytTrack.value!!,youtubeViewModel.format.value)
+                this.viewModel.getYTTrack(searchId,ytDownloader)
+            }else{showMessage("Your Youtube Link is not of a Video!!")}
+        }
+
+        /*
+        * Download All Tracks
+        * */
+        binding.btnDownloadAll.setOnClickListener {
+            if(!isOnline()){
+                showNoConnectionAlert()
+                return@setOnClickListener
+            }
+            binding.btnDownloadAll.visibility = View.GONE
+            binding.downloadingFab.visibility = View.VISIBLE
+
+            rotateAnim(binding.downloadingFab)
+
+            for (track in this.viewModel.trackList.value?: listOf()){
+                if(track.downloaded != DownloadStatus.Downloaded){
+                    track.downloaded = DownloadStatus.Downloading
+                    adapter.notifyItemChanged(this.viewModel.trackList.value!!.indexOf(track))
                 }
-            }else{showToast("Your Youtube Link is not of a Video!!")}
-        }else(showToast("Your Youtube Link is not of a Video!!"))
+            }
+            showMessage("Processing!")
+            sharedViewModel.uiScope.launch(Dispatchers.Default){
+                val urlList = arrayListOf<String>()
+                viewModel.trackList.value?.forEach { urlList.add("https://i.ytimg.com/vi/${it.albumArt.absolutePath.substringAfterLast("/")
+                    .substringBeforeLast(".")}/hqdefault.jpg")}
+                //Appending Source
+                urlList.add("youtube")
+                loadAllImages(
+                    requireActivity(),
+                    urlList
+                )
+            }
+            viewModel.uiScope.launch {
+                YTDownloadHelper.downloadYTTracks(
+                    type = viewModel.folderType,
+                    subFolder = viewModel.subFolder,
+                    tracks =  viewModel.trackList.value ?: listOf()
+                )
+            }
+        }
     }
-
-    private fun initializeLiveDataObservers() {
-        /**
-         * CoverUrl Binding Observer!
-         **/
-        youtubeViewModel.coverUrl.observe(viewLifecycleOwner, Observer {
-            if(it!="Loading") bindImage(binding.youtubeCoverImage,it)
-        })
-
-        /**
-         * TrackList Binding Observer!
-         **/
-        youtubeViewModel.ytTrack.observe(viewLifecycleOwner, Observer {
-            val list = mutableListOf<Track>()
-            list.add(it)
-            adapterConfig(list)
-        })
-
-        youtubeViewModel.format.observe(viewLifecycleOwner, Observer {
-            adapter.format = it
-        })
-
-        /**
-         * Title Binding Observer!
-         **/
-        youtubeViewModel.title.observe(viewLifecycleOwner, Observer {
-            binding.titleViewYoutube.text = it
-        })
-
-    }
-
-    /**
-     * Configure Recycler View Adapter
-     **/
-    private fun adapterConfig(list:List<Track>){
-        adapter.submitList(list)
-    }
-
-    /**
-     * Util. Function to create toasts!
-     **/
-    private fun showToast(message:String){
-        Toast.makeText(context,message, Toast.LENGTH_SHORT).show()
-    }
-
 }

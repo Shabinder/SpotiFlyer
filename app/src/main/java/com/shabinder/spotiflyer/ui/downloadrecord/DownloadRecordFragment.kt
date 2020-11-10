@@ -21,12 +21,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayout
-import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.databinding.DownloadRecordFragmentBinding
+import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.recyclerView.DownloadRecordAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -41,43 +40,49 @@ class DownloadRecordFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater,R.layout.download_record_fragment,container,false)
+        binding = DownloadRecordFragmentBinding.inflate(inflater,container,false)
         downloadRecordViewModel = ViewModelProvider(this).get(DownloadRecordViewModel::class.java)
         adapter = DownloadRecordAdapter()
         binding.downloadRecordList.adapter = adapter
 
         downloadRecordViewModel.downloadRecordList.observe(viewLifecycleOwner, {
             if(it.isNotEmpty()){
-                downloadRecordViewModel.spotifyList = mutableListOf()
-                downloadRecordViewModel.ytList = mutableListOf()
+                resetLists()
                 for (downloadRecord in it) {
-                    if(downloadRecord.link.contains("spotify",true)) downloadRecordViewModel.spotifyList.add(downloadRecord)
-                    else downloadRecordViewModel.ytList.add(downloadRecord)
+                    when{
+                        downloadRecord.link.contains("spotify",true) -> downloadRecordViewModel.spotifyList.add(downloadRecord)
+                        downloadRecord.link.contains("gaana",true) -> downloadRecordViewModel.gaanaList.add(downloadRecord)
+                        else -> downloadRecordViewModel.ytList.add(downloadRecord)
+                    }
                 }
-                if(binding.tabLayout.selectedTabPosition == 0) adapter.submitList(downloadRecordViewModel.spotifyList)
-                else adapter.submitList(downloadRecordViewModel.ytList)
+                when(binding.tabLayout.selectedTabPosition){
+                    0-> adapter.submitList(downloadRecordViewModel.spotifyList,Source.Spotify)
+                    1-> adapter.submitList(downloadRecordViewModel.gaanaList,Source.Gaana)
+                    2-> adapter.submitList(downloadRecordViewModel.ytList,Source.YouTube)
+                }
             }
         })
 
 
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                if(tab?.text == "Spotify"){
-                    adapter.submitList(downloadRecordViewModel.spotifyList)
-                } else adapter.submitList(downloadRecordViewModel.ytList)
+                when(tab?.position){
+                    0-> adapter.submitList(downloadRecordViewModel.spotifyList,Source.Spotify)
+                    1-> adapter.submitList(downloadRecordViewModel.gaanaList,Source.Gaana)
+                    2-> adapter.submitList(downloadRecordViewModel.ytList,Source.YouTube)
+                }
             }
-
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-                // Handle tab reselect
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                // Handle tab unselected
-            }
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
         })
 
         return  binding.root
+    }
+
+    private fun resetLists() {
+        downloadRecordViewModel.spotifyList = mutableListOf()
+        downloadRecordViewModel.ytList = mutableListOf()
+        downloadRecordViewModel.gaanaList = mutableListOf()
     }
 
 }

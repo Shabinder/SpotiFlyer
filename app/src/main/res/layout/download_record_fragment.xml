@@ -15,10 +15,9 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
 <androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -27,14 +26,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="@drawable/text_background_accented"
+        style="@style/Widget.AppCompat.TextView.Gradient"
         android:drawablePadding="5dp"
         android:fontFamily="@font/raleway_semibold"
-        android:gravity="center"
-        android:padding="8dp"
         android:text=" Download History "
-        android:textAlignment="center"
-        android:textColor="#E1FFFFFF"
         android:textSize="21sp"
         app:drawableStartCompat="@drawable/ic_history"
         app:layout_constraintEnd_toEndOf="parent"
@@ -43,6 +38,7 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
+        android:background="@color/black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -60,6 +56,11 @@
             android:icon="@drawable/ic_spotify_logo"
             android:text="Spotify" />
 
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:icon="@drawable/gaana"
+            android:text="Gaana" />
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -82,4 +83,3 @@
         app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>

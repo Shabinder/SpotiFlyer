@@ -17,49 +17,54 @@
 
 package com.shabinder.spotiflyer.downloadHelper
 
-import android.content.Context
-import android.content.Intent
 import android.os.Environment
 import android.util.Log
-import android.view.View
-import android.widget.TextView
-import androidx.core.content.ContextCompat
-import com.github.kiulian.downloader.model.formats.Format
+import android.widget.Toast
 import com.shabinder.spotiflyer.models.DownloadObject
-import com.shabinder.spotiflyer.models.Track
-import com.shabinder.spotiflyer.worker.ForegroundService
+import com.shabinder.spotiflyer.models.TrackDetails
+import com.shabinder.spotiflyer.utils.Provider.defaultDir
+import com.shabinder.spotiflyer.utils.Provider.mainActivity
+import com.shabinder.spotiflyer.utils.isOnline
+import com.shabinder.spotiflyer.utils.removeIllegalChars
+import com.shabinder.spotiflyer.utils.showNoConnectionAlert
+import com.shabinder.spotiflyer.utils.startService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 object YTDownloadHelper {
-    var context : Context? = null
-    var statusBar: TextView? = null
-
-    fun downloadFile(subFolder: String?, type: String,ytTrack: Track,format: Format?) {
-        format?.let {
-            val url:String = format.url()
-//                    Log.i("DHelper Link Found", url)
-            val outputFile:String = Environment.getExternalStorageDirectory().toString() + File.separator +
-                    SpotifyDownloadHelper.defaultDir + SpotifyDownloadHelper.removeIllegalChars(type) + File.separator + (if(subFolder == null){""}else{ SpotifyDownloadHelper.removeIllegalChars(subFolder)  + File.separator} + SpotifyDownloadHelper.removeIllegalChars(
-                ytTrack.name!!
-            ) +".m4a")
+    suspend fun downloadYTTracks(
+        type:String,
+        subFolder: String?,
+        tracks:List<TrackDetails>,
+    ){
+        val downloadList = ArrayList<DownloadObject>()
+        tracks.forEach {
+            if(!isOnline()){
+                showNoConnectionAlert()
+                return
+            }
+            val outputFile: String =
+                Environment.getExternalStorageDirectory().toString() + File.separator +
+                        defaultDir +
+                        removeIllegalChars(type) + File.separator +
+                        (if (subFolder == null) { "" }
+                        else { removeIllegalChars(subFolder) + File.separator }
+                                + removeIllegalChars(it.title) + ".m4a")
 
             val downloadObject = DownloadObject(
-                track = ytTrack,
-                url = url,
-                outputDir = outputFile
+                trackDetails = it,
+                ytVideoId = it.albumArt.absolutePath.substringAfterLast("/")
+                    .substringBeforeLast("."),
+                outputFile = outputFile
             )
-            Log.i("DH",outputFile)
-            startService(context!!, downloadObject)
-            statusBar?.visibility= View.VISIBLE
+
+            downloadList.add(downloadObject)
+        }
+        Log.i("YT Downloader Helper","Download Request Sent")
+        withContext(Dispatchers.Main){
+            Toast.makeText(mainActivity,"Download Started, Now You can leave the App!", Toast.LENGTH_SHORT).show()
+            startService(mainActivity,downloadList)
         }
     }
-
-
-
-    private fun startService(context:Context, obj: DownloadObject? = null ) {
-        val serviceIntent = Intent(context, ForegroundService::class.java)
-        serviceIntent.putExtra("object",obj)
-        ContextCompat.startForegroundService(context, serviceIntent)
-    }
-
 }

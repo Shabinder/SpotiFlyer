@@ -32,6 +32,7 @@ class DownloadRecordViewModel @ViewModelInject constructor(val databaseDAO: Data
     private var viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Default + viewModelJob)
     var spotifyList = mutableListOf<DownloadRecord>()
+    var gaanaList = mutableListOf<DownloadRecord>()
     var ytList = mutableListOf<DownloadRecord>()
     val downloadRecordList = MutableLiveData<MutableList<DownloadRecord>>().apply {
         value = mutableListOf()
@@ -40,6 +41,7 @@ class DownloadRecordViewModel @ViewModelInject constructor(val databaseDAO: Data
     init {
         getDownloadRecordList()
     }
+
     private fun getDownloadRecordList() {
         uiScope.launch {
             downloadRecordList.postValue(databaseDAO.getRecord().toMutableList())

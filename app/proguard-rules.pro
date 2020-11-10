@@ -11,7 +11,25 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt # core serialization annotations
 
+# kotlinx-serialization-json specific. Add this if you have java.lang.NoClassDefFoundError kotlinx.serialization.json.JsonObjectSerializer
+-keepclassmembers class kotlinx.serialization.json.* {
+    *** Companion;
+}
+-keepclasseswithmembers class kotlinx.serialization.json.* {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# Change here com.yourcompany.yourpackage
+-keep,includedescriptorclasses class com.shabinder.spotiflyer.**$$serializer { *; } # <-- change package name to your app's
+-keepclassmembers class com.shabinder.spotiflyer* { # <-- change package name to your app's
+    *** Companion;
+}
+-keepclasseswithmembers class com.shabinder.spotiflyer.* { # <-- change package name to your app's
+    kotlinx.serialization.KSerializer serializer(...);
+}
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable

@@ -18,12 +18,35 @@
 package com.shabinder.spotiflyer.models
 
 import android.os.Parcelable
+import com.shabinder.spotiflyer.models.spotify.Source
 import kotlinx.android.parcel.Parcelize
+import java.io.File
 
 @Parcelize
 data class DownloadObject(
-    var ytVideo: YTTrack?=null,
-    var track: Track?=null,
-    var url:String,
-    var outputDir:String
+    var trackDetails: TrackDetails,
+    var ytVideoId:String,
+    var outputFile:String
 ):Parcelable
+
+@Parcelize
+data class TrackDetails(
+    var title:String,
+    var artists:List<String>,
+    var durationSec:Int,
+    var albumName:String?=null,
+    var year:String?=null,
+    var comment:String?=null,
+    var lyrics:String?=null,
+    var trackUrl:String?=null,
+    var albumArt: File,
+    var albumArtURL: String,
+    var source: Source,
+    var downloaded: DownloadStatus = DownloadStatus.NotDownloaded
+):Parcelable
+
+enum class DownloadStatus{
+    Downloaded,
+    Downloading,
+    NotDownloaded
+}

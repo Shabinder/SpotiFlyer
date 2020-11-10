@@ -17,22 +17,19 @@
 
 package com.shabinder.spotiflyer.ui.mainfragment
 
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.MainFragmentBinding
+import com.shabinder.spotiflyer.utils.*
 import com.shreyaspatil.easyupipayment.EasyUpiPayment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -53,123 +50,88 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater,R.layout.main_fragment,container,false)
+        binding = MainFragmentBinding.inflate(inflater,container,false)
         initializeAll()
-
         binding.btnSearch.setOnClickListener {
+            if(!isOnline()){
+                showNoConnectionAlert()
+                return@setOnClickListener
+            }
             val link = binding.linkSearch.text.toString()
-            if (link.contains("spotify",true)){
-                findNavController().navigate(MainFragmentDirections.actionMainFragmentToSpotifyFragment(link))
-            }else if(link.contains("youtube.com",true) || link.contains("youtu.be",true) ){
-                findNavController().navigate(MainFragmentDirections.actionMainFragmentToYoutubeFragment(link))
-            }else{Toast.makeText(context,"Link is Not Valid",Toast.LENGTH_SHORT).show()}
+            when{
+                //SPOTIFY
+                link.contains("spotify",true) -> {
+                    if(sharedViewModel.spotifyService.value == null){//Authentication pending!!
+                        (activity as MainActivity).authenticateSpotify()
+                    }
+                    findNavController().navigate(MainFragmentDirections.actionMainFragmentToSpotifyFragment(link))
+                }
+
+                //YOUTUBE
+                link.contains("youtube.com",true) || link.contains("youtu.be",true) -> {
+                    findNavController().navigate(MainFragmentDirections.actionMainFragmentToYoutubeFragment(link))
+                }
+
+                //GAANA
+                link.contains("gaana",true) -> {
+                    findNavController().navigate(MainFragmentDirections.actionMainFragmentToGaanaFragment(link))
+                }
+
+                else -> showMessage("Link is Not Valid",true)
+            }
         }
         handleIntent()
         return binding.root
-    }
-
-
-    private fun initializeAll() {
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
-        openYTButton()
-        openSpotifyButton()
-        openGithubButton()
-        openInstaButton()
-        openLinkedInButton()
-        historyButton()
-        binding.usage.text = usageText()
-        binding.btnDonate.setOnClickListener {
-            easyUpiPayment.startPayment()
-        }
-    }
-
-    private fun historyButton() {
-        binding.btnHistory.setOnClickListener {
-            findNavController().navigate(MainFragmentDirections.actionMainFragmentToDownloadRecord())
-        }
     }
 
     /**
      * Handle Intent If there is any!
      **/
     private fun handleIntent() {
-        sharedViewModel.intentString.observe(viewLifecycleOwner,{
-            if(it != ""){
-                sharedViewModel.uiScope.launch(Dispatchers.IO) {
-                    while (sharedViewModel.accessToken.value == "") {
+        sharedViewModel.intentString.observe(viewLifecycleOwner,{ it?.let {
+            sharedViewModel.uiScope.launch(Dispatchers.IO) {
+                //Wait for any Authentication to Finish ,
+                // this Wait prevents from multiple Authentication Requests
+                Thread.sleep(1000)
+                if(sharedViewModel.spotifyService.value == null){
+                    //Not Authenticated Yet
+                    Provider.mainActivity.authenticateSpotify()
+                    while (sharedViewModel.spotifyService.value == null) {
                         //Waiting for Authentication to Finish
                         Thread.sleep(1000)
                     }
-                    withContext(Dispatchers.Main){
-                        binding.linkSearch.setText(sharedViewModel.intentString.value)
-                        binding.btnSearch.performClick()
-                        sharedViewModel.intentString.value = ""
-                    }
+                }
+
+                withContext(Dispatchers.Main){
+                    binding.linkSearch.setText(sharedViewModel.intentString.value)
+                    binding.btnSearch.performClick()
+                    //Intent Consumed
+                    sharedViewModel.intentString.value = null
                 }
             }
+        }
         })
     }
 
-    /**
-     * Implementing buttons
-     **/
-    private fun openSpotifyButton() {
-        val manager: PackageManager = requireActivity().packageManager
-        try {
-            val i = manager.getLaunchIntentForPackage("com.spotify.music")
-                ?: throw PackageManager.NameNotFoundException()
-            i.addCategory(Intent.CATEGORY_LAUNCHER)
-            binding.btnSpotify.setOnClickListener { startActivity(i) }
-        } catch (e: PackageManager.NameNotFoundException) {
-            val uri: Uri =
-                Uri.parse("http://open.spotify.com")
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            binding.btnSpotify.setOnClickListener {
-                startActivity(intent)
+    private fun initializeAll() {
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
+        binding.apply {
+            btnGaana.openPlatformOnClick("com.gaana","http://gaana.com")
+            btnSpotify.openPlatformOnClick("com.spotify.music","http://open.spotify.com")
+            btnYoutube.openPlatformOnClick("com.google.android.youtube","http://m.youtube.com")
+            btnGithub.openPlatformOnClick("http://github.com/Shabinder/SpotiFlyer")
+            btnInsta.openPlatformOnClick("http://www.instagram.com/mr.shabinder")
+            btnHistory.setOnClickListener {
+                findNavController().navigate(MainFragmentDirections.actionMainFragmentToDownloadRecord())
+            }
+            usage.text = usageText()
+            btnDonate.setOnClickListener {
+                easyUpiPayment.startPayment()
             }
         }
     }
-    private fun openYTButton() {
-        val manager: PackageManager = requireActivity().packageManager
-        try {
-            val i = manager.getLaunchIntentForPackage("com.google.android.youtube")
-                ?: throw PackageManager.NameNotFoundException()
-            i.addCategory(Intent.CATEGORY_LAUNCHER)
-            binding.btnYoutube.setOnClickListener { startActivity(i) }
-        } catch (e: PackageManager.NameNotFoundException) {
-            val uri: Uri =
-                Uri.parse("http://m.youtube.com")
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            binding.btnYoutube.setOnClickListener {
-                startActivity(intent)
-            }
-        }
-    }
-    private fun openGithubButton() {
-        val uri: Uri =
-            Uri.parse("http://github.com/Shabinder/SpotiFlyer")
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        binding.btnGithubSpotify.setOnClickListener {
-            startActivity(intent)
-        }
-    }
-    private fun openLinkedInButton() {
-        val uri: Uri =
-            Uri.parse("https://in.linkedin.com/in/shabinder")
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        binding.btnLinkedin.setOnClickListener {
-            startActivity(intent)
-        }
-    }
-    private fun openInstaButton() {
-        val uri: Uri =
-            Uri.parse("http://www.instagram.com/mr.shabinder")
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        binding.developerInstaSpotify.setOnClickListener {
-            startActivity(intent)
-        }
-    }
+
     private fun usageText(): SpannableStringBuilder {
         return SpannableStringBuilder()
             .append(getText(R.string.d_one)).append("\n")

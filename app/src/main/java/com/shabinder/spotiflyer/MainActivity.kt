@@ -21,24 +21,24 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.shabinder.spotiflyer.databinding.MainActivityBinding
-import com.shabinder.spotiflyer.downloadHelper.SpotifyDownloadHelper
-import com.shabinder.spotiflyer.utils.SpotifyService
-import com.shabinder.spotiflyer.utils.SpotifyServiceTokenRequest
-import com.shabinder.spotiflyer.utils.createDirectories
+import com.shabinder.spotiflyer.networking.SpotifyService
+import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
+import com.shabinder.spotiflyer.utils.*
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -49,49 +49,48 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Inject
 
+/*
+* This is App's God Activity
+* */
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(){
     private var spotifyService : SpotifyService? = null
-    private var isConnected: Boolean = false
-    private var sharedPref :SharedPreferences? = null
-    private var token :String =""
     private lateinit var binding: MainActivityBinding
+    lateinit var snackBarAnchor: View
     private lateinit var sharedViewModel: SharedViewModel
-    @Inject lateinit var spotifyServiceTokenRequest: SpotifyServiceTokenRequest
+    private lateinit var navController: NavController
     @Inject lateinit var moshi: Moshi
+    @Inject lateinit var spotifyServiceTokenRequest: SpotifyServiceTokenRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.main_activity)
-        sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         //Enabling Dark Mode
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        sharedPref = this.getPreferences(Context.MODE_PRIVATE)
+        binding = MainActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
+        navController = findNavController(R.id.navHostFragment)
+        snackBarAnchor = binding.snackBarPosition
 
-        //starting Notification and Downloader Service!
-        SpotifyDownloadHelper.startService(this)
-
-        if(sharedViewModel.spotifyService.value == null){
-            authenticateSpotify()
-        }else{
-            implementSpotifyService(sharedViewModel.accessToken.value!!)
-        }
+        authenticateSpotify()
 
         requestPermission()
         disableDozeMode()
         checkIfLatestVersion()
         createDirectories()
-        isConnected = sharedViewModel.isOnline(this)
-        sharedViewModel.isConnected.value = isConnected
-        Log.i("Connection Status", isConnected.toString())
+        Log.i("Connection Status", isOnline().toString())
+
+        //starting Notification and Downloader Service!
+        startService(this)
 
         handleIntentFromExternalActivity()
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        Log.i("NEW INTENT", "Received")
+        //Return to MainFragment For Further Processing of this Intent
+        navController.popBackStack(R.id.mainFragment,false)
         handleIntentFromExternalActivity(intent)
     }
 
@@ -102,9 +101,10 @@ class MainActivity : AppCompatActivity(){
                 this.getSystemService(Context.POWER_SERVICE) as PowerManager
             val isIgnoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(packageName)
             if (!isIgnoringBatteryOptimizations) {
-                val intent = Intent()
-                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-                intent.data = Uri.parse("package:$packageName")
+                val intent = Intent().apply{
+                    action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                    data = Uri.parse("package:$packageName")
+                }
                 startActivityForResult(intent, 1233)
             }
         }
@@ -139,13 +139,13 @@ class MainActivity : AppCompatActivity(){
                     "Bearer $token"
                 ).build()
             chain.proceed(request)
-        })
+        }).addInterceptor(NetworkInterceptor())
 
         val retrofit = Retrofit.Builder()
-                .baseUrl("https://api.spotify.com/v1/")
-                .client(httpClient.build())
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
-                .build()
+            .baseUrl("https://api.spotify.com/v1/")
+            .client(httpClient.build())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
 
         spotifyService = retrofit.create(SpotifyService::class.java)
         sharedViewModel.spotifyService.value = spotifyService
@@ -154,16 +154,13 @@ class MainActivity : AppCompatActivity(){
 
     fun authenticateSpotify() {
         sharedViewModel.uiScope.launch {
-            if (isConnected) {
-                Log.i("Post Request", "Made")
-                token = spotifyServiceTokenRequest.getToken()!!.access_token
-                implementSpotifyService(token)
-                Log.i("Post Request", token)
-                sharedViewModel.accessToken.value = token
-            }else{
-                Log.i("network", "unavailable")
-//                sharedViewModel.showAlertDialog(resources,this@MainActivity)
+            Log.i("Spotify Authentication","Started")
+            val token = spotifyServiceTokenRequest.getToken()
+            token.value?.let {
+                showMessage("Success: Spotify Token Acquired",isSuccess = true)
+                implementSpotifyService(it.access_token)
             }
+            Log.i("Spotify Token", token.value.toString())
         }
     }
 
@@ -188,25 +185,14 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
-    override fun onSaveInstanceState(savedInstanceState: Bundle) {
-        savedInstanceState.putString("token", token)
-        super.onSaveInstanceState(savedInstanceState)
-    }
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        if (savedInstanceState.getString("token") ==""){
-            super.onRestoreInstanceState(savedInstanceState)
-        }else{
-            implementSpotifyService(savedInstanceState.getString("token")!!)
-            super.onRestoreInstanceState(savedInstanceState)
-        }
-    }
-
     private fun checkIfLatestVersion() {
         val appUpdater = AppUpdater(this)
             .showAppUpdated(false)//true:Show App is Update Dialog
             .setUpdateFrom(UpdateFrom.XML)
             .setUpdateXML("https://raw.githubusercontent.com/Shabinder/SpotiFlyer/master/app/src/main/res/xml/app_update.xml")
             .setCancelable(false)
+            .setButtonDoNotShowAgain("Remind Later")
+            .setButtonDoNotShowAgainClickListener { dialog, _ -> dialog.dismiss()  }
             .setButtonUpdateClickListener { _, _ ->
                 val uri: Uri =
                     Uri.parse("http://github.com/Shabinder/SpotiFlyer/releases")
@@ -220,11 +206,10 @@ class MainActivity : AppCompatActivity(){
     }
 
     companion object{
-        private var instance = MainActivity()
-        fun getInstance():MainActivity{
-            return instance
-        }
+        private lateinit var instance: MainActivity
+        fun getInstance():MainActivity = instance
     }
+
     init {
         instance = this
     }

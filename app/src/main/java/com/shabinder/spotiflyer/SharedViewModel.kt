@@ -17,49 +17,22 @@
 
 package com.shabinder.spotiflyer
 
-import android.content.Context
-import android.content.res.Resources
-import android.net.ConnectivityManager
-import android.os.Environment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.shabinder.spotiflyer.utils.SpotifyService
+import com.shabinder.spotiflyer.networking.SpotifyService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import java.io.File
 
 class SharedViewModel : ViewModel() {
-    var intentString = MutableLiveData<String>().apply { value = "" }
+    var intentString = MutableLiveData<String>()
     var spotifyService = MutableLiveData<SpotifyService>()
-    var accessToken = MutableLiveData<String>().apply { value = "" }
-    var isConnected = MutableLiveData<Boolean>().apply { value = false }
-    val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator + ".Images" + File.separator
-
 
     private var viewModelJob = Job()
-
     val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
-    }
-
-     fun showAlertDialog(resources:Resources,context: Context){
-        MaterialAlertDialogBuilder(context,R.style.AlertDialogTheme)
-            .setTitle(resources.getString(R.string.title))
-            .setMessage(resources.getString(R.string.supporting_text))
-            .setPositiveButton(resources.getString(R.string.cancel)) { _, _ ->
-                // Respond to neutral button press
-            }
-            .show()
-    }
-    fun isOnline(context: Context): Boolean {
-        val cm =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val netInfo = cm.activeNetworkInfo
-        return netInfo != null && netInfo.isConnectedOrConnecting
     }
 }
