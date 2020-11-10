@@ -39,6 +39,8 @@
 
 SpotiFlyer is an **Android App**(Written in **Kotlin**), which **aims** to work as:
   - **Downloads**: Albums, Tracks and Playlists,etc 
+  - Youtube Playlist Support.
+  - Gaana Platform Support
   - Extension To **mute** whenever a Spotify Ad Plays.(TODO)
   - **Save your Data** ,by not listening your Fav Songs Online again & again(Just Download Them!)
   - **No ADS!** 
@@ -57,8 +59,6 @@ All contributions are welcome, from code to documentation to graphics to design 
  - Write **Tests**.
  - Support for Podcasts/Episodes and Shows.
  - Implementation To mute whenever Spotify Ad Plays.
- - Youtube Playlist Support.
- - Gaana Platform Support
 
 License
 ----
