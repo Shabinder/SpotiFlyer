@@ -23,24 +23,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.spotify.Source
+import com.shabinder.spotiflyer.networking.GaanaInterface
+import com.shabinder.spotiflyer.networking.YoutubeMusicApi
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
 import com.shabinder.spotiflyer.utils.*
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GaanaFragment : BaseFragment() {
+@AndroidEntryPoint
+class GaanaFragment : TrackListFragment<GaanaViewModel,GaanaFragmentArgs>() {
 
-    override lateinit var baseViewModel: BaseViewModel
+    @Inject lateinit var youtubeMusicApi: YoutubeMusicApi
+    @Inject lateinit var gaanaInterface: GaanaInterface
+    override lateinit var viewModel: GaanaViewModel
     override lateinit var adapter: TrackListAdapter
     override var source: Source = Source.Gaana
-    private val viewModel:GaanaViewModel
-        get() = baseViewModel as GaanaViewModel
-
+    override val args: GaanaFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -75,16 +81,16 @@ class GaanaFragment : BaseFragment() {
                     binding.downloadingFab.visibility = View.VISIBLE
 
                     rotateAnim(binding.downloadingFab)
-                    for (track in baseViewModel.trackList.value!!){
+                    for (track in viewModel.trackList.value!!){
                         if(track.downloaded != DownloadStatus.Downloaded){
                             track.downloaded = DownloadStatus.Downloading
-                            adapter.notifyItemChanged(baseViewModel.trackList.value!!.indexOf(track))
+                            adapter.notifyItemChanged(viewModel.trackList.value!!.indexOf(track))
                         }
                     }
                     showMessage("Processing!")
                     sharedViewModel.uiScope.launch(Dispatchers.Default){
                         val urlList = arrayListOf<String>()
-                        baseViewModel.trackList.value?.forEach { urlList.add(it.albumArtURL) }
+                        viewModel.trackList.value?.forEach { urlList.add(it.albumArtURL) }
                         //Appending Source
                         urlList.add("gaana")
                         loadAllImages(
@@ -92,12 +98,12 @@ class GaanaFragment : BaseFragment() {
                             urlList
                         )
                     }
-                    baseViewModel.uiScope.launch {
-                        val finalList = baseViewModel.trackList.value
+                    viewModel.uiScope.launch {
+                        val finalList = viewModel.trackList.value
                         if(finalList.isNullOrEmpty())showMessage("Not Downloading Any Song")
                         DownloadHelper.downloadAllTracks(
-                            baseViewModel.folderType,
-                            baseViewModel.subFolder,
+                            viewModel.folderType,
+                            viewModel.subFolder,
                             finalList ?: listOf(),
                         )
                     }
@@ -112,7 +118,7 @@ class GaanaFragment : BaseFragment() {
      **/
     private fun initializeAll() {
         sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
-        baseViewModel = ViewModelProvider(this).get(GaanaViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(GaanaViewModel::class.java)
         viewModel.gaanaInterface = gaanaInterface
         adapter = TrackListAdapter(viewModel)
         DownloadHelper.youtubeMusicApi = youtubeMusicApi

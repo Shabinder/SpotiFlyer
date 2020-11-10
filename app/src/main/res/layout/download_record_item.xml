@@ -17,89 +17,81 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <data>
-        <variable
-            name="downloadRecord"
-            type="com.shabinder.spotiflyer.database.DownloadRecord" />
-    </data>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="92dp"
+    android:background="#000000"
+    android:paddingBottom="12dp">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="92dp"
-        android:background="#000000"
-        android:paddingBottom="12dp">
+    <ImageView
+        android:id="@+id/coverUrl"
+        android:layout_width="100dp"
+        android:layout_height="80dp"
+        android:layout_alignParentStart="true"
+        android:contentDescription="Track Image"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_song_placeholder" />
 
-        <ImageView
-            android:id="@+id/coverUrl"
-            android:layout_width="100dp"
-            android:layout_height="80dp"
-            android:layout_alignParentStart="true"
-            android:contentDescription="Track Image"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_song_placeholder" />
+    <TextView
+        android:id="@+id/item_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="12dp"
+        android:layout_toStartOf="@+id/btn_action"
+        android:layout_toEndOf="@+id/coverUrl"
+        android:fontFamily="@font/raleway_semibold"
+        android:letterSpacing="0.04"
+        android:lines="1"
+        android:text="Weekend Chills"
+        android:textAllCaps="false"
+        android:textAppearance="@style/TextAppearance.AppTheme.Headline4"
+        android:textColor="#9AB3FF"
+        android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/item_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="14dp"
-            android:layout_marginEnd="12dp"
-            android:layout_toStartOf="@+id/btn_action"
-            android:layout_toEndOf="@+id/coverUrl"
-            android:fontFamily="@font/raleway_semibold"
-            android:letterSpacing="0.04"
-            android:lines="1"
-            android:text="Weekend Chills"
-            android:textAllCaps="false"
-            android:textAppearance="@style/TextAppearance.AppTheme.Headline4"
-            android:textColor="#9AB3FF"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/coverUrl"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginBottom="15dp"
-            android:layout_toStartOf="@+id/totalItems"
-            android:layout_toEndOf="@+id/coverUrl"
-            android:paddingLeft="9dp"
-            android:text="Playlist"
-            android:textSize="12sp" />
+    <TextView
+        android:id="@+id/type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/coverUrl"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="15dp"
+        android:layout_toStartOf="@+id/totalItems"
+        android:layout_toEndOf="@+id/coverUrl"
+        android:paddingLeft="9dp"
+        android:text="Playlist"
+        android:textSize="12sp" />
 
 
-        <TextView
-            android:id="@+id/totalItems"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/coverUrl"
-            android:layout_marginTop="7dp"
-            android:layout_marginEnd="25dp"
-            android:layout_marginBottom="15dp"
-            android:layout_toStartOf="@+id/btn_action"
-            android:paddingLeft="9dp"
-            android:text="50 Tracks"
-            android:textSize="12sp" />
+    <TextView
+        android:id="@+id/totalItems"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/coverUrl"
+        android:layout_marginTop="7dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="15dp"
+        android:layout_toStartOf="@+id/btn_action"
+        android:paddingLeft="9dp"
+        android:text="50 Tracks"
+        android:textSize="12sp" />
 
-        <ImageButton
-            android:id="@+id/btn_action"
-            android:layout_width="60dp"
-            android:layout_height="80dp"
-            android:layout_alignBottom="@+id/coverUrl"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="5dp"
-            android:backgroundTint="@color/black"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_share_open"
-            android:tint="@null" />
+    <ImageButton
+        android:id="@+id/btn_action"
+        android:layout_width="60dp"
+        android:layout_height="80dp"
+        android:layout_alignBottom="@+id/coverUrl"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="5dp"
+        android:backgroundTint="@color/black"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_share_open"
+        android:tint="@null" />
 
-    </RelativeLayout>
-</layout>
+</RelativeLayout>
 

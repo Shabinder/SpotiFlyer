@@ -15,12 +15,10 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
 <androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:background="@color/black"
     android:layout_height="match_parent">
 
     <TextView
@@ -28,14 +26,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="@drawable/text_background_accented"
+        style="@style/Widget.AppCompat.EditText.Gradient"
         android:drawablePadding="5dp"
         android:fontFamily="@font/raleway_semibold"
-        android:gravity="center"
-        android:padding="8dp"
         android:text=" Download History "
-        android:textAlignment="center"
-        android:textColor="#E1FFFFFF"
         android:textSize="21sp"
         app:drawableStartCompat="@drawable/ic_history"
         app:layout_constraintEnd_toEndOf="parent"
@@ -84,4 +78,3 @@
         app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>

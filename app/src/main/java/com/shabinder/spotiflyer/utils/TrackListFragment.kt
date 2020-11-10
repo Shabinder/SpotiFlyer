@@ -26,35 +26,27 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.github.kiulian.downloader.YoutubeDownloader
+import androidx.navigation.NavArgs
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.TrackListFragmentBinding
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.networking.GaanaInterface
-import com.shabinder.spotiflyer.networking.YoutubeMusicApi
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
-@AndroidEntryPoint
-abstract class BaseFragment : Fragment() {
+abstract class TrackListFragment<VM : TrackListViewModel , args: NavArgs> : Fragment() {
 
-    @Inject open lateinit var youtubeMusicApi: YoutubeMusicApi
-    @Inject open lateinit var ytDownloader: YoutubeDownloader
-    @Inject open lateinit var gaanaInterface: GaanaInterface
-    open lateinit var sharedViewModel: SharedViewModel
-    open lateinit var binding: TrackListFragmentBinding
-    abstract var baseViewModel: BaseViewModel
-    abstract var adapter: TrackListAdapter
-    abstract var source: Source
+    protected lateinit var sharedViewModel: SharedViewModel
+    protected lateinit var binding: TrackListFragmentBinding
+    protected abstract var viewModel: VM
+    protected abstract var adapter: TrackListAdapter
+    protected abstract var source: Source
     private var intentFilter: IntentFilter? = null
     private var updateUIReceiver: BroadcastReceiver? = null
+    protected abstract val args:NavArgs
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +58,7 @@ abstract class BaseFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding =  DataBindingUtil.inflate(inflater,R.layout.track_list_fragment, container, false)
+        binding =  TrackListFragmentBinding.inflate(inflater,container,false)
         return binding.root
     }
 
@@ -74,11 +66,12 @@ abstract class BaseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeLiveDataObservers()
     }
+
     /**
      *Live Data Observers
      **/
-    open fun initializeLiveDataObservers() {
-        baseViewModel.trackList.observe(viewLifecycleOwner, {
+    private fun initializeLiveDataObservers() {
+        viewModel.trackList.observe(viewLifecycleOwner, {
             if (it.isNotEmpty()){
                 Log.i("GaanaFragment","TrackList Updated")
                 adapter.submitList(it, source)
@@ -86,16 +79,16 @@ abstract class BaseFragment : Fragment() {
             }
         })
 
-        baseViewModel.coverUrl.observe(viewLifecycleOwner, {
+        viewModel.coverUrl.observe(viewLifecycleOwner, {
             if(it!="Loading") bindImage(binding.coverImage,it, source)
         })
 
-        baseViewModel.title.observe(viewLifecycleOwner, {
+        viewModel.title.observe(viewLifecycleOwner, {
             binding.titleView.text = it
         })
     }
 
-    open fun initializeBroadcast() {
+    private fun initializeBroadcast() {
         intentFilter = IntentFilter()
         intentFilter?.addAction("track_download_completed")
 
@@ -105,13 +98,13 @@ abstract class BaseFragment : Fragment() {
                 if (intent != null){
                     val trackDetails = intent.getParcelableExtra<TrackDetails?>("track")
                     trackDetails?.let {
-                        val position: Int = baseViewModel.trackList.value?.map { it.title }?.indexOf(trackDetails.title) ?: -1
+                        val position: Int = viewModel.trackList.value?.map { it.title }?.indexOf(trackDetails.title) ?: -1
                         Log.i("Track","Download Completed Intent :$position")
                         if(position != -1) {
-                            val track = baseViewModel.trackList.value?.get(position)
+                            val track = viewModel.trackList.value?.get(position)
                             track?.let{
                                 it.downloaded = DownloadStatus.Downloaded
-                                baseViewModel.trackList.value?.set(position, it)
+                                viewModel.trackList.value?.set(position, it)
                                 adapter.notifyItemChanged(position)
                                 checkIfAllDownloaded()
                             }
@@ -133,8 +126,8 @@ abstract class BaseFragment : Fragment() {
         requireActivity().unregisterReceiver(updateUIReceiver)
     }
 
-    open fun checkIfAllDownloaded() {
-        if(!baseViewModel.trackList.value!!.any { it.downloaded != DownloadStatus.Downloaded }){
+    private fun checkIfAllDownloaded() {
+        if(!viewModel.trackList.value!!.any { it.downloaded != DownloadStatus.Downloaded }){
             //All Tracks Downloaded
             binding.btnDownloadAll.visibility = View.GONE
             binding.downloadingFab.apply{

@@ -19,12 +19,22 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimaryDark">#000000</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:colorBackground">@color/black</item>
+        <item name="colorOnBackground">@color/white</item>
+        <item name="colorError">#FF5E5E</item>
+        <item name="colorOnError">@color/black</item>
+        <item name="colorSurface">@color/dark</item>
+        <item name="colorOnSurface">@color/white</item>
         <item name="colorPrimary">#FC5C7D</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/colorPrimaryDark</item>
+        <item name="colorOnSecondary">@color/white</item>
         <item name="android:textColor">#FFFFFF</item>
-        <item name="colorAccent">#6A82FB</item>
-        <item name="android:outlineAmbientShadowColor" tools:targetApi="p">#A9B200FF</item>
-        <item name="android:radius">11dp</item>
+        <item name="android:textColorHint">@color/grey</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:outlineAmbientShadowColor" tools:targetApi="p">@color/colorPrimaryDark</item>
+        <item name="android:radius">12dp</item>
         <!-- Text Appearances !-->
         <!-- use our brand's custom TextAppearance4 !-->
         <item name="textAppearanceHeadline4">@style/TextAppearance.AppTheme.Headline4</item>
@@ -32,7 +42,42 @@
         <item name="textAppearanceBody2">@style/TextAppearance.MaterialComponents.Body2</item>
     </style>
 
+    <style name="Widget.AppCompat.Button.Colored.Gradient" parent="Widget.AppCompat.ActionButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/btn_design</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingRight">4dp</item>
+        <item name="android:textSize">16sp</item>
 
+    </style>
+
+    <style name="Widget.AppCompat.ImageButton.40dp" parent="Widget.AppCompat.ImageButton">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:background">@drawable/transparent</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+    <style name="Widget.AppCompat.EditText.Gradient" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/text_background_accented</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:inputType">text</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="Widget.AppCompat.ImageButton.platformIcon" parent="Widget.AppCompat.ImageButton">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@color/black</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:padding">4dp</item>
+    </style>
     <style name="AlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
         <item name="shapeAppearanceMediumComponent">@style/CutShapeAppearance</item>
         <item name="buttonBarPositiveButtonStyle">@style/Alert.Button.Positive</item>

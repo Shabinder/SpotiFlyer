@@ -30,7 +30,6 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -69,12 +68,13 @@ class MainActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //Enabling Dark Mode
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        binding = DataBindingUtil.setContentView(this, R.layout.main_activity)
+        binding = MainActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         navController = findNavController(R.id.navHostFragment)
         snackBarAnchor = binding.snackBarPosition
-        //Enabling Dark Mode
 
         authenticateSpotify()
 

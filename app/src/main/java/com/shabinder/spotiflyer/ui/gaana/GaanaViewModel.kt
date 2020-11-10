@@ -27,15 +27,15 @@ import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.gaana.*
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.networking.GaanaInterface
-import com.shabinder.spotiflyer.utils.BaseViewModel
 import com.shabinder.spotiflyer.utils.Provider
+import com.shabinder.spotiflyer.utils.TrackListViewModel
 import com.shabinder.spotiflyer.utils.finalOutputDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class GaanaViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : BaseViewModel(){
+class GaanaViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : TrackListViewModel(){
 
     override var folderType:String = ""
     override var subFolder:String = ""

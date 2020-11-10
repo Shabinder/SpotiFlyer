@@ -21,11 +21,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayout
-import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.databinding.DownloadRecordFragmentBinding
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.recyclerView.DownloadRecordAdapter
@@ -42,7 +40,7 @@ class DownloadRecordFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater,R.layout.download_record_fragment,container,false)
+        binding = DownloadRecordFragmentBinding.inflate(inflater,container,false)
         downloadRecordViewModel = ViewModelProvider(this).get(DownloadRecordViewModel::class.java)
         adapter = DownloadRecordAdapter()
         binding.downloadRecordList.adapter = adapter

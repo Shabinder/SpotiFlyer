@@ -26,15 +26,15 @@ import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.*
 import com.shabinder.spotiflyer.networking.SpotifyService
-import com.shabinder.spotiflyer.utils.BaseViewModel
 import com.shabinder.spotiflyer.utils.Provider
+import com.shabinder.spotiflyer.utils.TrackListViewModel
 import com.shabinder.spotiflyer.utils.finalOutputDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : BaseViewModel(){
+class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : TrackListViewModel(){
 
     override var folderType:String = ""
     override var subFolder:String = ""
@@ -145,6 +145,7 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun List<Track>.toTrackDetailsList() = this.map {
         TrackDetails(
             title = it.name.toString(),

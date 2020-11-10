@@ -15,47 +15,40 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
 <ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/black"
+    tools:ignore="HardcodedText"
     >
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <EditText
             android:id="@+id/linkSearch"
-            android:layout_width="wrap_content"
+            style="@style/Widget.AppCompat.EditText.Gradient"
             android:layout_height="46dp"
             android:layout_marginTop="24dp"
-            android:background="@drawable/text_background_accented"
             android:ems="10"
             android:hint="Paste Link here"
-            android:inputType="text"
-            android:padding="8dp"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textColorHint="@color/grey"
-            android:textSize="19sp"
             app:layout_constraintEnd_toStartOf="@+id/btn_search"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
+            android:importantForAutofill="no"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_search"
-            android:layout_width="wrap_content"
+            style="@style/Widget.AppCompat.Button.Colored.Gradient"
             android:layout_height="44dp"
-            android:background="@drawable/btn_design"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            android:text="Search"
-            android:textColor="@color/black"
-            android:textSize="16sp"
+            android:fontFamily="@font/nunito_sans_light"
+            android:text=" Search "
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/linkSearch"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/linkSearch"
@@ -75,19 +68,16 @@
             app:layout_collapseMode="parallax"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linkSearch" />
+            app:layout_constraintTop_toBottomOf="@+id/linkSearch"
+            tools:ignore="UnusedAttribute" />
 
         <ImageButton
             android:id="@+id/btn_history"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/transparent"
-            android:scaleType="fitCenter"
+            style="@style/Widget.AppCompat.ImageButton.40dp"
             app:layout_constraintBottom_toBottomOf="@+id/appLogo"
             app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_history" />
+            android:contentDescription="Open Download History Button"
+            app:srcCompat="@drawable/ic_history"/>
 
         <TextView
             android:id="@+id/appName"
@@ -95,16 +85,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:fontFamily="@font/raleway_semibold"
-            android:gravity="end"
             android:text='"SpotiFlyer"'
-            android:textAlignment="viewEnd"
-            android:textColor="#9AB3FF"
+            android:textColor="@color/colorAccent"
             android:textSize="40sp"
-            android:typeface="normal"
-            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/appLogo" />
+            app:layout_constraintTop_toBottomOf="@id/appLogo"
+            />
 
         <TextView
             android:id="@+id/appSubTitle"
@@ -120,50 +107,26 @@
             app:layout_constraintStart_toStartOf="@+id/appName"
             app:layout_constraintTop_toBottomOf="@+id/appName" />
 
-
-        <TextView
-            android:id="@+id/platforms"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="2dp"
-            android:fontFamily="@font/raleway_semibold"
-            android:text="Supports: "
-            android:textAlignment="center"
-            android:textColor="#9AB3FF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:visibility="visible"
-            app:layout_constraintEnd_toStartOf="@+id/btn_spotify"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appSubTitle" />
-
         <ImageButton
             android:id="@+id/btn_spotify"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
+            style="@style/Widget.AppCompat.ImageButton.platformIcon"
             android:layout_marginEnd="2dp"
-            android:background="@color/black"
-            android:padding="5dp"
-            android:scaleType="fitCenter"
+            android:contentDescription="Open Spotify App Button"
             android:src="@drawable/ic_spotify_logo"
-            app:layout_constraintBottom_toBottomOf="@+id/platforms"
             app:layout_constraintEnd_toStartOf="@+id/btn_youtube"
-            app:layout_constraintStart_toEndOf="@+id/platforms"
-            app:layout_constraintTop_toTopOf="@+id/platforms" />
+            android:padding="6dp"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="@+id/appSubTitle"
+            app:layout_constraintTop_toBottomOf="@+id/appSubTitle"/>
 
         <ImageButton
             android:id="@+id/btn_youtube"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:background="@color/black"
-            android:padding="5dp"
-            android:scaleType="fitCenter"
+            style="@style/Widget.AppCompat.ImageButton.platformIcon"
             android:src="@drawable/ic_youtube"
             app:layout_constraintBottom_toBottomOf="@+id/btn_spotify"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:contentDescription="Open Youtube App Button"
             app:layout_constraintStart_toEndOf="@+id/btn_spotify"
+            app:layout_constraintEnd_toEndOf="@+id/appSubTitle"
             app:layout_constraintTop_toTopOf="@+id/btn_spotify" />
 
         <TextView
@@ -171,11 +134,11 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginEnd="24dp"
+            android:gravity="center"
             android:text="Usage Instructions!"
             android:textAlignment="center"
             android:textColor="#D0838383"
             android:textSize="14sp"
-            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="@+id/developer_insta_spotify"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btn_linkedin"
@@ -189,6 +152,7 @@
             android:background="@drawable/text_background_accented"
             android:drawableEnd="@drawable/ic_mug"
             android:drawablePadding="5dp"
+            android:contentDescription="Donate Money Button"
             android:fontFamily="@font/capriola"
             android:foreground="@drawable/rounded_gradient"
             android:gravity="end|center_vertical"
@@ -214,39 +178,30 @@
 
         <ImageButton
             android:id="@+id/btn_github_spotify"
-            android:layout_width="48dp"
-            android:layout_height="wrap_content"
-            android:background="@color/black"
-            android:padding="5dp"
-            android:scaleType="fitCenter"
+            style="@style/Widget.AppCompat.ImageButton.platformIcon"
             android:src="@drawable/ic_github"
             app:layout_constraintBottom_toTopOf="@+id/btn_linkedin"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_youtube"
-            app:layout_constraintVertical_chainStyle="packed" />
+            android:contentDescription="Open Github App Button"
+            app:layout_constraintVertical_chainStyle="packed"/>
 
         <ImageButton
             android:id="@+id/btn_linkedin"
-            android:layout_width="48dp"
-            android:layout_height="wrap_content"
-            android:background="@color/black"
-            android:padding="5dp"
-            android:scaleType="fitCenter"
+            style="@style/Widget.AppCompat.ImageButton.platformIcon"
             android:src="@drawable/ic_linkedin"
             app:layout_constraintBottom_toTopOf="@+id/developer_insta_spotify"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_github_spotify" />
+            android:contentDescription="Open LinkedIN App Button"
+            app:layout_constraintTop_toBottomOf="@+id/btn_github_spotify"/>
 
         <ImageButton
             android:id="@+id/developer_insta_spotify"
-            android:layout_width="48dp"
-            android:layout_height="wrap_content"
-            android:background="@color/black"
-            android:padding="5dp"
-            android:scaleType="fitCenter"
+            style="@style/Widget.AppCompat.ImageButton.platformIcon"
             android:src="@drawable/ic_instagram"
             app:layout_constraintBottom_toTopOf="@+id/btn_donate"
             app:layout_constraintStart_toStartOf="parent"
+            android:contentDescription="Open Instagram App Button"
             app:layout_constraintTop_toBottomOf="@+id/btn_linkedin" />
 
         <TextView
@@ -290,4 +245,3 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
-</layout>

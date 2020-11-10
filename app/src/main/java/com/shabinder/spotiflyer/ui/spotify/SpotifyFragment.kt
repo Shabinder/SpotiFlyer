@@ -24,26 +24,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.spotify.Source
+import com.shabinder.spotiflyer.networking.YoutubeMusicApi
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
 import com.shabinder.spotiflyer.utils.*
 import com.shabinder.spotiflyer.utils.Provider.mainActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-@Suppress("DEPRECATION")
-class SpotifyFragment : BaseFragment() {
+@AndroidEntryPoint
+class SpotifyFragment : TrackListFragment<SpotifyViewModel,SpotifyFragmentArgs>() {
 
-    override lateinit var baseViewModel: BaseViewModel
+    @Inject lateinit var youtubeMusicApi: YoutubeMusicApi
+    override lateinit var viewModel: SpotifyViewModel
     override lateinit var adapter: TrackListAdapter
     override var source: Source = Source.Spotify
-    private val viewModel: SpotifyViewModel
-        get() = baseViewModel as SpotifyViewModel
-
+    override val args: SpotifyFragmentArgs by navArgs()
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
@@ -53,7 +56,7 @@ class SpotifyFragment : BaseFragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         initializeAll()
 
-        val spotifyLink = SpotifyFragmentArgs.fromBundle(requireArguments()).link.substringAfter("open.spotify.com/")
+        val spotifyLink = args.link.substringAfter("open.spotify.com/")
 
         val link = spotifyLink.substringAfterLast('/', "Error").substringBefore('?')
         val type = spotifyLink.substringBeforeLast('/', "Error").substringAfterLast('/')
@@ -75,7 +78,7 @@ class SpotifyFragment : BaseFragment() {
                     showMessage("Implementing Soon, Stay Tuned!")
                 }
                 else{
-                    viewModel.spotifySearch(type,link)
+                    this.viewModel.spotifySearch(type,link)
 
                     binding.btnDownloadAll.setOnClickListener {
                         if(!isOnline()){
@@ -86,16 +89,16 @@ class SpotifyFragment : BaseFragment() {
                         binding.downloadingFab.visibility = View.VISIBLE
 
                         rotateAnim(binding.downloadingFab)
-                        for (track in viewModel.trackList.value!!){
+                        for (track in this.viewModel.trackList.value!!){
                             if(track.downloaded != DownloadStatus.Downloaded){
                                 track.downloaded = DownloadStatus.Downloading
-                                adapter.notifyItemChanged(viewModel.trackList.value!!.indexOf(track))
+                                adapter.notifyItemChanged(this.viewModel.trackList.value!!.indexOf(track))
                             }
                         }
                         showMessage("Processing!")
                         sharedViewModel.uiScope.launch(Dispatchers.Default){
                             val urlList = arrayListOf<String>()
-                            viewModel.trackList.value?.forEach { urlList.add(it.albumArtURL) }
+                            this@SpotifyFragment.viewModel.trackList.value?.forEach { urlList.add(it.albumArtURL) }
                             //Appending Source
                             urlList.add("spotify")
                             loadAllImages(
@@ -103,7 +106,7 @@ class SpotifyFragment : BaseFragment() {
                                 urlList
                             )
                         }
-                        viewModel.uiScope.launch {
+                        this.viewModel.uiScope.launch {
                             val finalList = viewModel.trackList.value
                             if(finalList.isNullOrEmpty())showMessage("Not Downloading Any Song")
                             DownloadHelper.downloadAllTracks(
@@ -124,10 +127,10 @@ class SpotifyFragment : BaseFragment() {
      * Basic Initialization
      **/
     private fun initializeAll() {
-        baseViewModel = ViewModelProvider(this).get(SpotifyViewModel::class.java)
-        adapter = TrackListAdapter(viewModel)
+        this.viewModel = ViewModelProvider(this).get(SpotifyViewModel::class.java)
+        adapter = TrackListAdapter(this.viewModel)
         sharedViewModel.spotifyService.observe(viewLifecycleOwner, {
-            viewModel.spotifyService = it
+            this.viewModel.spotifyService = it
         })
         DownloadHelper.youtubeMusicApi = youtubeMusicApi
         DownloadHelper.sharedViewModel = sharedViewModel

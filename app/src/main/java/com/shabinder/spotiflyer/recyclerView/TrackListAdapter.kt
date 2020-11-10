@@ -33,7 +33,7 @@ import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.utils.*
 import kotlinx.coroutines.launch
 
-class TrackListAdapter(private val viewModel :BaseViewModel): ListAdapter<TrackDetails, TrackListAdapter.ViewHolder>(TrackDiffCallback()) {
+class TrackListAdapter(private val viewModel :TrackListViewModel): ListAdapter<TrackDetails, TrackListAdapter.ViewHolder>(TrackDiffCallback()) {
 
     var source:Source =Source.Spotify
 

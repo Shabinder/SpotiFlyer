@@ -27,8 +27,8 @@ import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.utils.BaseViewModel
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
+import com.shabinder.spotiflyer.utils.TrackListViewModel
 import com.shabinder.spotiflyer.utils.finalOutputDir
 import com.shabinder.spotiflyer.utils.removeIllegalChars
 import com.shabinder.spotiflyer.utils.showMessage
@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : BaseViewModel(){
+class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : TrackListViewModel(){
     /*
     * YT Album Art Schema
     * HI-RES Url: https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"

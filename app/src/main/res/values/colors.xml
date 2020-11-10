@@ -20,10 +20,12 @@
 <resources>
     <color name="colorPrimary">#FC5C7D</color>
     <color name="colorPrimaryDark">#CE1CFF</color>
-    <color name="colorAccent">#799BFF</color>
+    <color name="colorAccent">#9AB3FF</color>
     <color name="white">#FFFFFF</color>
     <color name="grey">#99FFFFFF</color>
     <color name="black">#000000</color>
-
+    <color name="dark">#121212</color>
+    <color name="successGreen">#4BB543</color>
+    <color name="errorRed">#FF9494</color>
 
 </resources>

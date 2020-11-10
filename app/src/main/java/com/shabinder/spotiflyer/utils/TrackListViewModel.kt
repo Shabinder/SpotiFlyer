@@ -25,7 +25,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 
-abstract class BaseViewModel:ViewModel() {
+abstract class TrackListViewModel:ViewModel() {
     abstract var folderType:String
     abstract var subFolder:String
     open val trackList = MutableLiveData<MutableList<TrackDetails>>()
