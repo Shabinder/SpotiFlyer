@@ -40,6 +40,7 @@ class GaanaViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) 
     override var folderType:String = ""
     override var subFolder:String = ""
     var gaanaInterface : GaanaInterface? = null
+    val gaanaPlaceholderImageUrl = "https://a10.gaanacdn.com/images/social/gaana_social.jpg"
 
     fun gaanaSearch(type:String,link:String){
         when(type){
@@ -109,6 +110,7 @@ class GaanaViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) 
                         trackList.value = it.tracks.toTrackDetailsList()
                         title.value = link
                         //coverUrl.value = "TODO"
+                        coverUrl.value = gaanaPlaceholderImageUrl
                         withContext(Dispatchers.IO){
                             databaseDAO.insert(DownloadRecord(
                                 type = "Playlist",

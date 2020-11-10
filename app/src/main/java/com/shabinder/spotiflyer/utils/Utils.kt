@@ -96,7 +96,7 @@ fun isOnline(): Boolean {
     return result
 }
 
-fun showMessage(message: String, long: Boolean = false){
+fun showMessage(message: String, long: Boolean = false,isSuccess:Boolean = false , isError:Boolean = false){
     CoroutineScope(Dispatchers.Main).launch{
         Snackbar.make(
             mainActivity.snackBarAnchor,
@@ -105,6 +105,11 @@ fun showMessage(message: String, long: Boolean = false){
         ).apply {
             setAction("Ok") {
                 dismiss()
+            }
+            setActionTextColor(ContextCompat.getColor(mainActivity,R.color.black))
+            when{
+                isSuccess -> setBackgroundTint(ContextCompat.getColor(mainActivity,R.color.successGreen))
+                isError -> setBackgroundTint(ContextCompat.getColor(mainActivity,R.color.errorRed))
             }
         }.show()
     }

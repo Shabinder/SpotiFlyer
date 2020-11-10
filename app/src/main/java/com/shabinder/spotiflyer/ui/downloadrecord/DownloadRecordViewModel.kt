@@ -41,6 +41,7 @@ class DownloadRecordViewModel @ViewModelInject constructor(val databaseDAO: Data
     init {
         getDownloadRecordList()
     }
+
     private fun getDownloadRecordList() {
         uiScope.launch {
             downloadRecordList.postValue(databaseDAO.getRecord().toMutableList())

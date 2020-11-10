@@ -31,7 +31,7 @@
 
         <EditText
             android:id="@+id/linkSearch"
-            style="@style/Widget.AppCompat.EditText.Gradient"
+            style="@style/Widget.AppCompat.TextView.Gradient"
             android:layout_height="46dp"
             android:layout_marginTop="24dp"
             android:ems="10"
@@ -113,7 +113,7 @@
             android:layout_marginEnd="2dp"
             android:contentDescription="Open Spotify App Button"
             android:src="@drawable/ic_spotify_logo"
-            app:layout_constraintEnd_toStartOf="@+id/btn_youtube"
+            app:layout_constraintEnd_toStartOf="@+id/btn_Gaana"
             android:padding="6dp"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="@+id/appSubTitle"
@@ -122,11 +122,22 @@
         <ImageButton
             android:id="@+id/btn_youtube"
             style="@style/Widget.AppCompat.ImageButton.platformIcon"
+            android:contentDescription="Open Youtube App Button"
             android:src="@drawable/ic_youtube"
             app:layout_constraintBottom_toBottomOf="@+id/btn_spotify"
-            android:contentDescription="Open Youtube App Button"
-            app:layout_constraintStart_toEndOf="@+id/btn_spotify"
             app:layout_constraintEnd_toEndOf="@+id/appSubTitle"
+            app:layout_constraintStart_toEndOf="@+id/btn_Gaana"
+            app:layout_constraintTop_toTopOf="@+id/btn_spotify"/>
+
+        <ImageButton
+            android:id="@+id/btn_Gaana"
+            style="@style/Widget.AppCompat.ImageButton.platformIcon"
+            android:contentDescription="Open Gaana App Button"
+            android:padding="6dp"
+            android:src="@drawable/gaana"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_spotify"
+            app:layout_constraintEnd_toStartOf="@+id/btn_youtube"
+            app:layout_constraintStart_toEndOf="@+id/btn_spotify"
             app:layout_constraintTop_toTopOf="@+id/btn_spotify" />
 
         <TextView
@@ -139,10 +150,10 @@
             android:textAlignment="center"
             android:textColor="#D0838383"
             android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/developer_insta_spotify"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_Insta"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btn_linkedin"
-            app:layout_constraintTop_toTopOf="@+id/btn_github_spotify" />
+            app:layout_constraintTop_toTopOf="@+id/btn_github" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_donate"
@@ -177,7 +188,7 @@
 
 
         <ImageButton
-            android:id="@+id/btn_github_spotify"
+            android:id="@+id/btn_github"
             style="@style/Widget.AppCompat.ImageButton.platformIcon"
             android:src="@drawable/ic_github"
             app:layout_constraintBottom_toTopOf="@+id/btn_linkedin"
@@ -190,13 +201,13 @@
             android:id="@+id/btn_linkedin"
             style="@style/Widget.AppCompat.ImageButton.platformIcon"
             android:src="@drawable/ic_linkedin"
-            app:layout_constraintBottom_toTopOf="@+id/developer_insta_spotify"
+            app:layout_constraintBottom_toTopOf="@+id/btn_Insta"
             app:layout_constraintStart_toStartOf="parent"
             android:contentDescription="Open LinkedIN App Button"
-            app:layout_constraintTop_toBottomOf="@+id/btn_github_spotify"/>
+            app:layout_constraintTop_toBottomOf="@+id/btn_github"/>
 
         <ImageButton
-            android:id="@+id/developer_insta_spotify"
+            android:id="@+id/btn_Insta"
             style="@style/Widget.AppCompat.ImageButton.platformIcon"
             android:src="@drawable/ic_instagram"
             app:layout_constraintBottom_toTopOf="@+id/btn_donate"

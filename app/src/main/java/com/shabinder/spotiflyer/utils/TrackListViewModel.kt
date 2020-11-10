@@ -35,7 +35,7 @@ abstract class TrackListViewModel:ViewModel() {
 
     private val loading = "Loading!"
     open var title = MutableLiveData<String>().apply { value = loading }
-    open var coverUrl = MutableLiveData<String>().apply { value = loading }
+    open var coverUrl = MutableLiveData<String>()
 
     override fun onCleared() {
         super.onCleared()

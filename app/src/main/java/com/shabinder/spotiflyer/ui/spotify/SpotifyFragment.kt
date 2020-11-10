@@ -26,7 +26,6 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.SimpleItemAnimator
-import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.spotify.Source
@@ -63,8 +62,9 @@ class SpotifyFragment : TrackListFragment<SpotifyViewModel,SpotifyFragmentArgs>(
 
         Log.i("Spotify Fragment", "$type : $link")
 
+
         if(sharedViewModel.spotifyService.value == null){//Authentication pending!!
-            (activity as MainActivity).authenticateSpotify()
+            if(isOnline()) mainActivity.authenticateSpotify()
         }
 
         when{
@@ -89,7 +89,7 @@ class SpotifyFragment : TrackListFragment<SpotifyViewModel,SpotifyFragmentArgs>(
                         binding.downloadingFab.visibility = View.VISIBLE
 
                         rotateAnim(binding.downloadingFab)
-                        for (track in this.viewModel.trackList.value!!){
+                        for (track in this.viewModel.trackList.value ?: listOf()){
                             if(track.downloaded != DownloadStatus.Downloaded){
                                 track.downloaded = DownloadStatus.Downloading
                                 adapter.notifyItemChanged(this.viewModel.trackList.value!!.indexOf(track))

@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        style="@style/Widget.AppCompat.EditText.Gradient"
+        style="@style/Widget.AppCompat.TextView.Gradient"
         android:drawablePadding="5dp"
         android:fontFamily="@font/raleway_semibold"
         android:text=" Download History "
@@ -56,6 +56,11 @@
             android:icon="@drawable/ic_spotify_logo"
             android:text="Spotify" />
 
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:icon="@drawable/gaana"
+            android:text="Gaana" />
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

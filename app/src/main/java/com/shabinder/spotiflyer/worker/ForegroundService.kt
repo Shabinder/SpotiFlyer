@@ -304,7 +304,7 @@ class ForegroundService : Service(){
                 }
             }
             speed = 0
-            updateNotification()
+//            updateNotification()
         }
 
         override fun onDeleted(download: Download) {
@@ -343,7 +343,7 @@ class ForegroundService : Service(){
             val track  = requestMap[download.request]
             Log.i(tag,"${track?.title} ETA: ${etaInMilliSeconds/1000} sec")
             speed = (downloadedBytesPerSecond/1000)
-            updateNotification()
+//            updateNotification()
         }
 
     }
@@ -448,7 +448,7 @@ class ForegroundService : Service(){
             .setSubText("Total: $total  Completed:$converted")
             .setNotificationSilent()
             .setStyle(NotificationCompat.InboxStyle()
-                .setBigContentTitle("Speed: $speed KB/s")
+//                .setBigContentTitle("Speed: $speed KB/s")
                 .addLine(messageList[0])
                 .addLine(messageList[1])
                 .addLine(messageList[2])
@@ -540,7 +540,7 @@ class ForegroundService : Service(){
             .setNotificationSilent()
             .setSubText("Total: $total  Completed:$converted")
             .setStyle(NotificationCompat.InboxStyle()
-                .setBigContentTitle("Speed: $speed KB/s")
+//                .setBigContentTitle("Speed: $speed KB/s")
                 .addLine(messageList[0])
                 .addLine(messageList[1])
                 .addLine(messageList[2])

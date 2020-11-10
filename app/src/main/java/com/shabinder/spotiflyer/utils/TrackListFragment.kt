@@ -36,6 +36,7 @@ import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
+import com.shabinder.spotiflyer.utils.Provider.mainActivity
 
 abstract class TrackListFragment<VM : TrackListViewModel , args: NavArgs> : Fragment() {
 
@@ -50,6 +51,10 @@ abstract class TrackListFragment<VM : TrackListViewModel , args: NavArgs> : Frag
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if(!isOnline()){
+            showNoConnectionAlert()
+            mainActivity.onBackPressed()
+        }
         sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
     }
 
@@ -72,7 +77,7 @@ abstract class TrackListFragment<VM : TrackListViewModel , args: NavArgs> : Frag
      **/
     private fun initializeLiveDataObservers() {
         viewModel.trackList.observe(viewLifecycleOwner, {
-            if (it.isNotEmpty()){
+            if (!it.isNullOrEmpty()){
                 Log.i("GaanaFragment","TrackList Updated")
                 adapter.submitList(it, source)
                 checkIfAllDownloaded()
@@ -80,7 +85,7 @@ abstract class TrackListFragment<VM : TrackListViewModel , args: NavArgs> : Frag
         })
 
         viewModel.coverUrl.observe(viewLifecycleOwner, {
-            if(it!="Loading") bindImage(binding.coverImage,it, source)
+            it?.let{bindImage(binding.coverImage,it, source)}
         })
 
         viewModel.title.observe(viewLifecycleOwner, {

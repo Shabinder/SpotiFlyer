@@ -52,7 +52,7 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                         }
                         trackList.value = listOf(it).toTrackDetailsList()
                         title.value = it.name
-                        coverUrl.value = it.album!!.images?.get(0)!!.url!!
+                        coverUrl.value = it.album!!.images?.elementAtOrNull(1)?.url ?: it.album!!.images?.elementAtOrNull(0)?.url
                         withContext(Dispatchers.IO){
                             databaseDAO.insert(DownloadRecord(
                                 type = "Track",
@@ -77,11 +77,11 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                         if(File(finalOutputDir(it.name!!,folderType,subFolder)).exists()){//Download Already Present!!
                             it.downloaded = DownloadStatus.Downloaded
                         }
-                        it.album = Album(images = listOf(Image(url = albumObject.images?.get(0)?.url)))
+                        it.album = Album(images = listOf(Image(url = albumObject.images?.elementAtOrNull(1)?.url ?: albumObject.images?.elementAtOrNull(0)?.url )))
                     }
                     trackList.value = albumObject?.tracks?.items?.toTrackDetailsList()
                     title.value = albumObject?.name
-                    coverUrl.value = albumObject?.images?.get(0)?.url
+                    coverUrl.value = albumObject?.images?.elementAtOrNull(1)?.url ?: albumObject?.images?.elementAtOrNull(0)?.url
                     withContext(Dispatchers.IO){
                         databaseDAO.insert(DownloadRecord(
                             type = "Album",
@@ -124,7 +124,7 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                     Log.i("Total Tracks Fetched",tempTrackList.size.toString())
                     trackList.value = tempTrackList.toTrackDetailsList()
                     title.value = playlistObject?.name
-                    coverUrl.value =  playlistObject?.images?.get(0)?.url.toString()
+                    coverUrl.value =  playlistObject?.images?.elementAtOrNull(1)?.url ?: playlistObject?.images?.firstOrNull()?.url.toString()
                     withContext(Dispatchers.IO){
                         databaseDAO.insert(DownloadRecord(
                             type = "Playlist",
@@ -153,14 +153,14 @@ class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
             durationSec = (it.duration_ms/1000).toInt(),
             albumArt = File(
                 Environment.getExternalStorageDirectory(),
-                Provider.defaultDir +".Images/" + (it.album?.images?.get(0)?.url.toString()).substringAfterLast('/') + ".jpeg"),
+                Provider.defaultDir +".Images/" + (it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg"),
             albumName = it.album?.name,
             year = it.album?.release_date,
             comment = "Genres:${it.album?.genres?.joinToString()}",
             trackUrl = it.href,
             downloaded = it.downloaded,
             source = Source.Spotify,
-            albumArtURL = it.album?.images?.get(0)?.url.toString()
+            albumArtURL = it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()
         )
     }.toMutableList()
 

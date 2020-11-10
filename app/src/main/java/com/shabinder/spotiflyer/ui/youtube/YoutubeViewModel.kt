@@ -27,11 +27,8 @@ import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
+import com.shabinder.spotiflyer.utils.*
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
-import com.shabinder.spotiflyer.utils.TrackListViewModel
-import com.shabinder.spotiflyer.utils.finalOutputDir
-import com.shabinder.spotiflyer.utils.removeIllegalChars
-import com.shabinder.spotiflyer.utils.showMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,6 +45,7 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
     override var subFolder = ""
 
     fun getYTPlaylist(searchId:String, ytDownloader:YoutubeDownloader){
+        if(!isOnline())return
         try{
             uiScope.launch(Dispatchers.IO) {
                 Log.i("YT Playlist",searchId)
@@ -105,6 +103,7 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
 
     @SuppressLint("DefaultLocale")
     fun getYTTrack(searchId:String, ytDownloader:YoutubeDownloader) {
+        if(!isOnline())return
         try{
             uiScope.launch(Dispatchers.IO) {
                 Log.i("YT Video",searchId)

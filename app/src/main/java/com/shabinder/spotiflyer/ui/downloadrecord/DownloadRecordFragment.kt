@@ -57,7 +57,8 @@ class DownloadRecordFragment : Fragment() {
                 }
                 when(binding.tabLayout.selectedTabPosition){
                     0-> adapter.submitList(downloadRecordViewModel.spotifyList,Source.Spotify)
-                    1-> adapter.submitList(downloadRecordViewModel.ytList,Source.YouTube)
+                    1-> adapter.submitList(downloadRecordViewModel.gaanaList,Source.Gaana)
+                    2-> adapter.submitList(downloadRecordViewModel.ytList,Source.YouTube)
                 }
             }
         })
@@ -67,7 +68,8 @@ class DownloadRecordFragment : Fragment() {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 when(tab?.position){
                     0-> adapter.submitList(downloadRecordViewModel.spotifyList,Source.Spotify)
-                    1-> adapter.submitList(downloadRecordViewModel.ytList,Source.YouTube)
+                    1-> adapter.submitList(downloadRecordViewModel.gaanaList,Source.Gaana)
+                    2-> adapter.submitList(downloadRecordViewModel.ytList,Source.YouTube)
                 }
             }
             override fun onTabReselected(tab: TabLayout.Tab?) {}

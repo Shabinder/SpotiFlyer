@@ -79,7 +79,7 @@ object DownloadHelper {
                                 showMessage("Download Started, Now You can leave the App!")
                             }
                             startService(mainActivity,downloadList)
-                        },5000)
+                        },3000)
                     }
                 }else{
                     val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"

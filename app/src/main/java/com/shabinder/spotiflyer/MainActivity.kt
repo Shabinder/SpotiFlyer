@@ -38,10 +38,7 @@ import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.shabinder.spotiflyer.databinding.MainActivityBinding
 import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
-import com.shabinder.spotiflyer.utils.NetworkInterceptor
-import com.shabinder.spotiflyer.utils.createDirectories
-import com.shabinder.spotiflyer.utils.isOnline
-import com.shabinder.spotiflyer.utils.startService
+import com.shabinder.spotiflyer.utils.*
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -160,6 +157,7 @@ class MainActivity : AppCompatActivity(){
             Log.i("Spotify Authentication","Started")
             val token = spotifyServiceTokenRequest.getToken()
             token.value?.let {
+                showMessage("Success: Spotify Token Acquired",isSuccess = true)
                 implementSpotifyService(it.access_token)
             }
             Log.i("Spotify Token", token.value.toString())

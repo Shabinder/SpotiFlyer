@@ -17,9 +17,6 @@
 
 package com.shabinder.spotiflyer.ui.mainfragment
 
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
@@ -32,10 +29,7 @@ import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.MainFragmentBinding
-import com.shabinder.spotiflyer.utils.Provider
-import com.shabinder.spotiflyer.utils.isOnline
-import com.shabinder.spotiflyer.utils.showMessage
-import com.shabinder.spotiflyer.utils.showNoConnectionAlert
+import com.shabinder.spotiflyer.utils.*
 import com.shreyaspatil.easyupipayment.EasyUpiPayment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -122,82 +116,22 @@ class MainFragment : Fragment() {
     private fun initializeAll() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
-        openYTButton()
-        openSpotifyButton()
-        openGithubButton()
-        openInstaButton()
-        openLinkedInButton()
-        historyButton()
-        binding.usage.text = usageText()
-        binding.btnDonate.setOnClickListener {
-            easyUpiPayment.startPayment()
+        binding.apply {
+            btnGaana.openPlatformOnClick("com.gaana","http://gaana.com")
+            btnSpotify.openPlatformOnClick("com.spotify.music","http://open.spotify.com")
+            btnYoutube.openPlatformOnClick("com.google.android.youtube","http://m.youtube.com")
+            btnGithub.openPlatformOnClick("http://github.com/Shabinder/SpotiFlyer")
+            btnInsta.openPlatformOnClick("http://www.instagram.com/mr.shabinder")
+            btnHistory.setOnClickListener {
+                findNavController().navigate(MainFragmentDirections.actionMainFragmentToDownloadRecord())
+            }
+            usage.text = usageText()
+            btnDonate.setOnClickListener {
+                easyUpiPayment.startPayment()
+            }
         }
     }
 
-    /**
-     * Implementing buttons
-     **/
-    private fun historyButton() {
-        binding.btnHistory.setOnClickListener {
-            findNavController().navigate(MainFragmentDirections.actionMainFragmentToDownloadRecord())
-        }
-    }
-    private fun openSpotifyButton() {
-        val manager: PackageManager = requireActivity().packageManager
-        try {
-            val i = manager.getLaunchIntentForPackage("com.spotify.music")
-                ?: throw PackageManager.NameNotFoundException()
-            i.addCategory(Intent.CATEGORY_LAUNCHER)
-            binding.btnSpotify.setOnClickListener { startActivity(i) }
-        } catch (e: PackageManager.NameNotFoundException) {
-            val uri: Uri =
-                Uri.parse("http://open.spotify.com")
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            binding.btnSpotify.setOnClickListener {
-                startActivity(intent)
-            }
-        }
-    }
-    private fun openYTButton() {
-        val manager: PackageManager = requireActivity().packageManager
-        try {
-            val i = manager.getLaunchIntentForPackage("com.google.android.youtube")
-                ?: throw PackageManager.NameNotFoundException()
-            i.addCategory(Intent.CATEGORY_LAUNCHER)
-            binding.btnYoutube.setOnClickListener { startActivity(i) }
-        } catch (e: PackageManager.NameNotFoundException) {
-            val uri: Uri =
-                Uri.parse("http://m.youtube.com")
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            binding.btnYoutube.setOnClickListener {
-                startActivity(intent)
-            }
-        }
-    }
-    private fun openGithubButton() {
-        val uri: Uri =
-            Uri.parse("http://github.com/Shabinder/SpotiFlyer")
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        binding.btnGithubSpotify.setOnClickListener {
-            startActivity(intent)
-        }
-    }
-    private fun openLinkedInButton() {
-        val uri: Uri =
-            Uri.parse("https://in.linkedin.com/in/shabinder")
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        binding.btnLinkedin.setOnClickListener {
-            startActivity(intent)
-        }
-    }
-    private fun openInstaButton() {
-        val uri: Uri =
-            Uri.parse("http://www.instagram.com/mr.shabinder")
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        binding.developerInstaSpotify.setOnClickListener {
-            startActivity(intent)
-        }
-    }
     private fun usageText(): SpannableStringBuilder {
         return SpannableStringBuilder()
             .append(getText(R.string.d_one)).append("\n")
