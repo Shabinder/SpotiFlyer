@@ -64,7 +64,7 @@ All contributions are welcome, from code to documentation to graphics to design 
  - Implementation To mute whenever Spotify Ad Plays.
  
 ### Note
-The availability of YouTube Music in your country is important for spotDL to work since we use YouTube Music to filter out our search results.
+The availability of YouTube Music in your country is important for this app to work since we use YouTube Music to filter out our search results.
 To check if YouTube Music is available in your country, visit [YouTube Music](https://music.youtube.com).
 
 License
