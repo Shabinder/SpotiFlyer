@@ -25,23 +25,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.networking.YoutubeMusicApi
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
 import com.shabinder.spotiflyer.utils.*
 import com.shabinder.spotiflyer.utils.Provider.mainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SpotifyFragment : TrackListFragment<SpotifyViewModel,SpotifyFragmentArgs>() {
 
-    @Inject lateinit var youtubeMusicApi: YoutubeMusicApi
     override lateinit var viewModel: SpotifyViewModel
     override lateinit var adapter: TrackListAdapter
     override var source: Source = Source.Spotify
@@ -132,10 +128,5 @@ class SpotifyFragment : TrackListFragment<SpotifyViewModel,SpotifyFragmentArgs>(
         sharedViewModel.spotifyService.observe(viewLifecycleOwner, {
             this.viewModel.spotifyService = it
         })
-        DownloadHelper.youtubeMusicApi = youtubeMusicApi
-        DownloadHelper.sharedViewModel = sharedViewModel
-        DownloadHelper.statusBar = binding.statusBar
-        binding.trackList.adapter = adapter
-        (binding.trackList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     }
 }

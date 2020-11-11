@@ -116,19 +116,19 @@
                     app:layout_constraintBottom_toTopOf="@+id/cover_image"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
+
                 <TextView
                     android:id="@+id/title_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginBottom="22dp"
+                    android:layout_marginBottom="24dp"
                     android:background="#00000000"
                     android:fontFamily="@font/raleway_semibold"
                     android:gravity="end"
                     android:text='"Loading..."'
                     android:textAlignment="viewEnd"
                     android:textColor="#9AB3FF"
-                    android:textSize="28sp"
+                    android:textSize="26sp"
                     android:textStyle="bold"
                     android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"

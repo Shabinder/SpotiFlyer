@@ -34,7 +34,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : TrackListViewModel(){
+class YoutubeViewModel @ViewModelInject constructor(
+    val databaseDAO: DatabaseDAO,
+    val ytDownloader: YoutubeDownloader
+) : TrackListViewModel(){
     /*
     * YT Album Art Schema
     * HI-RES Url: https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"
@@ -44,7 +47,7 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
     override var folderType = "YT_Downloads"
     override var subFolder = ""
 
-    fun getYTPlaylist(searchId:String, ytDownloader:YoutubeDownloader){
+    fun getYTPlaylist(searchId:String){
         if(!isOnline())return
         try{
             uiScope.launch(Dispatchers.IO) {
@@ -102,7 +105,7 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
     }
 
     @SuppressLint("DefaultLocale")
-    fun getYTTrack(searchId:String, ytDownloader:YoutubeDownloader) {
+    fun getYTTrack(searchId:String) {
         if(!isOnline())return
         try{
             uiScope.launch(Dispatchers.IO) {

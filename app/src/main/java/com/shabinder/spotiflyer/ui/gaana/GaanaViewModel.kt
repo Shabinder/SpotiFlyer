@@ -18,13 +18,12 @@
 package com.shabinder.spotiflyer.ui.gaana
 
 import android.os.Environment
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
-import com.shabinder.spotiflyer.models.gaana.*
+import com.shabinder.spotiflyer.models.gaana.GaanaTrack
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.networking.GaanaInterface
 import com.shabinder.spotiflyer.utils.Provider
@@ -35,18 +34,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class GaanaViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : TrackListViewModel(){
+class GaanaViewModel @ViewModelInject constructor(
+    val databaseDAO: DatabaseDAO,
+    val gaanaInterface : GaanaInterface
+) : TrackListViewModel(){
 
     override var folderType:String = ""
     override var subFolder:String = ""
-    var gaanaInterface : GaanaInterface? = null
-    val gaanaPlaceholderImageUrl = "https://a10.gaanacdn.com/images/social/gaana_social.jpg"
+    private val gaanaPlaceholderImageUrl = "https://a10.gaanacdn.com/images/social/gaana_social.jpg"
 
     fun gaanaSearch(type:String,link:String){
         when(type){
             "song" -> {
                 uiScope.launch {
-                    getGaanaSong(link)?.tracks?.firstOrNull()?.also {
+                    gaanaInterface.getGaanaSong(seokey =  link).value?.tracks?.firstOrNull()?.also {
                         folderType = "Tracks"
                         if(File(finalOutputDir(it.track_title,folderType,subFolder)).exists()){//Download Already Present!!
                             it.downloaded = DownloadStatus.Downloaded
@@ -72,7 +73,7 @@ class GaanaViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) 
             }
             "album" -> {
                 uiScope.launch {
-                    getGaanaAlbum(link)?.also {
+                    gaanaInterface.getGaanaAlbum(seokey = link).value?.also {
                         folderType = "Albums"
                         subFolder = link
                         it.tracks.forEach { track ->
@@ -99,7 +100,7 @@ class GaanaViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) 
             }
             "playlist" -> {
                 uiScope.launch {
-                    getGaanaPlaylist(link)?.also {
+                    gaanaInterface.getGaanaPlaylist(seokey = link).value?.also {
                         folderType = "Playlists"
                         subFolder = link
                         it.tracks.forEach {track ->
@@ -129,11 +130,11 @@ class GaanaViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) 
                 uiScope.launch {
                     folderType = "Artist"
                     subFolder = link
-                    val artistDetails = getGaanaArtistDetails(link)?.artist?.firstOrNull()?.also {
+                    val artistDetails = gaanaInterface.getGaanaArtistDetails(seokey = link).value?.artist?.firstOrNull()?.also {
                         title.value = it.name
                         coverUrl.value = it.artworkLink
                     }
-                    getGaanaArtistTracks(link)?.also {
+                    gaanaInterface.getGaanaArtistTracks(seokey = link).value?.also {
                         it.tracks.forEach {track ->
                             if(File(finalOutputDir(track.track_title,folderType,subFolder)).exists()){//Download Already Present!!
                                 track.downloaded = DownloadStatus.Downloaded
@@ -175,25 +176,4 @@ class GaanaViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) 
             albumArtURL = it.artworkLink
         )
     }.toMutableList()
-
-    private suspend fun getGaanaSong(songLink:String): GaanaSong?{
-        Log.i("Requesting","https://gaana.com/song/$songLink")
-        return gaanaInterface?.getGaanaSong(seokey =  songLink)?.value
-    }
-    private suspend fun getGaanaAlbum(albumLink:String): GaanaAlbum?{
-        Log.i("Requesting","https://gaana.com/album/$albumLink")
-        return gaanaInterface?.getGaanaAlbum(seokey =  albumLink)?.value
-    }
-    private suspend fun getGaanaPlaylist(link:String): GaanaPlaylist?{
-        Log.i("Requesting","https://gaana.com/playlist/$link")
-        return gaanaInterface?.getGaanaPlaylist(seokey = link)?.value
-    }
-    private suspend fun getGaanaArtistDetails(link:String): GaanaArtistDetails?{
-        Log.i("Requesting","https://gaana.com/artist/$link")
-        return gaanaInterface?.getGaanaArtistDetails(seokey = link)?.value
-    }
-    private suspend fun getGaanaArtistTracks(link:String,limit:Int = 50): GaanaArtistTracks?{
-        Log.i("Requesting","Tracks of: https://gaana.com/artist/$link")
-        return gaanaInterface?.getGaanaArtistTracks(seokey = link,limit = limit)?.value
-    }
 }

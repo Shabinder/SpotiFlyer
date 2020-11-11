@@ -49,6 +49,11 @@ import javax.inject.Singleton
 @Module
 object Provider {
 
+    /*
+    * mainActivity Instance to use whereEver Needed , as Its God Activity.
+    * (i.e, Active Through out App' Lifecycle )
+    * */
+
     val mainActivity: MainActivity = MainActivity.getInstance()
     val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
 

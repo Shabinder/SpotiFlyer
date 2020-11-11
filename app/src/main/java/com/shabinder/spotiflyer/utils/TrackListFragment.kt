@@ -29,9 +29,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavArgs
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.TrackListFragmentBinding
+import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
@@ -53,7 +55,7 @@ abstract class TrackListFragment<VM : TrackListViewModel , args: NavArgs> : Frag
         super.onCreate(savedInstanceState)
         if(!isOnline()){
             showNoConnectionAlert()
-            mainActivity.onBackPressed()
+            mainActivity.navController.popBackStack()
         }
         sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
     }
@@ -64,11 +66,20 @@ abstract class TrackListFragment<VM : TrackListViewModel , args: NavArgs> : Frag
         savedInstanceState: Bundle?
     ): View? {
         binding =  TrackListFragmentBinding.inflate(inflater,container,false)
+        initializeAll()
         return binding.root
+    }
+
+    private fun initializeAll() {
+        DownloadHelper.youtubeMusicApi = sharedViewModel.youtubeMusicApi
+        DownloadHelper.sharedViewModel = sharedViewModel
+        DownloadHelper.statusBar = binding.statusBar
+        (binding.trackList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.trackList.adapter = adapter
         initializeLiveDataObservers()
     }
 
@@ -130,7 +141,6 @@ abstract class TrackListFragment<VM : TrackListViewModel , args: NavArgs> : Frag
         super.onPause()
         requireActivity().unregisterReceiver(updateUIReceiver)
     }
-
     private fun checkIfAllDownloaded() {
         if(!viewModel.trackList.value!!.any { it.downloaded != DownloadStatus.Downloaded }){
             //All Tracks Downloaded
@@ -142,5 +152,5 @@ abstract class TrackListFragment<VM : TrackListViewModel , args: NavArgs> : Frag
             }
         }
     }
-
+    open fun applicationContext(): Context = requireActivity().applicationContext
 }

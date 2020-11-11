@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
-import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.spotify.Source
@@ -32,7 +31,6 @@ import com.shabinder.spotiflyer.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 private const val sampleDomain2 = "youtu.be"
 private const val sampleDomain1 = "youtube.com"
@@ -40,7 +38,6 @@ private const val sampleDomain1 = "youtube.com"
 @AndroidEntryPoint
 class YoutubeFragment : TrackListFragment<YoutubeViewModel,YoutubeFragmentArgs>() {
 
-    @Inject lateinit var ytDownloader: YoutubeDownloader
     override lateinit var viewModel: YoutubeViewModel
     override lateinit var adapter : TrackListAdapter
     override var source: Source = Source.YouTube
@@ -53,7 +50,6 @@ class YoutubeFragment : TrackListFragment<YoutubeViewModel,YoutubeFragmentArgs>(
         super.onCreateView(inflater, container, savedInstanceState)
         this.viewModel = ViewModelProvider(this).get(YoutubeViewModel::class.java)
         adapter = TrackListAdapter(this.viewModel)
-        binding.trackList.adapter = adapter
 
         val args = YoutubeFragmentArgs.fromBundle(requireArguments())
         val link = args.link
@@ -66,7 +62,7 @@ class YoutubeFragment : TrackListFragment<YoutubeViewModel,YoutubeFragmentArgs>(
         if(link.contains("playlist",true) || link.contains("list",true)){
             // Given Link is of a Playlist
             val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&")
-            this.viewModel.getYTPlaylist(playlistId,ytDownloader)
+            this.viewModel.getYTPlaylist(playlistId)
         }else{//Given Link is of a Video
             var searchId = "error"
             if(link.contains(sampleDomain1,true) ){
@@ -76,7 +72,7 @@ class YoutubeFragment : TrackListFragment<YoutubeViewModel,YoutubeFragmentArgs>(
                 searchId = link.substringAfterLast("/","error")
             }
             if(searchId != "error") {
-                this.viewModel.getYTTrack(searchId,ytDownloader)
+                this.viewModel.getYTTrack(searchId)
             }else{showMessage("Your Youtube Link is not of a Video!!")}
         }
 

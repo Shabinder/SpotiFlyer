@@ -17,6 +17,7 @@
 
 package com.shabinder.spotiflyer.recyclerView
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,6 +47,7 @@ class TrackListAdapter(private val viewModel :TrackListViewModel): ListAdapter<T
         return ViewHolder(binding)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         if(itemCount == 1){ holder.binding.imageUrl.visibility = View.GONE}else{
@@ -100,8 +102,8 @@ class TrackListAdapter(private val viewModel :TrackListViewModel): ListAdapter<T
             }
         }
 
-        holder.binding.trackName.text = "${if(item.title.length > 17){"${item.title.subSequence(0,16)}..."}else{item.title}}"
-        holder.binding.artist.text = "${item.artists.get(0)}..."
+        holder.binding.trackName.text = if(item.title.length > 20){"${item.title.subSequence(0,18)}..."}else{item.title}
+        holder.binding.artist.text = "${item.artists.firstOrNull()}..."
         holder.binding.duration.text =  "${item.durationSec/60} minutes, ${item.durationSec%60} sec"
     }
 

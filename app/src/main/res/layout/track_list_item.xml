@@ -48,7 +48,7 @@
         android:textAllCaps="false"
         android:textAppearance="@style/TextAppearance.AppTheme.Headline4"
         android:textColor="#9AB3FF"
-        android:textSize="20sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/btn_download"
         app:layout_constraintStart_toStartOf="@+id/artist"
         app:layout_constraintTop_toTopOf="parent" />

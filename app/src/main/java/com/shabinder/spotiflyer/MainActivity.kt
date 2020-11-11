@@ -36,6 +36,7 @@ import androidx.navigation.findNavController
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.shabinder.spotiflyer.databinding.MainActivityBinding
+import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
 import com.shabinder.spotiflyer.utils.*
@@ -57,9 +58,9 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity(){
     private var spotifyService : SpotifyService? = null
     private lateinit var binding: MainActivityBinding
-    lateinit var snackBarAnchor: View
     private lateinit var sharedViewModel: SharedViewModel
-    private lateinit var navController: NavController
+    lateinit var snackBarAnchor: View
+    lateinit var navController: NavController
     @Inject lateinit var moshi: Moshi
     @Inject lateinit var spotifyServiceTokenRequest: SpotifyServiceTokenRequest
 
@@ -72,6 +73,7 @@ class MainActivity : AppCompatActivity(){
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         navController = findNavController(R.id.navHostFragment)
         snackBarAnchor = binding.snackBarPosition
+        DownloadHelper.youtubeMusicApi = sharedViewModel.youtubeMusicApi
 
         authenticateSpotify()
 
@@ -80,7 +82,6 @@ class MainActivity : AppCompatActivity(){
         checkIfLatestVersion()
         createDirectories()
         Log.i("Connection Status", isOnline().toString())
-
         //starting Notification and Downloader Service!
         startService(this)
 

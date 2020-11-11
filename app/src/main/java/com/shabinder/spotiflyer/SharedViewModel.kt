@@ -17,14 +17,18 @@
 
 package com.shabinder.spotiflyer
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.shabinder.spotiflyer.networking.SpotifyService
+import com.shabinder.spotiflyer.networking.YoutubeMusicApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 
-class SharedViewModel : ViewModel() {
+class SharedViewModel @ViewModelInject constructor(
+    val youtubeMusicApi: YoutubeMusicApi
+) : ViewModel() {
     var intentString = MutableLiveData<String>()
     var spotifyService = MutableLiveData<SpotifyService>()
 
