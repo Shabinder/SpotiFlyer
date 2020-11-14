@@ -18,7 +18,6 @@
 package com.shabinder.spotiflyer.ui.youtube
 
 import android.annotation.SuppressLint
-import android.os.Environment
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import com.github.kiulian.downloader.YoutubeDownloader
@@ -28,7 +27,7 @@ import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.utils.*
-import com.shabinder.spotiflyer.utils.Provider.defaultDir
+import com.shabinder.spotiflyer.utils.Provider.imageDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -36,7 +35,7 @@ import java.io.File
 
 class YoutubeViewModel @ViewModelInject constructor(
     val databaseDAO: DatabaseDAO,
-    val ytDownloader: YoutubeDownloader
+    private val ytDownloader: YoutubeDownloader
 ) : TrackListViewModel(){
     /*
     * YT Album Art Schema
@@ -67,8 +66,7 @@ class YoutubeViewModel @ViewModelInject constructor(
                         artists = listOf(it.author().toString()),
                         durationSec = it.lengthSeconds(),
                         albumArt = File(
-                            Environment.getExternalStorageDirectory(),
-                            defaultDir + ".Images/" + it.videoId() + ".jpeg"
+                            imageDir + it.videoId() + ".jpeg"
                         ),
                         source = Source.YouTube,
                         albumArtURL = "https://i.ytimg.com/vi/${it.videoId()}/hqdefault.jpg",
@@ -121,10 +119,7 @@ class YoutubeViewModel @ViewModelInject constructor(
                             title = name,
                             artists = listOf(detail?.author().toString()),
                             durationSec = detail?.lengthSeconds()?:0,
-                            albumArt = File(
-                                Environment.getExternalStorageDirectory(),
-                                "$defaultDir.Images/$searchId.jpeg"
-                            ),
+                            albumArt = File(imageDir,"$searchId.jpeg"),
                             source = Source.YouTube,
                             albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
                     )

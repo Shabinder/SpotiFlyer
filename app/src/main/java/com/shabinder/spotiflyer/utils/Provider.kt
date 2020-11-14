@@ -49,13 +49,21 @@ import javax.inject.Singleton
 @Module
 object Provider {
 
-    /*
-    * mainActivity Instance to use whereEver Needed , as Its God Activity.
-    * (i.e, Active Through out App' Lifecycle )
-    * */
 
+    // mainActivity Instance to use whereEver Needed , as Its God Activity.
+    // (i.e, Active Through out App' Lifecycle )
     val mainActivity: MainActivity = MainActivity.getInstance()
-    val defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
+
+    //Default Directory to save Media in their Own Categorized Folders
+    @Suppress("DEPRECATION")// We Do Have Media Access (But Just Media in Media Directory,Not Anything Else)
+    val defaultDir = Environment.getExternalStorageDirectory().toString() + File.separator +
+            Environment.DIRECTORY_MUSIC + File.separator +
+            "SpotiFlyer"+ File.separator
+
+    //Default Cache Directory to save Album Art to use them for writing in Media Later
+    val imageDir:String
+        get() = mainActivity.externalCacheDir?.absolutePath + File.separator +
+                ".Images" + File.separator
 
 
     @Provides

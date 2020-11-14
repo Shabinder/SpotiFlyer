@@ -25,7 +25,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Handler
+import android.os.IBinder
+import android.os.PowerManager
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -50,6 +53,7 @@ import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.utils.Provider
+import com.shabinder.spotiflyer.utils.Provider.imageDir
 import com.shabinder.spotiflyer.utils.copyTo
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
@@ -59,7 +63,6 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
 
-@Suppress("DEPRECATION")
 class ForegroundService : Service(){
     private val tag = "Foreground Service"
     private val channelId = "ForegroundDownloaderService"
@@ -73,18 +76,12 @@ class ForegroundService : Service(){
     private var serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
     private val requestMap = mutableMapOf<Request, TrackDetails>()
-    private var speed :Long = 0
-    private var defaultDir = Environment.DIRECTORY_MUSIC + File.separator + "SpotiFlyer" + File.separator
-    private val parentDirectory = File(Environment.getExternalStorageDirectory(),
-        defaultDir +File.separator
-    )
+    private var defaultDir = Provider.defaultDir
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
     var notificationLine = 0
     val messageList = mutableListOf("","","","")
     private var pendingIntent:PendingIntent? = null
-
-
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -201,7 +198,7 @@ class ForegroundService : Service(){
         if(converted == total){
             Handler().postDelayed({
                 Log.i(tag,"Service destroyed.")
-                deleteFile(parentDirectory)
+                cleanFiles(File(defaultDir))
                 releaseWakeLock()
                 stopForeground(true)
             },2000)
@@ -212,7 +209,7 @@ class ForegroundService : Service(){
         super.onTaskRemoved(rootIntent)
         if(converted == total ){
             Log.i(tag,"Service Removed.")
-            deleteFile(parentDirectory)
+            cleanFiles(File(defaultDir))
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 stopForeground(true)
             } else {
@@ -303,8 +300,6 @@ class ForegroundService : Service(){
                     requestMap.remove(download.request)
                 }
             }
-            speed = 0
-//            updateNotification()
         }
 
         override fun onDeleted(download: Download) {
@@ -342,7 +337,6 @@ class ForegroundService : Service(){
         ) {
             val track  = requestMap[download.request]
             Log.i(tag,"${track?.title} ETA: ${etaInMilliSeconds/1000} sec")
-            speed = (downloadedBytesPerSecond/1000)
 //            updateNotification()
         }
 
@@ -361,9 +355,7 @@ class ForegroundService : Service(){
             .setAllowedOverRoaming(false)
             .setTitle(track.title)
             .setDescription("Spotify Downloader Working Up here...")
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC, outputDir.removePrefix(
-                Environment.getExternalStorageDirectory().toString() + Environment.DIRECTORY_MUSIC + File.separator
-            ))
+            .setDestinationUri(File(outputDir).toUri())
             .setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         //Start Download
         val downloadID = downloadManager.enqueue(request)
@@ -562,18 +554,18 @@ class ForegroundService : Service(){
     }
 
     /**
-     * Deleting All Residual Files except Mp3 Files
+     * Cleaning All Residual Files except Mp3 Files
      **/
-    private fun deleteFile(dir:File) {
-        Log.i(tag,"Starting Deletions in ${dir.path} ")
+    private fun cleanFiles(dir:File) {
+        Log.i(tag,"Starting Cleaning in ${dir.path} ")
         val fList = dir.listFiles()
         fList?.let {
             for (file in fList) {
                 if (file.isDirectory) {
-                    deleteFile(file)
+                    cleanFiles(file)
                 } else if(file.isFile) {
                     if(file.path.toString().substringAfterLast(".") != "mp3"){
-                        Log.i(tag,"deleting ${file.path}")
+                        Log.i(tag,"Cleaning ${file.path}")
                         file.delete()
                     }
                 }
@@ -618,25 +610,16 @@ class ForegroundService : Service(){
                                 try {
                                     val file = when(source){
                                         "spotify" ->{
-                                            File(
-                                                Environment.getExternalStorageDirectory(),
-                                                defaultDir +".Images/" + url.substringAfterLast('/') + ".jpeg"
-                                            )
+                                            File(imageDir, url.substringAfterLast('/') + ".jpeg")
                                         }
                                         "youtube" ->{
-                                            File(
-                                                Environment.getExternalStorageDirectory(),
-                                                defaultDir +".Images/" + url.substringBeforeLast('/',url).substringAfterLast('/',url) + ".jpeg"
-                                            )
+                                            File(imageDir, url.substringBeforeLast('/',url).substringAfterLast('/',url) + ".jpeg")
                                         }
                                         "gaana" -> {
-                                            File(
-                                                Environment.getExternalStorageDirectory(),
-                                                Provider.defaultDir +".Images/" + (url.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg")
+                                            File(imageDir, (url.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg")
                                         }
-                                        else -> File(
-                                            Environment.getExternalStorageDirectory(),
-                                            defaultDir +".Images/" + url.substringAfterLast('/') + ".jpeg")
+
+                                        else -> File(imageDir, url.substringAfterLast('/') + ".jpeg")
                                     }
                                     resource?.copyTo(file)
                                 } catch (e: IOException) {

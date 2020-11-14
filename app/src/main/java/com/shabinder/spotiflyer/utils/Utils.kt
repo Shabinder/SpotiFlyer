@@ -22,7 +22,6 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
@@ -42,6 +41,7 @@ import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
+import com.shabinder.spotiflyer.utils.Provider.imageDir
 import com.shabinder.spotiflyer.utils.Provider.mainActivity
 import com.shabinder.spotiflyer.worker.ForegroundService
 import kotlinx.coroutines.CoroutineScope
@@ -63,8 +63,7 @@ fun startService(context:Context?,objects:ArrayList<DownloadObject>? = null ) {
 }
 
 fun finalOutputDir(itemName:String? = null,type:String, subFolder:String?=null,extension:String? = ".mp3"): String{
-    return Environment.getExternalStorageDirectory().toString() + File.separator +
-            defaultDir + removeIllegalChars(type) + File.separator +
+    return defaultDir + removeIllegalChars(type) + File.separator +
             (if(subFolder == null){""}else{ removeIllegalChars(subFolder) + File.separator}
                     + itemName?.let { removeIllegalChars(it) + extension})
 }
@@ -121,7 +120,7 @@ fun rotateAnim(view: View){
         0F, 360F,
         Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f
     )
-    rotate.duration = 1000
+    rotate.duration = 2000
     rotate.repeatCount = Animation.INFINITE
     rotate.repeatMode = Animation.INFINITE
     rotate.interpolator = LinearInterpolator()
@@ -172,26 +171,22 @@ fun bindImage(imgView: ImageView, imgUrl: String?,source: Source?) {
                                 val file = when(source){
                                     Source.Spotify->{
                                         File(
-                                            Environment.getExternalStorageDirectory(),
-                                            defaultDir+".Images/" + imgUrl.substringAfterLast('/',imgUrl) + ".jpeg"
+                                            imageDir + imgUrl.substringAfterLast('/',imgUrl) + ".jpeg"
                                         )
                                     }
                                     Source.YouTube->{
                                         //Url Format: https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"
                                         // We Are Naming using "$searchId"
                                         File(
-                                            Environment.getExternalStorageDirectory(),
-                                            defaultDir+".Images/" + imgUrl.substringBeforeLast('/',imgUrl).substringAfterLast('/',imgUrl) + ".jpeg"
+                                            imageDir + imgUrl.substringBeforeLast('/',imgUrl).substringAfterLast('/',imgUrl) + ".jpeg"
                                         )
                                     }
                                     Source.Gaana -> {
                                         File(
-                                            Environment.getExternalStorageDirectory(),
-                                            Provider.defaultDir +".Images/" + (imgUrl.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg")
+                                            imageDir + (imgUrl.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg")
                                     }
                                     else ->  File(
-                                        Environment.getExternalStorageDirectory(),
-                                        defaultDir+".Images/" + imgUrl.substringAfterLast('/',imgUrl) + ".jpeg"
+                                        imageDir + imgUrl.substringAfterLast('/',imgUrl) + ".jpeg"
                                     )
                                 }
                                  // the File to save , append increasing numeric counter to prevent files from getting overwritten.
@@ -221,18 +216,17 @@ fun File.copyTo(file: File) {
     }
 }
 fun createDirectory(dir:String){
-    val yourAppDir = File(Environment.getExternalStorageDirectory(),
-         dir)
+    val yourAppDir = File(dir)
 
     if(!yourAppDir.exists() && !yourAppDir.isDirectory)
     { // create empty directory
         if (yourAppDir.mkdirs())
-        {Log.i("CreateDir","App dir created")}
+        {Log.i("CreateDir","$dir created")}
         else
-        {Log.w("CreateDir","Unable to create app dir!")}
+        {Log.w("CreateDir","Unable to create Dir: $dir!")}
     }
     else
-    {Log.i("CreateDir","App dir already exists")}
+    {Log.i("CreateDir","$dir already exists")}
 }
 /**
  * Removing Illegal Chars from File Name
@@ -277,7 +271,7 @@ fun removeIllegalChars(fileName: String): String? {
 
 fun createDirectories() {
     createDirectory(defaultDir)
-    createDirectory(defaultDir + ".Images/")
+    createDirectory(imageDir)
     createDirectory(defaultDir + "Tracks/")
     createDirectory(defaultDir + "Albums/")
     createDirectory(defaultDir + "Playlists/")
@@ -286,19 +280,3 @@ fun createDirectories() {
 fun getEmojiByUnicode(unicode: Int): String? {
     return String(Character.toChars(unicode))
 }
-
-/*
-internal val nullOnEmptyConverterFactory = object : Converter.Factory() {
-    fun converterFactory() = this
-    override fun responseBodyConverter(
-        type: Type,
-        annotations: Array<out Annotation>,
-        retrofit: Retrofit
-    ) = object : Converter<ResponseBody, Any?> {
-        val nextResponseBodyConverter =
-            retrofit.nextResponseBodyConverter<Any?>(converterFactory(), type, annotations)
-
-        override fun convert(value: ResponseBody) =
-            if (value.contentLength() != 0L) nextResponseBodyConverter.convert(value) else null
-    }
-}*/

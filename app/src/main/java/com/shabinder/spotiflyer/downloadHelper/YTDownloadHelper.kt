@@ -17,7 +17,6 @@
 
 package com.shabinder.spotiflyer.downloadHelper
 
-import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import com.shabinder.spotiflyer.models.DownloadObject
@@ -44,9 +43,7 @@ object YTDownloadHelper {
                 showNoConnectionAlert()
                 return
             }
-            val outputFile: String =
-                Environment.getExternalStorageDirectory().toString() + File.separator +
-                        defaultDir +
+            val outputFile: String = defaultDir +
                         removeIllegalChars(type) + File.separator +
                         (if (subFolder == null) { "" }
                         else { removeIllegalChars(subFolder) + File.separator }

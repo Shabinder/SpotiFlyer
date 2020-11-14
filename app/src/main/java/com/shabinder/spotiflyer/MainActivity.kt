@@ -39,7 +39,10 @@ import com.shabinder.spotiflyer.databinding.MainActivityBinding
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
-import com.shabinder.spotiflyer.utils.*
+import com.shabinder.spotiflyer.utils.NetworkInterceptor
+import com.shabinder.spotiflyer.utils.createDirectories
+import com.shabinder.spotiflyer.utils.showMessage
+import com.shabinder.spotiflyer.utils.startService
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -53,7 +56,6 @@ import javax.inject.Inject
 /*
 * This is App's God Activity
 * */
-@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(){
     private var spotifyService : SpotifyService? = null
@@ -75,15 +77,15 @@ class MainActivity : AppCompatActivity(){
         snackBarAnchor = binding.snackBarPosition
         DownloadHelper.youtubeMusicApi = sharedViewModel.youtubeMusicApi
 
+        //starting Notification and Downloader Service!
+        startService(this)
+
         authenticateSpotify()
 
         requestPermission()
         disableDozeMode()
         checkIfLatestVersion()
         createDirectories()
-        Log.i("Connection Status", isOnline().toString())
-        //starting Notification and Downloader Service!
-        startService(this)
 
         handleIntentFromExternalActivity()
     }

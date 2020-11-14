@@ -68,7 +68,7 @@ class YoutubeFragment : TrackListFragment<YoutubeViewModel,YoutubeFragmentArgs>(
             if(link.contains(sampleDomain1,true) ){
                 searchId =  link.substringAfterLast("=","error")
             }
-            if(link.contains(sampleDomain2,true) && !link.contains("playlist",true) ){
+            if(link.contains(sampleDomain2,true) ){
                 searchId = link.substringAfterLast("/","error")
             }
             if(searchId != "error") {

@@ -17,7 +17,6 @@
 
 package com.shabinder.spotiflyer.ui.gaana
 
-import android.os.Environment
 import androidx.hilt.lifecycle.ViewModelInject
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
@@ -165,8 +164,7 @@ class GaanaViewModel @ViewModelInject constructor(
             artists = it.artist.map { artist -> artist?.name.toString() },
             durationSec = it.duration,
             albumArt = File(
-                Environment.getExternalStorageDirectory(),
-                Provider.defaultDir +".Images/" + (it.artworkLink.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg"),
+                Provider.imageDir + (it.artworkLink.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg"),
             albumName = it.album_title,
             year = it.release_date,
             comment = "Genres:${it.genre?.map { genre -> genre?.name }?.reduceOrNull { acc, s -> acc + s  }}",

@@ -18,7 +18,6 @@
 package com.shabinder.spotiflyer.downloadHelper
 
 import android.annotation.SuppressLint
-import android.os.Environment
 import android.os.Handler
 import android.util.Log
 import android.view.View
@@ -99,7 +98,6 @@ object DownloadHelper {
                                     if(videoId.isNullOrBlank()) {notFound++ ; updateStatusBar()}
                                     else {//Found Youtube Video ID
                                         val outputFile: String =
-                                            Environment.getExternalStorageDirectory().toString() + File.separator +
                                                     defaultDir +
                                                     removeIllegalChars(type) + File.separator +
                                                     (if (subFolder == null) { "" }

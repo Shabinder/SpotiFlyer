@@ -17,7 +17,6 @@
 
 package com.shabinder.spotiflyer.ui.spotify
 
-import android.os.Environment
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import com.shabinder.spotiflyer.database.DatabaseDAO
@@ -29,7 +28,7 @@ import com.shabinder.spotiflyer.models.spotify.Image
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.models.spotify.Track
 import com.shabinder.spotiflyer.networking.SpotifyService
-import com.shabinder.spotiflyer.utils.Provider
+import com.shabinder.spotiflyer.utils.Provider.imageDir
 import com.shabinder.spotiflyer.utils.TrackListViewModel
 import com.shabinder.spotiflyer.utils.finalOutputDir
 import kotlinx.coroutines.Dispatchers
@@ -200,8 +199,7 @@ class SpotifyViewModel @ViewModelInject constructor(
             artists = it.artists?.map { artist -> artist?.name.toString() } ?: listOf(),
             durationSec = (it.duration_ms/1000).toInt(),
             albumArt = File(
-                Environment.getExternalStorageDirectory(),
-                Provider.defaultDir +".Images/" + (it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg"),
+                imageDir + (it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg"),
             albumName = it.album?.name,
             year = it.album?.release_date,
             comment = "Genres:${it.album?.genres?.joinToString()}",
