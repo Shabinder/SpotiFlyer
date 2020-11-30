@@ -1,7 +1,9 @@
 <a href="https://github.com/Shabinder/SpotiFlyer"><img src="https://github.com/Shabinder/SpotiFlyer/blob/master/app/SpotifyDownload.png" align="left" height="80" width="80" ></a>
 
 # SpotiFlyer
--Spotify Music Downloader For Android
+- **Spotify,Youtube,Gaana** Music Downloader For Android
+
+-Supports- Playlist, Albums, Tracks. _(If You know Any Source for Episodes/Podcasts create an Issue sharing It.)_
 
 [![Build Status](https://github.com/Shabinder/SpotiFlyer/blob/master/app/build_passing.svg)](https://github.com/Shabinder/SpotiFlyer/releases)
 ![API](https://img.shields.io/badge/API-22%2B-brightgreen.svg)
@@ -36,14 +38,19 @@
 
 
 SpotiFlyer is an **Android App**(Written in **Kotlin**), which **aims** to work as:
-  - **Downloader** For Spotify:Albums, Tracks and Playlists and Even Direct Youtube Videos. 
+  - **Downloads**: Albums, Tracks and Playlists,etc 
   - Extension To **mute** whenever a Spotify Ad Plays.(TODO)
   - **Save your Data** ,by not listening your Fav Songs Online again & again(Just Download Them!)
   - **No ADS!** 
-  - Works straight out of the box and does not require you to generate or mess with your API keys (already included).
+  - **Works straight out of the box** and does not require you to generate or mess with your API keys (already included).
+  
+### Supported Platforms:
+- Spotify
+- Gaana
+- Youtube
+_(more coming soon)_
 
-Downloads
-----
+### Downloads
 The latest release and pre-release versions are available on GitHub.
 Or to save a click, [this link](https://github.com/Shabinder/SpotiFlyer/releases/latest) should always point to the most recent release.
 
@@ -55,8 +62,10 @@ All contributions are welcome, from code to documentation to graphics to design 
  - Write **Tests**.
  - Support for Podcasts/Episodes and Shows.
  - Implementation To mute whenever Spotify Ad Plays.
- - Youtube Playlist Support.
- - Gaana Platform Support
+ 
+### Note
+The availability of YouTube Music in your country is important for this app to work since we use YouTube Music to filter out our search results.
+To check if YouTube Music is available in your country, visit [YouTube Music](https://music.youtube.com).
 
 License
 ----
@@ -70,6 +79,7 @@ Credits
 ----
  - Library ScreenShot taken on [PowerAmp](https://play.google.com/store/apps/details?id=com.maxmpz.audioplayer&hl=en_IN).
  - Some Logos are Based on Logos by [Freepik](https://www.freepik.com/).
+ - [spotDL](https://github.com/spotDL/spotify-downloader) for inspiration and Scraping Algo Help and Great Documentation.
   
   
 Disclaimer
