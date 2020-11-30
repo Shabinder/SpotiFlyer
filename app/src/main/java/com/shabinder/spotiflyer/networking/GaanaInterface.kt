@@ -19,8 +19,11 @@ package com.shabinder.spotiflyer.networking
 
 import com.shabinder.spotiflyer.models.Optional
 import com.shabinder.spotiflyer.models.gaana.*
+import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 const val gaana_token = "b2e6d7fbc136547a940516e9b77e5990"
 
@@ -98,4 +101,9 @@ interface GaanaInterface {
         @Query("limit") limit: Int = 50
     ): Optional<GaanaArtistTracks>
 
+    /*
+    * Dynamic Url Requests
+    * */
+    @GET
+    fun getResponse(@Url url:String): Call<ResponseBody>
 }

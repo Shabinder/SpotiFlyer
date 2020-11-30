@@ -42,11 +42,15 @@ data class TrackDetails(
     var albumArt: File,
     var albumArtURL: String,
     var source: Source,
-    var downloaded: DownloadStatus = DownloadStatus.NotDownloaded
+    var downloaded: DownloadStatus = DownloadStatus.NotDownloaded,
+    var progress: Int = 0
 ):Parcelable
 
 enum class DownloadStatus{
     Downloaded,
     Downloading,
-    NotDownloaded
+    Queued,
+    NotDownloaded,
+    Converting,
+    Failed
 }

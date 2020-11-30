@@ -31,6 +31,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.github.javiersantos.appupdater.AppUpdater
@@ -42,7 +43,6 @@ import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
 import com.shabinder.spotiflyer.utils.NetworkInterceptor
 import com.shabinder.spotiflyer.utils.createDirectories
 import com.shabinder.spotiflyer.utils.showMessage
-import com.shabinder.spotiflyer.utils.startService
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -76,17 +76,15 @@ class MainActivity : AppCompatActivity(){
         navController = findNavController(R.id.navHostFragment)
         snackBarAnchor = binding.snackBarPosition
         DownloadHelper.youtubeMusicApi = sharedViewModel.youtubeMusicApi
-
-        //starting Notification and Downloader Service!
-        startService(this)
-
         authenticateSpotify()
+    }
 
+    override fun onStart() {
+        super.onStart()
         requestPermission()
         disableDozeMode()
         checkIfLatestVersion()
         createDirectories()
-
         handleIntentFromExternalActivity()
     }
 
@@ -154,9 +152,8 @@ class MainActivity : AppCompatActivity(){
         sharedViewModel.spotifyService.value = spotifyService
     }
 
-
     fun authenticateSpotify() {
-        sharedViewModel.uiScope.launch {
+        sharedViewModel.viewModelScope.launch {
             Log.i("Spotify Authentication","Started")
             val token = spotifyServiceTokenRequest.getToken()
             token.value?.let {
@@ -210,7 +207,7 @@ class MainActivity : AppCompatActivity(){
 
     companion object{
         private lateinit var instance: MainActivity
-        fun getInstance():MainActivity = instance
+        fun getInstance():MainActivity = this.instance
     }
 
     init {

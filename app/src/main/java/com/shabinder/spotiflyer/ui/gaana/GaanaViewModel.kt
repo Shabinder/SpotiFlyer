@@ -18,6 +18,7 @@
 package com.shabinder.spotiflyer.ui.gaana
 
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.viewModelScope
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.DownloadStatus
@@ -25,8 +26,8 @@ import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.gaana.GaanaTrack
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.networking.GaanaInterface
+import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListViewModel
 import com.shabinder.spotiflyer.utils.Provider
-import com.shabinder.spotiflyer.utils.TrackListViewModel
 import com.shabinder.spotiflyer.utils.finalOutputDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,12 +41,13 @@ class GaanaViewModel @ViewModelInject constructor(
 
     override var folderType:String = ""
     override var subFolder:String = ""
+
     private val gaanaPlaceholderImageUrl = "https://a10.gaanacdn.com/images/social/gaana_social.jpg"
 
     fun gaanaSearch(type:String,link:String){
         when(type){
             "song" -> {
-                uiScope.launch {
+                viewModelScope.launch {
                     gaanaInterface.getGaanaSong(seokey =  link).value?.tracks?.firstOrNull()?.also {
                         folderType = "Tracks"
                         if(File(finalOutputDir(it.track_title,folderType,subFolder)).exists()){//Download Already Present!!
@@ -71,7 +73,7 @@ class GaanaViewModel @ViewModelInject constructor(
                 }
             }
             "album" -> {
-                uiScope.launch {
+                viewModelScope.launch {
                     gaanaInterface.getGaanaAlbum(seokey = link).value?.also {
                         folderType = "Albums"
                         subFolder = link
@@ -98,7 +100,7 @@ class GaanaViewModel @ViewModelInject constructor(
                 }
             }
             "playlist" -> {
-                uiScope.launch {
+                viewModelScope.launch {
                     gaanaInterface.getGaanaPlaylist(seokey = link).value?.also {
                         folderType = "Playlists"
                         subFolder = link
@@ -126,7 +128,7 @@ class GaanaViewModel @ViewModelInject constructor(
                 }
             }
             "artist" -> {
-                uiScope.launch {
+                viewModelScope.launch {
                     folderType = "Artist"
                     subFolder = link
                     val artistDetails = gaanaInterface.getGaanaArtistDetails(seokey = link).value?.artist?.firstOrNull()?.also {
@@ -156,7 +158,6 @@ class GaanaViewModel @ViewModelInject constructor(
             }
         }
     }
-
 
     private fun List<GaanaTrack>.toTrackDetailsList() = this.map {
         TrackDetails(

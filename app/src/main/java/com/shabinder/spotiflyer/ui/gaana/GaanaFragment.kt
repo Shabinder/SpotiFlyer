@@ -22,21 +22,23 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.navArgs
 import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
+import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListFragment
 import com.shabinder.spotiflyer.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class GaanaFragment : TrackListFragment<GaanaViewModel,GaanaFragmentArgs>() {
+class GaanaFragment : TrackListFragment<GaanaViewModel, GaanaFragmentArgs>() {
 
-    override lateinit var viewModel: GaanaViewModel
+    override val viewModel: GaanaViewModel by viewModels()
     override lateinit var adapter: TrackListAdapter
     override var source: Source = Source.Gaana
     override val args: GaanaFragmentArgs by navArgs()
@@ -46,7 +48,6 @@ class GaanaFragment : TrackListFragment<GaanaViewModel,GaanaFragmentArgs>() {
         savedInstanceState: Bundle?
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        viewModel = ViewModelProvider(this).get(GaanaViewModel::class.java)
         adapter = TrackListAdapter(viewModel)
 
         val gaanaLink = GaanaFragmentArgs.fromBundle(requireArguments()).link.substringAfter("gaana.com/")
@@ -70,28 +71,22 @@ class GaanaFragment : TrackListFragment<GaanaViewModel,GaanaFragmentArgs>() {
                         showNoConnectionAlert()
                         return@setOnClickListener
                     }
-                    binding.btnDownloadAll.visibility = View.GONE
-                    binding.downloadingFab.visibility = View.VISIBLE
-
-                    rotateAnim(binding.downloadingFab)
+                    binding.btnDownloadAll.gone()
+                    binding.downloadingFab.apply{
+                        visible()
+                        rotate()
+                    }
                     for (track in viewModel.trackList.value!!){
                         if(track.downloaded != DownloadStatus.Downloaded){
-                            track.downloaded = DownloadStatus.Downloading
+                            track.downloaded = DownloadStatus.Queued
                             adapter.notifyItemChanged(viewModel.trackList.value!!.indexOf(track))
                         }
                     }
                     showMessage("Processing!")
-                    sharedViewModel.uiScope.launch(Dispatchers.Default){
-                        val urlList = arrayListOf<String>()
-                        viewModel.trackList.value?.forEach { urlList.add(it.albumArtURL) }
-                        //Appending Source
-                        urlList.add("gaana")
-                        loadAllImages(
-                            requireActivity(),
-                            urlList
-                        )
+                    sharedViewModel.viewModelScope.launch(Dispatchers.Default){
+                        loadAllImages(requireActivity(), viewModel.trackList.value?.map{it.albumArtURL}, Source.Gaana)
                     }
-                    viewModel.uiScope.launch {
+                    viewModel.viewModelScope.launch {
                         val finalList = viewModel.trackList.value
                         if(finalList.isNullOrEmpty())showMessage("Not Downloading Any Song")
                         DownloadHelper.downloadAllTracks(

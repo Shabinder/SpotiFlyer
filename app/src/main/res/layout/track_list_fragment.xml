@@ -54,7 +54,7 @@
         app:layout_anchor="@+id/appbar"
         app:layout_anchorGravity="bottom|center"
         app:maxImageSize="38dp"
-        app:rippleColor="@color/colorPrimaryDark"
+        android:clickable="false"
         app:srcCompat="@drawable/ic_refresh"
         app:tint="@null" />
 

@@ -20,14 +20,19 @@ package com.shabinder.spotiflyer.ui.youtube
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.viewModelScope
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.utils.*
+import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListViewModel
 import com.shabinder.spotiflyer.utils.Provider.imageDir
+import com.shabinder.spotiflyer.utils.finalOutputDir
+import com.shabinder.spotiflyer.utils.isOnline
+import com.shabinder.spotiflyer.utils.removeIllegalChars
+import com.shabinder.spotiflyer.utils.showMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -49,7 +54,7 @@ class YoutubeViewModel @ViewModelInject constructor(
     fun getYTPlaylist(searchId:String){
         if(!isOnline())return
         try{
-            uiScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 Log.i("YT Playlist",searchId)
                 val playlist = ytDownloader.getPlaylist(searchId)
                 val playlistDetails = playlist.details()
@@ -106,7 +111,7 @@ class YoutubeViewModel @ViewModelInject constructor(
     fun getYTTrack(searchId:String) {
         if(!isOnline())return
         try{
-            uiScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 Log.i("YT Video",searchId)
                 val video = ytDownloader.getVideo(searchId)
                 coverUrl.postValue("https://i.ytimg.com/vi/$searchId/hqdefault.jpg")

@@ -23,10 +23,6 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.Log
-import android.view.View
-import android.view.animation.Animation
-import android.view.animation.LinearInterpolator
-import android.view.animation.RotateAnimation
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -50,9 +46,9 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 
-fun loadAllImages(context: Context?, images:ArrayList<String>? = null ) {
+fun loadAllImages(context: Context?, images:List<String>? = null,source:Source) {
     val serviceIntent = Intent(context, ForegroundService::class.java)
-    images?.let {  serviceIntent.putStringArrayListExtra("imagesList",it) }
+    images?.let {  serviceIntent.putStringArrayListExtra("imagesList",(it + source.name) as ArrayList<String>) }
     context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
 }
 
@@ -112,19 +108,6 @@ fun showMessage(message: String, long: Boolean = false,isSuccess:Boolean = false
             }
         }.show()
     }
-}
-
-
-fun rotateAnim(view: View){
-    val rotate = RotateAnimation(
-        0F, 360F,
-        Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f
-    )
-    rotate.duration = 2000
-    rotate.repeatCount = Animation.INFINITE
-    rotate.repeatMode = Animation.INFINITE
-    rotate.interpolator = LinearInterpolator()
-    view.animation = rotate
 }
 
 fun showNoConnectionAlert(){

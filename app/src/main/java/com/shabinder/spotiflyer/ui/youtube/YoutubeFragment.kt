@@ -21,12 +21,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.navArgs
 import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
+import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListFragment
 import com.shabinder.spotiflyer.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -36,9 +38,9 @@ private const val sampleDomain2 = "youtu.be"
 private const val sampleDomain1 = "youtube.com"
 
 @AndroidEntryPoint
-class YoutubeFragment : TrackListFragment<YoutubeViewModel,YoutubeFragmentArgs>() {
+class YoutubeFragment : TrackListFragment<YoutubeViewModel, YoutubeFragmentArgs>() , YTDownloadHelper {
 
-    override lateinit var viewModel: YoutubeViewModel
+    override val viewModel: YoutubeViewModel by viewModels()
     override lateinit var adapter : TrackListAdapter
     override var source: Source = Source.YouTube
     override val args: YoutubeFragmentArgs by navArgs()
@@ -48,8 +50,7 @@ class YoutubeFragment : TrackListFragment<YoutubeViewModel,YoutubeFragmentArgs>(
         savedInstanceState: Bundle?
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        this.viewModel = ViewModelProvider(this).get(YoutubeViewModel::class.java)
-        adapter = TrackListAdapter(this.viewModel)
+        adapter = TrackListAdapter(viewModel)
 
         val args = YoutubeFragmentArgs.fromBundle(requireArguments())
         val link = args.link
@@ -62,7 +63,7 @@ class YoutubeFragment : TrackListFragment<YoutubeViewModel,YoutubeFragmentArgs>(
         if(link.contains("playlist",true) || link.contains("list",true)){
             // Given Link is of a Playlist
             val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&")
-            this.viewModel.getYTPlaylist(playlistId)
+            viewModel.getYTPlaylist(playlistId)
         }else{//Given Link is of a Video
             var searchId = "error"
             if(link.contains(sampleDomain1,true) ){
@@ -84,31 +85,25 @@ class YoutubeFragment : TrackListFragment<YoutubeViewModel,YoutubeFragmentArgs>(
                 showNoConnectionAlert()
                 return@setOnClickListener
             }
-            binding.btnDownloadAll.visibility = View.GONE
-            binding.downloadingFab.visibility = View.VISIBLE
-
-            rotateAnim(binding.downloadingFab)
+            binding.btnDownloadAll.gone()
+            binding.downloadingFab.apply{
+                visible()
+                rotate()
+            }
 
             for (track in this.viewModel.trackList.value?: listOf()){
                 if(track.downloaded != DownloadStatus.Downloaded){
-                    track.downloaded = DownloadStatus.Downloading
-                    adapter.notifyItemChanged(this.viewModel.trackList.value!!.indexOf(track))
+                    track.downloaded = DownloadStatus.Queued
+                    //adapter.notifyItemChanged(this.viewModel.trackList.value!!.indexOf(track))
                 }
             }
+            adapter.notifyDataSetChanged()
             showMessage("Processing!")
-            sharedViewModel.uiScope.launch(Dispatchers.Default){
-                val urlList = arrayListOf<String>()
-                viewModel.trackList.value?.forEach { urlList.add("https://i.ytimg.com/vi/${it.albumArt.absolutePath.substringAfterLast("/")
-                    .substringBeforeLast(".")}/hqdefault.jpg")}
-                //Appending Source
-                urlList.add("youtube")
-                loadAllImages(
-                    requireActivity(),
-                    urlList
-                )
+            sharedViewModel.viewModelScope.launch(Dispatchers.Default){
+                loadAllImages(requireActivity(), viewModel.trackList.value?.map{it.albumArtURL}, Source.YouTube)
             }
-            viewModel.uiScope.launch {
-                YTDownloadHelper.downloadYTTracks(
+            viewModel.viewModelScope.launch {
+                downloadYTTracks(
                     type = viewModel.folderType,
                     subFolder = viewModel.subFolder,
                     tracks =  viewModel.trackList.value ?: listOf()

@@ -18,20 +18,16 @@
 package com.shabinder.spotiflyer.downloadHelper
 
 import android.util.Log
-import android.widget.Toast
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.TrackDetails
+import com.shabinder.spotiflyer.utils.*
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
 import com.shabinder.spotiflyer.utils.Provider.mainActivity
-import com.shabinder.spotiflyer.utils.isOnline
-import com.shabinder.spotiflyer.utils.removeIllegalChars
-import com.shabinder.spotiflyer.utils.showNoConnectionAlert
-import com.shabinder.spotiflyer.utils.startService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-object YTDownloadHelper {
+interface YTDownloadHelper {
     suspend fun downloadYTTracks(
         type:String,
         subFolder: String?,
@@ -60,7 +56,7 @@ object YTDownloadHelper {
         }
         Log.i("YT Downloader Helper","Download Request Sent")
         withContext(Dispatchers.Main){
-            Toast.makeText(mainActivity,"Download Started, Now You can leave the App!", Toast.LENGTH_SHORT).show()
+            showMessage("Download Started, Now You can leave the App!")
             startService(mainActivity,downloadList)
         }
     }

@@ -22,21 +22,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.networking.YoutubeMusicApi
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 
 class SharedViewModel @ViewModelInject constructor(
     val youtubeMusicApi: YoutubeMusicApi
 ) : ViewModel() {
     var intentString = MutableLiveData<String>()
     var spotifyService = MutableLiveData<SpotifyService>()
-
-    private var viewModelJob = Job()
-    val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
-    }
 }

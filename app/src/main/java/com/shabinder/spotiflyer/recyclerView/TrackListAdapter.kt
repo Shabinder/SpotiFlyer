@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -31,10 +32,11 @@ import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
+import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListViewModel
 import com.shabinder.spotiflyer.utils.*
 import kotlinx.coroutines.launch
 
-class TrackListAdapter(private val viewModel :TrackListViewModel): ListAdapter<TrackDetails, TrackListAdapter.ViewHolder>(TrackDiffCallback()) {
+class TrackListAdapter(private val viewModel : TrackListViewModel): ListAdapter<TrackDetails, TrackListAdapter.ViewHolder>(TrackDiffCallback()),YTDownloadHelper {
 
     var source:Source =Source.Spotify
 
@@ -51,53 +53,87 @@ class TrackListAdapter(private val viewModel :TrackListViewModel): ListAdapter<T
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         if(itemCount == 1){ holder.binding.imageUrl.visibility = View.GONE}else{
-            viewModel.uiScope.launch {
+            viewModel.viewModelScope.launch {
                 bindImage(holder.binding.imageUrl,item.albumArtURL, source)
             }
         }
 
         when (item.downloaded) {
             DownloadStatus.Downloaded -> {
-                holder.binding.btnDownload.setImageResource(R.drawable.ic_tick)
-                holder.binding.btnDownload.clearAnimation()
+                holder.binding.btnDownloadProgress.invisible()
+                holder.binding.btnDownload.apply{
+                    setImageResource(R.drawable.ic_tick)
+                    clearAnimation()
+                    visible()
+                }
+            }
+            DownloadStatus.Queued -> {
+                holder.binding.btnDownloadProgress.invisible()
+                holder.binding.btnDownload.apply{
+                    setImageResource(R.drawable.ic_refresh)
+                    rotate()
+                    visible()
+                }
+            }
+            DownloadStatus.Failed -> {
+                holder.binding.btnDownloadProgress.invisible()
+                holder.binding.btnDownload.apply{
+                    setImageResource(R.drawable.ic_error)
+                    clearAnimation()
+                    visible()
+                }
             }
             DownloadStatus.Downloading -> {
-                holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
-                rotateAnim(holder.binding.btnDownload)
+                holder.binding.btnDownload.invisible()
+                holder.binding.btnDownloadProgress.apply {
+                    progress = item.progress
+                    bottomText = "Downloading"
+                    visible()
+                }
+            }
+            DownloadStatus.Converting -> {
+                holder.binding.btnDownload.invisible()
+                holder.binding.btnDownloadProgress.apply {
+                    visible()
+                    progress = 100
+                    bottomText = "Converting"
+                }
             }
             DownloadStatus.NotDownloaded -> {
-                holder.binding.btnDownload.setImageResource(R.drawable.ic_arrow)
-                holder.binding.btnDownload.clearAnimation()
-                holder.binding.btnDownload.setOnClickListener{
-                    if(!isOnline()){
-                        showNoConnectionAlert()
-                        return@setOnClickListener
-                    }
-                    showMessage("Processing!")
-                    holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
-                    rotateAnim(it)
-                    item.downloaded = DownloadStatus.Downloading
-                    when(source){
-                        Source.YouTube -> {
-                            viewModel.uiScope.launch {
-                                YTDownloadHelper.downloadYTTracks(
-                                    viewModel.folderType,
-                                    viewModel.subFolder,
-                                    listOf(item)
-                                )
+                holder.binding.btnDownloadProgress.invisible()
+                holder.binding.btnDownload.apply{
+                    setImageResource(R.drawable.ic_arrow)
+                    clearAnimation()
+                    visible()
+                    setOnClickListener{
+                        if(!isOnline()){
+                            showNoConnectionAlert()
+                            return@setOnClickListener
+                        }
+                        showMessage("Processing!")
+                        item.downloaded = DownloadStatus.Queued
+                        when(source){
+                            Source.YouTube -> {
+                                viewModel.viewModelScope.launch {
+                                    downloadYTTracks(
+                                        viewModel.folderType,
+                                        viewModel.subFolder,
+                                        listOf(item)
+                                    )
+                                }
+                            }
+                            else -> {
+                                viewModel.viewModelScope.launch {
+                                    DownloadHelper.downloadAllTracks(
+                                        viewModel.folderType,
+                                        viewModel.subFolder,
+                                        listOf(item)
+                                    )
+                                }
                             }
                         }
-                        else -> {
-                            viewModel.uiScope.launch {
-                                DownloadHelper.downloadAllTracks(
-                                    viewModel.folderType,
-                                    viewModel.subFolder,
-                                    listOf(item)
-                                )
-                            }
-                        }
+                        notifyItemChanged(position)//start showing anim!
                     }
-                    notifyItemChanged(position)//start showing anim!
                 }
             }
         }

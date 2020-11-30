@@ -49,10 +49,9 @@ import javax.inject.Singleton
 @Module
 object Provider {
 
-
     // mainActivity Instance to use whereEver Needed , as Its God Activity.
-    // (i.e, Active Through out App' Lifecycle )
-    val mainActivity: MainActivity = MainActivity.getInstance()
+    // (i.e, Active Throughout App' Lifecycle )
+    val mainActivity: MainActivity by lazy { MainActivity.getInstance()  }
 
     //Default Directory to save Media in their Own Categorized Folders
     @Suppress("DEPRECATION")// We Do Have Media Access (But Just Media in Media Directory,Not Anything Else)
@@ -61,12 +60,13 @@ object Provider {
             "SpotiFlyer"+ File.separator
 
     //Default Cache Directory to save Album Art to use them for writing in Media Later
-    val imageDir:String
-        get() = mainActivity.externalCacheDir?.absolutePath + File.separator +
-                ".Images" + File.separator
+    val imageDir:String by lazy { mainActivity
+        .externalCacheDir?.absolutePath + File.separator +
+            ".Images" + File.separator }
 
 
     @Provides
+    @Singleton
     fun databaseDAO(@ApplicationContext appContext: Context):DatabaseDAO{
         return DownloadRecordDatabase.getInstance(appContext).databaseDAO
     }

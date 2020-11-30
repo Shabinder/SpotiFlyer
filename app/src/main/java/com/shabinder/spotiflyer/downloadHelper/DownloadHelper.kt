@@ -18,14 +18,14 @@
 package com.shabinder.spotiflyer.downloadHelper
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.widget.TextView
-import android.widget.Toast
-import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.models.DownloadObject
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
@@ -34,6 +34,8 @@ import com.shabinder.spotiflyer.networking.makeJsonBody
 import com.shabinder.spotiflyer.utils.*
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
 import com.shabinder.spotiflyer.utils.Provider.mainActivity
+import com.tonyodev.fetch2.Status
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -46,7 +48,6 @@ object DownloadHelper {
 
     var statusBar:TextView? = null
     var youtubeMusicApi: YoutubeMusicApi? = null
-    var sharedViewModel: SharedViewModel? = null
 
     private var total = 0
     private var processed = 0
@@ -61,7 +62,7 @@ object DownloadHelper {
         trackList: List<TrackDetails>) {
         resetStatusBar()// For New Download Request's Status
         val downloadList = ArrayList<DownloadObject>()
-        withContext(Dispatchers.Main){
+        withContext(Dispatchers.IO){
             total += trackList.size // Adding New Download List Count to StatusBar
             trackList.forEachIndexed { index, it ->
                 if(!isOnline()){
@@ -71,12 +72,10 @@ object DownloadHelper {
                 if(it.downloaded == DownloadStatus.Downloaded){//Download Already Present!!
                     processed++
                     if(index == (trackList.size-1)){//LastElement
-                        Handler().postDelayed({
+                        Handler(Looper.myLooper()!!).postDelayed({
                             //Delay is Added ,if a request is in processing it may finish
                             Log.i("Spotify Helper","Download Request Sent")
-                            sharedViewModel?.uiScope?.launch (Dispatchers.Main){
-                                showMessage("Download Started, Now You can leave the App!")
-                            }
+                            showMessage("Download Started, Now You can leave the App!")
                             startService(mainActivity,downloadList)
                         },3000)
                     }
@@ -86,47 +85,50 @@ object DownloadHelper {
                     youtubeMusicApi?.getYoutubeMusicResponse(jsonBody)?.enqueue(
                         object : Callback<String>{
                             override fun onResponse(call: Call<String>, response: Response<String>) {
-                                sharedViewModel?.uiScope?.launch {
-                                    val videoId = sortByBestMatch(
-                                        getYTTracks(response.body().toString()),
-                                        trackName = it.title,
-                                        trackArtists = it.artists,
-                                        trackDurationSec = it.durationSec
-                                    ).keys.firstOrNull()
-                                    Log.i("Spotify Helper Video ID",videoId ?: "Not Found")
+                                val videoId = sortByBestMatch(
+                                    getYTTracks(response.body().toString()),
+                                    trackName = it.title,
+                                    trackArtists = it.artists,
+                                    trackDurationSec = it.durationSec
+                                ).keys.firstOrNull()
+                                Log.i("Spotify Helper Video ID",videoId ?: "Not Found")
+                                if(videoId.isNullOrBlank()) {
+                                    //Track Not Found
+                                    notFound++ ; updateStatusBar()
+                                    val intent = Intent()
+                                        .setAction(Status.FAILED.name)
+                                        .putExtra("track",it)
+                                    statusBar?.context?.sendBroadcast(intent)
+                                }
+                                else {//Found Youtube Video ID
+                                    val outputFile: String =
+                                                defaultDir +
+                                                removeIllegalChars(type) + File.separator +
+                                                (if (subFolder == null) { "" }
+                                                else { removeIllegalChars(subFolder) + File.separator }
+                                                        + removeIllegalChars(it.title) + ".m4a")
 
-                                    if(videoId.isNullOrBlank()) {notFound++ ; updateStatusBar()}
-                                    else {//Found Youtube Video ID
-                                        val outputFile: String =
-                                                    defaultDir +
-                                                    removeIllegalChars(type) + File.separator +
-                                                    (if (subFolder == null) { "" }
-                                                    else { removeIllegalChars(subFolder) + File.separator }
-                                                            + removeIllegalChars(it.title) + ".m4a")
-
-                                        val downloadObject = DownloadObject(
-                                            trackDetails = it,
-                                            ytVideoId = videoId,
-                                            outputFile = outputFile
-                                        )
-                                        processed++
-                                        sharedViewModel?.uiScope?.launch(Dispatchers.Main) {
-                                            updateStatusBar()
-                                        }
-                                        downloadList.add(downloadObject)
-                                        if(index == (trackList.size-1)){//LastElement
-                                            Handler().postDelayed({
-                                                //Delay is Added ,if a request is in processing it may finish
-                                                Log.i("Spotify Helper","Download Request Sent")
-                                                sharedViewModel?.uiScope?.launch (Dispatchers.Main){
-                                                    Toast.makeText(mainActivity,"Download Started, Now You can leave the App!", Toast.LENGTH_SHORT).show()
-                                                }
-                                                startService(mainActivity,downloadList)
-                                            },5000)
-                                        }
+                                    val downloadObject = DownloadObject(
+                                        trackDetails = it,
+                                        ytVideoId = videoId,
+                                        outputFile = outputFile
+                                    )
+                                    processed++
+                                    updateStatusBar()
+                                    downloadList.add(downloadObject)
+                                }
+                                if(index == (trackList.size-1)){//LastElement
+                                    statusBar?.clearAnimation()
+                                    if(downloadList.size > 0) {
+                                        Handler(Looper.myLooper()!!).postDelayed({
+                                            //Delay is Added ,if a request is in processing it may finish
+                                            Log.i("Spotify Helper", "Download Request Sent")
+                                            showMessage("Download Started, Now You can leave the App!")
+                                            startService(mainActivity, downloadList)
+                                        }, 3000)
                                     }
                                 }
-                            }
+                             }
                             override fun onFailure(call: Call<String>, t: Throwable) {
                                 if(t.message.toString().contains("Failed to connect")) showMessage("Failed, Check Your Internet Connection!")
                                 Log.i("YT API Req. Fail",t.message.toString())
@@ -157,8 +159,10 @@ object DownloadHelper {
     }
 
     @SuppressLint("SetTextI18n")
-    fun updateStatusBar() {
-        statusBar!!.visibility = View.VISIBLE
-        statusBar?.text = "Total: $total  ${getEmojiByUnicode(0x2705)}: $processed   ${getEmojiByUnicode(0x274C)}: $notFound"
+    private fun updateStatusBar() {
+        CoroutineScope(Dispatchers.Main).launch{
+            statusBar!!.visibility = View.VISIBLE
+            statusBar?.text = "Total: $total  ${getEmojiByUnicode(0x2705)}: $processed   ${getEmojiByUnicode(0x274C)}: $notFound"
+        }
     }
 }

@@ -19,6 +19,7 @@ package com.shabinder.spotiflyer.ui.spotify
 
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.viewModelScope
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.DownloadStatus
@@ -27,9 +28,10 @@ import com.shabinder.spotiflyer.models.spotify.Album
 import com.shabinder.spotiflyer.models.spotify.Image
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.models.spotify.Track
+import com.shabinder.spotiflyer.networking.GaanaInterface
 import com.shabinder.spotiflyer.networking.SpotifyService
+import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListViewModel
 import com.shabinder.spotiflyer.utils.Provider.imageDir
-import com.shabinder.spotiflyer.utils.TrackListViewModel
 import com.shabinder.spotiflyer.utils.finalOutputDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,6 +40,7 @@ import java.io.File
 
 class SpotifyViewModel @ViewModelInject constructor(
     val databaseDAO: DatabaseDAO,
+    val gaanaInterface : GaanaInterface
 ) : TrackListViewModel(){
 
     override var folderType:String = ""
@@ -45,8 +48,14 @@ class SpotifyViewModel @ViewModelInject constructor(
 
     var spotifyService : SpotifyService? = null
 
+    fun resolveLink(url:String):String {
+        val response = gaanaInterface.getResponse(url).execute().body()?.string().toString()
+        val regex = """https://open\.spotify\.com.+\w""".toRegex()
+        return regex.find(response)?.value.toString()
+    }
+
     fun spotifySearch(type:String,link: String){
-        uiScope.launch {
+        viewModelScope.launch {
             when (type) {
                 "track" -> {
                     spotifyService?.getTrack(link)?.value?.also {
@@ -130,6 +139,7 @@ class SpotifyViewModel @ViewModelInject constructor(
                 }
 
                 "playlist" -> {
+                    Log.i("Spotify Service",spotifyService.toString())
                     val playlistObject = spotifyService?.getPlaylist(link)?.value
                     folderType = "Playlists"
                     subFolder = playlistObject?.name.toString()
