@@ -29,6 +29,7 @@ import com.shabinder.spotiflyer.networking.GaanaInterface
 import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListViewModel
 import com.shabinder.spotiflyer.utils.Provider
 import com.shabinder.spotiflyer.utils.finalOutputDir
+import com.shabinder.spotiflyer.utils.queryActiveTracks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,67 +46,98 @@ class GaanaViewModel @ViewModelInject constructor(
     private val gaanaPlaceholderImageUrl = "https://a10.gaanacdn.com/images/social/gaana_social.jpg"
 
     fun gaanaSearch(type:String,link:String){
-        when(type){
-            "song" -> {
-                viewModelScope.launch {
-                    gaanaInterface.getGaanaSong(seokey =  link).value?.tracks?.firstOrNull()?.also {
+        viewModelScope.launch {
+            when (type) {
+                "song" -> {
+                    gaanaInterface.getGaanaSong(seokey = link).value?.tracks?.firstOrNull()?.also {
                         folderType = "Tracks"
-                        if(File(finalOutputDir(it.track_title,folderType,subFolder)).exists()){//Download Already Present!!
+                        if (File(
+                                finalOutputDir(
+                                    it.track_title,
+                                    folderType,
+                                    subFolder
+                                )
+                            ).exists()
+                        ) {//Download Already Present!!
                             it.downloaded = DownloadStatus.Downloaded
                         }
                         trackList.value = listOf(it).toTrackDetailsList()
                         title.value = it.track_title
                         coverUrl.value = it.artworkLink
-                        withContext(Dispatchers.IO){
+                        withContext(Dispatchers.IO) {
                             databaseDAO.insert(
                                 DownloadRecord(
-                                type = "Track",
-                                name = title.value!!,
-                                link = "https://gaana.com/$type/$link",
-                                coverUrl = coverUrl.value!!,
-                                totalFiles = 1,
-                                downloaded = it.downloaded == DownloadStatus.Downloaded,
-                                directory = finalOutputDir(it.track_title,folderType,subFolder)
-                            )
+                                    type = "Track",
+                                    name = title.value!!,
+                                    link = "https://gaana.com/$type/$link",
+                                    coverUrl = coverUrl.value!!,
+                                    totalFiles = 1,
+                                    downloaded = it.downloaded == DownloadStatus.Downloaded,
+                                    directory = finalOutputDir(
+                                        it.track_title,
+                                        folderType,
+                                        subFolder
+                                    )
+                                )
                             )
                         }
                     }
                 }
-            }
-            "album" -> {
-                viewModelScope.launch {
+                "album" -> {
                     gaanaInterface.getGaanaAlbum(seokey = link).value?.also {
                         folderType = "Albums"
                         subFolder = link
                         it.tracks.forEach { track ->
-                            if(File(finalOutputDir(track.track_title,folderType,subFolder)).exists()){//Download Already Present!!
+                            if (File(
+                                    finalOutputDir(
+                                        track.track_title,
+                                        folderType,
+                                        subFolder
+                                    )
+                                ).exists()
+                            ) {//Download Already Present!!
                                 track.downloaded = DownloadStatus.Downloaded
                             }
                         }
                         trackList.value = it.tracks.toTrackDetailsList()
                         title.value = link
                         coverUrl.value = it.custom_artworks.size_480p
-                        withContext(Dispatchers.IO){
-                            databaseDAO.insert(DownloadRecord(
-                                type = "Album",
-                                name = title.value!!,
-                                link = "https://gaana.com/$type/$link",
-                                coverUrl = coverUrl.value.toString(),
-                                totalFiles = trackList.value?.size ?: 0,
-                                downloaded = File(finalOutputDir(type = folderType,subFolder = subFolder)).listFiles()?.size == trackList.value?.size,
-                                directory = finalOutputDir(type = folderType,subFolder = subFolder)
-                            ))
+                        withContext(Dispatchers.IO) {
+                            databaseDAO.insert(
+                                DownloadRecord(
+                                    type = "Album",
+                                    name = title.value!!,
+                                    link = "https://gaana.com/$type/$link",
+                                    coverUrl = coverUrl.value.toString(),
+                                    totalFiles = trackList.value?.size ?: 0,
+                                    downloaded = File(
+                                        finalOutputDir(
+                                            type = folderType,
+                                            subFolder = subFolder
+                                        )
+                                    ).listFiles()?.size == trackList.value?.size,
+                                    directory = finalOutputDir(
+                                        type = folderType,
+                                        subFolder = subFolder
+                                    )
+                                )
+                            )
                         }
                     }
                 }
-            }
-            "playlist" -> {
-                viewModelScope.launch {
+                "playlist" -> {
                     gaanaInterface.getGaanaPlaylist(seokey = link).value?.also {
                         folderType = "Playlists"
                         subFolder = link
-                        it.tracks.forEach {track ->
-                            if(File(finalOutputDir(track.track_title,folderType,subFolder)).exists()){//Download Already Present!!
+                        it.tracks.forEach { track ->
+                            if (File(
+                                    finalOutputDir(
+                                        track.track_title,
+                                        folderType,
+                                        subFolder
+                                    )
+                                ).exists()
+                            ) {//Download Already Present!!
                                 track.downloaded = DownloadStatus.Downloaded
                             }
                         }
@@ -113,49 +145,77 @@ class GaanaViewModel @ViewModelInject constructor(
                         title.value = link
                         //coverUrl.value = "TODO"
                         coverUrl.value = gaanaPlaceholderImageUrl
-                        withContext(Dispatchers.IO){
-                            databaseDAO.insert(DownloadRecord(
-                                type = "Playlist",
-                                name = title.value.toString(),
-                                link = "https://gaana.com/$type/$link",
-                                coverUrl = coverUrl.value.toString(),
-                                totalFiles = it.tracks.size,
-                                downloaded = File(finalOutputDir(type = folderType,subFolder = subFolder)).listFiles()?.size == trackList.value?.size,
-                                directory = finalOutputDir(type = folderType,subFolder = subFolder)
-                            ))
+                        withContext(Dispatchers.IO) {
+                            databaseDAO.insert(
+                                DownloadRecord(
+                                    type = "Playlist",
+                                    name = title.value.toString(),
+                                    link = "https://gaana.com/$type/$link",
+                                    coverUrl = coverUrl.value.toString(),
+                                    totalFiles = it.tracks.size,
+                                    downloaded = File(
+                                        finalOutputDir(
+                                            type = folderType,
+                                            subFolder = subFolder
+                                        )
+                                    ).listFiles()?.size == trackList.value?.size,
+                                    directory = finalOutputDir(
+                                        type = folderType,
+                                        subFolder = subFolder
+                                    )
+                                )
+                            )
                         }
                     }
                 }
-            }
-            "artist" -> {
-                viewModelScope.launch {
+                "artist" -> {
                     folderType = "Artist"
                     subFolder = link
-                    val artistDetails = gaanaInterface.getGaanaArtistDetails(seokey = link).value?.artist?.firstOrNull()?.also {
-                        title.value = it.name
-                        coverUrl.value = it.artworkLink
-                    }
+                    val artistDetails =
+                        gaanaInterface.getGaanaArtistDetails(seokey = link).value?.artist?.firstOrNull()
+                            ?.also {
+                                title.value = it.name
+                                coverUrl.value = it.artworkLink
+                            }
                     gaanaInterface.getGaanaArtistTracks(seokey = link).value?.also {
-                        it.tracks.forEach {track ->
-                            if(File(finalOutputDir(track.track_title,folderType,subFolder)).exists()){//Download Already Present!!
+                        it.tracks.forEach { track ->
+                            if (File(
+                                    finalOutputDir(
+                                        track.track_title,
+                                        folderType,
+                                        subFolder
+                                    )
+                                ).exists()
+                            ) {//Download Already Present!!
                                 track.downloaded = DownloadStatus.Downloaded
                             }
                         }
                         trackList.value = it.tracks.toTrackDetailsList()
-                        withContext(Dispatchers.IO){
-                            databaseDAO.insert(DownloadRecord(
-                                type = "Artist",
-                                name = artistDetails?.name ?: link,
-                                link = "https://gaana.com/$type/$link",
-                                coverUrl = coverUrl.value.toString(),
-                                totalFiles = trackList.value?.size ?: 0,
-                                downloaded = File(finalOutputDir(type = folderType,subFolder = subFolder)).listFiles()?.size == trackList.value?.size,
-                                directory = finalOutputDir(type = folderType,subFolder = subFolder)
-                            ))
+                        withContext(Dispatchers.IO) {
+                            databaseDAO.insert(
+                                DownloadRecord(
+                                    type = "Artist",
+                                    name = artistDetails?.name ?: link,
+                                    link = "https://gaana.com/$type/$link",
+                                    coverUrl = coverUrl.value.toString(),
+                                    totalFiles = trackList.value?.size ?: 0,
+                                    downloaded = File(
+                                        finalOutputDir(
+                                            type = folderType,
+                                            subFolder = subFolder
+                                        )
+                                    ).listFiles()?.size == trackList.value?.size,
+                                    directory = finalOutputDir(
+                                        type = folderType,
+                                        subFolder = subFolder
+                                    )
+                                )
+                            )
                         }
                     }
                 }
             }
+            queryActiveTracks()
         }
     }
 

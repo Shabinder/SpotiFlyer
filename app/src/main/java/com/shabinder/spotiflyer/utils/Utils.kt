@@ -52,9 +52,15 @@ fun loadAllImages(context: Context?, images:List<String>? = null,source:Source) 
     context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
 }
 
-fun startService(context:Context?,objects:ArrayList<DownloadObject>? = null ) {
+fun startService(context:Context? = mainActivity,objects:ArrayList<DownloadObject>? = null ) {
     val serviceIntent = Intent(context, ForegroundService::class.java)
     objects?.let {  serviceIntent.putParcelableArrayListExtra("object",it) }
+    context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
+}
+fun queryActiveTracks(context:Context? = mainActivity) {
+    val serviceIntent = Intent(context, ForegroundService::class.java).apply {
+        action = "query"
+    }
     context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
 }
 

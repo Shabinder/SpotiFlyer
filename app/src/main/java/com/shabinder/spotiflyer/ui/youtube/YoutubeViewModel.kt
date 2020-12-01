@@ -28,11 +28,8 @@ import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListViewModel
+import com.shabinder.spotiflyer.utils.*
 import com.shabinder.spotiflyer.utils.Provider.imageDir
-import com.shabinder.spotiflyer.utils.finalOutputDir
-import com.shabinder.spotiflyer.utils.isOnline
-import com.shabinder.spotiflyer.utils.removeIllegalChars
-import com.shabinder.spotiflyer.utils.showMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -100,6 +97,7 @@ class YoutubeViewModel @ViewModelInject constructor(
                         downloaded = File(finalOutputDir(itemName = removeIllegalChars(name),type = folderType,subFolder = subFolder)).exists()
                     ))
                 }
+                queryActiveTracks()
             }
         }catch (e:com.github.kiulian.downloader.YoutubeException.BadPageException){
             showMessage("An Error Occurred While Processing!")
@@ -145,6 +143,7 @@ class YoutubeViewModel @ViewModelInject constructor(
                         directory = finalOutputDir(type = "YT_Downloads")
                     ))
                 }
+                queryActiveTracks()
             }
         } catch (e:com.github.kiulian.downloader.YoutubeException){
             showMessage("An Error Occurred While Processing!")

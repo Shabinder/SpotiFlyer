@@ -47,6 +47,7 @@ import com.mpatric.mp3agic.ID3v24Tag
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.models.DownloadObject
+import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.utils.Provider
@@ -73,11 +74,12 @@ class ForegroundService : Service(){
     private var serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
     private val requestMap = mutableMapOf<Request, TrackDetails>()
+    private val allTracksDetails = mutableListOf<TrackDetails>()
     private var defaultDir = Provider.defaultDir
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
-    var notificationLine = 0
-    var messageList = mutableListOf("", "", "", "")
+    private var notificationLine = 0
+    private var messageList = mutableListOf("", "", "", "")
     private var cancelIntent:PendingIntent? = null
 
     override fun onBind(intent: Intent): IBinder? = null
@@ -103,6 +105,14 @@ class ForegroundService : Service(){
 
         if(intent.action == "kill") killService()
 
+        if(intent.action == "query"){
+            val response = Intent().apply {
+                action = "query_result"
+                putParcelableArrayListExtra("tracks", allTracksDetails as ArrayList<TrackDetails> )
+            }
+            sendBroadcast(response)
+        }
+
         val downloadObjects: ArrayList<DownloadObject>? = (intent.getParcelableArrayListExtra("object") ?: intent.extras?.getParcelableArrayList(
             "object"
         ))
@@ -119,6 +129,9 @@ class ForegroundService : Service(){
         downloadObjects?.let {
             total += downloadObjects.size
             updateNotification()
+            it.forEach { it1 ->
+                allTracksDetails.add(it1.trackDetails.apply { downloaded = DownloadStatus.Queued })
+            }
             downloadAllTracks(downloadObjects)
         }
 
@@ -207,7 +220,6 @@ class ForegroundService : Service(){
             download: Download,
             waitingOnNetwork: Boolean
         ) {
-            //Notify Download Completed
             val intent = Intent()
                 .setAction(Status.QUEUED.name)
                 .putExtra("track", requestMap[download.request])
@@ -247,10 +259,14 @@ class ForegroundService : Service(){
                 }
             }
             Log.i(tag, "${track?.title} Download Started")
+            track?.let{
+                allTracksDetails[allTracksDetails.map{ trackDetails -> trackDetails.title}.indexOf(it.title)] =
+                    it.apply { downloaded = DownloadStatus.Downloading }
+            }
             updateNotification()
             val intent = Intent()
                 .setAction(Status.DOWNLOADING.name)
-                .putExtra("track", requestMap[download.request])
+                .putExtra("track", track)
             this@ForegroundService.sendBroadcast(intent)
         }
 
@@ -277,7 +293,11 @@ class ForegroundService : Service(){
 
             serviceScope.launch {
                 try{
-                    track?.let { convertToMp3(download.file, it) }
+                    track?.let {
+                        convertToMp3(download.file, it)
+                        allTracksDetails[allTracksDetails.map{ trackDetails -> trackDetails.title}.indexOf(it.title)] =
+                            it.apply { downloaded = DownloadStatus.Converting }
+                    }
                     Log.i(tag, "${track?.title} Download Completed")
                 }catch (
                     e: KotlinNullPointerException
@@ -360,6 +380,8 @@ class ForegroundService : Service(){
                 val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
                 //Checking if the received broadcast is for our enqueued download by matching download id
                 if (downloadID == id) {
+                    allTracksDetails[allTracksDetails.map{ trackDetails -> trackDetails.title}.indexOf(track.title)] =
+                        track.apply { downloaded = DownloadStatus.Converting }
                     convertToMp3(outputDir, track)
                     converted++
                     //Unregister this broadcast Receiver
@@ -419,7 +441,7 @@ class ForegroundService : Service(){
         newFile.renameTo(file)
         converted++
         updateNotification()
-
+        allTracksDetails.removeAt(allTracksDetails.map{ trackDetails -> trackDetails.title}.indexOf(track.title))
         //Notify Download Completed
         val intent = Intent()
             .setAction("track_download_completed")

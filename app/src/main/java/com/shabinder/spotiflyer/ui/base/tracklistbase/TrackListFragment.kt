@@ -35,10 +35,8 @@ import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
 import com.shabinder.spotiflyer.ui.base.BaseFragment
+import com.shabinder.spotiflyer.utils.*
 import com.shabinder.spotiflyer.utils.Provider.mainActivity
-import com.shabinder.spotiflyer.utils.bindImage
-import com.shabinder.spotiflyer.utils.isOnline
-import com.shabinder.spotiflyer.utils.showNoConnectionAlert
 import com.tonyodev.fetch2.Status
 
 abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseFragment<TrackListFragmentBinding,VM>() {
@@ -48,6 +46,7 @@ abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseF
     protected abstract var source: Source
     private var intentFilter: IntentFilter? = null
     private var updateUIReceiver: BroadcastReceiver? = null
+    private var queryReceiver: BroadcastReceiver? = null
     protected abstract val args:NavArgs
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,7 +86,7 @@ abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseF
             if (!it.isNullOrEmpty()){
                 Log.i("GaanaFragment","TrackList Updated")
                 adapter.submitList(it, source)
-                checkIfAllDownloaded()
+                updateTracksStatus()
             }
         })
 
@@ -101,14 +100,14 @@ abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseF
     }
 
     private fun initializeBroadcast() {
-        intentFilter = IntentFilter()
-        intentFilter?.addAction(Status.QUEUED.name)
-        intentFilter?.addAction(Status.FAILED.name)
-        intentFilter?.addAction(Status.DOWNLOADING.name)
-        intentFilter?.addAction("Progress")
-        intentFilter?.addAction("Converting")
-        intentFilter?.addAction("track_download_completed")
-
+        intentFilter = IntentFilter().apply {
+            addAction(Status.QUEUED.name)
+            addAction(Status.FAILED.name)
+            addAction(Status.DOWNLOADING.name)
+            addAction("Progress")
+            addAction("Converting")
+            addAction("track_download_completed")
+        }
         updateUIReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 //UI update here
@@ -145,7 +144,28 @@ abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseF
                                 }
                                 viewModel.trackList.value?.set(position, it)
                                 adapter.notifyItemChanged(position)
-                                checkIfAllDownloaded()
+                                updateTracksStatus()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        val queryFilter = IntentFilter().apply { addAction("query_result") }
+        queryReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                //UI update here
+                if (intent != null){
+                    val trackList = intent.getParcelableArrayListExtra<TrackDetails?>("tracks") ?: listOf()
+                    Log.i("Service Response", "${trackList.size} Tracks Active")
+                    for (trackDetails in trackList) {
+                        trackDetails?.let { it ->
+                            val position: Int = viewModel.trackList.value?.map { it.title }?.indexOf(trackDetails.title) ?: -1
+                            Log.i("BroadCast Received","$position, ${it.downloaded} , ${trackDetails.title}")
+                            if(position != -1) {
+                                viewModel.trackList.value?.set(position,it)
+                                adapter.notifyItemChanged(position)
+                                updateTracksStatus()
                             }
                         }
                     }
@@ -153,6 +173,7 @@ abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseF
             }
         }
         requireActivity().registerReceiver(updateUIReceiver, intentFilter)
+        requireActivity().registerReceiver(queryReceiver, queryFilter)
     }
 
     override fun onResume() {
@@ -163,10 +184,25 @@ abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseF
     override fun onPause() {
         super.onPause()
         requireActivity().unregisterReceiver(updateUIReceiver)
+        requireActivity().unregisterReceiver(queryReceiver)
     }
-    private fun checkIfAllDownloaded() {
-        if(!viewModel.trackList.value!!.any { it.downloaded == DownloadStatus.NotDownloaded || it.downloaded == DownloadStatus.Queued || it.downloaded == DownloadStatus.Converting }){
-            //All Tracks Downloaded
+
+    private fun updateTracksStatus() {
+        var allDownloaded = true
+        var allProcessing = true
+        for (track in viewModel.trackList.value!!){
+            if(track.downloaded != DownloadStatus.Downloaded)allDownloaded = false
+            if(track.downloaded == DownloadStatus.NotDownloaded)allProcessing = false
+        }
+        if(allProcessing){
+            binding.btnDownloadAll.visibility = View.GONE
+            binding.downloadingFab.apply{
+                setImageResource(R.drawable.ic_refresh)
+                visible()
+                rotate()
+            }
+        }
+        if(allDownloaded){
             binding.btnDownloadAll.visibility = View.GONE
             binding.downloadingFab.apply{
                 setImageResource(R.drawable.ic_tick)

@@ -33,6 +33,7 @@ import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListViewModel
 import com.shabinder.spotiflyer.utils.Provider.imageDir
 import com.shabinder.spotiflyer.utils.finalOutputDir
+import com.shabinder.spotiflyer.utils.queryActiveTracks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -199,6 +200,7 @@ class SpotifyViewModel @ViewModelInject constructor(
                 "show" -> {//TODO
                 }
             }
+            queryActiveTracks()
         }
     }
 
