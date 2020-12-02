@@ -24,6 +24,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
 import android.util.Log
@@ -46,21 +47,29 @@ import com.mpatric.mp3agic.ID3v1Tag
 import com.mpatric.mp3agic.ID3v24Tag
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.spotiflyer.R
-import com.shabinder.spotiflyer.models.DownloadObject
+import com.shabinder.spotiflyer.downloadHelper.getYTTracks
+import com.shabinder.spotiflyer.downloadHelper.sortByBestMatch
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.utils.Provider
+import com.shabinder.spotiflyer.networking.YoutubeMusicApi
+import com.shabinder.spotiflyer.networking.makeJsonBody
+import com.shabinder.spotiflyer.utils.*
 import com.shabinder.spotiflyer.utils.Provider.imageDir
-import com.shabinder.spotiflyer.utils.copyTo
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
-
+import javax.inject.Inject
+@AndroidEntryPoint
+@RequiresApi(Build.VERSION_CODES.O)
 class ForegroundService : Service(){
     private val tag = "Foreground Service"
     private val channelId = "ForegroundDownloaderService"
@@ -68,9 +77,6 @@ class ForegroundService : Service(){
     private var total = 0 //Total Downloads Requested
     private var converted = 0//Total Files Converted
     private var downloaded = 0//Total Files downloaded
-    private lateinit var fetch:Fetch
-    private lateinit var ytDownloader: YoutubeDownloader
-    private lateinit var downloadManager : DownloadManager
     private var serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
     private val requestMap = mutableMapOf<Request, TrackDetails>()
@@ -80,12 +86,17 @@ class ForegroundService : Service(){
     private var isServiceStarted = false
     private var notificationLine = 0
     private var messageList = mutableListOf("", "", "", "")
-    private var cancelIntent:PendingIntent? = null
+    private lateinit var cancelIntent:PendingIntent
+    private lateinit var fetch:Fetch
+    private lateinit var ytDownloader: YoutubeDownloader
+    private lateinit var downloadManager : DownloadManager
+    @Inject lateinit var youtubeMusicApi: YoutubeMusicApi
 
     override fun onBind(intent: Intent): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
+        createNotificationChannel(channelId,"Downloader Service")
         val intent = Intent(
             this,
             ForegroundService::class.java
@@ -94,26 +105,26 @@ class ForegroundService : Service(){
         downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         ytDownloader = YoutubeDownloader()
         initialiseFetch()
-        startForeground()
     }
 
     @SuppressLint("WakelockTimeout")
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         // Send a notification that service is started
         Log.i(tag, "Service Started.")
-        startForeground()
+        startForeground(notificationId, getNotification())
 
-        if(intent.action == "kill") killService()
-
-        if(intent.action == "query"){
-            val response = Intent().apply {
-                action = "query_result"
-                putParcelableArrayListExtra("tracks", allTracksDetails as ArrayList<TrackDetails> )
+        when (intent.action) {
+            "kill" -> killService()
+            "query" -> {
+                val response = Intent().apply {
+                    action = "query_result"
+                    putParcelableArrayListExtra("tracks", allTracksDetails as ArrayList<TrackDetails> )
+                }
+                sendBroadcast(response)
             }
-            sendBroadcast(response)
         }
 
-        val downloadObjects: ArrayList<DownloadObject>? = (intent.getParcelableArrayListExtra("object") ?: intent.extras?.getParcelableArrayList(
+        val downloadObjects: ArrayList<TrackDetails>? = (intent.getParcelableArrayListExtra("object") ?: intent.extras?.getParcelableArrayList(
             "object"
         ))
         val imagesList: ArrayList<String>? = (intent.getStringArrayListExtra("imagesList") ?: intent.extras?.getStringArrayList(
@@ -130,9 +141,9 @@ class ForegroundService : Service(){
             total += downloadObjects.size
             updateNotification()
             it.forEach { it1 ->
-                allTracksDetails.add(it1.trackDetails.apply { downloaded = DownloadStatus.Queued })
+                allTracksDetails.add(it1.apply { downloaded = DownloadStatus.Queued })
             }
-            downloadAllTracks(downloadObjects)
+            downloadAllTracks(it)
         }
 
         //Wake locks and misc tasks from here :
@@ -152,65 +163,95 @@ class ForegroundService : Service(){
         }
     }
 
-    private fun downloadAllTracks(downloadObjects: List<DownloadObject>){
-        serviceScope.launch(Dispatchers.IO) {
-            for(downloadObj in downloadObjects){
-                try {
-                    val video = ytDownloader.getVideo(downloadObj.ytVideoId)
-                    val format: Format? = try {
-                        video?.findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
-                    } catch (e: java.lang.IndexOutOfBoundsException) {
-                        try {
-                            video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
-                        } catch (e: java.lang.IndexOutOfBoundsException) {
-                            try {
-                                video?.findAudioWithQuality(AudioQuality.low)?.get(0) as Format
-                            } catch (e: java.lang.IndexOutOfBoundsException) {
-                                Log.i("YTDownloader", e.toString())
-                                null
-                            }
-                        }
-                    }
-                    format?.let {
-                        val url: String = format.url()
-                        Log.i("DHelper Link Found", url)
-                        val request= Request(url, downloadObj.outputFile).apply{
-                            priority = Priority.NORMAL
-                            networkType = NetworkType.ALL
-                        }
-                        fetch.enqueue(request,
-                            {
-                                requestMap[it] = downloadObj.trackDetails
-                                Log.i(tag, "Enqueuing Download")
-                            },
-                            {
-                                Log.i(tag, "Enqueuing Error:${it.throwable.toString()}")
+    /**
+     * Function To Download All Tracks Available in a List
+     **/
+    private fun downloadAllTracks(trackList: List<TrackDetails>) {
+        serviceScope.launch(Dispatchers.Default){
+            trackList.forEach {
+                if(it.downloaded == DownloadStatus.Downloaded){//Download Already Present!!
+                }else {
+                    if (!it.videoID.isNullOrBlank()) {//Video ID already known!
+                        downloadTrack(it.videoID!!, it)
+                    } else {
+                        val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
+                        val jsonBody = makeJsonBody(searchQuery.trim()).toJsonString()
+                        youtubeMusicApi.getYoutubeMusicResponse(jsonBody).enqueue(
+                            object : Callback<String> {
+                                override fun onResponse(
+                                    call: Call<String>,
+                                    response: Response<String>
+                                ) {
+                                    val videoId = sortByBestMatch(
+                                        getYTTracks(response.body().toString()),
+                                        trackName = it.title,
+                                        trackArtists = it.artists,
+                                        trackDurationSec = it.durationSec
+                                    ).keys.firstOrNull()
+                                    Log.i("Service VideoID", videoId ?: "Not Found")
+                                    if (videoId.isNullOrBlank()) sendTrackBroadcast(
+                                        Status.FAILED.name,
+                                        it
+                                    )
+                                    else {//Found Youtube Video ID
+                                        downloadTrack(videoId, it)
+                                    }
+                                }
+
+                                override fun onFailure(call: Call<String>, t: Throwable) {
+                                    if (t.message.toString()
+                                            .contains("Failed to connect")
+                                    ) showMessage("Failed, Check Your Internet Connection!")
+                                    Log.i("YT API Req. Fail", t.message.toString())
+                                }
                             }
                         )
                     }
-                }catch (e: com.github.kiulian.downloader.YoutubeException){
-                    Log.i("Service YT Error", e.message.toString())
                 }
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        if(converted == total){
-            Handler(Looper.myLooper()!!).postDelayed({
-                killService()
-            }, 5000)
+    fun downloadTrack(videoID:String,track: TrackDetails){
+        serviceScope.launch(Dispatchers.IO) {
+            try {
+                val video = ytDownloader.getVideo(videoID)
+                val format: Format? = try {
+                    video?.findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
+                } catch (e: java.lang.IndexOutOfBoundsException) {
+                    try {
+                        video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
+                    } catch (e: java.lang.IndexOutOfBoundsException) {
+                        try {
+                            video?.findAudioWithQuality(AudioQuality.low)?.get(0) as Format
+                        } catch (e: java.lang.IndexOutOfBoundsException) {
+                            Log.i("YTDownloader", e.toString())
+                            null
+                        }
+                    }
+                }
+                format?.let {
+                    val url: String = format.url()
+                    Log.i("DHelper Link Found", url)
+                    val request= Request(url, track.outputFile).apply{
+                        priority = Priority.NORMAL
+                        networkType = NetworkType.ALL
+                    }
+                    fetch.enqueue(request,
+                        {
+                            requestMap[it] = track
+                            Log.i(tag, "Enqueuing Download")
+                        },
+                        {
+                            Log.i(tag, "Enqueuing Error:${it.throwable.toString()}")
+                        }
+                    )
+                }
+            }catch (e: com.github.kiulian.downloader.YoutubeException){
+                Log.i("Service YT Error", e.message.toString())
+            }
         }
     }
-
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
-        if(converted == total ){
-            killService()
-        }
-    }
-
 
     /**
      * Fetch Listener/ Responsible for Fetch Behaviour
@@ -220,10 +261,7 @@ class ForegroundService : Service(){
             download: Download,
             waitingOnNetwork: Boolean
         ) {
-            val intent = Intent()
-                .setAction(Status.QUEUED.name)
-                .putExtra("track", requestMap[download.request])
-            this@ForegroundService.sendBroadcast(intent)
+            requestMap[download.request]?.let { sendTrackBroadcast(Status.QUEUED.name, it) }
         }
 
         override fun onRemoved(download: Download) {
@@ -262,12 +300,9 @@ class ForegroundService : Service(){
             track?.let{
                 allTracksDetails[allTracksDetails.map{ trackDetails -> trackDetails.title}.indexOf(it.title)] =
                     it.apply { downloaded = DownloadStatus.Downloading }
+                updateNotification()
+                sendTrackBroadcast(Status.DOWNLOADING.name,track)
             }
-            updateNotification()
-            val intent = Intent()
-                .setAction(Status.DOWNLOADING.name)
-                .putExtra("track", track)
-            this@ForegroundService.sendBroadcast(intent)
         }
 
         override fun onWaitingNetwork(download: Download) {
@@ -346,12 +381,12 @@ class ForegroundService : Service(){
         ) {
             val track  = requestMap[download.request]
             Log.i(tag, "${track?.title} ETA: ${etaInMilliSeconds / 1000} sec")
-            val intent = Intent()
-                .setAction("Progress")
-                .putExtra("progress", download.progress)
-                .putExtra("track", requestMap[download.request])
-            this@ForegroundService.sendBroadcast(intent)
-//            updateNotification()
+            val intent = Intent().apply {
+                action = "Progress"
+                putExtra("progress", download.progress)
+                putExtra("track", requestMap[download.request])
+            }
+            sendBroadcast(intent)
         }
     }
 
@@ -360,16 +395,18 @@ class ForegroundService : Service(){
     **/
     fun downloadUsingDM(url: String, outputDir: String, track: TrackDetails){
         val uri = Uri.parse(url)
-        val request = DownloadManager.Request(uri)
-            .setAllowedNetworkTypes(
+        val request = DownloadManager.Request(uri).apply {
+            setAllowedNetworkTypes(
                 DownloadManager.Request.NETWORK_WIFI or
                         DownloadManager.Request.NETWORK_MOBILE
             )
-            .setAllowedOverRoaming(false)
-            .setTitle(track.title)
-            .setDescription("Spotify Downloader Working Up here...")
-            .setDestinationUri(File(outputDir).toUri())
-            .setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            setAllowedOverRoaming(false)
+            setTitle(track.title)
+            setDescription("Spotify Downloader Working Up here...")
+            setDestinationUri(File(outputDir).toUri())
+            setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        }
+
         //Start Download
         val downloadID = downloadManager.enqueue(request)
         Log.i("DownloadManager", "Download Request Sent")
@@ -396,11 +433,7 @@ class ForegroundService : Service(){
      *Converting Downloaded Audio (m4a) to Mp3.( Also Applying Metadata)
      **/
     fun convertToMp3(filePath: String, track: TrackDetails){
-        val intent = Intent()
-            .setAction("Converting")
-            .putExtra("track", track)
-        this@ForegroundService.sendBroadcast(intent)
-
+        sendTrackBroadcast("Converting",track)
         val m4aFile = File(filePath)
 
         FFmpeg.executeAsync(
@@ -441,13 +474,10 @@ class ForegroundService : Service(){
         newFile.renameTo(file)
         converted++
         updateNotification()
+        addToLibrary(file.absolutePath)
         allTracksDetails.removeAt(allTracksDetails.map{ trackDetails -> trackDetails.title}.indexOf(track.title))
         //Notify Download Completed
-        val intent = Intent()
-            .setAction("track_download_completed")
-            .putExtra("track", track)
-        this@ForegroundService.sendBroadcast(intent)
-
+        sendTrackBroadcast("track_download_completed",track)
         //All tasks completed (REST IN PEACE)
         if(converted == total){
             onDestroy()
@@ -460,21 +490,7 @@ class ForegroundService : Service(){
     private fun updateNotification() {
         val mNotificationManager: NotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.down_arrowbw)
-            .setSubText("Total: $total  Completed:$converted")
-            .setNotificationSilent()
-            .setStyle(
-                NotificationCompat.InboxStyle()
-//                .setBigContentTitle("Speed: $speed KB/s")
-                    .addLine(messageList[0])
-                    .addLine(messageList[1])
-                    .addLine(messageList[2])
-                    .addLine(messageList[3])
-            )
-            .addAction(R.drawable.ic_baseline_cancel_24,"Exit",cancelIntent)
-            .build()
-        mNotificationManager.notify(notificationId, notification)
+        mNotificationManager.notify(notificationId, getNotification())
     }
 
     /**
@@ -541,47 +557,16 @@ class ForegroundService : Service(){
         isServiceStarted = false
     }
 
-    /**
-     *Starting Service with Notification as Foreground!
-     **/
-    private fun startForeground() {
-        val channelId =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                createNotificationChannel(channelId, "Downloader Service")
-            } else {
-                // If earlier version channel ID is not used
-                // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
-                ""
-            }
-
-        val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.down_arrowbw)
-            .setNotificationSilent()
-            .setSubText("Total: $total  Completed:$converted")
-            .setStyle(
-                NotificationCompat.InboxStyle()
-//                .setBigContentTitle("Speed: $speed KB/s")
-                    .addLine(messageList[0])
-                    .addLine(messageList[1])
-                    .addLine(messageList[2])
-                    .addLine(messageList[3])
-            )
-            .addAction(R.drawable.ic_baseline_cancel_24,"Exit",cancelIntent)
-            .build()
-        startForeground(notificationId, notification)
-    }
-
     @Suppress("SameParameterValue")
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(channelId: String, channelName: String): String{
-        val chan = NotificationChannel(
+    private fun createNotificationChannel(channelId: String, channelName: String){
+        val channel = NotificationChannel(
             channelId,
             channelName, NotificationManager.IMPORTANCE_DEFAULT
         )
-        chan.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        service.createNotificationChannel(chan)
-        return channelId
+        service.createNotificationChannel(channel)
     }
 
     /**
@@ -602,6 +587,15 @@ class ForegroundService : Service(){
                 }
             }
         }
+    }
+
+    /*
+    * Add File to Android's Media Library.
+    * */
+    private fun addToLibrary(path:String) {
+        Log.i(tag,"Scanning File")
+        MediaScannerConnection.scanFile(this,
+            listOf(path).toTypedArray(), null,null)
     }
 
     /**
@@ -681,6 +675,7 @@ class ForegroundService : Service(){
 
     private fun killService() {
         serviceScope.launch{
+            Log.i(tag,"Killing Self")
             messageList = mutableListOf("Cleaning And Exiting","","","")
             fetch.cancelAll()
             fetch.removeAll()
@@ -693,6 +688,22 @@ class ForegroundService : Service(){
             } else {
                 stopSelf()//System will automatically close it
             }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(converted == total){
+            Handler(Looper.myLooper()!!).postDelayed({
+                killService()
+            }, 5000)
+        }
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        if(converted == total ){
+            killService()
         }
     }
 
@@ -710,5 +721,29 @@ class ForegroundService : Service(){
         //clearing all not completed Downloads
         //Starting fresh
         fetch.removeAll()
+    }
+
+    private fun getNotification():Notification = NotificationCompat.Builder(this, channelId).run {
+        setSmallIcon(R.drawable.down_arrowbw)
+        setSubText("Total: $total  Completed:$converted")
+        setNotificationSilent()
+        setStyle(
+            NotificationCompat.InboxStyle().run {
+                addLine(messageList[0])
+                addLine(messageList[1])
+                addLine(messageList[2])
+                addLine(messageList[3])
+            }
+        )
+        addAction(R.drawable.ic_baseline_cancel_24,"Exit",cancelIntent)
+        build()
+    }
+
+    fun sendTrackBroadcast(action:String,track:TrackDetails){
+        val intent = Intent().apply{
+            setAction(action)
+            putExtra("track", track)
+        }
+        this@ForegroundService.sendBroadcast(intent)
     }
 }

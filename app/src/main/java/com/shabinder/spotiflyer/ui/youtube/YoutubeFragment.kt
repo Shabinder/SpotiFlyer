@@ -24,8 +24,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.navArgs
-import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
+import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
 import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListFragment
@@ -38,7 +38,7 @@ private const val sampleDomain2 = "youtu.be"
 private const val sampleDomain1 = "youtube.com"
 
 @AndroidEntryPoint
-class YoutubeFragment : TrackListFragment<YoutubeViewModel, YoutubeFragmentArgs>() , YTDownloadHelper {
+class YoutubeFragment : TrackListFragment<YoutubeViewModel, YoutubeFragmentArgs>(){
 
     override val viewModel: YoutubeViewModel by viewModels()
     override lateinit var adapter : TrackListAdapter
@@ -48,7 +48,7 @@ class YoutubeFragment : TrackListFragment<YoutubeViewModel, YoutubeFragmentArgs>
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         adapter = TrackListAdapter(viewModel)
 
@@ -90,24 +90,19 @@ class YoutubeFragment : TrackListFragment<YoutubeViewModel, YoutubeFragmentArgs>
                 visible()
                 rotate()
             }
-
-            for (track in this.viewModel.trackList.value?: listOf()){
-                if(track.downloaded != DownloadStatus.Downloaded){
-                    track.downloaded = DownloadStatus.Queued
-                    //adapter.notifyItemChanged(this.viewModel.trackList.value!!.indexOf(track))
-                }
-            }
-            adapter.notifyDataSetChanged()
             showMessage("Processing!")
             sharedViewModel.viewModelScope.launch(Dispatchers.Default){
                 loadAllImages(requireActivity(), viewModel.trackList.value?.map{it.albumArtURL}, Source.YouTube)
             }
             viewModel.viewModelScope.launch {
-                downloadYTTracks(
-                    type = viewModel.folderType,
-                    subFolder = viewModel.subFolder,
-                    tracks =  viewModel.trackList.value ?: listOf()
-                )
+                downloadTracks((viewModel.trackList.value?.filter { it.downloaded == DownloadStatus.NotDownloaded } ?: arrayListOf()) as ArrayList<TrackDetails>)
+                for (track in viewModel.trackList.value?: listOf()){
+                    if(track.downloaded == DownloadStatus.NotDownloaded){
+                        track.downloaded = DownloadStatus.Queued
+                        //adapter.notifyItemChanged(viewModel.trackList.value!!.indexOf(track))
+                    }
+                }
+                adapter.notifyDataSetChanged()
             }
         }
     }

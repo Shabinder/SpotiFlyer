@@ -37,7 +37,7 @@ import java.io.File
 
 class GaanaViewModel @ViewModelInject constructor(
     val databaseDAO: DatabaseDAO,
-    val gaanaInterface : GaanaInterface
+    private val gaanaInterface : GaanaInterface
 ) : TrackListViewModel(){
 
     override var folderType:String = ""
@@ -51,6 +51,7 @@ class GaanaViewModel @ViewModelInject constructor(
                 "song" -> {
                     gaanaInterface.getGaanaSong(seokey = link).value?.tracks?.firstOrNull()?.also {
                         folderType = "Tracks"
+                        subFolder = ""
                         if (File(
                                 finalOutputDir(
                                     it.track_title,
@@ -61,7 +62,7 @@ class GaanaViewModel @ViewModelInject constructor(
                         ) {//Download Already Present!!
                             it.downloaded = DownloadStatus.Downloaded
                         }
-                        trackList.value = listOf(it).toTrackDetailsList()
+                        trackList.value = listOf(it).toTrackDetailsList(folderType, subFolder)
                         title.value = it.track_title
                         coverUrl.value = it.artworkLink
                         withContext(Dispatchers.IO) {
@@ -72,12 +73,6 @@ class GaanaViewModel @ViewModelInject constructor(
                                     link = "https://gaana.com/$type/$link",
                                     coverUrl = coverUrl.value!!,
                                     totalFiles = 1,
-                                    downloaded = it.downloaded == DownloadStatus.Downloaded,
-                                    directory = finalOutputDir(
-                                        it.track_title,
-                                        folderType,
-                                        subFolder
-                                    )
                                 )
                             )
                         }
@@ -99,7 +94,7 @@ class GaanaViewModel @ViewModelInject constructor(
                                 track.downloaded = DownloadStatus.Downloaded
                             }
                         }
-                        trackList.value = it.tracks.toTrackDetailsList()
+                        trackList.value = it.tracks.toTrackDetailsList(folderType, subFolder)
                         title.value = link
                         coverUrl.value = it.custom_artworks.size_480p
                         withContext(Dispatchers.IO) {
@@ -110,16 +105,6 @@ class GaanaViewModel @ViewModelInject constructor(
                                     link = "https://gaana.com/$type/$link",
                                     coverUrl = coverUrl.value.toString(),
                                     totalFiles = trackList.value?.size ?: 0,
-                                    downloaded = File(
-                                        finalOutputDir(
-                                            type = folderType,
-                                            subFolder = subFolder
-                                        )
-                                    ).listFiles()?.size == trackList.value?.size,
-                                    directory = finalOutputDir(
-                                        type = folderType,
-                                        subFolder = subFolder
-                                    )
                                 )
                             )
                         }
@@ -141,7 +126,7 @@ class GaanaViewModel @ViewModelInject constructor(
                                 track.downloaded = DownloadStatus.Downloaded
                             }
                         }
-                        trackList.value = it.tracks.toTrackDetailsList()
+                        trackList.value = it.tracks.toTrackDetailsList(folderType, subFolder)
                         title.value = link
                         //coverUrl.value = "TODO"
                         coverUrl.value = gaanaPlaceholderImageUrl
@@ -153,16 +138,6 @@ class GaanaViewModel @ViewModelInject constructor(
                                     link = "https://gaana.com/$type/$link",
                                     coverUrl = coverUrl.value.toString(),
                                     totalFiles = it.tracks.size,
-                                    downloaded = File(
-                                        finalOutputDir(
-                                            type = folderType,
-                                            subFolder = subFolder
-                                        )
-                                    ).listFiles()?.size == trackList.value?.size,
-                                    directory = finalOutputDir(
-                                        type = folderType,
-                                        subFolder = subFolder
-                                    )
                                 )
                             )
                         }
@@ -190,7 +165,7 @@ class GaanaViewModel @ViewModelInject constructor(
                                 track.downloaded = DownloadStatus.Downloaded
                             }
                         }
-                        trackList.value = it.tracks.toTrackDetailsList()
+                        trackList.value = it.tracks.toTrackDetailsList(folderType, subFolder)
                         withContext(Dispatchers.IO) {
                             databaseDAO.insert(
                                 DownloadRecord(
@@ -199,16 +174,6 @@ class GaanaViewModel @ViewModelInject constructor(
                                     link = "https://gaana.com/$type/$link",
                                     coverUrl = coverUrl.value.toString(),
                                     totalFiles = trackList.value?.size ?: 0,
-                                    downloaded = File(
-                                        finalOutputDir(
-                                            type = folderType,
-                                            subFolder = subFolder
-                                        )
-                                    ).listFiles()?.size == trackList.value?.size,
-                                    directory = finalOutputDir(
-                                        type = folderType,
-                                        subFolder = subFolder
-                                    )
                                 )
                             )
                         }
@@ -219,7 +184,7 @@ class GaanaViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun List<GaanaTrack>.toTrackDetailsList() = this.map {
+    private fun List<GaanaTrack>.toTrackDetailsList(type:String , subFolder:String) = this.map {
         TrackDetails(
             title = it.track_title,
             artists = it.artist.map { artist -> artist?.name.toString() },
@@ -232,7 +197,8 @@ class GaanaViewModel @ViewModelInject constructor(
             trackUrl = it.lyrics_url,
             downloaded = it.downloaded ?: DownloadStatus.NotDownloaded,
             source = Source.Gaana,
-            albumArtURL = it.artworkLink
+            albumArtURL = it.artworkLink,
+            outputFile = finalOutputDir(it.track_title,type, subFolder,".m4a")
         )
     }.toMutableList()
 }

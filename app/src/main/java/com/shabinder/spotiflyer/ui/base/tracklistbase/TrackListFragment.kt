@@ -29,7 +29,6 @@ import android.view.ViewGroup
 import androidx.navigation.NavArgs
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.databinding.TrackListFragmentBinding
-import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
@@ -63,13 +62,7 @@ abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseF
         savedInstanceState: Bundle?
     ): View? {
         binding =  TrackListFragmentBinding.inflate(inflater,container,false)
-        initializeAll()
         return binding.root
-    }
-
-    private fun initializeAll() {
-        DownloadHelper.youtubeMusicApi = sharedViewModel.youtubeMusicApi
-        DownloadHelper.statusBar = binding.statusBar
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -84,7 +77,7 @@ abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseF
     private fun initializeLiveDataObservers() {
         viewModel.trackList.observe(viewLifecycleOwner, {
             if (!it.isNullOrEmpty()){
-                Log.i("GaanaFragment","TrackList Updated")
+                Log.i("TrackListFragment","TrackList Updated")
                 adapter.submitList(it, source)
                 updateTracksStatus()
             }

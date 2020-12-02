@@ -25,8 +25,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.navArgs
-import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
+import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.recyclerView.TrackListAdapter
 import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListFragment
@@ -46,7 +46,7 @@ class GaanaFragment : TrackListFragment<GaanaViewModel, GaanaFragmentArgs>() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         adapter = TrackListAdapter(viewModel)
 
@@ -76,24 +76,21 @@ class GaanaFragment : TrackListFragment<GaanaViewModel, GaanaFragmentArgs>() {
                         visible()
                         rotate()
                     }
-                    for (track in viewModel.trackList.value!!){
-                        if(track.downloaded != DownloadStatus.Downloaded){
-                            track.downloaded = DownloadStatus.Queued
-                            adapter.notifyItemChanged(viewModel.trackList.value!!.indexOf(track))
-                        }
-                    }
                     showMessage("Processing!")
                     sharedViewModel.viewModelScope.launch(Dispatchers.Default){
                         loadAllImages(requireActivity(), viewModel.trackList.value?.map{it.albumArtURL}, Source.Gaana)
                     }
                     viewModel.viewModelScope.launch {
-                        val finalList = viewModel.trackList.value
+                        val finalList = viewModel.trackList.value?.filter{it.downloaded == DownloadStatus.NotDownloaded}
                         if(finalList.isNullOrEmpty())showMessage("Not Downloading Any Song")
-                        DownloadHelper.downloadAllTracks(
-                            viewModel.folderType,
-                            viewModel.subFolder,
-                            finalList ?: listOf(),
-                        )
+                        finalList?.let { it1 -> downloadTracks(it1 as ArrayList<TrackDetails>) }
+                        for (track in viewModel.trackList.value!!){
+                            if(track.downloaded == DownloadStatus.NotDownloaded){
+                                track.downloaded = DownloadStatus.Queued
+                                //adapter.notifyItemChanged(viewModel.trackList.value!!.indexOf(track))
+                            }
+                        }
+                        adapter.notifyDataSetChanged()
                     }
                 }
             }

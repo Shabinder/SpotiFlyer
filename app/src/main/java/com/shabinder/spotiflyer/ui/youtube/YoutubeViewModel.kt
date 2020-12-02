@@ -82,7 +82,9 @@ class YoutubeViewModel @ViewModelInject constructor(
                             DownloadStatus.Downloaded
                         else {
                             DownloadStatus.NotDownloaded
-                        }
+                        },
+                        outputFile = finalOutputDir(it.title(),folderType, subFolder,".m4a"),
+                        videoID = it.videoId()
                     )
                 }.toMutableList())
 
@@ -93,8 +95,6 @@ class YoutubeViewModel @ViewModelInject constructor(
                         link = "https://www.youtube.com/playlist?list=$searchId",
                         coverUrl = "https://i.ytimg.com/vi/${videos.firstOrNull()?.videoId()}/hqdefault.jpg",
                         totalFiles = videos.size,
-                        directory = finalOutputDir(itemName = removeIllegalChars(name),type = folderType,subFolder = subFolder),
-                        downloaded = File(finalOutputDir(itemName = removeIllegalChars(name),type = folderType,subFolder = subFolder)).exists()
                     ))
                 }
                 queryActiveTracks()
@@ -124,8 +124,21 @@ class YoutubeViewModel @ViewModelInject constructor(
                             durationSec = detail?.lengthSeconds()?:0,
                             albumArt = File(imageDir,"$searchId.jpeg"),
                             source = Source.YouTube,
-                            albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
-                    )
+                            albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
+                            downloaded = if (File(
+                                    finalOutputDir(
+                                        itemName = name,
+                                        type = folderType,
+                                        subFolder = subFolder
+                                    )).exists()
+                            )
+                                DownloadStatus.Downloaded
+                            else {
+                                DownloadStatus.NotDownloaded
+                            },
+                            outputFile = finalOutputDir(name,folderType, subFolder,".m4a"),
+                            videoID = searchId
+                        )
                     ).toMutableList()
                 )
                 title.postValue(
@@ -139,8 +152,6 @@ class YoutubeViewModel @ViewModelInject constructor(
                         link = "https://www.youtube.com/watch?v=$searchId",
                         coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
                         totalFiles = 1,
-                        downloaded = false,
-                        directory = finalOutputDir(type = "YT_Downloads")
                     ))
                 }
                 queryActiveTracks()

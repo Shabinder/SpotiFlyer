@@ -61,9 +61,10 @@ class SpotifyViewModel @ViewModelInject constructor(
                 "track" -> {
                     spotifyService?.getTrack(link)?.value?.also {
                         folderType = "Tracks"
+                        subFolder = ""
                         if (File(
                                 finalOutputDir(
-                                    it.name,
+                                    it.name.toString(),
                                     folderType,
                                     subFolder
                                 )
@@ -71,7 +72,7 @@ class SpotifyViewModel @ViewModelInject constructor(
                         ) {//Download Already Present!!
                             it.downloaded = DownloadStatus.Downloaded
                         }
-                        trackList.value = listOf(it).toTrackDetailsList()
+                        trackList.value = listOf(it).toTrackDetailsList(folderType, subFolder)
                         title.value = it.name
                         coverUrl.value = it.album!!.images?.elementAtOrNull(1)?.url
                             ?: it.album!!.images?.elementAtOrNull(0)?.url
@@ -83,8 +84,6 @@ class SpotifyViewModel @ViewModelInject constructor(
                                     link = "https://open.spotify.com/$type/$link",
                                     coverUrl = coverUrl.value!!,
                                     totalFiles = 1,
-                                    downloaded = it.downloaded == DownloadStatus.Downloaded,
-                                    directory = finalOutputDir(it.name, folderType, subFolder)
                                 )
                             )
                         }
@@ -115,7 +114,7 @@ class SpotifyViewModel @ViewModelInject constructor(
                             )
                         )
                     }
-                    trackList.value = albumObject?.tracks?.items?.toTrackDetailsList()
+                    trackList.value = albumObject?.tracks?.items?.toTrackDetailsList(folderType, subFolder)
                     title.value = albumObject?.name
                     coverUrl.value = albumObject?.images?.elementAtOrNull(1)?.url
                         ?: albumObject?.images?.elementAtOrNull(0)?.url
@@ -127,13 +126,6 @@ class SpotifyViewModel @ViewModelInject constructor(
                                 link = "https://open.spotify.com/$type/$link",
                                 coverUrl = coverUrl.value.toString(),
                                 totalFiles = trackList.value?.size ?: 0,
-                                downloaded = File(
-                                    finalOutputDir(
-                                        type = folderType,
-                                        subFolder = subFolder
-                                    )
-                                ).listFiles()?.size == trackList.value?.size,
-                                directory = finalOutputDir(type = folderType, subFolder = subFolder)
                             )
                         )
                     }
@@ -172,7 +164,7 @@ class SpotifyViewModel @ViewModelInject constructor(
                         moreTracksAvailable = !moreTracks?.next.isNullOrBlank()
                     }
                     Log.i("Total Tracks Fetched", tempTrackList.size.toString())
-                    trackList.value = tempTrackList.toTrackDetailsList()
+                    trackList.value = tempTrackList.toTrackDetailsList(folderType, subFolder)
                     title.value = playlistObject?.name
                     coverUrl.value = playlistObject?.images?.elementAtOrNull(1)?.url
                         ?: playlistObject?.images?.firstOrNull()?.url.toString()
@@ -184,13 +176,6 @@ class SpotifyViewModel @ViewModelInject constructor(
                                 link = "https://open.spotify.com/$type/$link",
                                 coverUrl = coverUrl.value.toString(),
                                 totalFiles = tempTrackList.size,
-                                downloaded = File(
-                                    finalOutputDir(
-                                        type = folderType,
-                                        subFolder = subFolder
-                                    )
-                                ).listFiles()?.size == tempTrackList.size,
-                                directory = finalOutputDir(type = folderType, subFolder = subFolder)
                             )
                         )
                     }
@@ -204,8 +189,7 @@ class SpotifyViewModel @ViewModelInject constructor(
         }
     }
 
-    @Suppress("DEPRECATION")
-    private fun List<Track>.toTrackDetailsList() = this.map {
+    private fun List<Track>.toTrackDetailsList(type:String , subFolder:String) = this.map {
         TrackDetails(
             title = it.name.toString(),
             artists = it.artists?.map { artist -> artist?.name.toString() } ?: listOf(),
@@ -218,7 +202,8 @@ class SpotifyViewModel @ViewModelInject constructor(
             trackUrl = it.href,
             downloaded = it.downloaded,
             source = Source.Spotify,
-            albumArtURL = it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()
+            albumArtURL = it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString(),
+            outputFile = finalOutputDir(it.name.toString(),type, subFolder,".m4a")
         )
     }.toMutableList()
 }

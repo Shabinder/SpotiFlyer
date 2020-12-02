@@ -19,7 +19,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'kotlin-android-extensions'
+    id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
     id 'dagger.hilt.android.plugin'
     id 'kotlinx-serialization'
@@ -39,8 +39,8 @@ android {
         applicationId 'com.shabinder.spotiflyer'
         minSdkVersion 22
         targetSdkVersion 30
-        versionCode 8
-        versionName "1.6"
+        versionCode 9
+        versionName "1.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -79,6 +79,7 @@ android {
         exclude 'META-INF/ASL2.0'
         exclude("META-INF/*.kotlin_module")
     }
+    ndkVersion '21.3.6528147'
 }
 
 
@@ -101,7 +102,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.google.android.material:material:1.2.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2-native-mt'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1"
 

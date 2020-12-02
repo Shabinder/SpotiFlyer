@@ -34,7 +34,7 @@ import com.bumptech.glide.request.target.Target
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.shabinder.spotiflyer.R
-import com.shabinder.spotiflyer.models.DownloadObject
+import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.utils.Provider.defaultDir
 import com.shabinder.spotiflyer.utils.Provider.imageDir
@@ -52,11 +52,17 @@ fun loadAllImages(context: Context?, images:List<String>? = null,source:Source) 
     context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
 }
 
-fun startService(context:Context? = mainActivity,objects:ArrayList<DownloadObject>? = null ) {
-    val serviceIntent = Intent(context, ForegroundService::class.java)
-    objects?.let {  serviceIntent.putParcelableArrayListExtra("object",it) }
-    context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
+fun downloadTracks(
+    trackList: ArrayList<TrackDetails>,
+    context: Context? = mainActivity
+) {
+    if(!trackList.isNullOrEmpty()){
+        val serviceIntent = Intent(context, ForegroundService::class.java)
+        serviceIntent.putParcelableArrayListExtra("object",trackList)
+        context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
+    }
 }
+
 fun queryActiveTracks(context:Context? = mainActivity) {
     val serviceIntent = Intent(context, ForegroundService::class.java).apply {
         action = "query"
@@ -64,10 +70,10 @@ fun queryActiveTracks(context:Context? = mainActivity) {
     context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
 }
 
-fun finalOutputDir(itemName:String? = null,type:String, subFolder:String?=null,extension:String? = ".mp3"): String{
+fun finalOutputDir(itemName:String ,type:String, subFolder:String,extension:String = ".mp3"): String{
     return defaultDir + removeIllegalChars(type) + File.separator +
-            (if(subFolder == null){""}else{ removeIllegalChars(subFolder) + File.separator}
-                    + itemName?.let { removeIllegalChars(it) + extension})
+            if(subFolder.isEmpty())"" else { removeIllegalChars(subFolder) + File.separator} +
+            removeIllegalChars(itemName) + extension
 }
 
 /**
@@ -220,7 +226,7 @@ fun createDirectory(dir:String){
 /**
  * Removing Illegal Chars from File Name
  * **/
-fun removeIllegalChars(fileName: String): String? {
+fun removeIllegalChars(fileName: String): String {
     val illegalCharArray = charArrayOf(
         '/',
         '\n',
@@ -265,7 +271,4 @@ fun createDirectories() {
     createDirectory(defaultDir + "Albums/")
     createDirectory(defaultDir + "Playlists/")
     createDirectory(defaultDir + "YT_Downloads/")
-}
-fun getEmojiByUnicode(unicode: Int): String? {
-    return String(Character.toChars(unicode))
 }

@@ -19,7 +19,7 @@ package com.shabinder.spotiflyer.models.spotify
 
 import android.os.Parcelable
 import com.shabinder.spotiflyer.models.DownloadStatus
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Track(

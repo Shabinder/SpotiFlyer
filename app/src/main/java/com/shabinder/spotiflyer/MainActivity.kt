@@ -37,7 +37,6 @@ import androidx.navigation.findNavController
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.shabinder.spotiflyer.databinding.MainActivityBinding
-import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
 import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
 import com.shabinder.spotiflyer.utils.NetworkInterceptor
@@ -45,6 +44,7 @@ import com.shabinder.spotiflyer.utils.createDirectories
 import com.shabinder.spotiflyer.utils.showMessage
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -59,6 +59,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(){
     private var spotifyService : SpotifyService? = null
+    val viewModelScope : CoroutineScope
+        get() = sharedViewModel.viewModelScope
     private lateinit var binding: MainActivityBinding
     private lateinit var sharedViewModel: SharedViewModel
     lateinit var snackBarAnchor: View
@@ -75,7 +77,6 @@ class MainActivity : AppCompatActivity(){
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         navController = findNavController(R.id.navHostFragment)
         snackBarAnchor = binding.snackBarPosition
-        DownloadHelper.youtubeMusicApi = sharedViewModel.youtubeMusicApi
         authenticateSpotify()
     }
 

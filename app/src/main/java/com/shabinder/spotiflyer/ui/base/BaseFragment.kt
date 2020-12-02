@@ -32,5 +32,6 @@ abstract class BaseFragment<VB:ViewBinding,VM : ViewModel> : Fragment() {
     protected abstract val viewModel: VM
     protected val viewModelScope by lazy{viewModel.viewModelScope}
 
-    open fun applicationContext(): Context = requireActivity().applicationContext
+    protected val applicationContext: Context
+        get() = requireActivity().applicationContext
 }

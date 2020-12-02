@@ -27,8 +27,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.databinding.TrackListItemBinding
-import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
-import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
@@ -36,7 +34,7 @@ import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListViewModel
 import com.shabinder.spotiflyer.utils.*
 import kotlinx.coroutines.launch
 
-class TrackListAdapter(private val viewModel : TrackListViewModel): ListAdapter<TrackDetails, TrackListAdapter.ViewHolder>(TrackDiffCallback()),YTDownloadHelper {
+class TrackListAdapter(private val viewModel : TrackListViewModel): ListAdapter<TrackDetails, TrackListAdapter.ViewHolder>(TrackDiffCallback()){
 
     var source:Source =Source.Spotify
 
@@ -115,20 +113,12 @@ class TrackListAdapter(private val viewModel : TrackListViewModel): ListAdapter<
                         when(source){
                             Source.YouTube -> {
                                 viewModel.viewModelScope.launch {
-                                    downloadYTTracks(
-                                        viewModel.folderType,
-                                        viewModel.subFolder,
-                                        listOf(item)
-                                    )
+                                    downloadTracks(arrayListOf(item))
                                 }
                             }
                             else -> {
                                 viewModel.viewModelScope.launch {
-                                    DownloadHelper.downloadAllTracks(
-                                        viewModel.folderType,
-                                        viewModel.subFolder,
-                                        listOf(item)
-                                    )
+                                    downloadTracks(arrayListOf(item))
                                 }
                             }
                         }
