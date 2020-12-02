@@ -15,5 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-configurations.maybeCreate("default")
-artifacts.add("default", file('mobile-ffmpeg.aar'))
+package com.shabinder.spotiflyer.ui.base.tracklistbase
+
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.shabinder.spotiflyer.models.TrackDetails
+
+abstract class TrackListViewModel:ViewModel() {
+    abstract var folderType:String
+    abstract var subFolder:String
+    open val trackList = MutableLiveData<MutableList<TrackDetails>>()
+
+    private val loading = "Loading!"
+    open var title = MutableLiveData<String>().apply { value = loading }
+    open var coverUrl = MutableLiveData<String>()
+
+}

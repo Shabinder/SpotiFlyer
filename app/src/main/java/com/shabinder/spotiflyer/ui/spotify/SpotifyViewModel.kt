@@ -17,167 +17,193 @@
 
 package com.shabinder.spotiflyer.ui.spotify
 
-import android.os.Environment
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.viewModelScope
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
-import com.shabinder.spotiflyer.models.spotify.*
+import com.shabinder.spotiflyer.models.spotify.Album
+import com.shabinder.spotiflyer.models.spotify.Image
+import com.shabinder.spotiflyer.models.spotify.Source
+import com.shabinder.spotiflyer.models.spotify.Track
+import com.shabinder.spotiflyer.networking.GaanaInterface
 import com.shabinder.spotiflyer.networking.SpotifyService
-import com.shabinder.spotiflyer.utils.Provider
-import com.shabinder.spotiflyer.utils.TrackListViewModel
+import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListViewModel
+import com.shabinder.spotiflyer.utils.Provider.imageDir
 import com.shabinder.spotiflyer.utils.finalOutputDir
+import com.shabinder.spotiflyer.utils.queryActiveTracks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class SpotifyViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : TrackListViewModel(){
+class SpotifyViewModel @ViewModelInject constructor(
+    val databaseDAO: DatabaseDAO,
+    val gaanaInterface : GaanaInterface
+) : TrackListViewModel(){
 
     override var folderType:String = ""
     override var subFolder:String = ""
 
     var spotifyService : SpotifyService? = null
 
+    fun resolveLink(url:String):String {
+        val response = gaanaInterface.getResponse(url).execute().body()?.string().toString()
+        val regex = """https://open\.spotify\.com.+\w""".toRegex()
+        return regex.find(response)?.value.toString()
+    }
+
     fun spotifySearch(type:String,link: String){
-        when (type) {
-            "track" -> {
-                uiScope.launch {
-                    getTrackDetails(link)?.also {
+        viewModelScope.launch {
+            when (type) {
+                "track" -> {
+                    spotifyService?.getTrack(link)?.value?.also {
                         folderType = "Tracks"
-                        if(File(finalOutputDir(it.name,folderType,subFolder)).exists()){//Download Already Present!!
+                        subFolder = ""
+                        if (File(
+                                finalOutputDir(
+                                    it.name.toString(),
+                                    folderType,
+                                    subFolder
+                                )
+                            ).exists()
+                        ) {//Download Already Present!!
                             it.downloaded = DownloadStatus.Downloaded
                         }
-                        trackList.value = listOf(it).toTrackDetailsList()
+                        trackList.value = listOf(it).toTrackDetailsList(folderType, subFolder)
                         title.value = it.name
-                        coverUrl.value = it.album!!.images?.elementAtOrNull(1)?.url ?: it.album!!.images?.elementAtOrNull(0)?.url
-                        withContext(Dispatchers.IO){
-                            databaseDAO.insert(DownloadRecord(
-                                type = "Track",
-                                name = title.value!!,
-                                link = "https://open.spotify.com/$type/$link",
-                                coverUrl = coverUrl.value!!,
-                                totalFiles = 1,
-                                downloaded = it.downloaded == DownloadStatus.Downloaded,
-                                directory = finalOutputDir(it.name,folderType,subFolder)
-                            ))
+                        coverUrl.value = it.album!!.images?.elementAtOrNull(1)?.url
+                            ?: it.album!!.images?.elementAtOrNull(0)?.url
+                        withContext(Dispatchers.IO) {
+                            databaseDAO.insert(
+                                DownloadRecord(
+                                    type = "Track",
+                                    name = title.value!!,
+                                    link = "https://open.spotify.com/$type/$link",
+                                    coverUrl = coverUrl.value!!,
+                                    totalFiles = 1,
+                                )
+                            )
                         }
                     }
                 }
-            }
 
-            "album" -> {
-                uiScope.launch {
-                    val albumObject = getAlbumDetails(link)
+                "album" -> {
+                    val albumObject = spotifyService?.getAlbum(link)?.value
                     folderType = "Albums"
                     subFolder = albumObject?.name.toString()
                     albumObject?.tracks?.items?.forEach {
-                        if(File(finalOutputDir(it.name!!,folderType,subFolder)).exists()){//Download Already Present!!
+                        if (File(
+                                finalOutputDir(
+                                    it.name!!,
+                                    folderType,
+                                    subFolder
+                                )
+                            ).exists()
+                        ) {//Download Already Present!!
                             it.downloaded = DownloadStatus.Downloaded
                         }
-                        it.album = Album(images = listOf(Image(url = albumObject.images?.elementAtOrNull(1)?.url ?: albumObject.images?.elementAtOrNull(0)?.url )))
+                        it.album = Album(
+                            images = listOf(
+                                Image(
+                                    url = albumObject.images?.elementAtOrNull(1)?.url
+                                        ?: albumObject.images?.elementAtOrNull(0)?.url
+                                )
+                            )
+                        )
                     }
-                    trackList.value = albumObject?.tracks?.items?.toTrackDetailsList()
+                    trackList.value = albumObject?.tracks?.items?.toTrackDetailsList(folderType, subFolder)
                     title.value = albumObject?.name
-                    coverUrl.value = albumObject?.images?.elementAtOrNull(1)?.url ?: albumObject?.images?.elementAtOrNull(0)?.url
-                    withContext(Dispatchers.IO){
-                        databaseDAO.insert(DownloadRecord(
-                            type = "Album",
-                            name = title.value!!,
-                            link = "https://open.spotify.com/$type/$link",
-                            coverUrl = coverUrl.value.toString(),
-                            totalFiles = trackList.value?.size ?: 0,
-                            downloaded = File(finalOutputDir(type = folderType,subFolder = subFolder)).listFiles()?.size == trackList.value?.size,
-                            directory = finalOutputDir(type = folderType,subFolder = subFolder)
-                        ))
+                    coverUrl.value = albumObject?.images?.elementAtOrNull(1)?.url
+                        ?: albumObject?.images?.elementAtOrNull(0)?.url
+                    withContext(Dispatchers.IO) {
+                        databaseDAO.insert(
+                            DownloadRecord(
+                                type = "Album",
+                                name = title.value!!,
+                                link = "https://open.spotify.com/$type/$link",
+                                coverUrl = coverUrl.value.toString(),
+                                totalFiles = trackList.value?.size ?: 0,
+                            )
+                        )
                     }
                 }
-            }
 
-            "playlist" -> {
-                uiScope.launch {
-                    val playlistObject = getPlaylistDetails(link)
+                "playlist" -> {
+                    Log.i("Spotify Service",spotifyService.toString())
+                    val playlistObject = spotifyService?.getPlaylist(link)?.value
                     folderType = "Playlists"
                     subFolder = playlistObject?.name.toString()
                     val tempTrackList = mutableListOf<Track>()
-                    Log.i("Tracks Fetched",playlistObject?.tracks?.items?.size.toString())
+                    Log.i("Tracks Fetched", playlistObject?.tracks?.items?.size.toString())
                     playlistObject?.tracks?.items?.forEach {
-                        it.track?.let {
-                                it1 -> if(File(finalOutputDir(it1.name!!,folderType,subFolder)).exists()){//Download Already Present!!
-                            it1.downloaded = DownloadStatus.Downloaded
-                        }
+                        it.track?.let { it1 ->
+                            if (File(
+                                    finalOutputDir(
+                                        it1.name!!,
+                                        folderType,
+                                        subFolder
+                                    )
+                                ).exists()
+                            ) {//Download Already Present!!
+                                it1.downloaded = DownloadStatus.Downloaded
+                            }
                             tempTrackList.add(it1)
                         }
                     }
                     var moreTracksAvailable = !playlistObject?.tracks?.next.isNullOrBlank()
 
-                    while(moreTracksAvailable){
+                    while (moreTracksAvailable) {
                         //Check For More Tracks If available
-                        val moreTracks = getPlaylistTrackDetails(link,offset = tempTrackList.size)
-                        moreTracks?.items?.forEach{
+                        val moreTracks = spotifyService?.getPlaylistTracks(link, offset = tempTrackList.size)?.value
+                        moreTracks?.items?.forEach {
                             it.track?.let { it1 -> tempTrackList.add(it1) }
                         }
                         moreTracksAvailable = !moreTracks?.next.isNullOrBlank()
                     }
-                    Log.i("Total Tracks Fetched",tempTrackList.size.toString())
-                    trackList.value = tempTrackList.toTrackDetailsList()
+                    Log.i("Total Tracks Fetched", tempTrackList.size.toString())
+                    trackList.value = tempTrackList.toTrackDetailsList(folderType, subFolder)
                     title.value = playlistObject?.name
-                    coverUrl.value =  playlistObject?.images?.elementAtOrNull(1)?.url ?: playlistObject?.images?.firstOrNull()?.url.toString()
-                    withContext(Dispatchers.IO){
-                        databaseDAO.insert(DownloadRecord(
-                            type = "Playlist",
-                            name = title.value.toString(),
-                            link = "https://open.spotify.com/$type/$link",
-                            coverUrl = coverUrl.value.toString(),
-                            totalFiles = tempTrackList.size,
-                            downloaded = File(finalOutputDir(type = folderType,subFolder = subFolder)).listFiles()?.size == tempTrackList.size,
-                            directory = finalOutputDir(type = folderType,subFolder = subFolder)
-                        ))
+                    coverUrl.value = playlistObject?.images?.elementAtOrNull(1)?.url
+                        ?: playlistObject?.images?.firstOrNull()?.url.toString()
+                    withContext(Dispatchers.IO) {
+                        databaseDAO.insert(
+                            DownloadRecord(
+                                type = "Playlist",
+                                name = title.value.toString(),
+                                link = "https://open.spotify.com/$type/$link",
+                                coverUrl = coverUrl.value.toString(),
+                                totalFiles = tempTrackList.size,
+                            )
+                        )
                     }
                 }
+                "episode" -> {//TODO
+                }
+                "show" -> {//TODO
+                }
             }
-            "episode" -> {//TODO
-            }
-            "show" -> {//TODO
-            }
+            queryActiveTracks()
         }
     }
 
-    @Suppress("DEPRECATION")
-    private fun List<Track>.toTrackDetailsList() = this.map {
+    private fun List<Track>.toTrackDetailsList(type:String , subFolder:String) = this.map {
         TrackDetails(
             title = it.name.toString(),
             artists = it.artists?.map { artist -> artist?.name.toString() } ?: listOf(),
             durationSec = (it.duration_ms/1000).toInt(),
             albumArt = File(
-                Environment.getExternalStorageDirectory(),
-                Provider.defaultDir +".Images/" + (it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg"),
+                imageDir + (it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg"),
             albumName = it.album?.name,
             year = it.album?.release_date,
             comment = "Genres:${it.album?.genres?.joinToString()}",
             trackUrl = it.href,
             downloaded = it.downloaded,
             source = Source.Spotify,
-            albumArtURL = it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()
+            albumArtURL = it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString(),
+            outputFile = finalOutputDir(it.name.toString(),type, subFolder,".m4a")
         )
     }.toMutableList()
-
-    private suspend fun getTrackDetails(trackLink:String): Track?{
-        Log.i("Requesting","https://api.spotify.com/v1/tracks/$trackLink")
-        return spotifyService?.getTrack(trackLink)?.value
-    }
-    private suspend fun getAlbumDetails(albumLink:String): Album?{
-        Log.i("Requesting","https://api.spotify.com/v1/albums/$albumLink")
-        return spotifyService?.getAlbum(albumLink)?.value
-    }
-    private suspend fun getPlaylistDetails(link:String): Playlist?{
-        Log.i("Requesting","https://api.spotify.com/v1/playlists/$link")
-        return spotifyService?.getPlaylist(link)?.value
-    }
-    private suspend fun getPlaylistTrackDetails(link:String,offset:Int = 0,limit:Int = 100): PagingObjectPlaylistTrack?{
-        Log.i("Requesting","https://api.spotify.com/v1/playlists/$link/tracks?offset=$offset&limit=$limit")
-        return spotifyService?.getPlaylistTracks(link, offset, limit)?.value
-    }
 }

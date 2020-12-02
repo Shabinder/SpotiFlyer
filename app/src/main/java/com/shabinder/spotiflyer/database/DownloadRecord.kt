@@ -22,7 +22,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Entity(
@@ -48,10 +48,4 @@ data class DownloadRecord(
 
     @ColumnInfo(name = "totalFiles")
     var totalFiles:Int = 1,
-
-    @ColumnInfo(name = "downloaded")
-    var downloaded:Boolean=false,
-
-    @ColumnInfo(name = "directory")
-    var directory:String?=null
 ):Parcelable

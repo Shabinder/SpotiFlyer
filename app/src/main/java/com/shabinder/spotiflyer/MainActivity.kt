@@ -31,6 +31,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.github.javiersantos.appupdater.AppUpdater
@@ -38,9 +39,12 @@ import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.shabinder.spotiflyer.databinding.MainActivityBinding
 import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
-import com.shabinder.spotiflyer.utils.*
+import com.shabinder.spotiflyer.utils.NetworkInterceptor
+import com.shabinder.spotiflyer.utils.createDirectories
+import com.shabinder.spotiflyer.utils.showMessage
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -52,14 +56,15 @@ import javax.inject.Inject
 /*
 * This is App's God Activity
 * */
-@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(){
     private var spotifyService : SpotifyService? = null
+    val viewModelScope : CoroutineScope
+        get() = sharedViewModel.viewModelScope
     private lateinit var binding: MainActivityBinding
-    lateinit var snackBarAnchor: View
     private lateinit var sharedViewModel: SharedViewModel
-    private lateinit var navController: NavController
+    lateinit var snackBarAnchor: View
+    lateinit var navController: NavController
     @Inject lateinit var moshi: Moshi
     @Inject lateinit var spotifyServiceTokenRequest: SpotifyServiceTokenRequest
 
@@ -72,18 +77,15 @@ class MainActivity : AppCompatActivity(){
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         navController = findNavController(R.id.navHostFragment)
         snackBarAnchor = binding.snackBarPosition
-
         authenticateSpotify()
+    }
 
+    override fun onStart() {
+        super.onStart()
         requestPermission()
         disableDozeMode()
         checkIfLatestVersion()
         createDirectories()
-        Log.i("Connection Status", isOnline().toString())
-
-        //starting Notification and Downloader Service!
-        startService(this)
-
         handleIntentFromExternalActivity()
     }
 
@@ -151,9 +153,8 @@ class MainActivity : AppCompatActivity(){
         sharedViewModel.spotifyService.value = spotifyService
     }
 
-
     fun authenticateSpotify() {
-        sharedViewModel.uiScope.launch {
+        sharedViewModel.viewModelScope.launch {
             Log.i("Spotify Authentication","Started")
             val token = spotifyServiceTokenRequest.getToken()
             token.value?.let {
@@ -207,7 +208,7 @@ class MainActivity : AppCompatActivity(){
 
     companion object{
         private lateinit var instance: MainActivity
-        fun getInstance():MainActivity = instance
+        fun getInstance():MainActivity = this.instance
     }
 
     init {

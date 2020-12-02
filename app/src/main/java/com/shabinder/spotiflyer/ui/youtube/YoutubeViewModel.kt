@@ -18,23 +18,27 @@
 package com.shabinder.spotiflyer.ui.youtube
 
 import android.annotation.SuppressLint
-import android.os.Environment
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.viewModelScope
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
+import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListViewModel
 import com.shabinder.spotiflyer.utils.*
-import com.shabinder.spotiflyer.utils.Provider.defaultDir
+import com.shabinder.spotiflyer.utils.Provider.imageDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO) : TrackListViewModel(){
+class YoutubeViewModel @ViewModelInject constructor(
+    val databaseDAO: DatabaseDAO,
+    private val ytDownloader: YoutubeDownloader
+) : TrackListViewModel(){
     /*
     * YT Album Art Schema
     * HI-RES Url: https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"
@@ -44,10 +48,10 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
     override var folderType = "YT_Downloads"
     override var subFolder = ""
 
-    fun getYTPlaylist(searchId:String, ytDownloader:YoutubeDownloader){
+    fun getYTPlaylist(searchId:String){
         if(!isOnline())return
         try{
-            uiScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 Log.i("YT Playlist",searchId)
                 val playlist = ytDownloader.getPlaylist(searchId)
                 val playlistDetails = playlist.details()
@@ -64,8 +68,7 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                         artists = listOf(it.author().toString()),
                         durationSec = it.lengthSeconds(),
                         albumArt = File(
-                            Environment.getExternalStorageDirectory(),
-                            defaultDir + ".Images/" + it.videoId() + ".jpeg"
+                            imageDir + it.videoId() + ".jpeg"
                         ),
                         source = Source.YouTube,
                         albumArtURL = "https://i.ytimg.com/vi/${it.videoId()}/hqdefault.jpg",
@@ -79,7 +82,9 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                             DownloadStatus.Downloaded
                         else {
                             DownloadStatus.NotDownloaded
-                        }
+                        },
+                        outputFile = finalOutputDir(it.title(),folderType, subFolder,".m4a"),
+                        videoID = it.videoId()
                     )
                 }.toMutableList())
 
@@ -90,10 +95,9 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                         link = "https://www.youtube.com/playlist?list=$searchId",
                         coverUrl = "https://i.ytimg.com/vi/${videos.firstOrNull()?.videoId()}/hqdefault.jpg",
                         totalFiles = videos.size,
-                        directory = finalOutputDir(itemName = removeIllegalChars(name),type = folderType,subFolder = subFolder),
-                        downloaded = File(finalOutputDir(itemName = removeIllegalChars(name),type = folderType,subFolder = subFolder)).exists()
                     ))
                 }
+                queryActiveTracks()
             }
         }catch (e:com.github.kiulian.downloader.YoutubeException.BadPageException){
             showMessage("An Error Occurred While Processing!")
@@ -102,10 +106,10 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
     }
 
     @SuppressLint("DefaultLocale")
-    fun getYTTrack(searchId:String, ytDownloader:YoutubeDownloader) {
+    fun getYTTrack(searchId:String) {
         if(!isOnline())return
         try{
-            uiScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 Log.i("YT Video",searchId)
                 val video = ytDownloader.getVideo(searchId)
                 coverUrl.postValue("https://i.ytimg.com/vi/$searchId/hqdefault.jpg")
@@ -118,13 +122,23 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                             title = name,
                             artists = listOf(detail?.author().toString()),
                             durationSec = detail?.lengthSeconds()?:0,
-                            albumArt = File(
-                                Environment.getExternalStorageDirectory(),
-                                "$defaultDir.Images/$searchId.jpeg"
-                            ),
+                            albumArt = File(imageDir,"$searchId.jpeg"),
                             source = Source.YouTube,
-                            albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
-                    )
+                            albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
+                            downloaded = if (File(
+                                    finalOutputDir(
+                                        itemName = name,
+                                        type = folderType,
+                                        subFolder = subFolder
+                                    )).exists()
+                            )
+                                DownloadStatus.Downloaded
+                            else {
+                                DownloadStatus.NotDownloaded
+                            },
+                            outputFile = finalOutputDir(name,folderType, subFolder,".m4a"),
+                            videoID = searchId
+                        )
                     ).toMutableList()
                 )
                 title.postValue(
@@ -138,10 +152,9 @@ class YoutubeViewModel @ViewModelInject constructor(val databaseDAO: DatabaseDAO
                         link = "https://www.youtube.com/watch?v=$searchId",
                         coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
                         totalFiles = 1,
-                        downloaded = false,
-                        directory = finalOutputDir(type = "YT_Downloads")
                     ))
                 }
+                queryActiveTracks()
             }
         } catch (e:com.github.kiulian.downloader.YoutubeException){
             showMessage("An Error Occurred While Processing!")

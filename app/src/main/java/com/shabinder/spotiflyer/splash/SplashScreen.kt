@@ -20,6 +20,7 @@ package com.shabinder.spotiflyer.splash
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
@@ -33,7 +34,7 @@ class SplashScreen : AppCompatActivity(){
 
         val splashTimeout = 400
         val homeIntent = Intent(this@SplashScreen, MainActivity::class.java)
-        Handler().postDelayed({
+        Handler(Looper.myLooper()!!).postDelayed({
             //TODO:Bring Initial Setup here
             startActivity(homeIntent)
             finish()

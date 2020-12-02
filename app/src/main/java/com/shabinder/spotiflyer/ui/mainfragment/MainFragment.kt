@@ -23,7 +23,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
@@ -33,6 +35,7 @@ import com.shabinder.spotiflyer.utils.*
 import com.shreyaspatil.easyupipayment.EasyUpiPayment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -40,16 +43,15 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    private lateinit var mainViewModel: MainViewModel
-    private lateinit var sharedViewModel: SharedViewModel
+    private val mainViewModel: MainViewModel by viewModels()
+    private val sharedViewModel: SharedViewModel by activityViewModels()
     private lateinit var binding: MainFragmentBinding
     @Inject lateinit var easyUpiPayment: EasyUpiPayment
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = MainFragmentBinding.inflate(inflater,container,false)
         initializeAll()
         binding.btnSearch.setOnClickListener {
@@ -89,16 +91,16 @@ class MainFragment : Fragment() {
      **/
     private fun handleIntent() {
         sharedViewModel.intentString.observe(viewLifecycleOwner,{ it?.let {
-            sharedViewModel.uiScope.launch(Dispatchers.IO) {
+            sharedViewModel.viewModelScope.launch(Dispatchers.IO) {
                 //Wait for any Authentication to Finish ,
                 // this Wait prevents from multiple Authentication Requests
-                Thread.sleep(1000)
+                delay(1500)
                 if(sharedViewModel.spotifyService.value == null){
                     //Not Authenticated Yet
                     Provider.mainActivity.authenticateSpotify()
                     while (sharedViewModel.spotifyService.value == null) {
                         //Waiting for Authentication to Finish
-                        Thread.sleep(1000)
+                        delay(1000)
                     }
                 }
 
@@ -114,8 +116,6 @@ class MainFragment : Fragment() {
     }
 
     private fun initializeAll() {
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        sharedViewModel = ViewModelProvider(this.requireActivity()).get(SharedViewModel::class.java)
         binding.apply {
             btnGaana.openPlatformOnClick("com.gaana","http://gaana.com")
             btnSpotify.openPlatformOnClick("com.spotify.music","http://open.spotify.com")
@@ -139,4 +139,5 @@ class MainFragment : Fragment() {
             .append(getText(R.string.d_three)).append("\n")
             .append(getText(R.string.d_four)).append("\n")
     }
+
 }

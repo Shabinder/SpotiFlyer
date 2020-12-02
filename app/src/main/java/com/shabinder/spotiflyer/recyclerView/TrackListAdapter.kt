@@ -17,23 +17,24 @@
 
 package com.shabinder.spotiflyer.recyclerView
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.databinding.TrackListItemBinding
-import com.shabinder.spotiflyer.downloadHelper.DownloadHelper
-import com.shabinder.spotiflyer.downloadHelper.YTDownloadHelper
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
+import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListViewModel
 import com.shabinder.spotiflyer.utils.*
 import kotlinx.coroutines.launch
 
-class TrackListAdapter(private val viewModel :TrackListViewModel): ListAdapter<TrackDetails, TrackListAdapter.ViewHolder>(TrackDiffCallback()) {
+class TrackListAdapter(private val viewModel : TrackListViewModel): ListAdapter<TrackDetails, TrackListAdapter.ViewHolder>(TrackDiffCallback()){
 
     var source:Source =Source.Spotify
 
@@ -46,62 +47,89 @@ class TrackListAdapter(private val viewModel :TrackListViewModel): ListAdapter<T
         return ViewHolder(binding)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         if(itemCount == 1){ holder.binding.imageUrl.visibility = View.GONE}else{
-            viewModel.uiScope.launch {
+            viewModel.viewModelScope.launch {
                 bindImage(holder.binding.imageUrl,item.albumArtURL, source)
             }
         }
 
         when (item.downloaded) {
             DownloadStatus.Downloaded -> {
-                holder.binding.btnDownload.setImageResource(R.drawable.ic_tick)
-                holder.binding.btnDownload.clearAnimation()
+                holder.binding.btnDownloadProgress.invisible()
+                holder.binding.btnDownload.apply{
+                    setImageResource(R.drawable.ic_tick)
+                    clearAnimation()
+                    visible()
+                }
+            }
+            DownloadStatus.Queued -> {
+                holder.binding.btnDownloadProgress.invisible()
+                holder.binding.btnDownload.apply{
+                    setImageResource(R.drawable.ic_refresh)
+                    rotate()
+                    visible()
+                }
+            }
+            DownloadStatus.Failed -> {
+                holder.binding.btnDownloadProgress.invisible()
+                holder.binding.btnDownload.apply{
+                    setImageResource(R.drawable.ic_error)
+                    clearAnimation()
+                    visible()
+                }
             }
             DownloadStatus.Downloading -> {
-                holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
-                rotateAnim(holder.binding.btnDownload)
+                holder.binding.btnDownload.invisible()
+                holder.binding.btnDownloadProgress.apply {
+                    progress = item.progress
+                    bottomText = "Downloading"
+                    visible()
+                }
+            }
+            DownloadStatus.Converting -> {
+                holder.binding.btnDownload.invisible()
+                holder.binding.btnDownloadProgress.apply {
+                    visible()
+                    progress = 100
+                    bottomText = "Converting"
+                }
             }
             DownloadStatus.NotDownloaded -> {
-                holder.binding.btnDownload.setImageResource(R.drawable.ic_arrow)
-                holder.binding.btnDownload.clearAnimation()
-                holder.binding.btnDownload.setOnClickListener{
-                    if(!isOnline()){
-                        showNoConnectionAlert()
-                        return@setOnClickListener
-                    }
-                    showMessage("Processing!")
-                    holder.binding.btnDownload.setImageResource(R.drawable.ic_refresh)
-                    rotateAnim(it)
-                    item.downloaded = DownloadStatus.Downloading
-                    when(source){
-                        Source.YouTube -> {
-                            viewModel.uiScope.launch {
-                                YTDownloadHelper.downloadYTTracks(
-                                    viewModel.folderType,
-                                    viewModel.subFolder,
-                                    listOf(item)
-                                )
+                holder.binding.btnDownloadProgress.invisible()
+                holder.binding.btnDownload.apply{
+                    setImageResource(R.drawable.ic_arrow)
+                    clearAnimation()
+                    visible()
+                    setOnClickListener{
+                        if(!isOnline()){
+                            showNoConnectionAlert()
+                            return@setOnClickListener
+                        }
+                        showMessage("Processing!")
+                        item.downloaded = DownloadStatus.Queued
+                        when(source){
+                            Source.YouTube -> {
+                                viewModel.viewModelScope.launch {
+                                    downloadTracks(arrayListOf(item))
+                                }
+                            }
+                            else -> {
+                                viewModel.viewModelScope.launch {
+                                    downloadTracks(arrayListOf(item))
+                                }
                             }
                         }
-                        else -> {
-                            viewModel.uiScope.launch {
-                                DownloadHelper.downloadAllTracks(
-                                    viewModel.folderType,
-                                    viewModel.subFolder,
-                                    listOf(item)
-                                )
-                            }
-                        }
+                        notifyItemChanged(position)//start showing anim!
                     }
-                    notifyItemChanged(position)//start showing anim!
                 }
             }
         }
 
-        holder.binding.trackName.text = "${if(item.title.length > 17){"${item.title.subSequence(0,16)}..."}else{item.title}}"
-        holder.binding.artist.text = "${item.artists.get(0)}..."
+        holder.binding.trackName.text = if(item.title.length > 20){"${item.title.subSequence(0,18)}..."}else{item.title}
+        holder.binding.artist.text = "${item.artists.firstOrNull()}..."
         holder.binding.duration.text =  "${item.durationSec/60} minutes, ${item.durationSec%60} sec"
     }
 

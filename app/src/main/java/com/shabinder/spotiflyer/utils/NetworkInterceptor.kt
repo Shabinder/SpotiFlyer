@@ -17,9 +17,9 @@
 
 package com.shabinder.spotiflyer.utils
 
+import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.Protocol
-import okhttp3.RequestBody
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 
@@ -27,13 +27,14 @@ const val NoInternetErrorCode = 222
 
 class NetworkInterceptor: Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
+        Log.i("Network Requesting",chain.request().url.toString())
         return if (!isOnline()){
             //No Internet Connection
             showNoConnectionAlert()
             //Lets Stop the Incoming Request
             Response.Builder()
                 .code(NoInternetErrorCode) // code(200.300) = successful else = unsuccessful
-                .body("{}".toResponseBody(null)) // Whatever body
+                .body("{}".toResponseBody(null)) // Empty Object
                 .protocol(Protocol.HTTP_2)
                 .message("No Internet Connection")
                 .request(chain.request())
@@ -52,15 +53,7 @@ class NetworkInterceptor: Interceptor {
                 .message(response.message)
                 .request(chain.request())
                 .build()
+//            chain.proceed(chain.request())
         }
-    }
-    /*
-    * Converts REQUEST's Body to String
-    * */
-    private fun RequestBody?.bodyToString(): String {
-        if (this == null) return ""
-        val buffer = okio.Buffer()
-        writeTo(buffer)
-        return buffer.readUtf8()
     }
 }

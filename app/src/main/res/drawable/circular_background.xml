@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C)  2020  Shabinder Singh
   ~
   ~ This program is free software: you can redistribute it and/or modify
@@ -15,11 +14,15 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:innerRadiusRatio="2.5"
+    android:shape="ring"
+    android:thickness="4dp"
+    android:useLevel="false">
 
-<AppUpdater>
-    <update>
-        <latestVersion>1.7</latestVersion>
-        <latestVersionCode>9</latestVersionCode>
-        <url>https://github.com/Shabinder/SpotiFlyer/releases/</url>
-    </update>
-</AppUpdater>
+    <solid android:color="@color/colorPrimary"/>
+
+</shape>
+
+
