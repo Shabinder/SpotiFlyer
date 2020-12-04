@@ -24,7 +24,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.shabinder.spotiflyer.MainActivity
@@ -43,7 +42,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    private val mainViewModel: MainViewModel by viewModels()
+    //private val mainViewModel: MainViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by activityViewModels()
     private lateinit var binding: MainFragmentBinding
     @Inject lateinit var easyUpiPayment: EasyUpiPayment
@@ -54,6 +53,11 @@ class MainFragment : Fragment() {
     ): View {
         binding = MainFragmentBinding.inflate(inflater,container,false)
         initializeAll()
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         binding.btnSearch.setOnClickListener {
             if(!isOnline()){
                 showNoConnectionAlert()
@@ -83,7 +87,6 @@ class MainFragment : Fragment() {
             }
         }
         handleIntent()
-        return binding.root
     }
 
     /**
@@ -127,7 +130,10 @@ class MainFragment : Fragment() {
             }
             usage.text = usageText()
             btnDonate.setOnClickListener {
-                easyUpiPayment.startPayment()
+                try { easyUpiPayment.startPayment() }
+                catch (e:com.shreyaspatil.easyupipayment.exception.AppNotFoundException ){
+                    showMessage("No UPI app available")
+                }
             }
         }
     }

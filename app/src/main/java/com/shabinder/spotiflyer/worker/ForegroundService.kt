@@ -68,8 +68,8 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
+
 @AndroidEntryPoint
-@RequiresApi(Build.VERSION_CODES.O)
 class ForegroundService : Service(){
     private val tag = "Foreground Service"
     private val channelId = "ForegroundDownloaderService"
@@ -77,6 +77,7 @@ class ForegroundService : Service(){
     private var total = 0 //Total Downloads Requested
     private var converted = 0//Total Files Converted
     private var downloaded = 0//Total Files downloaded
+    private var failed = 0//Total Files failed
     private var serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
     private val requestMap = mutableMapOf<Request, TrackDetails>()
@@ -88,64 +89,65 @@ class ForegroundService : Service(){
     private var messageList = mutableListOf("", "", "", "")
     private lateinit var cancelIntent:PendingIntent
     private lateinit var fetch:Fetch
-    private lateinit var ytDownloader: YoutubeDownloader
     private lateinit var downloadManager : DownloadManager
+    @Inject lateinit var ytDownloader: YoutubeDownloader
     @Inject lateinit var youtubeMusicApi: YoutubeMusicApi
 
     override fun onBind(intent: Intent): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel(channelId,"Downloader Service")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel(channelId,"Downloader Service")
+        }
         val intent = Intent(
             this,
             ForegroundService::class.java
         ).apply{action = "kill"}
         cancelIntent = PendingIntent.getService (this, 0 , intent , PendingIntent.FLAG_CANCEL_CURRENT )
         downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        ytDownloader = YoutubeDownloader()
         initialiseFetch()
     }
 
     @SuppressLint("WakelockTimeout")
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // Send a notification that service is started
         Log.i(tag, "Service Started.")
         startForeground(notificationId, getNotification())
-
-        when (intent.action) {
-            "kill" -> killService()
-            "query" -> {
-                val response = Intent().apply {
-                    action = "query_result"
-                    putParcelableArrayListExtra("tracks", allTracksDetails as ArrayList<TrackDetails> )
+        intent?.let{
+            when (it.action) {
+                "kill" -> killService()
+                "query" -> {
+                    val response = Intent().apply {
+                        action = "query_result"
+                        putParcelableArrayListExtra("tracks", allTracksDetails as ArrayList<TrackDetails> )
+                    }
+                    sendBroadcast(response)
                 }
-                sendBroadcast(response)
+            }
+
+            val downloadObjects: ArrayList<TrackDetails>? = (it.getParcelableArrayListExtra("object") ?: it.extras?.getParcelableArrayList(
+                "object"
+            ))
+            val imagesList: ArrayList<String>? = (it.getStringArrayListExtra("imagesList") ?: it.extras?.getStringArrayList(
+                "imagesList"
+            ))
+
+            imagesList?.let{ imageList ->
+                serviceScope.launch {
+                    loadAllImages(imageList)
+                }
+            }
+
+            downloadObjects?.let { list ->
+                total += downloadObjects.size
+                updateNotification()
+                list.forEach { it1 ->
+                    allTracksDetails.add(it1.apply { downloaded = DownloadStatus.Queued })
+                }
+                downloadAllTracks(list)
             }
         }
-
-        val downloadObjects: ArrayList<TrackDetails>? = (intent.getParcelableArrayListExtra("object") ?: intent.extras?.getParcelableArrayList(
-            "object"
-        ))
-        val imagesList: ArrayList<String>? = (intent.getStringArrayListExtra("imagesList") ?: intent.extras?.getStringArrayList(
-            "imagesList"
-        ))
-
-        imagesList?.let{
-            serviceScope.launch {
-                loadAllImages(it)
-            }
-        }
-
-        downloadObjects?.let {
-            total += downloadObjects.size
-            updateNotification()
-            it.forEach { it1 ->
-                allTracksDetails.add(it1.apply { downloaded = DownloadStatus.Queued })
-            }
-            downloadAllTracks(it)
-        }
-
         //Wake locks and misc tasks from here :
         return if (isServiceStarted){
             //Service Already Started
@@ -189,10 +191,10 @@ class ForegroundService : Service(){
                                         trackDurationSec = it.durationSec
                                     ).keys.firstOrNull()
                                     Log.i("Service VideoID", videoId ?: "Not Found")
-                                    if (videoId.isNullOrBlank()) sendTrackBroadcast(
-                                        Status.FAILED.name,
-                                        it
-                                    )
+                                    if (videoId.isNullOrBlank()) {
+                                        sendTrackBroadcast(Status.FAILED.name, it)
+                                        failed++
+                                    }
                                     else {//Found Youtube Video ID
                                         downloadTrack(videoId, it)
                                     }
@@ -247,7 +249,7 @@ class ForegroundService : Service(){
                         }
                     )
                 }
-            }catch (e: com.github.kiulian.downloader.YoutubeException){
+            }catch (e: java.lang.Exception){
                 Log.i("Service YT Error", e.message.toString())
             }
         }

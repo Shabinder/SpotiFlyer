@@ -56,7 +56,7 @@ class YoutubeViewModel @ViewModelInject constructor(
                 val playlist = ytDownloader.getPlaylist(searchId)
                 val playlistDetails = playlist.details()
                 val name = playlistDetails.title()
-                subFolder = removeIllegalChars(name).toString()
+                subFolder = removeIllegalChars(name)
                 val videos = playlist.videos()
                 coverUrl.postValue("https://i.ytimg.com/vi/${videos.firstOrNull()?.videoId()}/hqdefault.jpg")
                 title.postValue(
@@ -99,7 +99,7 @@ class YoutubeViewModel @ViewModelInject constructor(
                 }
                 queryActiveTracks()
             }
-        }catch (e:com.github.kiulian.downloader.YoutubeException.BadPageException){
+        }catch (e:Exception){
             showMessage("An Error Occurred While Processing!")
         }
 
@@ -156,7 +156,7 @@ class YoutubeViewModel @ViewModelInject constructor(
                 }
                 queryActiveTracks()
             }
-        } catch (e:com.github.kiulian.downloader.YoutubeException){
+        } catch (e:Exception){
             showMessage("An Error Occurred While Processing!")
         }
     }

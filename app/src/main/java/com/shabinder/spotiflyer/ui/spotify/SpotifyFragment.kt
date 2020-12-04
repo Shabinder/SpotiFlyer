@@ -45,10 +45,10 @@ class SpotifyFragment : TrackListFragment<SpotifyViewModel, SpotifyFragmentArgs>
     override val args: SpotifyFragmentArgs by navArgs()
     override lateinit var adapter: TrackListAdapter
     override var source: Source = Source.Spotify
+    private lateinit var link:String
+    private lateinit var type:String
     private val spotifyService:SpotifyService?
-    get() = sharedViewModel.spotifyService.value
-    lateinit var link:String
-    lateinit var type:String
+        get() = sharedViewModel.spotifyService.value
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(

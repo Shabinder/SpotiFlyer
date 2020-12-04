@@ -81,14 +81,15 @@ object Provider {
     @Provides
     @Singleton
     fun provideUpi():EasyUpiPayment {
-        return EasyUpiPayment.Builder(mainActivity)
-            .setPayeeVpa("technoshab@paytm")
-            .setPayeeName("Shabinder Singh")
-            .setTransactionId("UNIQUE_TRANSACTION_ID")
-            .setTransactionRefId("UNIQUE_TRANSACTION_REF_ID")
-            .setDescription("Thanks for donating")
-            .setAmount("49.00")
-            .build()
+        return EasyUpiPayment.Builder(mainActivity).run {
+            payeeVpa = "technoshab@paytm"
+            payeeName = "Shabinder Singh"
+            transactionId = "UNIQUE_TRANSACTION_ID"
+            transactionRefId = "UNIQUE_TRANSACTION_REF_ID"
+            description = "Thanks for donating"
+            amount = "49"
+            build()
+        }
     }
 
     @Provides
