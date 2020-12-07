@@ -30,6 +30,22 @@
 -keepclasseswithmembers class com.shabinder.spotiflyer.* { # <-- change package name to your app's
     kotlinx.serialization.KSerializer serializer(...);
 }
+
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+-keepattributes JavascriptInterface
+-keepattributes *Annotation*
+
+-dontwarn com.razorpay.**
+-keep class com.razorpay.* {*;}
+
+-optimizations !method/inlining/*
+
+-keepclasseswithmembers class * {
+  public void onPayment*(...);
+}
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable

@@ -38,7 +38,8 @@ fun setId3v1Tags(mp3File: Mp3File, track: TrackDetails): Mp3File {
     mp3File.id3v1Tag = id3v1Tag
     return mp3File
 }
-fun setId3v2Tags(mp3file: Mp3File, track: TrackDetails): Mp3File {
+
+fun setId3v2Tags(mp3file: Mp3File, track: TrackDetails,service: ForegroundService): Mp3File {
     val id3v2Tag = ID3v24Tag().apply {
         artist = track.artists.joinToString(",")
         title = track.title
@@ -48,14 +49,24 @@ fun setId3v2Tags(mp3file: Mp3File, track: TrackDetails): Mp3File {
         lyrics = "Gonna Implement Soon"
         url = track.trackUrl
     }
-    val bytesArray = ByteArray(track.albumArt.length().toInt())
     try{
+        val bytesArray = ByteArray(track.albumArt.length().toInt())
         val fis = FileInputStream(track.albumArt)
         fis.read(bytesArray) //read file into bytes[]
         fis.close()
         id3v2Tag.setAlbumImage(bytesArray, "image/jpeg")
     }catch (e: java.io.FileNotFoundException){
-        log("Error", "Couldn't Write Mp3 Album Art")
+        try {
+            //Image Still Not Downloaded!
+            //Lets Download Now and Write it into Album Art
+            service.downloadAllImages(arrayListOf(track.albumArtURL, track.source.name)){
+                val bytesArray = ByteArray(it.length().toInt())
+                val fis = FileInputStream(it)
+                fis.read(bytesArray) //read file into bytes[]
+                fis.close()
+                id3v2Tag.setAlbumImage(bytesArray, "image/jpeg")
+            }
+        }catch (e: Exception){log("Error", "Couldn't Write Mp3 Album Art, error: ${e.stackTrace}")}
     }
     mp3file.id3v2Tag = id3v2Tag
     return mp3file

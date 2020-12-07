@@ -79,6 +79,12 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
+        <!-- Add your API key here -->
+        <meta-data
+            android:name="com.razorpay.ApiKey"
+            android:value="rzp_live_3ZQeoFYOxjmXye"
+            />
+
         <service android:name=".worker.ForegroundService"/>
 
     </application>

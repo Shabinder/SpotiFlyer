@@ -39,8 +39,8 @@ android {
         applicationId 'com.shabinder.spotiflyer'
         minSdkVersion 22
         targetSdkVersion 30
-        versionCode 10
-        versionName "1.8"
+        versionCode 11
+        versionName "1.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -144,12 +144,13 @@ dependencies {
     //Extras
     implementation 'me.xdrop:fuzzywuzzy:1.3.1'
     implementation 'com.mpatric:mp3agic:0.9.1'
-    implementation 'com.shreyaspatil:EasyUpiPayment:3.0.0'
+    implementation 'com.razorpay:checkout:1.5.16'
     implementation 'com.github.javiersantos:AppUpdater:2.7'
     implementation 'com.github.lzyzsd:circleprogress:1.2.1'
     implementation "androidx.tonyodev.fetch2:xfetch2:3.1.5"
     implementation 'com.github.sealedtx:java-youtube-downloader:2.4.4'
 
+    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.5'
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

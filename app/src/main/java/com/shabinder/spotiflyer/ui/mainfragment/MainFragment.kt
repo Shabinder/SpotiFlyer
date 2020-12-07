@@ -26,26 +26,25 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import com.razorpay.Checkout
 import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.databinding.MainFragmentBinding
 import com.shabinder.spotiflyer.utils.*
-import com.shreyaspatil.easyupipayment.EasyUpiPayment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
+import org.json.JSONObject
 
 @AndroidEntryPoint
-class MainFragment : Fragment() {
+class MainFragment : Fragment(){
 
     //private val mainViewModel: MainViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by activityViewModels()
     private lateinit var binding: MainFragmentBinding
-    @Inject lateinit var easyUpiPayment: EasyUpiPayment
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -130,11 +129,41 @@ class MainFragment : Fragment() {
             }
             usage.text = usageText()
             btnDonate.setOnClickListener {
-                try { easyUpiPayment.startPayment() }
-                catch (e:com.shreyaspatil.easyupipayment.exception.AppNotFoundException ){
-                    showMessage("No UPI app available")
-                }
+                startPayment()
             }
+        }
+    }
+
+
+    private fun startPayment() {
+        /*
+        *  You need to pass current activity in order to let Razorpay create CheckoutActivity
+        * */
+        val co = Checkout().apply {
+            setKeyID("rzp_live_3ZQeoFYOxjmXye")
+            setImage(R.drawable.spotify_download)
+        }
+
+        try {
+            val preFill = JSONObject().apply {
+//                put("email","dev.shabinder@gmail.com")
+//                put("contact","9780538548")
+            }
+
+            val options = JSONObject().apply {
+                put("name","SpotiFlyer")
+                put("description","Thanks For the Donation!")
+                //You can omit the image option to fetch the image from dashboard
+                put("image","https://github.com/Shabinder/SpotiFlyer/raw/master/app/SpotifyDownload.png")
+                put("currency","INR")
+                put("amount","4900")
+                put("prefill",preFill)
+            }
+
+            co.open(requireActivity(),options)
+        }catch (e: Exception){
+            showMessage("Error in payment: "+ e.message)
+            e.printStackTrace()
         }
     }
 

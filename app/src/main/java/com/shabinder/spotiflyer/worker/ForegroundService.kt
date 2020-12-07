@@ -51,6 +51,7 @@ import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.networking.YoutubeMusicApi
 import com.shabinder.spotiflyer.networking.makeJsonBody
 import com.shabinder.spotiflyer.utils.*
+import com.shabinder.spotiflyer.utils.Provider.defaultDir
 import com.shabinder.spotiflyer.utils.Provider.imageDir
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
@@ -80,10 +81,9 @@ class ForegroundService : Service(){
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
     private val requestMap = hashMapOf<Request, TrackDetails>()
     private val allTracksStatus = hashMapOf<String,DownloadStatus>()
-    private var defaultDir = Provider.defaultDir
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
-    private var messageList = arrayOf("", "", "", "")
+    private var messageList = mutableListOf("", "", "", "","")
     private lateinit var cancelIntent:PendingIntent
     private lateinit var fetch:Fetch
     private lateinit var downloadManager : DownloadManager
@@ -132,7 +132,7 @@ class ForegroundService : Service(){
 
             imagesList?.let{ imageList ->
                 serviceScope.launch {
-                    loadAllImages(imageList)
+                    downloadAllImages(imageList)
                 }
             }
 
@@ -142,9 +142,6 @@ class ForegroundService : Service(){
                     isSingleDownload = (size == 1)
                 }
                 updateNotification()
-                list.forEach { it1 ->
-                    allTracksStatus[it1.title] = DownloadStatus.Queued
-                }
                 downloadAllTracks(list)
             }
         }
@@ -173,6 +170,7 @@ class ForegroundService : Service(){
             serviceScope.launch {
                 if (it.downloaded == DownloadStatus.Downloaded) {//Download Already Present!!
                 } else {
+                    allTracksStatus[it.title] = DownloadStatus.Queued
                     if (!it.videoID.isNullOrBlank()) {//Video ID already known!
                         downloadTrack(it.videoID!!, it)
                     } else {
@@ -269,13 +267,14 @@ class ForegroundService : Service(){
             downloadBlocks: List<DownloadBlock>,
             totalBlocks: Int
         ) {
-            val track  = requestMap[download.request]
-            messageList[messageList.indexOf("")] = "Downloading ${track?.title}"
-            log(tag, "${track?.title} Download Started")
-            track?.let{
-                allTracksStatus[it.title] = DownloadStatus.Downloading
-                updateNotification()
-                sendTrackBroadcast(Status.DOWNLOADING.name,track)
+            serviceScope.launch {
+                val track  = requestMap[download.request]
+                addToNotification("Downloading ${track?.title}")
+                log(tag, "${track?.title} Download Started")
+                track?.let{
+                    allTracksStatus[it.title] = DownloadStatus.Downloading
+                    sendTrackBroadcast(Status.DOWNLOADING.name,track)
+                }
             }
         }
 
@@ -292,15 +291,9 @@ class ForegroundService : Service(){
         }
 
         override fun onCompleted(download: Download) {
-            val track = requestMap[download.request]
-            for (message in messageList){
-                if( message == "Downloading ${track?.title}"){
-                    //Remove Downloading Status from Notification
-                    messageList[messageList.indexOf(message)] = ""
-                }
-            }
-
             serviceScope.launch {
+                val track = requestMap[download.request]
+                removeFromNotification("Downloading ${track?.title}")
                 try{
                     track?.let {
                         convertToMp3(download.file, it)
@@ -339,6 +332,7 @@ class ForegroundService : Service(){
                 log(tag, "${track?.title} Requesting Download thru Android DM")
                 downloadUsingDM(download.request.url, download.request.file, track!!)
                 requestMap.remove(download.request)
+                removeFromNotification("Downloading ${track.title}")
             }
             updateNotification()
         }
@@ -352,14 +346,16 @@ class ForegroundService : Service(){
             etaInMilliSeconds: Long,
             downloadedBytesPerSecond: Long
         ) {
-            val track  = requestMap[download.request]
-            log(tag, "${track?.title} ETA: ${etaInMilliSeconds / 1000} sec")
-            val intent = Intent().apply {
-                action = "Progress"
-                putExtra("progress", download.progress)
-                putExtra("track", requestMap[download.request])
+            serviceScope.launch {
+                val track  = requestMap[download.request]
+                log(tag, "${track?.title} ETA: ${etaInMilliSeconds / 1000} sec")
+                val intent = Intent().apply {
+                    action = "Progress"
+                    putExtra("progress", download.progress)
+                    putExtra("track", requestMap[download.request])
+                }
+                sendBroadcast(intent)
             }
-            sendBroadcast(intent)
         }
     }
 
@@ -367,92 +363,102 @@ class ForegroundService : Service(){
     * If fetch Fails , Android Download Manager To RESCUE!!
     **/
     fun downloadUsingDM(url: String, outputDir: String, track: TrackDetails){
-        val uri = Uri.parse(url)
-        val request = DownloadManager.Request(uri).apply {
-            setAllowedNetworkTypes(
-                DownloadManager.Request.NETWORK_WIFI or
-                        DownloadManager.Request.NETWORK_MOBILE
-            )
-            setAllowedOverRoaming(false)
-            setTitle(track.title)
-            setDescription("Spotify Downloader Working Up here...")
-            setDestinationUri(File(outputDir).toUri())
-            setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        }
+        serviceScope.launch {
+            val uri = Uri.parse(url)
+            val request = DownloadManager.Request(uri).apply {
+                setAllowedNetworkTypes(
+                    DownloadManager.Request.NETWORK_WIFI or
+                            DownloadManager.Request.NETWORK_MOBILE
+                )
+                setAllowedOverRoaming(false)
+                setTitle(track.title)
+                setDescription("Spotify Downloader Working Up here...")
+                setDestinationUri(File(outputDir).toUri())
+                setNotificationVisibility(VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            }
 
-        //Start Download
-        val downloadID = downloadManager.enqueue(request)
-        log("DownloadManager", "Download Request Sent")
+            //Start Download
+            val downloadID = downloadManager.enqueue(request)
+            log("DownloadManager", "Download Request Sent")
 
-        val onDownloadComplete: BroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                //Fetching the download id received with the broadcast
-                val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-                //Checking if the received broadcast is for our enqueued download by matching download id
-                if (downloadID == id) {
-                    allTracksStatus[track.title] = DownloadStatus.Converting
-                    convertToMp3(outputDir, track)
-                    converted++
-                    //Unregister this broadcast Receiver
-                    this@ForegroundService.unregisterReceiver(this)
+            val onDownloadComplete: BroadcastReceiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    //Fetching the download id received with the broadcast
+                    val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+                    //Checking if the received broadcast is for our enqueued download by matching download id
+                    if (downloadID == id) {
+                        allTracksStatus[track.title] = DownloadStatus.Converting
+                        convertToMp3(outputDir, track)
+                        converted++
+                        //Unregister this broadcast Receiver
+                        this@ForegroundService.unregisterReceiver(this)
+                    }
                 }
             }
+            registerReceiver(onDownloadComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
         }
-        registerReceiver(onDownloadComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
     }
 
     /**
      *Converting Downloaded Audio (m4a) to Mp3.( Also Applying Metadata)
      **/
     fun convertToMp3(filePath: String, track: TrackDetails){
-        sendTrackBroadcast("Converting",track)
-        val m4aFile = File(filePath)
+        serviceScope.launch {
+            sendTrackBroadcast("Converting",track)
+            val m4aFile = File(filePath)
 
-        FFmpeg.executeAsync(
-            "-i $filePath -y -b:a 160k -vn ${filePath.substringBeforeLast('.') + ".mp3"}"
-        ) { _, returnCode ->
-            when (returnCode) {
-                RETURN_CODE_SUCCESS -> {
-                    log(Config.TAG, "Async command execution completed successfully.")
-                    m4aFile.delete()
-                    writeMp3Tags(filePath.substringBeforeLast('.') + ".mp3", track)
-                    //FFMPEG task Completed
-                }
-                RETURN_CODE_CANCEL -> {
-                    log(Config.TAG, "Async command execution cancelled by user.")
-                }
-                else -> {
-                    log(
-                        Config.TAG, String.format(
-                            "Async command execution failed with rc=%d.",
-                            returnCode
+            addToNotification("Processing ${track.title}")
+
+            FFmpeg.executeAsync(
+                "-i $filePath -y -b:a 160k -vn ${filePath.substringBeforeLast('.') + ".mp3"}"
+            ) { _, returnCode ->
+                when (returnCode) {
+                    RETURN_CODE_SUCCESS -> {
+                        log(Config.TAG, "Async command execution completed successfully.")
+                        removeFromNotification("Processing ${track.title}")
+                        m4aFile.delete()
+                        writeMp3Tags(filePath.substringBeforeLast('.') + ".mp3", track)
+                        //FFMPEG task Completed
+                    }
+                    RETURN_CODE_CANCEL -> {
+                        log(Config.TAG, "Async command execution cancelled by user.")
+                    }
+                    else -> {
+                        log(
+                            Config.TAG, String.format(
+                                "Async command execution failed with rc=%d.",
+                                returnCode
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     private fun writeMp3Tags(filePath: String, track: TrackDetails){
-        var mp3File = Mp3File(filePath)
-        mp3File =  removeAllTags(mp3File)
-        mp3File = setId3v1Tags(mp3File, track)
-        mp3File = setId3v2Tags(mp3File, track)
-        log("Mp3Tags", "saving file")
-        mp3File.save(filePath.substringBeforeLast('.') + ".new.mp3")
-        val file = File(filePath)
-        file.delete()
-        val newFile = File((filePath.substringBeforeLast('.') + ".new.mp3"))
-        newFile.renameTo(file)
-        converted++
-        updateNotification()
-        addToLibrary(file.absolutePath)
-        allTracksStatus.remove(track.title)
-        //Notify Download Completed
-        sendTrackBroadcast("track_download_completed",track)
-        //All tasks completed (REST IN PEACE)
-        if(isFinished && !isSingleDownload){
-            onDestroy()
+        serviceScope.launch {
+            var mp3File = Mp3File(filePath)
+            mp3File =  removeAllTags(mp3File)
+            mp3File = setId3v1Tags(mp3File, track)
+            mp3File = setId3v2Tags(mp3File, track,this@ForegroundService)
+            log("Mp3Tags", "saving file")
+            mp3File.save(filePath.substringBeforeLast('.') + ".new.mp3")
+            val file = File(filePath)
+            file.delete()
+            val newFile = File((filePath.substringBeforeLast('.') + ".new.mp3"))
+            newFile.renameTo(file)
+            converted++
+            updateNotification()
+            addToLibrary(file.absolutePath)
+            allTracksStatus.remove(track.title)
+            //Notify Download Completed
+            sendTrackBroadcast("track_download_completed",track)
+            //All tasks completed (REST IN PEACE)
+            if(isFinished && !isSingleDownload){
+                onDestroy()
+            }
         }
     }
 
@@ -523,7 +529,7 @@ class ForegroundService : Service(){
     /**
      * Function to fetch all Images for use in mp3 tags.
      **/
-    private fun loadAllImages(urlList: ArrayList<String>) {
+    fun downloadAllImages(urlList: ArrayList<String>, func: ((resource:File) -> Unit)? = null) {
         /*
         * Last Element of this List defines Its Source
         * */
@@ -584,6 +590,7 @@ class ForegroundService : Service(){
                                     )
                                 }
                                 resource?.copyTo(file)
+                                func?.let { it(file) }
                             }
                         } catch (e: IOException) {
                             e.printStackTrace()
@@ -597,12 +604,13 @@ class ForegroundService : Service(){
     private fun killService() {
         serviceScope.launch{
             log(tag,"Killing Self")
-            messageList = arrayOf("Cleaning And Exiting","","","")
+            messageList = mutableListOf("Cleaning And Exiting","","","","")
             fetch.cancelAll()
             fetch.removeAll()
             updateNotification()
             cleanFiles(File(defaultDir))
-            messageList = arrayOf("","","","")
+            cleanFiles(File(imageDir))
+            messageList = mutableListOf("","","","","")
             releaseWakeLock()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 stopForeground(true)
@@ -651,14 +659,25 @@ class ForegroundService : Service(){
         setNotificationSilent()
         setStyle(
             NotificationCompat.InboxStyle().run {
-                addLine(messageList[0])
-                addLine(messageList[1])
-                addLine(messageList[2])
-                addLine(messageList[3])
+                addLine(messageList[messageList.size - 1])
+                addLine(messageList[messageList.size - 2])
+                addLine(messageList[messageList.size - 3])
+                addLine(messageList[messageList.size - 4])
+                addLine(messageList[messageList.size - 5])
             }
         )
         addAction(R.drawable.ic_baseline_cancel_24,"Exit",cancelIntent)
         build()
+    }
+
+    private fun addToNotification(message:String){
+        messageList.add(message)
+        updateNotification()
+    }
+
+    private fun removeFromNotification(message: String){
+        messageList.remove(message)
+        updateNotification()
     }
 
     fun sendTrackBroadcast(action:String,track:TrackDetails){

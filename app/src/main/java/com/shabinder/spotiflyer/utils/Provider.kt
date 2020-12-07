@@ -27,7 +27,6 @@ import com.shabinder.spotiflyer.database.DownloadRecordDatabase
 import com.shabinder.spotiflyer.networking.GaanaInterface
 import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
 import com.shabinder.spotiflyer.networking.YoutubeMusicApi
-import com.shreyaspatil.easyupipayment.EasyUpiPayment
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -72,25 +71,10 @@ object Provider {
         return DownloadRecordDatabase.getInstance(appContext).databaseDAO
     }
 
-
     @Provides
     @Singleton
     fun getYTDownloader():YoutubeDownloader{
         return YoutubeDownloader()
-    }
-
-    @Provides
-    @Singleton
-    fun provideUpi():EasyUpiPayment {
-        return EasyUpiPayment.Builder(mainActivity).run {
-            payeeVpa = "technoshab@paytm"
-            payeeName = "Shabinder Singh"
-            transactionId = "UNIQUE_TRANSACTION_ID"
-            transactionRefId = "UNIQUE_TRANSACTION_REF_ID"
-            description = "Thanks for donating"
-            amount = "49.00"
-            build()
-        }
     }
 
     @Provides

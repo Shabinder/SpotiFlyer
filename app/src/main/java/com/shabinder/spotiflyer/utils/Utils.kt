@@ -122,13 +122,13 @@ fun showMessage(message: String, long: Boolean = false,isSuccess:Boolean = false
     }
 }
 
-fun showDialog(title:String? = null, message: String? = null){
+fun showDialog(title:String? = null, message: String? = null,response: String = "Ok"){
     mainActivity.viewModelScope.launch(Dispatchers.Main) {
         mainActivity.apply {
             MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme).apply {
                 setTitle(title ?: resources.getString(R.string.no_internet))
                 setMessage(message ?: resources.getString(R.string.supporting_text))
-                setPositiveButton(resources.getString(R.string.lemme_check)) { _, _ ->
+                setPositiveButton(response) { _, _ ->
                     // Respond to neutral button press
                 }
                 show()
