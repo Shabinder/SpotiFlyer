@@ -60,7 +60,7 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.btnSearch.setOnClickListener {
             if(!isOnline()){
-                showNoConnectionAlert()
+                showDialog()
                 return@setOnClickListener
             }
             val link = binding.linkSearch.text.toString()

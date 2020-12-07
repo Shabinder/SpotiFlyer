@@ -82,7 +82,7 @@ class YoutubeFragment : TrackListFragment<YoutubeViewModel, YoutubeFragmentArgs>
         * */
         binding.btnDownloadAll.setOnClickListener {
             if(!isOnline()){
-                showNoConnectionAlert()
+                showDialog()
                 return@setOnClickListener
             }
             binding.btnDownloadAll.gone()

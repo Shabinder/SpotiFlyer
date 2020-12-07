@@ -17,7 +17,6 @@
 
 package com.shabinder.spotiflyer.ui.spotify
 
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
 import com.shabinder.spotiflyer.database.DatabaseDAO
@@ -33,6 +32,7 @@ import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.ui.base.tracklistbase.TrackListViewModel
 import com.shabinder.spotiflyer.utils.Provider.imageDir
 import com.shabinder.spotiflyer.utils.finalOutputDir
+import com.shabinder.spotiflyer.utils.log
 import com.shabinder.spotiflyer.utils.queryActiveTracks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -74,15 +74,15 @@ class SpotifyViewModel @ViewModelInject constructor(
                         }
                         trackList.value = listOf(it).toTrackDetailsList(folderType, subFolder)
                         title.value = it.name
-                        coverUrl.value = it.album!!.images?.elementAtOrNull(1)?.url
-                            ?: it.album!!.images?.elementAtOrNull(0)?.url
+                        coverUrl.value = it.album?.images?.elementAtOrNull(1)?.url
+                            ?: it.album?.images?.elementAtOrNull(0)?.url
                         withContext(Dispatchers.IO) {
                             databaseDAO.insert(
                                 DownloadRecord(
                                     type = "Track",
-                                    name = title.value!!,
+                                    name = title.value.toString(),
                                     link = "https://open.spotify.com/$type/$link",
-                                    coverUrl = coverUrl.value!!,
+                                    coverUrl = coverUrl.value.toString(),
                                     totalFiles = 1,
                                 )
                             )
@@ -97,7 +97,7 @@ class SpotifyViewModel @ViewModelInject constructor(
                     albumObject?.tracks?.items?.forEach {
                         if (File(
                                 finalOutputDir(
-                                    it.name!!,
+                                    it.name.toString(),
                                     folderType,
                                     subFolder
                                 )
@@ -122,7 +122,7 @@ class SpotifyViewModel @ViewModelInject constructor(
                         databaseDAO.insert(
                             DownloadRecord(
                                 type = "Album",
-                                name = title.value!!,
+                                name = title.value.toString(),
                                 link = "https://open.spotify.com/$type/$link",
                                 coverUrl = coverUrl.value.toString(),
                                 totalFiles = trackList.value?.size ?: 0,
@@ -132,17 +132,17 @@ class SpotifyViewModel @ViewModelInject constructor(
                 }
 
                 "playlist" -> {
-                    Log.i("Spotify Service",spotifyService.toString())
+                    log("Spotify Service",spotifyService.toString())
                     val playlistObject = spotifyService?.getPlaylist(link)?.value
                     folderType = "Playlists"
                     subFolder = playlistObject?.name.toString()
                     val tempTrackList = mutableListOf<Track>()
-                    Log.i("Tracks Fetched", playlistObject?.tracks?.items?.size.toString())
+                    log("Tracks Fetched", playlistObject?.tracks?.items?.size.toString())
                     playlistObject?.tracks?.items?.forEach {
                         it.track?.let { it1 ->
                             if (File(
                                     finalOutputDir(
-                                        it1.name!!,
+                                        it1.name.toString(),
                                         folderType,
                                         subFolder
                                     )
@@ -163,7 +163,7 @@ class SpotifyViewModel @ViewModelInject constructor(
                         }
                         moreTracksAvailable = !moreTracks?.next.isNullOrBlank()
                     }
-                    Log.i("Total Tracks Fetched", tempTrackList.size.toString())
+                    log("Total Tracks Fetched", tempTrackList.size.toString())
                     trackList.value = tempTrackList.toTrackDetailsList(folderType, subFolder)
                     title.value = playlistObject?.name
                     coverUrl.value = playlistObject?.images?.elementAtOrNull(1)?.url

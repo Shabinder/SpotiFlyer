@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 
-fun loadAllImages(context: Context?, images:List<String>? = null,source:Source) {
+fun loadAllImages(context: Context? = mainActivity, images:List<String>? = null,source:Source) {
     val serviceIntent = Intent(context, ForegroundService::class.java)
     images?.let {  serviceIntent.putStringArrayListExtra("imagesList",(it + source.name) as ArrayList<String>) }
     context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
@@ -122,15 +122,17 @@ fun showMessage(message: String, long: Boolean = false,isSuccess:Boolean = false
     }
 }
 
-fun showNoConnectionAlert(){
-    CoroutineScope(Dispatchers.Main).launch {
+fun showDialog(title:String? = null, message: String? = null){
+    mainActivity.viewModelScope.launch(Dispatchers.Main) {
         mainActivity.apply {
-            MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme)
-                .setTitle(resources.getString(R.string.title))
-                .setMessage(resources.getString(R.string.supporting_text))
-                .setPositiveButton(resources.getString(R.string.cancel)) { _, _ ->
+            MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme).apply {
+                setTitle(title ?: resources.getString(R.string.no_internet))
+                setMessage(message ?: resources.getString(R.string.supporting_text))
+                setPositiveButton(resources.getString(R.string.lemme_check)) { _, _ ->
                     // Respond to neutral button press
-                }.show()
+                }
+                show()
+            }
         }
     }
 }
@@ -150,7 +152,7 @@ fun bindImage(imgView: ImageView, imgUrl: String?,source: Source?) {
                     target: Target<File>?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    Log.i("Glide","LoadFailed")
+                    log("Glide","LoadFailed")
                     return false
                 }
 
@@ -216,12 +218,12 @@ fun createDirectory(dir:String){
     if(!yourAppDir.exists() && !yourAppDir.isDirectory)
     { // create empty directory
         if (yourAppDir.mkdirs())
-        {Log.i("CreateDir","$dir created")}
+        {log("CreateDir","$dir created")}
         else
         {Log.w("CreateDir","Unable to create Dir: $dir!")}
     }
     else
-    {Log.i("CreateDir","$dir already exists")}
+    {log("CreateDir","$dir already exists")}
 }
 /**
  * Removing Illegal Chars from File Name

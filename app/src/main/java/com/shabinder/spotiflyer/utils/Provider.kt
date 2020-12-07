@@ -51,7 +51,8 @@ object Provider {
 
     // mainActivity Instance to use whereEver Needed , as Its God Activity.
     // (i.e, Active Throughout App' Lifecycle )
-    val mainActivity: MainActivity by lazy { MainActivity.getInstance()  }
+    val mainActivity: MainActivity
+        get() = MainActivity.getInstance()
 
     //Default Directory to save Media in their Own Categorized Folders
     @Suppress("DEPRECATION")// We Do Have Media Access (But Just Media in Media Directory,Not Anything Else)
@@ -87,7 +88,7 @@ object Provider {
             transactionId = "UNIQUE_TRANSACTION_ID"
             transactionRefId = "UNIQUE_TRANSACTION_REF_ID"
             description = "Thanks for donating"
-            amount = "49"
+            amount = "49.00"
             build()
         }
     }

@@ -18,7 +18,6 @@
 package com.shabinder.spotiflyer.ui.youtube
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
 import com.github.kiulian.downloader.YoutubeDownloader
@@ -52,7 +51,7 @@ class YoutubeViewModel @ViewModelInject constructor(
         if(!isOnline())return
         try{
             viewModelScope.launch(Dispatchers.IO) {
-                Log.i("YT Playlist",searchId)
+                log("YT Playlist",searchId)
                 val playlist = ytDownloader.getPlaylist(searchId)
                 val playlistDetails = playlist.details()
                 val name = playlistDetails.title()
@@ -110,12 +109,12 @@ class YoutubeViewModel @ViewModelInject constructor(
         if(!isOnline())return
         try{
             viewModelScope.launch(Dispatchers.IO) {
-                Log.i("YT Video",searchId)
+                log("YT Video",searchId)
                 val video = ytDownloader.getVideo(searchId)
                 coverUrl.postValue("https://i.ytimg.com/vi/$searchId/hqdefault.jpg")
                 val detail = video?.details()
                 val name = detail?.title()?.replace(detail.author()!!.toUpperCase(),"",true) ?: detail?.title() ?: ""
-                Log.i("YT View Model",detail.toString())
+                log("YT View Model",detail.toString())
                 this@YoutubeViewModel.trackList.postValue(
                     listOf(
                         TrackDetails(

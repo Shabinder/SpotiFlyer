@@ -18,7 +18,6 @@
 package com.shabinder.spotiflyer.downloadHelper
 
 import android.annotation.SuppressLint
-import android.util.Log
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
@@ -128,7 +127,7 @@ fun getYTTracks(response: String):List<YoutubeTrack>{
                         )
                     }
             }
-            Log.i("Text Api",availableDetails.toString())
+            //log("Text Api",availableDetails.toString())
             /*
             ! Filter Out non-Song/Video results and incomplete results here itself
             ! From what we know about detail order, note that [1] - indicate result type
@@ -188,7 +187,7 @@ fun sortByBestMatch(ytTracks:List<YoutubeTrack>,
 
         // Skip this Result if No Word is Common in Name
         if (!hasCommonWord) {
-            Log.i("YT Api Removing", result.toString())
+            //log("YT Api Removing", result.toString())
             continue
         }
 
@@ -211,7 +210,7 @@ fun sortByBestMatch(ytTracks:List<YoutubeTrack>,
         }
 
         if(artistMatchNumber == 0) {
-            Log.i("YT Api Removing", result.toString())
+            //log("YT Api Removing", result.toString())
             continue
         }
 
@@ -231,6 +230,6 @@ fun sortByBestMatch(ytTracks:List<YoutubeTrack>,
         val avgMatch = (artistMatch + durationMatch)/2
         linksWithMatchValue[result.videoId.toString()] = avgMatch.toInt()
     }
-    Log.i("YT Api Result", "$trackName - $linksWithMatchValue")
+    //log("YT Api Result", "$trackName - $linksWithMatchValue")
     return linksWithMatchValue.toList().sortedByDescending { it.second }.toMap()
 }

@@ -20,11 +20,42 @@ package com.shabinder.spotiflyer.utils
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
+import com.github.kiulian.downloader.model.YoutubeVideo
+import com.github.kiulian.downloader.model.formats.Format
+import com.github.kiulian.downloader.model.quality.AudioQuality
+import com.shabinder.spotiflyer.BuildConfig
 import com.shabinder.spotiflyer.utils.Provider.mainActivity
+
+fun YoutubeVideo.getData(): Format?{
+    return try {
+        findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
+    } catch (e: java.lang.IndexOutOfBoundsException) {
+        try {
+            findAudioWithQuality(AudioQuality.high)?.get(0) as Format
+        } catch (e: java.lang.IndexOutOfBoundsException) {
+            try {
+                findAudioWithQuality(AudioQuality.low)?.get(0) as Format
+            } catch (e: java.lang.IndexOutOfBoundsException) {
+                log("YTDownloader", e.toString())
+                null
+            }
+        }
+    }
+}
+
+/*
+* Only Log in Debug Mode
+**/
+fun log(tag:String? = "SpotiFlyer",message:String? = "null"){
+    if (BuildConfig.DEBUG) {
+        Log.d(tag ?: "spotiflyer", message ?: "null")
+    }
+}
 
 fun View.openPlatformOnClick(packageName:String, websiteAddress:String){
     val manager: PackageManager = mainActivity.packageManager

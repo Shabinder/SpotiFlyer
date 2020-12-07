@@ -17,7 +17,6 @@
 
 package com.shabinder.spotiflyer.utils
 
-import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.Protocol
 import okhttp3.Response
@@ -27,33 +26,38 @@ const val NoInternetErrorCode = 222
 
 class NetworkInterceptor: Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        Log.i("Network Requesting",chain.request().url.toString())
+        log("Network Requesting",chain.request().url.toString())
         return if (!isOnline()){
             //No Internet Connection
-            showNoConnectionAlert()
-            //Lets Stop the Incoming Request
-            Response.Builder()
-                .code(NoInternetErrorCode) // code(200.300) = successful else = unsuccessful
-                .body("{}".toResponseBody(null)) // Empty Object
-                .protocol(Protocol.HTTP_2)
-                .message("No Internet Connection")
-                .request(chain.request())
-                .build()
+            showDialog()
+            //Lets Stop the Incoming Request and send Dummy Response
+            createEmptyResponse(chain,"No Internet Connection")
         }else {
-            val response = chain.proceed(chain.request())
-            val responseBody = response.body
-            val bodyString = responseBody?.string()
-            //Log.i("Network Request",bodyString)
-            //chain.proceed(chain.request())
-            //Log.i("Network Request","{\"unchecked\":${bodyString}}")
-            Response.Builder()
-                .code(response.code) // code(200.300) = successful else = unsuccessful
-                .body("{\"value\":${bodyString}}".toResponseBody(responseBody?.contentType())) // Whatever body
-                .protocol(response.protocol)
-                .message(response.message)
-                .request(chain.request())
-                .build()
-//            chain.proceed(chain.request())
+            try{
+                val response = chain.proceed(chain.request())
+                val responseBody = response.body
+                val bodyString = responseBody?.string()
+                Response.Builder().run {
+                    code(response.code) // code(200.300) = successful else = unsuccessful
+                    body("{\"value\":${bodyString}}".toResponseBody(responseBody?.contentType())) // Whatever body
+                    protocol(response.protocol)
+                    message(response.message)
+                    request(chain.request())
+                    build()
+                }
+            }catch (e: java.net.SocketTimeoutException){
+                showDialog("Timeout!","Please Go Back and Try Again")
+                createEmptyResponse(chain,"Timeout!, Slow Internet Connection")
+            }
         }
     }
+}
+
+fun createEmptyResponse(chain: Interceptor.Chain, message:String = "Error") = Response.Builder().run {
+        code(NoInternetErrorCode) // code(200.300) = successful else = unsuccessful
+        body("{}".toResponseBody(null)) // Empty Object
+        protocol(Protocol.HTTP_2)
+        message(message)
+        request(chain.request())
+        build()
 }

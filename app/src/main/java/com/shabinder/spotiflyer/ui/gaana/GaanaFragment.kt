@@ -18,7 +18,6 @@
 package com.shabinder.spotiflyer.ui.gaana
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -55,7 +54,7 @@ class GaanaFragment : TrackListFragment<GaanaViewModel, GaanaFragmentArgs>() {
         val link = gaanaLink.substringAfterLast('/', "error")
         val type = gaanaLink.substringBeforeLast('/', "error").substringAfterLast('/')
 
-        Log.i("Gaana Fragment", "$type : $link")
+        log("Gaana Fragment", "$type : $link")
 
         when{
             type == "Error" || link == "Error" -> {
@@ -68,7 +67,7 @@ class GaanaFragment : TrackListFragment<GaanaViewModel, GaanaFragmentArgs>() {
 
                 binding.btnDownloadAll.setOnClickListener {
                     if(!isOnline()){
-                        showNoConnectionAlert()
+                        showDialog()
                         return@setOnClickListener
                     }
                     binding.btnDownloadAll.gone()

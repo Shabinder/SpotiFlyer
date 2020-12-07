@@ -27,7 +27,6 @@ import android.content.IntentFilter
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
@@ -37,14 +36,11 @@ import com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.github.kiulian.downloader.YoutubeDownloader
-import com.github.kiulian.downloader.model.formats.Format
-import com.github.kiulian.downloader.model.quality.AudioQuality
-import com.mpatric.mp3agic.ID3v1Tag
-import com.mpatric.mp3agic.ID3v24Tag
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.downloadHelper.getYTTracks
@@ -64,7 +60,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
-import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
@@ -78,15 +73,17 @@ class ForegroundService : Service(){
     private var converted = 0//Total Files Converted
     private var downloaded = 0//Total Files downloaded
     private var failed = 0//Total Files failed
-    private var serviceJob = Job()
+    private val isFinished: Boolean
+        get() = converted + failed == total
+    private var isSingleDownload: Boolean = false
+    private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
-    private val requestMap = mutableMapOf<Request, TrackDetails>()
-    private val allTracksDetails = mutableListOf<TrackDetails>()
+    private val requestMap = hashMapOf<Request, TrackDetails>()
+    private val allTracksStatus = hashMapOf<String,DownloadStatus>()
     private var defaultDir = Provider.defaultDir
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
-    private var notificationLine = 0
-    private var messageList = mutableListOf("", "", "", "")
+    private var messageList = arrayOf("", "", "", "")
     private lateinit var cancelIntent:PendingIntent
     private lateinit var fetch:Fetch
     private lateinit var downloadManager : DownloadManager
@@ -112,7 +109,7 @@ class ForegroundService : Service(){
     @SuppressLint("WakelockTimeout")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // Send a notification that service is started
-        Log.i(tag, "Service Started.")
+        log(tag, "Service Started.")
         startForeground(notificationId, getNotification())
         intent?.let{
             when (it.action) {
@@ -120,7 +117,7 @@ class ForegroundService : Service(){
                 "query" -> {
                     val response = Intent().apply {
                         action = "query_result"
-                        putParcelableArrayListExtra("tracks", allTracksDetails as ArrayList<TrackDetails> )
+                        putExtra("tracks", allTracksStatus)
                     }
                     sendBroadcast(response)
                 }
@@ -140,10 +137,13 @@ class ForegroundService : Service(){
             }
 
             downloadObjects?.let { list ->
-                total += downloadObjects.size
+                downloadObjects.size.let { size ->
+                    total += size
+                    isSingleDownload = (size == 1)
+                }
                 updateNotification()
                 list.forEach { it1 ->
-                    allTracksDetails.add(it1.apply { downloaded = DownloadStatus.Queued })
+                    allTracksStatus[it1.title] = DownloadStatus.Queued
                 }
                 downloadAllTracks(list)
             }
@@ -153,7 +153,7 @@ class ForegroundService : Service(){
             //Service Already Started
             START_STICKY
         } else{
-            Log.i(tag, "Starting the foreground service task")
+            log(tag, "Starting the foreground service task")
             isServiceStarted = true
             wakeLock =
                 (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
@@ -169,10 +169,10 @@ class ForegroundService : Service(){
      * Function To Download All Tracks Available in a List
      **/
     private fun downloadAllTracks(trackList: List<TrackDetails>) {
-        serviceScope.launch(Dispatchers.Default){
-            trackList.forEach {
-                if(it.downloaded == DownloadStatus.Downloaded){//Download Already Present!!
-                }else {
+        trackList.forEach {
+            serviceScope.launch {
+                if (it.downloaded == DownloadStatus.Downloaded) {//Download Already Present!!
+                } else {
                     if (!it.videoID.isNullOrBlank()) {//Video ID already known!
                         downloadTrack(it.videoID!!, it)
                     } else {
@@ -184,19 +184,22 @@ class ForegroundService : Service(){
                                     call: Call<String>,
                                     response: Response<String>
                                 ) {
-                                    val videoId = sortByBestMatch(
-                                        getYTTracks(response.body().toString()),
-                                        trackName = it.title,
-                                        trackArtists = it.artists,
-                                        trackDurationSec = it.durationSec
-                                    ).keys.firstOrNull()
-                                    Log.i("Service VideoID", videoId ?: "Not Found")
-                                    if (videoId.isNullOrBlank()) {
-                                        sendTrackBroadcast(Status.FAILED.name, it)
-                                        failed++
-                                    }
-                                    else {//Found Youtube Video ID
-                                        downloadTrack(videoId, it)
+                                    serviceScope.launch {
+                                        val videoId = sortByBestMatch(
+                                            getYTTracks(response.body().toString()),
+                                            trackName = it.title,
+                                            trackArtists = it.artists,
+                                            trackDurationSec = it.durationSec
+                                        ).keys.firstOrNull()
+                                        log("Service VideoID", videoId ?: "Not Found")
+                                        if (videoId.isNullOrBlank()) {
+                                            sendTrackBroadcast(Status.FAILED.name, it)
+                                            failed++
+                                            updateNotification()
+                                            allTracksStatus[it.title] = DownloadStatus.Failed
+                                        } else {//Found Youtube Video ID
+                                            downloadTrack(videoId, it)
+                                        }
                                     }
                                 }
 
@@ -204,7 +207,7 @@ class ForegroundService : Service(){
                                     if (t.message.toString()
                                             .contains("Failed to connect")
                                     ) showMessage("Failed, Check Your Internet Connection!")
-                                    Log.i("YT API Req. Fail", t.message.toString())
+                                    log("YT API Req. Fail", t.message.toString())
                                 }
                             }
                         )
@@ -217,40 +220,27 @@ class ForegroundService : Service(){
     fun downloadTrack(videoID:String,track: TrackDetails){
         serviceScope.launch(Dispatchers.IO) {
             try {
-                val video = ytDownloader.getVideo(videoID)
-                val format: Format? = try {
-                    video?.findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
-                } catch (e: java.lang.IndexOutOfBoundsException) {
-                    try {
-                        video?.findAudioWithQuality(AudioQuality.high)?.get(0) as Format
-                    } catch (e: java.lang.IndexOutOfBoundsException) {
-                        try {
-                            video?.findAudioWithQuality(AudioQuality.low)?.get(0) as Format
-                        } catch (e: java.lang.IndexOutOfBoundsException) {
-                            Log.i("YTDownloader", e.toString())
-                            null
-                        }
-                    }
-                }
-                format?.let {
-                    val url: String = format.url()
-                    Log.i("DHelper Link Found", url)
+                val audioData = ytDownloader.getVideo(videoID).getData()
+
+                audioData?.let {
+                    val url: String = it.url()
+                    log("DHelper Link Found", url)
                     val request= Request(url, track.outputFile).apply{
                         priority = Priority.NORMAL
                         networkType = NetworkType.ALL
                     }
                     fetch.enqueue(request,
-                        {
-                            requestMap[it] = track
-                            Log.i(tag, "Enqueuing Download")
+                        { request1 ->
+                            requestMap[request1] = track
+                            log(tag, "Enqueuing Download")
                         },
-                        {
-                            Log.i(tag, "Enqueuing Error:${it.throwable.toString()}")
+                        { error ->
+                            log(tag, "Enqueuing Error:${error.throwable.toString()}")
                         }
                     )
                 }
             }catch (e: java.lang.Exception){
-                Log.i("Service YT Error", e.message.toString())
+                log("Service YT Error", e.message.toString())
             }
         }
     }
@@ -280,28 +270,10 @@ class ForegroundService : Service(){
             totalBlocks: Int
         ) {
             val track  = requestMap[download.request]
-            when(notificationLine){
-                0 -> {
-                    messageList[0] = "Downloading ${track?.title}"
-                    notificationLine = 1
-                }
-                1 -> {
-                    messageList[1] = "Downloading ${track?.title}"
-                    notificationLine = 2
-                }
-                2 -> {
-                    messageList[2] = "Downloading ${track?.title}"
-                    notificationLine = 3
-                }
-                3 -> {
-                    messageList[3] = "Downloading ${track?.title}"
-                    notificationLine = 0
-                }
-            }
-            Log.i(tag, "${track?.title} Download Started")
+            messageList[messageList.indexOf("")] = "Downloading ${track?.title}"
+            log(tag, "${track?.title} Download Started")
             track?.let{
-                allTracksDetails[allTracksDetails.map{ trackDetails -> trackDetails.title}.indexOf(it.title)] =
-                    it.apply { downloaded = DownloadStatus.Downloading }
+                allTracksStatus[it.title] = DownloadStatus.Downloading
                 updateNotification()
                 sendTrackBroadcast(Status.DOWNLOADING.name,track)
             }
@@ -332,15 +304,14 @@ class ForegroundService : Service(){
                 try{
                     track?.let {
                         convertToMp3(download.file, it)
-                        allTracksDetails[allTracksDetails.map{ trackDetails -> trackDetails.title}.indexOf(it.title)] =
-                            it.apply { downloaded = DownloadStatus.Converting }
+                        allTracksStatus[it.title] = DownloadStatus.Converting
                     }
-                    Log.i(tag, "${track?.title} Download Completed")
+                    log(tag, "${track?.title} Download Completed")
                 }catch (
                     e: KotlinNullPointerException
                 ){
-                    Log.i(tag, "${track?.title} Download Failed! Error:Fetch!!!!")
-                    Log.i(tag, "${track?.title} Requesting Download thru Android DM")
+                    log(tag, "${track?.title} Download Failed! Error:Fetch!!!!")
+                    log(tag, "${track?.title} Requesting Download thru Android DM")
                     downloadUsingDM(download.request.url, download.request.file, track!!)
                     downloaded++
                     requestMap.remove(download.request)
@@ -364,8 +335,8 @@ class ForegroundService : Service(){
             serviceScope.launch {
                 val track = requestMap[download.request]
                 downloaded++
-                Log.i(tag, download.error.throwable.toString())
-                Log.i(tag, "${track?.title} Requesting Download thru Android DM")
+                log(tag, download.error.throwable.toString())
+                log(tag, "${track?.title} Requesting Download thru Android DM")
                 downloadUsingDM(download.request.url, download.request.file, track!!)
                 requestMap.remove(download.request)
             }
@@ -382,7 +353,7 @@ class ForegroundService : Service(){
             downloadedBytesPerSecond: Long
         ) {
             val track  = requestMap[download.request]
-            Log.i(tag, "${track?.title} ETA: ${etaInMilliSeconds / 1000} sec")
+            log(tag, "${track?.title} ETA: ${etaInMilliSeconds / 1000} sec")
             val intent = Intent().apply {
                 action = "Progress"
                 putExtra("progress", download.progress)
@@ -411,7 +382,7 @@ class ForegroundService : Service(){
 
         //Start Download
         val downloadID = downloadManager.enqueue(request)
-        Log.i("DownloadManager", "Download Request Sent")
+        log("DownloadManager", "Download Request Sent")
 
         val onDownloadComplete: BroadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -419,8 +390,7 @@ class ForegroundService : Service(){
                 val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
                 //Checking if the received broadcast is for our enqueued download by matching download id
                 if (downloadID == id) {
-                    allTracksDetails[allTracksDetails.map{ trackDetails -> trackDetails.title}.indexOf(track.title)] =
-                        track.apply { downloaded = DownloadStatus.Converting }
+                    allTracksStatus[track.title] = DownloadStatus.Converting
                     convertToMp3(outputDir, track)
                     converted++
                     //Unregister this broadcast Receiver
@@ -443,16 +413,16 @@ class ForegroundService : Service(){
         ) { _, returnCode ->
             when (returnCode) {
                 RETURN_CODE_SUCCESS -> {
-                    Log.i(Config.TAG, "Async command execution completed successfully.")
+                    log(Config.TAG, "Async command execution completed successfully.")
                     m4aFile.delete()
                     writeMp3Tags(filePath.substringBeforeLast('.') + ".mp3", track)
                     //FFMPEG task Completed
                 }
                 RETURN_CODE_CANCEL -> {
-                    Log.i(Config.TAG, "Async command execution cancelled by user.")
+                    log(Config.TAG, "Async command execution cancelled by user.")
                 }
                 else -> {
-                    Log.i(
+                    log(
                         Config.TAG, String.format(
                             "Async command execution failed with rc=%d.",
                             returnCode
@@ -468,7 +438,7 @@ class ForegroundService : Service(){
         mp3File =  removeAllTags(mp3File)
         mp3File = setId3v1Tags(mp3File, track)
         mp3File = setId3v2Tags(mp3File, track)
-        Log.i("Mp3Tags", "saving file")
+        log("Mp3Tags", "saving file")
         mp3File.save(filePath.substringBeforeLast('.') + ".new.mp3")
         val file = File(filePath)
         file.delete()
@@ -477,11 +447,11 @@ class ForegroundService : Service(){
         converted++
         updateNotification()
         addToLibrary(file.absolutePath)
-        allTracksDetails.removeAt(allTracksDetails.map{ trackDetails -> trackDetails.title}.indexOf(track.title))
+        allTracksStatus.remove(track.title)
         //Notify Download Completed
         sendTrackBroadcast("track_download_completed",track)
         //All tasks completed (REST IN PEACE)
-        if(converted == total){
+        if(isFinished && !isSingleDownload){
             onDestroy()
         }
     }
@@ -495,58 +465,8 @@ class ForegroundService : Service(){
         mNotificationManager.notify(notificationId, getNotification())
     }
 
-    /**
-     *Modifying Mp3 com.shabinder.spotiflyer.models.gaana.Tags with MetaData!
-     **/
-    private fun setId3v1Tags(mp3File: Mp3File, track: TrackDetails): Mp3File {
-        val id3v1Tag = ID3v1Tag().apply {
-            artist = track.artists.joinToString(",")
-            title = track.title
-            album = track.albumName
-            year = track.year
-            comment = "Genres:${track.comment}"
-        }
-        mp3File.id3v1Tag = id3v1Tag
-        return mp3File
-    }
-    private fun setId3v2Tags(mp3file: Mp3File, track: TrackDetails): Mp3File {
-        val id3v2Tag = ID3v24Tag().apply {
-            artist = track.artists.joinToString(",")
-            title = track.title
-            album = track.albumName
-            year = track.year
-            comment = "Genres:${track.comment}"
-            lyrics = "Gonna Implement Soon"
-            url = track.trackUrl
-        }
-        val bytesArray = ByteArray(track.albumArt.length().toInt())
-        try{
-            val fis = FileInputStream(track.albumArt)
-            fis.read(bytesArray) //read file into bytes[]
-            fis.close()
-            id3v2Tag.setAlbumImage(bytesArray, "image/jpeg")
-        }catch (e: java.io.FileNotFoundException){
-            Log.i("Error", "Couldn't Write Mp3 Album Art")
-        }
-        mp3file.id3v2Tag = id3v2Tag
-        return mp3file
-    }
-
-    private fun removeAllTags(mp3file: Mp3File): Mp3File {
-        if (mp3file.hasId3v1Tag()) {
-            mp3file.removeId3v1Tag()
-        }
-        if (mp3file.hasId3v2Tag()) {
-            mp3file.removeId3v2Tag()
-        }
-        if (mp3file.hasCustomTag()) {
-            mp3file.removeCustomTag()
-        }
-        return mp3file
-    }
-
     private fun releaseWakeLock() {
-        Log.i(tag, "Releasing Wake Lock")
+        log(tag, "Releasing Wake Lock")
         try {
             wakeLock?.let {
                 if (it.isHeld) {
@@ -554,7 +474,7 @@ class ForegroundService : Service(){
                 }
             }
         } catch (e: Exception) {
-            Log.i(tag, "Service stopped without being started: ${e.message}")
+            log(tag, "Service stopped without being started: ${e.message}")
         }
         isServiceStarted = false
     }
@@ -575,7 +495,7 @@ class ForegroundService : Service(){
      * Cleaning All Residual Files except Mp3 Files
      **/
     private fun cleanFiles(dir: File) {
-        Log.i(tag, "Starting Cleaning in ${dir.path} ")
+        log(tag, "Starting Cleaning in ${dir.path} ")
         val fList = dir.listFiles()
         fList?.let {
             for (file in fList) {
@@ -583,7 +503,7 @@ class ForegroundService : Service(){
                     cleanFiles(file)
                 } else if(file.isFile) {
                     if(file.path.toString().substringAfterLast(".") != "mp3"){
-                        Log.i(tag, "Cleaning ${file.path}")
+                        log(tag, "Cleaning ${file.path}")
                         file.delete()
                     }
                 }
@@ -595,7 +515,7 @@ class ForegroundService : Service(){
     * Add File to Android's Media Library.
     * */
     private fun addToLibrary(path:String) {
-        Log.i(tag,"Scanning File")
+        log(tag,"Scanning File")
         MediaScannerConnection.scanFile(this,
             listOf(path).toTypedArray(), null,null)
     }
@@ -603,7 +523,7 @@ class ForegroundService : Service(){
     /**
      * Function to fetch all Images for use in mp3 tags.
      **/
-    private suspend fun loadAllImages(urlList: ArrayList<String>) {
+    private fun loadAllImages(urlList: ArrayList<String>) {
         /*
         * Last Element of this List defines Its Source
         * */
@@ -611,8 +531,9 @@ class ForegroundService : Service(){
         for (url in urlList.subList(0, urlList.size - 2)) {
             val imgUri = url.toUri().buildUpon().scheme("https").build()
             Glide
-                .with(this)
+                .with(this@ForegroundService)
                 .asFile()
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .load(imgUri)
                 .listener(object : RequestListener<File> {
                     override fun onLoadFailed(
@@ -621,7 +542,7 @@ class ForegroundService : Service(){
                         target: Target<File>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        Log.i("Glide", "LoadFailed")
+                        log("Glide", "LoadFailed")
                         return false
                     }
 
@@ -632,42 +553,40 @@ class ForegroundService : Service(){
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        serviceScope.launch {
-                            withContext(Dispatchers.IO) {
-                                try {
-                                    val file = when (source) {
-                                        Source.Spotify.name -> {
-                                            File(imageDir, url.substringAfterLast('/') + ".jpeg")
-                                        }
-                                        Source.YouTube.name -> {
-                                            File(
-                                                imageDir,
-                                                url.substringBeforeLast('/', url)
-                                                    .substringAfterLast(
-                                                        '/',
-                                                        url
-                                                    ) + ".jpeg"
-                                            )
-                                        }
-                                        Source.Gaana.name -> {
-                                            File(
-                                                imageDir,
-                                                (url.substringBeforeLast('/').substringAfterLast(
-                                                    '/'
-                                                )) + ".jpeg"
-                                            )
-                                        }
-
-                                        else -> File(
+                        try {
+                            serviceScope.launch {
+                                val file = when (source) {
+                                    Source.Spotify.name -> {
+                                        File(imageDir, url.substringAfterLast('/') + ".jpeg")
+                                    }
+                                    Source.YouTube.name -> {
+                                        File(
                                             imageDir,
-                                            url.substringAfterLast('/') + ".jpeg"
+                                            url.substringBeforeLast('/', url)
+                                                .substringAfterLast(
+                                                    '/',
+                                                    url
+                                                ) + ".jpeg"
                                         )
                                     }
-                                    resource?.copyTo(file)
-                                } catch (e: IOException) {
-                                    e.printStackTrace()
+                                    Source.Gaana.name -> {
+                                        File(
+                                            imageDir,
+                                            (url.substringBeforeLast('/').substringAfterLast(
+                                                '/'
+                                            )) + ".jpeg"
+                                        )
+                                    }
+
+                                    else -> File(
+                                        imageDir,
+                                        url.substringAfterLast('/') + ".jpeg"
+                                    )
                                 }
+                                resource?.copyTo(file)
                             }
+                        } catch (e: IOException) {
+                            e.printStackTrace()
                         }
                         return false
                     }
@@ -677,13 +596,13 @@ class ForegroundService : Service(){
 
     private fun killService() {
         serviceScope.launch{
-            Log.i(tag,"Killing Self")
-            messageList = mutableListOf("Cleaning And Exiting","","","")
+            log(tag,"Killing Self")
+            messageList = arrayOf("Cleaning And Exiting","","","")
             fetch.cancelAll()
             fetch.removeAll()
             updateNotification()
             cleanFiles(File(defaultDir))
-            messageList = mutableListOf("","","","")
+            messageList = arrayOf("","","","")
             releaseWakeLock()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 stopForeground(true)
@@ -695,7 +614,7 @@ class ForegroundService : Service(){
 
     override fun onDestroy() {
         super.onDestroy()
-        if(converted == total){
+        if(isFinished){
             Handler(Looper.myLooper()!!).postDelayed({
                 killService()
             }, 5000)
@@ -704,30 +623,31 @@ class ForegroundService : Service(){
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        if(converted == total ){
+        if(isFinished){
             killService()
         }
     }
 
     private fun initialiseFetch() {
         val fetchConfiguration =
-            FetchConfiguration.Builder(this)
-                .setNamespace(channelId)
-                .setDownloadConcurrentLimit(4)
-                .build()
+            FetchConfiguration.Builder(this).run {
+                setNamespace(channelId)
+                setDownloadConcurrentLimit(4)
+                build()
+            }
 
-        Fetch.setDefaultInstanceConfiguration(fetchConfiguration)
-
-        fetch = Fetch.getDefaultInstance()
-        fetch.addListener(fetchListener)
-        //clearing all not completed Downloads
-        //Starting fresh
-        fetch.removeAll()
+        fetch = Fetch.run {
+            setDefaultInstanceConfiguration(fetchConfiguration)
+            getDefaultInstance()
+        }.apply {
+            addListener(fetchListener)
+            removeAll() //Starting fresh
+        }
     }
 
     private fun getNotification():Notification = NotificationCompat.Builder(this, channelId).run {
         setSmallIcon(R.drawable.down_arrowbw)
-        setSubText("Total: $total  Completed:$converted")
+        setSubText("Total: $total  Completed:$converted  Failed:$failed")
         setNotificationSilent()
         setStyle(
             NotificationCompat.InboxStyle().run {

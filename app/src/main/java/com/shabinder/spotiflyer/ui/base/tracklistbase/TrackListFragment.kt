@@ -22,7 +22,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,7 +50,7 @@ abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseF
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if(!isOnline()){
-            showNoConnectionAlert()
+            showDialog()
             mainActivity.navController.popBackStack()
         }
     }
@@ -77,7 +76,7 @@ abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseF
     private fun initializeLiveDataObservers() {
         viewModel.trackList.observe(viewLifecycleOwner, {
             if (!it.isNullOrEmpty()){
-                Log.i("TrackListFragment","TrackList Updated")
+                log("TrackListFragment","TrackList Updated")
                 adapter.submitList(it, source)
                 updateTracksStatus()
             }
@@ -108,7 +107,7 @@ abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseF
                     val trackDetails = intent.getParcelableExtra<TrackDetails?>("track")
                     trackDetails?.let {
                         val position: Int = viewModel.trackList.value?.map { it.title }?.indexOf(trackDetails.title) ?: -1
-                        Log.i("BroadCast Received","$position, ${intent.action} , ${trackDetails.title}")
+                        log("BroadCast Received","$position, ${intent.action} , ${trackDetails.title}")
                         if(position != -1) {
                             val track = viewModel.trackList.value?.get(position)
                             track?.let{
@@ -149,14 +148,16 @@ abstract class TrackListFragment<VM : TrackListViewModel, args: NavArgs> : BaseF
             override fun onReceive(context: Context?, intent: Intent?) {
                 //UI update here
                 if (intent != null){
-                    val trackList = intent.getParcelableArrayListExtra<TrackDetails?>("tracks") ?: listOf()
-                    Log.i("Service Response", "${trackList.size} Tracks Active")
-                    for (trackDetails in trackList) {
-                        trackDetails?.let { it ->
-                            val position: Int = viewModel.trackList.value?.map { it.title }?.indexOf(trackDetails.title) ?: -1
-                            Log.i("BroadCast Received","$position, ${it.downloaded} , ${trackDetails.title}")
+                    @Suppress("UNCHECKED_CAST")
+                    val trackList = intent.getSerializableExtra("tracks") as HashMap<String, DownloadStatus>?
+                    trackList?.let { list ->
+                        log("Service Response", "${list.size} Tracks Active")
+                        for (it in list) {
+                            val position: Int = viewModel.trackList.value?.map { it.title }?.indexOf(it.key) ?: -1
+                            log("BroadCast Received","$position, ${it.value} , ${it.key}")
                             if(position != -1) {
-                                viewModel.trackList.value?.set(position,it)
+                                viewModel.trackList.value!![position] =
+                                    viewModel.trackList.value!![position].apply { downloaded = it.value }
                                 adapter.notifyItemChanged(position)
                                 updateTracksStatus()
                             }

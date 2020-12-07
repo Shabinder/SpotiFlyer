@@ -51,6 +51,7 @@ class TrackListAdapter(private val viewModel : TrackListViewModel): ListAdapter<
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         if(itemCount == 1){ holder.binding.imageUrl.visibility = View.GONE}else{
+            holder.binding.imageUrl.setImageURI(null) //Clear Previous Image(Recycled)
             viewModel.viewModelScope.launch {
                 bindImage(holder.binding.imageUrl,item.albumArtURL, source)
             }
@@ -105,7 +106,7 @@ class TrackListAdapter(private val viewModel : TrackListViewModel): ListAdapter<
                     visible()
                     setOnClickListener{
                         if(!isOnline()){
-                            showNoConnectionAlert()
+                            showDialog()
                             return@setOnClickListener
                         }
                         showMessage("Processing!")

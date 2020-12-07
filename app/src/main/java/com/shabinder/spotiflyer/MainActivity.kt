@@ -26,7 +26,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -41,6 +40,7 @@ import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
 import com.shabinder.spotiflyer.utils.NetworkInterceptor
 import com.shabinder.spotiflyer.utils.createDirectories
+import com.shabinder.spotiflyer.utils.log
 import com.shabinder.spotiflyer.utils.showMessage
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,6 +56,7 @@ import javax.inject.Inject
 /*
 * This is App's God Activity
 * */
+@SuppressLint("GoogleAppIndexingApiWarning")
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(){
     private var spotifyService : SpotifyService? = null
@@ -155,13 +156,13 @@ class MainActivity : AppCompatActivity(){
 
     fun authenticateSpotify() {
         sharedViewModel.viewModelScope.launch {
-            Log.i("Spotify Authentication","Started")
+            log("Spotify Authentication","Started")
             val token = spotifyServiceTokenRequest.getToken()
             token.value?.let {
                 showMessage("Success: Spotify Token Acquired",isSuccess = true)
                 implementSpotifyService(it.access_token)
             }
-            Log.i("Spotify Token", token.value.toString())
+            log("Spotify Token", token.value.toString())
         }
     }
 
@@ -170,7 +171,7 @@ class MainActivity : AppCompatActivity(){
         if (intent?.action == Intent.ACTION_SEND) {
             if ("text/plain" == intent.type) {
                 intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-                    Log.i("Intent Received", it)
+                    log("Intent Received", it)
                     sharedViewModel.intentString.value = it
                 }
             }
@@ -193,7 +194,7 @@ class MainActivity : AppCompatActivity(){
             .setUpdateXML("https://raw.githubusercontent.com/Shabinder/SpotiFlyer/master/app/src/main/res/xml/app_update.xml")
             .setCancelable(false)
             .setButtonDoNotShowAgain("Remind Later")
-            .setButtonDoNotShowAgainClickListener { dialog, _ -> dialog.dismiss()  }
+            .setButtonDoNotShowAgainClickListener { dialog, _ -> dialog.dismiss() }
             .setButtonUpdateClickListener { _, _ ->
                 val uri: Uri =
                     Uri.parse("http://github.com/Shabinder/SpotiFlyer/releases")

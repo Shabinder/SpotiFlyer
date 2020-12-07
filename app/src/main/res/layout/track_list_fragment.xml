@@ -124,9 +124,8 @@
                     android:layout_marginBottom="24dp"
                     android:background="#00000000"
                     android:fontFamily="@font/raleway_semibold"
-                    android:gravity="end"
                     android:text='"Loading..."'
-                    android:textAlignment="viewEnd"
+                    android:textAlignment="center"
                     android:textColor="#9AB3FF"
                     android:textSize="26sp"
                     android:textStyle="bold"
@@ -152,7 +151,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar" />
+        app:layout_constraintTop_toBottomOf="@id/appbar"
+        tools:itemCount="6"
+        tools:listitem="@layout/track_list_item"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
