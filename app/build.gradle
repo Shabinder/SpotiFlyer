@@ -51,6 +51,19 @@ android {
         kotlinCompilerExtensionVersion compose_version
         kotlinCompilerVersion '1.4.21'
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/LGPL2.1'
+        exclude("META-INF/*.kotlin_module")
+    }
 }
 
 dependencies {
@@ -59,7 +72,6 @@ dependencies {
     implementation "androidx.core:core-ktx:1.5.0-alpha05"
     implementation "androidx.palette:palette-ktx:1.0.0"
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.2.1'
 
     //Compose
     implementation "androidx.compose.ui:ui:$compose_version"
@@ -69,18 +81,17 @@ dependencies {
 
     //Lifecycle
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-extensions-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
 
     //Coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
+    //implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    //implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
 
     //Room
     kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-runtime-ktx:$room_version"
+    implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
 
     //Okhttp
