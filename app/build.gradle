@@ -1,7 +1,10 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-parcelize'
     id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'kotlinx-serialization'
 }
 
 kapt {
@@ -98,6 +101,15 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
 
+    //Hilt
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt 'androidx.hilt:hilt-compiler:1.0.0-alpha02'
+    implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02'
+
+    //FFmpeg
+    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+
     //Okhttp
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
@@ -106,11 +118,15 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
 
     //Json
+    implementation 'com.beust:klaxon:5.4'
     implementation 'com.squareup.moshi:moshi:1.11.0'
     implementation 'com.squareup.moshi:moshi-kotlin:1.11.0'
     implementation "com.squareup.retrofit2:converter-moshi:2.9.0"
     implementation "com.squareup.retrofit2:converter-scalars:2.9.0"
-    implementation 'com.beust:klaxon:5.4'
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1"
+
+    //Glide-Image Loading
+    implementation "dev.chrisbanes.accompanist:accompanist-glide:0.4.1"
 
     //Coil-Image Loading
     implementation "dev.chrisbanes.accompanist:accompanist-coil:$coil_version"

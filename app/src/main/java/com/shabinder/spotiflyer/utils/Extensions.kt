@@ -6,6 +6,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import com.github.kiulian.downloader.model.YoutubeVideo
+import com.github.kiulian.downloader.model.formats.Format
+import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.shabinder.spotiflyer.BuildConfig
 import com.shabinder.spotiflyer.MainActivity
 
@@ -26,7 +29,22 @@ fun MainActivity.requestStoragePermission() {
         )
     }
 }
-
+fun YoutubeVideo.getData(): Format?{
+    return try {
+        findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
+    } catch (e: java.lang.IndexOutOfBoundsException) {
+        try {
+            findAudioWithQuality(AudioQuality.high)?.get(0) as Format
+        } catch (e: java.lang.IndexOutOfBoundsException) {
+            try {
+                findAudioWithQuality(AudioQuality.low)?.get(0) as Format
+            } catch (e: java.lang.IndexOutOfBoundsException) {
+                log("YTDownloader", e.toString())
+                null
+            }
+        }
+    }
+}
 fun openPlatform(packageName:String, websiteAddress:String){
     val manager: PackageManager = mainActivity.packageManager
     try {

@@ -7,6 +7,8 @@ buildscript {
         okhttp_version = "4.9.0"
         coroutines_version = "1.4.2"
         coil_version = "0.4.1"
+        kotlin_version = "1.4.21"
+        hilt_version = '2.30.1-alpha'
     }
 
     repositories {
@@ -17,7 +19,10 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:7.0.0-alpha03"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21"
-
+        //Hilt
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
+        //Kotlinx-Serialization
+        classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
