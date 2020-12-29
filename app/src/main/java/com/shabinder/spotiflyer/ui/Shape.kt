@@ -1,4 +1,4 @@
-package com.example.composelearn.ui
+package com.shabinder.spotiflyer.ui
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

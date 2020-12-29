@@ -1,4 +1,4 @@
-package com.example.composelearn
+package com.shabinder.spotiflyer
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -15,11 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.example.composelearn.ui.ComposeLearnTheme
-import com.example.composelearn.ui.appNameStyle
+import com.shabinder.spotiflyer.home.Home
+import com.shabinder.spotiflyer.ui.ComposeLearnTheme
+import com.shabinder.spotiflyer.ui.appNameStyle
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.statusBarsHeight
 
@@ -33,27 +32,22 @@ class MainActivity : AppCompatActivity() {
         setContent {
             ComposeLearnTheme {
                 ProvideWindowInsets {
-                    HomeScreen()
+                    Column {
+                        val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
+
+                        // Draw a scrim over the status bar which matches the app bar
+                        Spacer(Modifier.background(appBarColor).fillMaxWidth().statusBarsHeight())
+
+                        AppBar(
+                            backgroundColor = appBarColor,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Home()
+                    }
                 }
             }
         }
-    }
-
-
-}
-
-@Composable
-fun HomeScreen() {
-    Column {
-        val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
-
-        // Draw a scrim over the status bar which matches the app bar
-        Spacer(Modifier.background(appBarColor).fillMaxWidth().statusBarsHeight())
-
-        AppBar(
-            backgroundColor = appBarColor,
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }
 
@@ -89,10 +83,10 @@ fun AppBar(
 }
 
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     ComposeLearnTheme {
-        HomeScreen()
+
     }
 }

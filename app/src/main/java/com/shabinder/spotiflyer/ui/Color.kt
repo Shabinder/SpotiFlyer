@@ -1,4 +1,4 @@
-package com.example.composelearn.ui
+package com.shabinder.spotiflyer.ui
 
 import androidx.compose.material.Colors
 import androidx.compose.material.darkColors
@@ -22,7 +22,9 @@ val SpotiFlyerColors = darkColors(
     error = colorRedError,
     onError = Color.Black,
     surface = darkBackgroundColor,
-    background = darkBackgroundColor
+    background = darkBackgroundColor,
+    onSurface = Color.LightGray,
+    onBackground = Color.LightGray
 )
 
 /**

@@ -1,4 +1,4 @@
-package com.example.composelearn.ui
+package com.shabinder.spotiflyer.ui
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable

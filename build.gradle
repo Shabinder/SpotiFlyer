@@ -23,11 +23,30 @@ buildscript {
     }
 }
 
-allprojects {
+subprojects{
     repositories {
         google()
         jcenter()
         maven { url "https://jitpack.io" }
+    }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            // Treat all Kotlin warnings as errors
+            //allWarningsAsErrors = true
+
+            freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
+
+            // Enable experimental coroutines APIs, including Flow
+            freeCompilerArgs += '-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi'
+            freeCompilerArgs += '-Xopt-in=kotlinx.coroutines.FlowPreview'
+            freeCompilerArgs += '-Xopt-in=kotlin.Experimental'
+
+            freeCompilerArgs += "-Xallow-jvm-ir-dependencies"
+
+            // Set JVM target to 1.8
+            jvmTarget = "1.8"
+        }
     }
 }
 

@@ -1,11 +1,11 @@
-package com.example.composelearn.ui
+package com.shabinder.spotiflyer.ui
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.sp
-import com.example.composelearn.R
+import com.shabinder.spotiflyer.R
 
 private val Montserrat = fontFamily(
         font(R.font.montserrat_light, FontWeight.Light),
@@ -110,9 +110,9 @@ val SpotiFlyerTypography = Typography(
 
 val appNameStyle = TextStyle(
         fontFamily = pristineFont,
-        fontSize = 42.sp,
+        fontSize = 40.sp,
         fontWeight = FontWeight.SemiBold,
         lineHeight = 42.sp,
-        letterSpacing = (-0.5).sp,
-        color = Color.White
+        letterSpacing = (1.5).sp,
+        color = Color(0xFFECECEC)
 )

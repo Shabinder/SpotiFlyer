@@ -1,9 +1,10 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="Theme.ComposeLearn" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme.SpotiFlyer" parent="Theme.AppCompat.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
