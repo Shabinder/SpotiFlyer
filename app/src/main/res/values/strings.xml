@@ -2,4 +2,5 @@
     <string name="app_name">SpotiFlyer</string>
     <string name="home_about">About</string>
     <string name="home_history">History</string>
+    <string name="supported_platform">Supported Platforms</string>
 </resources>

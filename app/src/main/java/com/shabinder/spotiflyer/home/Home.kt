@@ -1,6 +1,7 @@
 package com.shabinder.spotiflyer.home
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -9,6 +10,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.TabDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.InsertLink
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,7 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -34,10 +41,17 @@ fun Home(modifier: Modifier = Modifier) {
 
     Column(modifier = modifier) {
 
-        AuthenticationBanner(viewModel,modifier)
-        SearchBar(viewModel,modifier)
-
+        val link by viewModel.link.collectAsState()
         val selectedCategory by viewModel.selectedCategory.collectAsState()
+
+        AuthenticationBanner(viewModel,modifier)
+
+        SearchBar(
+            link,
+            viewModel::updateLink,
+            modifier
+        )
+
 
         HomeTabBar(
             selectedCategory,
@@ -46,7 +60,41 @@ fun Home(modifier: Modifier = Modifier) {
             modifier
         )
 
+        when(selectedCategory){
+            HomeCategory.About -> AboutColumn(viewModel,modifier)
+            HomeCategory.History -> HistoryColumn()
+        }
+
     }
+}
+
+
+@Composable
+fun AboutColumn(viewModel: HomeViewModel, modifier: Modifier) {
+    Card(
+        modifier = modifier.padding(8.dp).fillMaxWidth(),
+        border = BorderStroke(1.dp,Color.Gray)
+    ) {
+        Column(modifier.padding(8.dp)) {
+            Text(
+                text = stringResource(R.string.supported_platform),
+                style = SpotiFlyerTypography.body1
+            )
+            Spacer(modifier = Modifier.padding(top = 8.dp))
+            Row(horizontalArrangement = Arrangement.Center,modifier = modifier.fillMaxWidth()) {
+                Icon(imageVector = vectorResource(id = R.drawable.ic_spotify_logo ),tint = Color.Unspecified)
+                Spacer(modifier = modifier.padding(start = 24.dp))
+                Icon(imageVector = vectorResource(id = R.drawable.ic_gaana ),tint = Color.Unspecified)
+                Spacer(modifier = modifier.padding(start = 24.dp))
+                Icon(imageVector = vectorResource(id = R.drawable.ic_youtube),tint = Color.Unspecified)
+            }
+        }
+    }
+}
+
+@Composable
+fun HistoryColumn() {
+    //TODO("Not yet implemented")
 }
 
 @Composable
@@ -89,6 +137,12 @@ fun HomeTabBar(
                         },
                         style = MaterialTheme.typography.body2
                     )
+                },
+                icon = {
+                    when (category) {
+                        HomeCategory.About -> Icon(Icons.Outlined.Info)
+                        HomeCategory.History -> Icon(Icons.Outlined.History)
+                    }
                 }
             )
         }
@@ -97,10 +151,10 @@ fun HomeTabBar(
 
 @Composable
 fun SearchBar(
-    viewModel: HomeViewModel,
+    link:String,
+    updateLink:(s:String) -> Unit,
     modifier: Modifier = Modifier
 ){
-    val link by viewModel.link.collectAsState()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -112,7 +166,7 @@ fun SearchBar(
             },
             label = {Text(text = "Paste Link Here...",color = Color.LightGray)},
             value = link,
-            onValueChange = { viewModel.updateLink(it) },
+            onValueChange = { updateLink(it) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
             modifier = Modifier.padding(12.dp).fillMaxWidth()
@@ -121,7 +175,7 @@ fun SearchBar(
                     RoundedCornerShape(30.dp)
                 ),
             backgroundColor = Color.Black,
-            textStyle = AmbientTextStyle.current.merge(TextStyle(fontSize = 20.sp)),
+            textStyle = AmbientTextStyle.current.merge(TextStyle(fontSize = 20.sp,color = Color.White)),
             shape = RoundedCornerShape(size = 30.dp),
             activeColor = Color.Transparent,
             inactiveColor = Color.Transparent
