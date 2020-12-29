@@ -1,24 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.shabinder.spotiflyer">
+
+    <queries>
+        <package android:name="com.gaana" />
+        <package android:name="com.spotify.music" />
+        <package android:name="com.google.android.youtube" />
+    </queries>
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"
+        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.READ_STORAGE_PERMISSION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:forceDarkAllowed="true"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SpotiFlyer">
+        android:theme="@style/Theme.SpotiFlyer"
+        tools:targetApi="q"
+        tools:ignore="AllowBackup">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.SpotiFlyer">
+            android:hardwareAccelerated="true"
+            android:theme="@style/Theme.SpotiFlyer"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <data android:mimeType="text/plain" />
+                <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Add your API key here -->
+        <meta-data
+            android:name="com.razorpay.ApiKey"
+            android:value="rzp_live_3ZQeoFYOxjmXye"
+            />
+
     </application>
 
 </manifest>

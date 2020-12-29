@@ -1,20 +1,18 @@
 package com.shabinder.spotiflyer.home
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.AmbientTextStyle
+import androidx.compose.material.Icon
 import androidx.compose.material.TabDefaults.tabIndicatorOffset
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.rounded.History
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.InsertLink
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,20 +21,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.navigate
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
 import com.shabinder.spotiflyer.ui.colorAccent
 import com.shabinder.spotiflyer.ui.colorPrimary
+import com.shabinder.spotiflyer.utils.openPlatform
 
 @Composable
-fun Home(modifier: Modifier = Modifier) {
+fun Home(navController: NavController, modifier: Modifier = Modifier) {
     val viewModel: HomeViewModel = viewModel()
 
     Column(modifier = modifier) {
@@ -46,9 +46,10 @@ fun Home(modifier: Modifier = Modifier) {
 
         AuthenticationBanner(viewModel,modifier)
 
-        SearchBar(
+        SearchPanel(
             link,
             viewModel::updateLink,
+            navController,
             modifier
         )
 
@@ -61,7 +62,7 @@ fun Home(modifier: Modifier = Modifier) {
         )
 
         when(selectedCategory){
-            HomeCategory.About -> AboutColumn(viewModel,modifier)
+            HomeCategory.About -> AboutColumn()
             HomeCategory.History -> HistoryColumn()
         }
 
@@ -70,24 +71,129 @@ fun Home(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun AboutColumn(viewModel: HomeViewModel, modifier: Modifier) {
-    Card(
-        modifier = modifier.padding(8.dp).fillMaxWidth(),
-        border = BorderStroke(1.dp,Color.Gray)
-    ) {
-        Column(modifier.padding(8.dp)) {
-            Text(
-                text = stringResource(R.string.supported_platform),
-                style = SpotiFlyerTypography.body1
-            )
-            Spacer(modifier = Modifier.padding(top = 8.dp))
-            Row(horizontalArrangement = Arrangement.Center,modifier = modifier.fillMaxWidth()) {
-                Icon(imageVector = vectorResource(id = R.drawable.ic_spotify_logo ),tint = Color.Unspecified)
-                Spacer(modifier = modifier.padding(start = 24.dp))
-                Icon(imageVector = vectorResource(id = R.drawable.ic_gaana ),tint = Color.Unspecified)
-                Spacer(modifier = modifier.padding(start = 24.dp))
-                Icon(imageVector = vectorResource(id = R.drawable.ic_youtube),tint = Color.Unspecified)
+fun AboutColumn(modifier: Modifier = Modifier) {
+    ScrollableColumn(modifier.fillMaxSize(),contentPadding = PaddingValues(16.dp)) {
+        Card(
+            modifier = modifier.fillMaxWidth(),
+            border = BorderStroke(1.dp,Color.Gray)
+        ) {
+            Column(modifier.padding(12.dp)) {
+                Text(
+                    text = stringResource(R.string.supported_platform),
+                    style = SpotiFlyerTypography.body1
+                )
+                Spacer(modifier = Modifier.padding(top = 12.dp))
+                Row(horizontalArrangement = Arrangement.Center,modifier = modifier.fillMaxWidth()) {
+                    Icon(
+                        imageVector = vectorResource(id = R.drawable.ic_spotify_logo), tint = Color.Unspecified,
+                        modifier = Modifier.clickable(
+                            onClick = { openPlatform("com.spotify.music","http://open.spotify.com") })
+                    )
+                    Spacer(modifier = modifier.padding(start = 24.dp))
+                    Icon(imageVector = vectorResource(id = R.drawable.ic_gaana ),tint = Color.Unspecified,
+                        modifier = Modifier.clickable(
+                            onClick = { openPlatform("com.gaana","http://gaana.com") })
+                    )
+                    Spacer(modifier = modifier.padding(start = 24.dp))
+                    Icon(imageVector = vectorResource(id = R.drawable.ic_youtube),tint = Color.Unspecified,
+                        modifier = Modifier.clickable(
+                            onClick = { openPlatform("com.google.android.youtube","http://m.youtube.com") })
+                    )
+                }
             }
+        }
+        Spacer(modifier = Modifier.padding(top = 8.dp))
+        Card(
+            modifier = modifier.fillMaxWidth(),
+            border = BorderStroke(1.dp,Color.Gray)
+        ) {
+            Column(modifier.padding(12.dp)) {
+                Text(
+                    text = stringResource(R.string.support_development),
+                    style = SpotiFlyerTypography.body1
+                )
+                Spacer(modifier = Modifier.padding(top = 6.dp))
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().clickable(
+                        onClick = { openPlatform("http://github.com/Shabinder/SpotiFlyer") })
+                        .padding(vertical = 6.dp)
+                ) {
+                    Icon(imageVector = vectorResource(id = R.drawable.ic_github ),tint = Color.LightGray)
+                    Spacer(modifier = Modifier.padding(start = 16.dp))
+                    Column {
+                        Text(
+                            text = stringResource(R.string.github),
+                            style = SpotiFlyerTypography.h6
+                        )
+                        Text(
+                            text = stringResource(R.string.github_star),
+                            style = SpotiFlyerTypography.subtitle2
+                        )
+                    }
+                }
+                Row(modifier = modifier.fillMaxWidth().padding(vertical = 6.dp),verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Rounded.Flag.copy(defaultHeight = 32.dp,defaultWidth = 32.dp))
+                    Spacer(modifier = Modifier.padding(start = 16.dp))
+                    Column {
+                        Text(
+                            text = stringResource(R.string.translate),
+                            style = SpotiFlyerTypography.h6
+                        )
+                        Text(
+                            text = stringResource(R.string.help_us_translate),
+                            style = SpotiFlyerTypography.subtitle2
+                        )
+                    }
+                }
+                Row(modifier = modifier.fillMaxWidth().padding(vertical = 6.dp),verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Rounded.CardGiftcard.copy(defaultHeight = 32.dp,defaultWidth = 32.dp))
+                    Spacer(modifier = Modifier.padding(start = 16.dp))
+                    Column {
+                        Text(
+                            text = stringResource(R.string.donate),
+                            style = SpotiFlyerTypography.h6
+                        )
+                        Text(
+                            text = stringResource(R.string.donate_subtitle),
+                            style = SpotiFlyerTypography.subtitle2
+                        )
+                    }
+                }
+                Row(modifier = modifier.fillMaxWidth().padding(vertical = 6.dp),verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Rounded.Share.copy(defaultHeight = 32.dp,defaultWidth = 32.dp))
+                    Spacer(modifier = Modifier.padding(start = 16.dp))
+                    Column {
+                        Text(
+                            text = stringResource(R.string.share),
+                            style = SpotiFlyerTypography.h6
+                        )
+                        Text(
+                            text = stringResource(R.string.share_subtitle),
+                            style = SpotiFlyerTypography.subtitle2
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier.fillMaxWidth().padding(8.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.made_with_love),
+                color = colorPrimary,
+                fontSize = 22.sp
+            )
+            Spacer(modifier = Modifier.padding(start = 4.dp))
+            Icon(vectorResource(id = R.drawable.ic_heart),tint = Color.Unspecified)
+            Spacer(modifier = Modifier.padding(start = 4.dp))
+            Text(
+                text = stringResource(id = R.string.in_india),
+                color = colorPrimary,
+                fontSize = 22.sp
+            )
         }
     }
 }
@@ -150,15 +256,16 @@ fun HomeTabBar(
 }
 
 @Composable
-fun SearchBar(
+fun SearchPanel(
     link:String,
     updateLink:(s:String) -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier
 ){
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.padding(top = 16.dp,bottom = 16.dp)
+        modifier = modifier.padding(top = 16.dp,)
     ){
         TextField(
             leadingIcon = {
@@ -182,7 +289,7 @@ fun SearchBar(
         )
         OutlinedButton(
             modifier = Modifier.padding(12.dp).wrapContentWidth(),
-            onClick = {/*TODO*/},
+            onClick = {navController.navigate("track_list/$link") },
             border = BorderStroke(1.dp, Brush.horizontalGradient(listOf(colorPrimary, colorAccent)))
         ){
             Text(text = "Search",style = SpotiFlyerTypography.h6,modifier = Modifier.padding(4.dp))

@@ -79,6 +79,9 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
+    
+    //Compose-Navigation
+    implementation "androidx.navigation:navigation-compose:1.0.0-alpha04"
 
     //Lifecycle
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"

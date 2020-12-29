@@ -17,8 +17,10 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.res.vectorResource
 import androidx.core.view.WindowCompat
 import com.shabinder.spotiflyer.home.Home
+import com.shabinder.spotiflyer.navigation.ComposeNavigation
 import com.shabinder.spotiflyer.ui.ComposeLearnTheme
 import com.shabinder.spotiflyer.ui.appNameStyle
+import com.shabinder.spotiflyer.utils.requestStoragePermission
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.statusBarsHeight
 
@@ -43,11 +45,22 @@ class MainActivity : AppCompatActivity() {
                             modifier = Modifier.fillMaxWidth()
                         )
 
-                        Home()
+                        ComposeNavigation()
                     }
                 }
             }
         }
+
+        requestStoragePermission()
+    }
+
+    companion object{
+        private lateinit var instance: MainActivity
+        fun getInstance():MainActivity = this.instance
+    }
+
+    init {
+        instance = this
     }
 }
 
@@ -72,7 +85,7 @@ fun AppBar(
         actions = {
             Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                 IconButton(
-                    onClick = { /* TODO: Open Settings */ }
+                    onClick = { /* TODO: Open Preferences*/ }
                 ) {
                     Icon(Icons.Filled.Settings, tint = Color.Gray)
                 }

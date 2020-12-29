@@ -1,5 +1,6 @@
 package com.shabinder.spotiflyer.ui
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -53,9 +54,11 @@ val SpotiFlyerTypography = Typography(
         ),
         h6 = TextStyle(
                 fontFamily = Montserrat,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                lineHeight = 24.sp
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                lineHeight = 26.sp,
+                letterSpacing = 0.5.sp
+
         ),
         subtitle1 = TextStyle(
                 fontFamily = Montserrat,
@@ -76,7 +79,8 @@ val SpotiFlyerTypography = Typography(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 lineHeight = 20.sp,
-                letterSpacing = 0.15.sp
+                letterSpacing = 0.15.sp,
+                color = colorAccent
         ),
         body2 = TextStyle(
                 fontFamily = Montserrat,
