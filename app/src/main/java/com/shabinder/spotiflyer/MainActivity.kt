@@ -25,11 +25,16 @@ import androidx.compose.ui.res.vectorResource
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.shabinder.spotiflyer.navigation.ComposeNavigation
+import com.shabinder.spotiflyer.navigation.navigateToPlatform
 import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
 import com.shabinder.spotiflyer.ui.ComposeLearnTheme
 import com.shabinder.spotiflyer.ui.appNameStyle
+import com.shabinder.spotiflyer.ui.colorOffWhite
 import com.shabinder.spotiflyer.utils.*
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,6 +56,7 @@ import com.shabinder.spotiflyer.utils.showDialog as showDialog1
 class MainActivity : AppCompatActivity() {
 
     private var spotifyService : SpotifyService? = null
+    lateinit var navController: NavHostController
     @Inject lateinit var moshi: Moshi
     @Inject lateinit var spotifyServiceTokenRequest: SpotifyServiceTokenRequest
 
@@ -62,19 +68,24 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             ComposeLearnTheme {
-                ProvideWindowInsets {
-                    Column {
-                        val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
+                Providers(AmbientContentColor provides colorOffWhite) {
+                    ProvideWindowInsets {
+                        Column {
+                            val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
 
-                        // Draw a scrim over the status bar which matches the app bar
-                        Spacer(Modifier.background(appBarColor).fillMaxWidth().statusBarsHeight())
+                            // Draw a scrim over the status bar which matches the app bar
+                            Spacer(
+                                Modifier.background(appBarColor).fillMaxWidth().statusBarsHeight()
+                            )
 
-                        AppBar(
-                            backgroundColor = appBarColor,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                            AppBar(
+                                backgroundColor = appBarColor,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            navController = rememberNavController()
 
-                        ComposeNavigation()
+                            ComposeNavigation(navController)
+                        }
                     }
                 }
             }
@@ -93,7 +104,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        //Return to MainFragment For Further Processing of this Intent
         handleIntentFromExternalActivity(intent)
     }
 
@@ -172,7 +182,7 @@ class MainActivity : AppCompatActivity() {
             if ("text/plain" == intent.type) {
                 intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
                     log("Intent Received", it)
-                    sharedViewModel.intentString.value = it
+                    navController.navigateToPlatform(it)
                 }
             }
         }
@@ -238,7 +248,7 @@ fun DefaultPreview() {
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                ComposeNavigation()
+                //ComposeNavigation()
             }
         }
     }

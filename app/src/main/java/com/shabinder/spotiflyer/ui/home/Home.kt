@@ -85,7 +85,8 @@ fun AboutColumn(modifier: Modifier = Modifier) {
             Column(modifier.padding(12.dp)) {
                 Text(
                     text = stringResource(R.string.supported_platform),
-                    style = SpotiFlyerTypography.body1
+                    style = SpotiFlyerTypography.body1,
+                    color = colorAccent
                 )
                 Spacer(modifier = Modifier.padding(top = 12.dp))
                 Row(horizontalArrangement = Arrangement.Center,modifier = modifier.fillMaxWidth()) {
@@ -115,7 +116,8 @@ fun AboutColumn(modifier: Modifier = Modifier) {
             Column(modifier.padding(12.dp)) {
                 Text(
                     text = stringResource(R.string.support_development),
-                    style = SpotiFlyerTypography.body1
+                    style = SpotiFlyerTypography.body1,
+                    color = colorAccent
                 )
                 Spacer(modifier = Modifier.padding(top = 6.dp))
                 Row(verticalAlignment = Alignment.CenterVertically,

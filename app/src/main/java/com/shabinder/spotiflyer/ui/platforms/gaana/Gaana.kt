@@ -1,8 +1,15 @@
 package com.shabinder.spotiflyer.ui.platforms.gaana
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
+import com.shabinder.spotiflyer.models.PlatformQueryResult
+import com.shabinder.spotiflyer.models.spotify.Source
+import com.shabinder.spotiflyer.ui.tracklist.TrackList
 import com.shabinder.spotiflyer.utils.*
 import kotlinx.coroutines.launch
 
@@ -11,6 +18,9 @@ fun Gaana(
     fullLink: String,
     navController: NavController
 ) {
+    val source = Source.Gaana
+    var result by remember { mutableStateOf<PlatformQueryResult?>(null) }
+
     //Coroutine Scope Active till this Composable is Active
     val coroutineScope = rememberCoroutineScope()
 
@@ -29,17 +39,17 @@ fun Gaana(
     }
 
     coroutineScope.launch {
-        val result = gaanaSearch(
+        result = gaanaSearch(
             type,
             link,
             sharedViewModel.gaanaInterface,
             sharedViewModel.databaseDAO,
         )
-
-        log("Gaana",result.toString())
-        log("Gaana Tracks",result.trackList.size.toString())
-
-
-
+    }
+    result?.let {
+        TrackList(
+            result = it,
+            source = source
+        )
     }
 }

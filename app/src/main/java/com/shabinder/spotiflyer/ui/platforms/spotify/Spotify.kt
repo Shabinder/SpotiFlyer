@@ -1,12 +1,15 @@
 package com.shabinder.spotiflyer.ui.platforms.spotify
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.viewinterop.viewModel
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.shabinder.spotiflyer.models.PlatformQueryResult
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.networking.SpotifyService
+import com.shabinder.spotiflyer.ui.tracklist.TrackList
 import com.shabinder.spotiflyer.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,8 +17,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun Spotify(fullLink: String, navController: NavController,) {
     val source: Source = Source.Spotify
-
     val coroutineScope = rememberCoroutineScope()
+    var result by remember { mutableStateOf<PlatformQueryResult?>(null) }
 
     var spotifyLink =
         "https://" + fullLink.substringAfterLast("https://").substringBefore(" ").trim()
@@ -57,7 +60,7 @@ fun Spotify(fullLink: String, navController: NavController,) {
                 showDialog("Authentication Failed")
                 navController.popBackStack()
             }else{
-                val result = spotifySearch(
+                result = spotifySearch(
                     type,
                     link,
                     sharedViewModel.spotifyService.value!!,
@@ -65,5 +68,12 @@ fun Spotify(fullLink: String, navController: NavController,) {
                 )
             }
         }
+    }
+    result?.let {
+        log("Spotify",it.trackList.size.toString())
+        TrackList(
+            result = it,
+            source = source
+        )
     }
 }

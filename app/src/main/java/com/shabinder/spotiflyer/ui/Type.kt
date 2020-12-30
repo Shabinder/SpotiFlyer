@@ -80,7 +80,6 @@ val SpotiFlyerTypography = Typography(
                 fontWeight = FontWeight.Medium,
                 lineHeight = 20.sp,
                 letterSpacing = 0.15.sp,
-                color = colorAccent
         ),
         body2 = TextStyle(
                 fontFamily = Montserrat,

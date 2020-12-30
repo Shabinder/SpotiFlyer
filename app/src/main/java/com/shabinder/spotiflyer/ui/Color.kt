@@ -12,6 +12,7 @@ val colorAccent = Color(0xFF9AB3FF)
 val colorRedError = Color(0xFFFF9494)
 val colorSuccessGreen = Color(0xFF59C351)
 val darkBackgroundColor = Color(0xFF000000)
+val colorOffWhite = Color(0xFFE7E7E7)
 
 val SpotiFlyerColors = darkColors(
     primary = colorPrimary,
