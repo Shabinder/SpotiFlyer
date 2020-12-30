@@ -21,6 +21,9 @@ import java.io.File
 val mainActivity
     get() = MainActivity.getInstance()
 
+val sharedViewModel
+    get() = MainActivity.getSharedViewModel()
+
 fun loadAllImages(context: Context? = mainActivity, images:List<String>? = null,source: Source) {
     val serviceIntent = Intent(context, ForegroundService::class.java)
     images?.let {  serviceIntent.putStringArrayListExtra("imagesList",(it + source.name) as ArrayList<String>) }

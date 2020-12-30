@@ -1,15 +1,17 @@
 package com.shabinder.spotiflyer.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
+import androidx.navigation.compose.popUpTo
 import com.shabinder.spotiflyer.ui.home.Home
 import com.shabinder.spotiflyer.ui.platforms.gaana.Gaana
 import com.shabinder.spotiflyer.ui.platforms.spotify.Spotify
 import com.shabinder.spotiflyer.ui.platforms.youtube.Youtube
+import com.shabinder.spotiflyer.utils.mainActivity
+import com.shabinder.spotiflyer.utils.sharedViewModel
+import com.shabinder.spotiflyer.utils.showDialog
 
 @Composable
 fun ComposeNavigation() {
@@ -31,7 +33,7 @@ fun ComposeNavigation() {
             arguments = listOf(navArgument("link") { type = NavType.StringType })
         ) {
             Spotify(
-                link = it.arguments?.getString("link") ?: "error",
+                fullLink = it.arguments?.getString("link") ?: "error",
                 navController = navController
             )
         }
@@ -43,7 +45,7 @@ fun ComposeNavigation() {
             arguments = listOf(navArgument("link") { type = NavType.StringType })
         ) {
             Gaana(
-                link = it.arguments?.getString("link") ?: "error",
+                fullLink = it.arguments?.getString("link") ?: "error",
                 navController = navController
             )
         }
@@ -55,9 +57,42 @@ fun ComposeNavigation() {
             arguments = listOf(navArgument("link") { type = NavType.StringType })
         ) {
             Youtube(
-                link = it.arguments?.getString("link") ?: "error",
+                fullLink = it.arguments?.getString("link") ?: "error",
                 navController = navController
             )
+        }
+    }
+}
+
+fun NavController.navigateToPlatform(link:String){
+    when{
+        //SPOTIFY
+        link.contains("spotify",true) -> {
+            if(sharedViewModel.spotifyService.value == null){//Authentication pending!!
+                mainActivity.authenticateSpotify()
+            }
+            this.navigateAndPopUpToHome("spotify/$link")
+        }
+
+        //YOUTUBE
+        link.contains("youtube.com",true) || link.contains("youtu.be",true) -> {
+            this.navigateAndPopUpToHome("youtube/$link")
+        }
+
+        //GAANA
+        link.contains("gaana",true) -> {
+            this.navigateAndPopUpToHome("gaana/$link")
+        }
+
+        else -> showDialog("Link is Not Valid")
+    }
+}
+
+fun NavController.navigateAndPopUpToHome(route:String, inclusive:Boolean = false,singleInstance:Boolean = true){
+    this.navigate(route){
+        launchSingleTop = singleInstance
+        popUpTo(route = "home"){
+            this.inclusive = inclusive
         }
     }
 }

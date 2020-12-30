@@ -29,11 +29,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
+import com.shabinder.spotiflyer.navigation.navigateToPlatform
 import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
 import com.shabinder.spotiflyer.ui.colorAccent
 import com.shabinder.spotiflyer.ui.colorPrimary
+import com.shabinder.spotiflyer.utils.mainActivity
 import com.shabinder.spotiflyer.utils.openPlatform
+import com.shabinder.spotiflyer.utils.sharedViewModel
+import com.shabinder.spotiflyer.utils.showDialog
 
 @Composable
 fun Home(navController: NavController, modifier: Modifier = Modifier) {
@@ -289,7 +294,7 @@ fun SearchPanel(
         )
         OutlinedButton(
             modifier = Modifier.padding(12.dp).wrapContentWidth(),
-            onClick = {navController.navigate("track_list/$link") },
+            onClick = {navController.navigateToPlatform(link)},
             border = BorderStroke(1.dp, Brush.horizontalGradient(listOf(colorPrimary, colorAccent)))
         ){
             Text(text = "Search",style = SpotiFlyerTypography.h6,modifier = Modifier.padding(4.dp))

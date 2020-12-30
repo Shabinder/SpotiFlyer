@@ -1,6 +1,13 @@
 package com.shabinder.spotiflyer
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,15 +24,25 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.res.vectorResource
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.shabinder.spotiflyer.navigation.ComposeNavigation
 import com.shabinder.spotiflyer.networking.SpotifyService
+import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
 import com.shabinder.spotiflyer.ui.ComposeLearnTheme
 import com.shabinder.spotiflyer.ui.appNameStyle
-import com.shabinder.spotiflyer.utils.requestStoragePermission
+import com.shabinder.spotiflyer.utils.*
+import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.statusBarsHeight
+import kotlinx.coroutines.launch
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Inject
+import com.shabinder.spotiflyer.utils.showDialog as showDialog1
 
 /*
 * This is App's God Activity
@@ -34,13 +51,15 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 
     private var spotifyService : SpotifyService? = null
+    @Inject lateinit var moshi: Moshi
+    @Inject lateinit var spotifyServiceTokenRequest: SpotifyServiceTokenRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
+
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
         setContent {
             ComposeLearnTheme {
                 ProvideWindowInsets {
@@ -60,8 +79,103 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        initialize()
+    }
 
+    private fun initialize() {
+        authenticateSpotify()
         requestStoragePermission()
+        disableDozeMode()
+        //checkIfLatestVersion()
+        createDirectories()
+        handleIntentFromExternalActivity()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        //Return to MainFragment For Further Processing of this Intent
+        handleIntentFromExternalActivity(intent)
+    }
+
+    @SuppressLint("BatteryLife")
+    fun disableDozeMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val pm =
+                this.getSystemService(Context.POWER_SERVICE) as PowerManager
+            val isIgnoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(packageName)
+            if (!isIgnoringBatteryOptimizations) {
+                val intent = Intent().apply{
+                    action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                    data = Uri.parse("package:$packageName")
+                }
+                startActivityForResult(intent, 1233)
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1233) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val pm =
+                    getSystemService(Context.POWER_SERVICE) as PowerManager
+                val isIgnoringBatteryOptimizations =
+                    pm.isIgnoringBatteryOptimizations(packageName)
+                if (isIgnoringBatteryOptimizations) {
+                    // Ignoring battery optimization
+                } else {
+                    disableDozeMode()//Again Ask For Permission!!
+                }
+            }
+        }
+    }
+
+    /**
+     * Adding my own new Spotify Web Api Requests!
+     * */
+    private fun implementSpotifyService(token: String) {
+        val httpClient: OkHttpClient.Builder = OkHttpClient.Builder()
+        httpClient.addInterceptor(Interceptor { chain ->
+            val request: Request =
+                chain.request().newBuilder().addHeader(
+                    "Authorization",
+                    "Bearer $token"
+                ).build()
+            chain.proceed(request)
+        }).addInterceptor(NetworkInterceptor())
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.spotify.com/v1/")
+            .client(httpClient.build())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+
+        spotifyService = retrofit.create(SpotifyService::class.java)
+        sharedViewModel.spotifyService.value = spotifyService
+    }
+
+    fun authenticateSpotify() {
+        sharedViewModel.viewModelScope.launch {
+            log("Spotify Authentication","Started")
+            val token = spotifyServiceTokenRequest.getToken()
+            token.value?.let {
+                showDialog1("Success: Spotify Token Acquired")
+                implementSpotifyService(it.access_token)
+            }
+            log("Spotify Token", token.value.toString())
+        }
+    }
+
+
+    private fun handleIntentFromExternalActivity(intent: Intent? = getIntent()) {
+        if (intent?.action == Intent.ACTION_SEND) {
+            if ("text/plain" == intent.type) {
+                intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
+                    log("Intent Received", it)
+                    sharedViewModel.intentString.value = it
+                }
+            }
+        }
     }
 
     companion object{

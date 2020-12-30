@@ -17,11 +17,21 @@
 
 package com.shabinder.spotiflyer
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.github.kiulian.downloader.YoutubeDownloader
+import com.shabinder.spotiflyer.database.DatabaseDAO
+import com.shabinder.spotiflyer.networking.GaanaInterface
 import com.shabinder.spotiflyer.networking.SpotifyService
+import dagger.hilt.android.scopes.ActivityRetainedScoped
 
-class SharedViewModel : ViewModel() {
+@ActivityRetainedScoped
+class SharedViewModel @ViewModelInject constructor(
+    val databaseDAO: DatabaseDAO,
+    val gaanaInterface : GaanaInterface,
+    val ytDownloader: YoutubeDownloader
+) : ViewModel() {
     var intentString = MutableLiveData<String>()
     var spotifyService = MutableLiveData<SpotifyService>()
 }

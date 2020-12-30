@@ -17,17 +17,24 @@
 
 package com.shabinder.spotiflyer.ui.base
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.shabinder.spotiflyer.models.TrackDetails
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 abstract class TrackListViewModel:ViewModel() {
     abstract var folderType:String
     abstract var subFolder:String
-    open val trackList = MutableLiveData<MutableList<TrackDetails>>()
+    private val _trackList = MutableStateFlow<List<TrackDetails>>(mutableListOf())
+    open val trackList:StateFlow<List<TrackDetails>>
+        get() = _trackList
+
+    fun updateTrackList(list:List<TrackDetails>){
+        _trackList.value = list
+    }
 
     private val loading = "Loading!"
-    open var title = MutableLiveData<String>().apply { value = loading }
-    open var coverUrl = MutableLiveData<String>()
+    open var title = MutableStateFlow(loading)
+    open var coverUrl = MutableStateFlow(loading)
 
 }
