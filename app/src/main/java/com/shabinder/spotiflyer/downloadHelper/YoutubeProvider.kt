@@ -22,6 +22,7 @@ import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import com.shabinder.spotiflyer.models.YoutubeTrack
+import com.shabinder.spotiflyer.utils.log
 import me.xdrop.fuzzywuzzy.FuzzySearch
 import kotlin.math.absoluteValue
 
@@ -119,15 +120,20 @@ fun getYTTracks(response: String):List<YoutubeTrack>{
                 if(detail.obj("musicResponsiveListItemFlexColumnRenderer")?.size!! < 2) continue
 
                 // if not a dummy, collect All Variables
-                detail.obj("musicResponsiveListItemFlexColumnRenderer")
+                val details = detail.obj("musicResponsiveListItemFlexColumnRenderer")
                     ?.obj("text")
-                    ?.array<JsonObject>("runs")?.get(0)?.get("text")?.let {
-                        availableDetails.add(
-                            it.toString()
-                        )
+                    ?.array<JsonObject>("runs") ?: listOf()
+                for (d in details){
+                    d["text"]?.let {
+                        if(it.toString() != " • "){
+                            availableDetails.add(
+                                it.toString()
+                            )
+                        }
                     }
+                }
             }
-            //log("Text Api",availableDetails.toString())
+//            log("YT Music details",availableDetails.toString())
             /*
             ! Filter Out non-Song/Video results and incomplete results here itself
             ! From what we know about detail order, note that [1] - indicate result type
@@ -135,7 +141,7 @@ fun getYTTracks(response: String):List<YoutubeTrack>{
             if ( availableDetails.size == 5 && availableDetails[1] in listOf("Song","Video") ){
 
                 // skip if result is in hours instead of minutes (no song is that long)
-                if(availableDetails[4].split(':').size != 2) continue //Has Been Giving Issues
+                if(availableDetails[4].split(':').size != 2) continue
 
                 /*
                 ! grab Video ID
@@ -145,7 +151,7 @@ fun getYTTracks(response: String):List<YoutubeTrack>{
                 ! reference the dict keys by index
                 */
 
-                val videoId:String = result.last().obj("watchEndpoint")?.get("videoId") as String
+                val videoId:String? = result.last().obj("watchEndpoint")?.get("videoId") as String?
                 val ytTrack = YoutubeTrack(
                     name = availableDetails[0],
                     type = availableDetails[1],
@@ -154,10 +160,11 @@ fun getYTTracks(response: String):List<YoutubeTrack>{
                     videoId = videoId
                 )
                 youtubeTracks.add(ytTrack)
+
             }
         }
     }
-
+    log("YT Search",youtubeTracks.joinToString(" abc \n"))
     return youtubeTracks
 }
 

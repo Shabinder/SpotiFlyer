@@ -190,6 +190,7 @@ class ForegroundService : Service(){
                                             trackDurationSec = it.durationSec
                                         ).keys.firstOrNull()
                                         log("Service VideoID", videoId ?: "Not Found")
+                                        //println(response.body().toString())
                                         if (videoId.isNullOrBlank()) {
                                             sendTrackBroadcast(Status.FAILED.name, it)
                                             failed++
