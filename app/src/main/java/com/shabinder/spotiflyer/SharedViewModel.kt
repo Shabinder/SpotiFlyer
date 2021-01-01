@@ -17,41 +17,42 @@
 
 package com.shabinder.spotiflyer
 
-import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.database.DatabaseDAO
-import com.shabinder.spotiflyer.models.PlatformQueryResult
 import com.shabinder.spotiflyer.networking.GaanaInterface
 import com.shabinder.spotiflyer.networking.SpotifyService
-import com.shabinder.spotiflyer.ui.colorPrimary
 import com.shabinder.spotiflyer.ui.colorPrimaryDark
-import com.shabinder.spotiflyer.ui.home.HomeCategory
 import dagger.hilt.android.scopes.ActivityRetainedScoped
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 @ActivityRetainedScoped
 class SharedViewModel @ViewModelInject constructor(
     val databaseDAO: DatabaseDAO,
+    val spotifyService: SpotifyService,
     val gaanaInterface : GaanaInterface,
     val ytDownloader: YoutubeDownloader
 ) : ViewModel() {
-    var spotifyService = MutableStateFlow<SpotifyService?>(null)
+    var isAuthenticated by mutableStateOf(false)
+        private set
 
-    private val _gradientColor = MutableStateFlow(colorPrimaryDark)
-    val gradientColor : StateFlow<Color>
-        get() = _gradientColor
+    fun authenticated(s:Boolean) {
+        isAuthenticated = s
+    }
+
+    var gradientColor by mutableStateOf(colorPrimaryDark)
+    private set
 
     fun updateGradientColor(color: Color) {
-        _gradientColor.value = color
+        gradientColor = color
     }
 
     fun resetGradient() {
-        _gradientColor.value = colorPrimaryDark
+        gradientColor = colorPrimaryDark
     }
 }

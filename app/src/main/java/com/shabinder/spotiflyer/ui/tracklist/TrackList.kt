@@ -8,6 +8,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,14 +23,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import androidx.navigation.NavController
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.models.PlatformQueryResult
 import com.shabinder.spotiflyer.models.TrackDetails
-import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
 import com.shabinder.spotiflyer.ui.colorAccent
+import com.shabinder.spotiflyer.providers.queryGaana
+import com.shabinder.spotiflyer.providers.querySpotify
+import com.shabinder.spotiflyer.providers.queryYoutube
 import com.shabinder.spotiflyer.ui.utils.calculateDominantColor
 import com.shabinder.spotiflyer.utils.sharedViewModel
+import com.shabinder.spotiflyer.utils.showDialog
 import dev.chrisbanes.accompanist.coil.CoilImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -36,28 +44,56 @@ import kotlinx.coroutines.launch
 **/
 @Composable
 fun TrackList(
-    result: PlatformQueryResult,
-    source: Source,
+    fullLink: String,
+    navController: NavController,
     modifier: Modifier = Modifier
 ){
     val coroutineScope = rememberCoroutineScope()
-    Box(modifier = modifier.fillMaxSize()){
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            content = {
-                item {
-                    CoverImage(result.title,result.coverUrl,coroutineScope)
+
+    var result by remember(fullLink) { mutableStateOf<PlatformQueryResult?>(null) }
+
+    coroutineScope.launch {
+        if(result == null){
+            result = when{
+                //SPOTIFY
+                fullLink.contains("spotify",true) -> querySpotify(fullLink)
+
+                //YOUTUBE
+                fullLink.contains("youtube.com",true) || fullLink.contains("youtu.be",true) -> queryYoutube(fullLink)
+
+                //GAANA
+                fullLink.contains("gaana",true) -> queryGaana(fullLink)
+
+                else -> {
+                    showDialog("Link is Not Valid")
+                    null
                 }
-                items(result.trackList) {
-                    TrackCard(track = it)
-                }
-            },
-            modifier = Modifier.fillMaxSize(),
-        )
-        DownloadAllButton(
-            onClick = {},
-            modifier = Modifier.padding(bottom = 24.dp).align(Alignment.BottomCenter)
-        )
+            }
+        }
+        //Error Occurred And Has Been Shown to User
+        if(result == null) navController.popBackStack()
+    }
+
+
+    result?.let{
+        Box(modifier = modifier.fillMaxSize()){
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                content = {
+                    item {
+                        CoverImage(it.title,it.coverUrl,coroutineScope)
+                    }
+                    items(it.trackList) {
+                        TrackCard(track = it)
+                    }
+                },
+                modifier = Modifier.fillMaxSize(),
+            )
+            DownloadAllButton(
+                onClick = {},
+                modifier = Modifier.padding(bottom = 24.dp).align(Alignment.BottomCenter)
+            )
+        }
     }
 }
 
@@ -87,7 +123,9 @@ fun CoverImage(
             //color = colorAccent,
         )
     }
-    scope.launch { updateGradient(coverURL) }
+    scope.launch {
+        updateGradient(coverURL)
+    }
 }
 
 @Composable

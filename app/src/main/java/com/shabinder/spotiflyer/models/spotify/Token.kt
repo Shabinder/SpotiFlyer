@@ -18,11 +18,12 @@
 package com.shabinder.spotiflyer.models.spotify
 
 import android.os.Parcelable
+import com.squareup.moshi.Json
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Token(
-    var access_token:String,
-    var token_type:String,
-    var expires_in:Int
+    var access_token:String?,
+    var token_type:String?,
+    @Json(name = "expires_in") var expiry:Long?
 ): Parcelable

@@ -26,7 +26,8 @@ const val NoInternetErrorCode = 222
 
 class NetworkInterceptor: Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        log("Network Requesting",chain.request().url.toString())
+        log("Network Requesting Debug",chain.request().url.toString())
+
         return if (!isOnline()){
             //No Internet Connection
             showDialog()

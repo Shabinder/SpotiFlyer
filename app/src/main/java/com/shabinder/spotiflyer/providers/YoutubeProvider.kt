@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.ui.platforms.youtube
+package com.shabinder.spotiflyer.providers
 
 import android.annotation.SuppressLint
 import com.github.kiulian.downloader.YoutubeDownloader
@@ -37,6 +37,43 @@ import java.io.File
 * Normal Url: https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
 * */
 
+private const val sampleDomain2 = "youtu.be"
+private const val sampleDomain1 = "youtube.com"
+
+/*
+* Sending a Result as null = Some Error Occurred!
+* */
+suspend fun queryYoutube(fullLink: String): PlatformQueryResult?{
+    val link = fullLink.removePrefix("https://").removePrefix("http://")
+    if(link.contains("playlist",true) || link.contains("list",true)){
+        // Given Link is of a Playlist
+        val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&")
+        return getYTPlaylist(
+            playlistId,
+            sharedViewModel.ytDownloader,
+            sharedViewModel.databaseDAO
+        )
+    }else{//Given Link is of a Video
+        var searchId = "error"
+        if(link.contains(sampleDomain1,true) ){
+            searchId =  link.substringAfterLast("=","error")
+        }
+        if(link.contains(sampleDomain2,true) ){
+            searchId = link.substringAfterLast("/","error")
+        }
+        return if(searchId != "error") {
+            getYTTrack(
+                searchId,
+                sharedViewModel.ytDownloader,
+                sharedViewModel.databaseDAO
+            )
+        }else{
+            showDialog("Your Youtube Link is not of a Video!!")
+            null
+        }
+    }
+}
+
 suspend fun getYTPlaylist(
     searchId: String,
     ytDownloader: YoutubeDownloader,
@@ -48,6 +85,7 @@ suspend fun getYTPlaylist(
         title = "",
         coverUrl = "",
         trackList = listOf(),
+        Source.YouTube
     )
     with(result) {
         try {
@@ -127,6 +165,7 @@ suspend fun getYTTrack(
         title = "",
         coverUrl = "",
         trackList = listOf(),
+        Source.YouTube
     )
     with(result) {
         try {

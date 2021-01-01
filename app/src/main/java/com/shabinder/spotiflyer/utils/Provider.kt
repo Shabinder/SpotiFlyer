@@ -3,15 +3,11 @@ package com.shabinder.spotiflyer.utils
 import android.content.Context
 import android.os.Environment
 import android.util.Base64
-import androidx.lifecycle.ViewModelProvider
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.App
-import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecordDatabase
-import com.shabinder.spotiflyer.networking.GaanaInterface
-import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
-import com.shabinder.spotiflyer.networking.YoutubeMusicApi
+import com.shabinder.spotiflyer.networking.*
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -26,6 +22,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.File
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 
@@ -59,15 +56,26 @@ object Provider {
 
     @Provides
     @Singleton
-    fun getMoshi(): Moshi {
-        return Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-    }
+    fun getTokenStore(
+        @ApplicationContext appContext: Context,
+        spotifyServiceTokenRequest: SpotifyServiceTokenRequest):TokenStore = TokenStore(appContext,spotifyServiceTokenRequest)
 
     @Provides
     @Singleton
-    fun getSpotifyTokenInterface(moshi: Moshi): SpotifyServiceTokenRequest {
+    fun getSpotifyService(authInterceptor: SpotifyAuthInterceptor,okHttpClient: OkHttpClient.Builder,moshi: Moshi) :SpotifyService{
+        val retrofit = Retrofit.Builder().run{
+            baseUrl("https://api.spotify.com/v1/")
+            client(okHttpClient.addInterceptor(authInterceptor).build())
+            addConverterFactory(MoshiConverterFactory.create(moshi))
+            build()
+        }
+        return retrofit.create(SpotifyService::class.java)
+    }
+
+
+    @Provides
+    @Singleton
+    fun getSpotifyTokenInterface(moshi: Moshi,networkInterceptor: NetworkInterceptor): SpotifyServiceTokenRequest {
         val httpClient2: OkHttpClient.Builder = OkHttpClient.Builder()
             .addInterceptor(Interceptor { chain ->
                 val request: Request =
@@ -82,7 +90,7 @@ object Provider {
                             }"
                         ).build()
                 chain.proceed(request)
-            }).addInterceptor(NetworkInterceptor())
+            }).addInterceptor(networkInterceptor)
 
         val retrofit = Retrofit.Builder()
             .baseUrl("https://accounts.spotify.com/")
@@ -94,18 +102,10 @@ object Provider {
 
     @Provides
     @Singleton
-    fun okHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(NetworkInterceptor())
-            .build()
-    }
-
-    @Provides
-    @Singleton
-    fun getGaanaInterface(moshi: Moshi, okHttpClient: OkHttpClient): GaanaInterface {
+    fun getGaanaInterface(moshi: Moshi, okHttpClient: OkHttpClient.Builder): GaanaInterface {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.gaana.com/")
-            .client(okHttpClient)
+            .client(okHttpClient.build())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
         return retrofit.create(GaanaInterface::class.java)
@@ -122,4 +122,25 @@ object Provider {
         return retrofit.create(YoutubeMusicApi::class.java)
     }
 
+    @Provides
+    @Singleton
+    fun getNetworkInterceptor():NetworkInterceptor = NetworkInterceptor()
+
+    @Provides
+    @Singleton
+    fun okHttpClient(networkInterceptor: NetworkInterceptor): OkHttpClient.Builder {
+        return OkHttpClient.Builder()
+            .readTimeout(1, TimeUnit.MINUTES)
+            .writeTimeout(1, TimeUnit.MINUTES)
+            .addInterceptor(networkInterceptor)
+
+    }
+
+    @Provides
+    @Singleton
+    fun getMoshi(): Moshi {
+        return Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+    }
 }

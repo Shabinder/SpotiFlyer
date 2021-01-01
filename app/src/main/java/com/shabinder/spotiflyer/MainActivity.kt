@@ -28,8 +28,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.jetcaster.util.verticalGradientScrim
+import com.shabinder.spotiflyer.models.spotify.Token
 import com.shabinder.spotiflyer.navigation.ComposeNavigation
-import com.shabinder.spotiflyer.navigation.navigateToPlatform
+import com.shabinder.spotiflyer.navigation.navigateToTrackList
 import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
 import com.shabinder.spotiflyer.ui.ComposeLearnTheme
@@ -40,7 +41,10 @@ import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.statusBarsHeight
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -69,14 +73,12 @@ class MainActivity : AppCompatActivity() {
             ComposeLearnTheme {
                 Providers(AmbientContentColor provides colorOffWhite) {
                     ProvideWindowInsets {
-                        val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
+                        val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.7f)
                         navController = rememberNavController()
-
-                        val gradientColor by sharedViewModel.gradientColor.collectAsState()
 
                         Column(
                             modifier = Modifier.fillMaxSize().verticalGradientScrim(
-                                color = gradientColor.copy(alpha = 0.38f),
+                                color = sharedViewModel.gradientColor.copy(alpha = 0.38f),
                                 startYPercentage = 1f,
                                 endYPercentage = 0f,
                                 fixedHeight = 700f,
@@ -101,7 +103,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initialize() {
-        authenticateSpotify()
         requestStoragePermission()
         disableDozeMode()
         //checkIfLatestVersion()
@@ -147,50 +148,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Adding my own Spotify Web Api Requests!
-     * */
-    private fun implementSpotifyService(token: String) {
-        val httpClient: OkHttpClient.Builder = OkHttpClient.Builder()
-        httpClient.addInterceptor(Interceptor { chain ->
-            val request: Request =
-                chain.request().newBuilder().addHeader(
-                    "Authorization",
-                    "Bearer $token"
-                ).build()
-            chain.proceed(request)
-        }).addInterceptor(NetworkInterceptor())
-
-        val retrofit = Retrofit.Builder().run{
-            baseUrl("https://api.spotify.com/v1/")
-            client(httpClient.build())
-            addConverterFactory(MoshiConverterFactory.create(moshi))
-            build()
-        }
-        sharedViewModel.spotifyService.value = retrofit.create(SpotifyService::class.java)
-    }
-
-    fun authenticateSpotify() {
-        if(sharedViewModel.spotifyService.value == null){
-            sharedViewModel.viewModelScope.launch {
-                log("Spotify Authentication","Started")
-                val token = spotifyServiceTokenRequest.getToken()
-                token.value?.let {
-                    showDialog1("Success: Spotify Token Acquired")
-                    implementSpotifyService(it.access_token)
-                }
-                log("Spotify Token", token.value.toString())
-            }
-        }
-    }
-
-
     private fun handleIntentFromExternalActivity(intent: Intent? = getIntent()) {
         if (intent?.action == Intent.ACTION_SEND) {
             if ("text/plain" == intent.type) {
                 intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
                     log("Intent Received", it)
-                    navController.navigateToPlatform(it)
+                    navController.navigateToTrackList(it)
                 }
             }
         }

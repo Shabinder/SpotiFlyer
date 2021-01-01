@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.ui.platforms.gaana
+package com.shabinder.spotiflyer.providers
 
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
@@ -25,14 +25,38 @@ import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.gaana.GaanaTrack
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.networking.GaanaInterface
+import com.shabinder.spotiflyer.utils.*
 import com.shabinder.spotiflyer.utils.Provider.imageDir
-import com.shabinder.spotiflyer.utils.finalOutputDir
-import com.shabinder.spotiflyer.utils.queryActiveTracks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
 private const val gaanaPlaceholderImageUrl = "https://a10.gaanacdn.com/images/social/gaana_social.jpg"
+
+suspend fun queryGaana(
+    fullLink: String,
+):PlatformQueryResult?{
+
+    //Link Schema: https://gaana.com/type/link
+    val gaanaLink = fullLink.substringAfter("gaana.com/")
+
+    val link = gaanaLink.substringAfterLast('/', "error")
+    val type = gaanaLink.substringBeforeLast('/', "error").substringAfterLast('/')
+
+    log("Gaana Fragment", "$type : $link")
+
+    //Error
+    if (type == "Error" || link == "Error"){
+        showDialog("Please Check Your Link!")
+        return null
+    }
+    return gaanaSearch(
+        type,
+        link,
+        sharedViewModel.gaanaInterface,
+        sharedViewModel.databaseDAO,
+    )
+}
 
 suspend fun gaanaSearch(
     type:String,
@@ -46,6 +70,7 @@ suspend fun gaanaSearch(
         title = link,
         coverUrl = gaanaPlaceholderImageUrl,
         trackList = listOf(),
+        Source.Gaana
     )
     with(result) {
         when (type) {

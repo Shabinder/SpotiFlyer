@@ -15,9 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.ui.platforms.spotify
+package com.shabinder.spotiflyer.providers
 
 import androidx.annotation.WorkerThread
+import androidx.compose.runtime.Composable
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.models.DownloadStatus
@@ -34,6 +35,40 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
+suspend fun querySpotify(fullLink: String):PlatformQueryResult?{
+    var spotifyLink =
+        "https://" + fullLink.substringAfterLast("https://").substringBefore(" ").trim()
+
+    if (!spotifyLink.contains("open.spotify")) {
+        //Very Rare instance
+        spotifyLink = resolveLink(spotifyLink, sharedViewModel.gaanaInterface)
+    }
+
+
+    val link = spotifyLink.substringAfterLast('/', "Error").substringBefore('?')
+    val type = spotifyLink.substringBeforeLast('/', "Error").substringAfterLast('/')
+
+    log("Spotify Fragment", "$type : $link")
+
+    if (type == "Error" || link == "Error") {
+        showDialog("Please Check Your Link!")
+        return null
+    }
+
+    if (type == "episode" || type == "show") {
+        //TODO Implementation
+        showDialog("Implementing Soon, Stay Tuned!")
+        return null
+    }
+
+    return spotifySearch(
+        type,
+        link,
+        sharedViewModel.spotifyService,
+        sharedViewModel.databaseDAO
+    )
+}
+
 suspend fun spotifySearch(
     type:String,
     link: String,
@@ -46,6 +81,7 @@ suspend fun spotifySearch(
         title = "",
         coverUrl = "",
         trackList = listOf(),
+        Source.Spotify
     )
     with(result) {
         when (type) {
@@ -192,6 +228,10 @@ suspend fun spotifySearch(
     return result
 }
 
+/*
+* New Link Schema: https://link.tospotify.com/kqTBblrjQbb,
+* Fetching Standard Link: https://open.spotify.com/playlist/37i9dQZF1DX9RwfGbeGQwP?si=iWz7B1tETiunDntnDo3lSQ&amp;_branch_match_id=862039436205270630
+* */
 @WorkerThread
 fun resolveLink(
     url:String,

@@ -2,55 +2,39 @@ package com.shabinder.spotiflyer.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.utils.sharedViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 class HomeViewModel : ViewModel() {
 
-    private val _link = MutableStateFlow("")
-    val link:StateFlow<String>
-        get() = _link
+    var link by mutableStateOf("")
+    private set
 
     fun updateLink(s:String) {
-        _link.value = s
+        link = s
     }
 
-    private val _isAuthenticating = MutableStateFlow(true)
-    val isAuthenticating:StateFlow<Boolean>
-        get() = _isAuthenticating
-
-    fun authenticated(s:Boolean) {
-        _isAuthenticating.value = s
-    }
-
-    private val _selectedCategory = MutableStateFlow(HomeCategory.About)
-    val selectedCategory :StateFlow<HomeCategory>
-        get() = _selectedCategory
+    var selectedCategory by mutableStateOf(HomeCategory.About)
+    private set
 
     fun selectCategory(s:HomeCategory) {
-        _selectedCategory.value = s
+        selectedCategory = s
     }
 
-    private val _downloadRecordList = MutableStateFlow<List<DownloadRecord>>(listOf())
-    val downloadRecordList: StateFlow<List<DownloadRecord>>
-        get() = _downloadRecordList
+    var downloadRecordList by mutableStateOf<List<DownloadRecord>>(listOf())
 
     fun getDownloadRecordList() {
         viewModelScope.launch {
             withContext(Dispatchers.IO){
-                _downloadRecordList.value = sharedViewModel.databaseDAO.getRecord().toMutableList()
+                downloadRecordList = sharedViewModel.databaseDAO.getRecord()
             }
         }
-    }
-
-    init {
-        getDownloadRecordList()
     }
 }
 

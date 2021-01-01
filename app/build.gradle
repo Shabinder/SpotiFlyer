@@ -134,6 +134,9 @@ dependencies {
     implementation "dev.chrisbanes.accompanist:accompanist-coil:$coil_version"
     implementation "dev.chrisbanes.accompanist:accompanist-insets:$coil_version"
 
+    //DataStore
+    implementation "androidx.datastore:datastore-preferences:1.0.0-alpha05"
+
     //Extras
     implementation 'me.xdrop:fuzzywuzzy:1.3.1'
     implementation 'com.mpatric:mp3agic:0.9.1'

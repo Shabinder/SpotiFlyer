@@ -15,8 +15,6 @@ import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,14 +32,13 @@ import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.database.DownloadRecord
-import com.shabinder.spotiflyer.navigation.navigateToPlatform
+import com.shabinder.spotiflyer.navigation.navigateToTrackList
 import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
 import com.shabinder.spotiflyer.ui.colorAccent
 import com.shabinder.spotiflyer.ui.colorPrimary
 import com.shabinder.spotiflyer.utils.openPlatform
 import com.shabinder.spotiflyer.utils.sharedViewModel
 import dev.chrisbanes.accompanist.glide.GlideImage
-import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun Home(navController: NavController, modifier: Modifier = Modifier) {
@@ -49,26 +46,23 @@ fun Home(navController: NavController, modifier: Modifier = Modifier) {
 
     Column(modifier = modifier) {
 
-        val link by viewModel.link.collectAsState()
-
-        AuthenticationBanner(viewModel,modifier)
+        AuthenticationBanner(sharedViewModel.isAuthenticated,modifier)
 
         SearchPanel(
-            link,
+            viewModel.link,
             viewModel::updateLink,
             navController,
             modifier
         )
-        val selectedCategory by viewModel.selectedCategory.collectAsState()
 
         HomeTabBar(
-            selectedCategory,
+            viewModel.selectedCategory,
             HomeCategory.values(),
             viewModel::selectCategory,
             modifier
         )
 
-        when(selectedCategory){
+        when(viewModel.selectedCategory){
             HomeCategory.About -> AboutColumn()
             HomeCategory.History -> HistoryColumn(viewModel.downloadRecordList,navController)
         }
@@ -212,11 +206,9 @@ fun AboutColumn(modifier: Modifier = Modifier) {
 
 @Composable
 fun HistoryColumn(
-    downloadRecordList: StateFlow<List<DownloadRecord>>,
+    list: List<DownloadRecord>,
     navController: NavController
 ) {
-    val list by downloadRecordList.collectAsState()
-
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         content = {
@@ -254,16 +246,15 @@ fun DownloadRecordItem(item: DownloadRecord,navController: NavController) {
         }
         Image(
             imageVector = vectorResource(id = R.drawable.ic_share_open),
-            modifier = Modifier.clickable(onClick = { navController.navigateToPlatform(item.link) })
+            modifier = Modifier.clickable(onClick = { navController.navigateToTrackList(item.link) })
         )
     }
 }
 
 @Composable
-fun AuthenticationBanner(viewModel: HomeViewModel, modifier: Modifier) {
-    val authenticationStatus by viewModel.isAuthenticating.collectAsState()
+fun AuthenticationBanner(isAuthenticated: Boolean, modifier: Modifier) {
 
-    if (authenticationStatus) {
+    if (!isAuthenticated) {
         // TODO show a progress indicator or similar
     }
 }
@@ -321,7 +312,7 @@ fun SearchPanel(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.padding(top = 16.dp,)
+        modifier = modifier.padding(top = 16.dp)
     ){
         TextField(
             leadingIcon = {
@@ -346,7 +337,7 @@ fun SearchPanel(
         OutlinedButton(
             modifier = Modifier.padding(12.dp).wrapContentWidth(),
             onClick = {
-                navController.navigateToPlatform(link)
+                navController.navigateToTrackList(link)
             },
             border = BorderStroke(1.dp, Brush.horizontalGradient(listOf(colorPrimary, colorAccent)))
         ){
@@ -354,6 +345,8 @@ fun SearchPanel(
         }
     }
 }
+
+
 @Composable
 fun HomeCategoryTabIndicator(
     modifier: Modifier = Modifier,
