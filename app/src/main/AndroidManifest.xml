@@ -56,6 +56,6 @@
             android:value="rzp_live_3ZQeoFYOxjmXye"
             />
 
+        <service android:name=".worker.ForegroundService"/>
     </application>
-
 </manifest>

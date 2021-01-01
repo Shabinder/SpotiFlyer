@@ -22,6 +22,8 @@ import com.mpatric.mp3agic.ID3v24Tag
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.utils.log
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.FileInputStream
 
 /**
@@ -59,12 +61,14 @@ fun setId3v2Tags(mp3file: Mp3File, track: TrackDetails,service: ForegroundServic
         try {
             //Image Still Not Downloaded!
             //Lets Download Now and Write it into Album Art
-            service.downloadAllImages(arrayListOf(track.albumArtURL, track.source.name)){
-                val bytesArray = ByteArray(it.length().toInt())
-                val fis = FileInputStream(it)
-                fis.read(bytesArray) //read file into bytes[]
-                fis.close()
-                id3v2Tag.setAlbumImage(bytesArray, "image/jpeg")
+            GlobalScope.launch {
+                service.downloadAllImages(arrayListOf(track.albumArtURL, track.source.name)) {
+                    val bytesArray = ByteArray(it.length().toInt())
+                    val fis = FileInputStream(it)
+                    fis.read(bytesArray) //read file into bytes[]
+                    fis.close()
+                    id3v2Tag.setAlbumImage(bytesArray, "image/jpeg")
+                }
             }
         }catch (e: Exception){log("Error", "Couldn't Write Mp3 Album Art, error: ${e.stackTrace}")}
     }

@@ -3,6 +3,7 @@ package com.shabinder.spotiflyer.utils
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -11,6 +12,7 @@ import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.shabinder.spotiflyer.BuildConfig
 import com.shabinder.spotiflyer.MainActivity
+import java.io.File
 
 
 /*
@@ -27,6 +29,12 @@ fun MainActivity.requestStoragePermission() {
             arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
             786
         )
+    }
+}
+fun File.writeBitmap(bitmap: Bitmap, format: Bitmap.CompressFormat = Bitmap.CompressFormat.JPEG , quality: Int = 90) {
+    outputStream().use { out ->
+        bitmap.compress(format, quality, out)
+        out.flush()
     }
 }
 fun YoutubeVideo.getData(): Format?{

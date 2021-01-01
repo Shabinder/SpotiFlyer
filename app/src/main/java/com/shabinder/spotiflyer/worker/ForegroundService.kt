@@ -20,6 +20,7 @@ package com.shabinder.spotiflyer.worker
 import android.annotation.SuppressLint
 import android.app.*
 import android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
+import android.app.PendingIntent.FLAG_CANCEL_CURRENT
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -28,21 +29,15 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
 import androidx.annotation.RequiresApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Cancel
-import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
+import coil.Coil
+import coil.request.ImageRequest
 import com.arthenica.mobileffmpeg.Config
 import com.arthenica.mobileffmpeg.Config.RETURN_CODE_CANCEL
 import com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS
 import com.arthenica.mobileffmpeg.FFmpeg
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.spotiflyer.R
@@ -64,7 +59,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
-import java.io.IOException
 import java.util.*
 import javax.inject.Inject
 
@@ -97,6 +91,7 @@ class ForegroundService : Service(){
 
     override fun onBind(intent: Intent): IBinder? = null
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     override fun onCreate() {
         super.onCreate()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -106,7 +101,7 @@ class ForegroundService : Service(){
             this,
             ForegroundService::class.java
         ).apply{action = "kill"}
-        cancelIntent = PendingIntent.getService (this, 0 , intent , PendingIntent.FLAG_CANCEL_CURRENT )
+        cancelIntent = PendingIntent.getService (this, 0 , intent , FLAG_CANCEL_CURRENT )
         downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         initialiseFetch()
     }
@@ -535,75 +530,50 @@ class ForegroundService : Service(){
     /**
      * Function to fetch all Images for use in mp3 tags.
      **/
-    fun downloadAllImages(urlList: ArrayList<String>, func: ((resource:File) -> Unit)? = null) {
+    suspend fun downloadAllImages(urlList: ArrayList<String>, func: ((resource:File) -> Unit)? = null) {
         /*
         * Last Element of this List defines Its Source
         * */
         val source = urlList.last()
+
         for (url in urlList.subList(0, urlList.size - 2)) {
-            val imgUri = url.toUri().buildUpon().scheme("https").build()
-            Glide
-                .with(this@ForegroundService)
-                .asFile()
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .load(imgUri)
-                .listener(object : RequestListener<File> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<File>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        log("Glide", "LoadFailed")
-                        return false
-                    }
+            withContext(Dispatchers.IO) {
+                val imgUri = url.toUri().buildUpon().scheme("https").build()
 
-                    override fun onResourceReady(
-                        resource: File?,
-                        model: Any?,
-                        target: Target<File>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        try {
-                            serviceScope.launch {
-                                val file = when (source) {
-                                    Source.Spotify.name -> {
-                                        File(imageDir, url.substringAfterLast('/') + ".jpeg")
-                                    }
-                                    Source.YouTube.name -> {
-                                        File(
-                                            imageDir,
-                                            url.substringBeforeLast('/', url)
-                                                .substringAfterLast(
-                                                    '/',
-                                                    url
-                                                ) + ".jpeg"
-                                        )
-                                    }
-                                    Source.Gaana.name -> {
-                                        File(
-                                            imageDir,
-                                            (url.substringBeforeLast('/').substringAfterLast(
-                                                '/'
-                                            )) + ".jpeg"
-                                        )
-                                    }
+                val r = ImageRequest.Builder(this@ForegroundService)
+                    .data(imgUri)
+                    .build()
 
-                                    else -> File(
-                                        imageDir,
-                                        url.substringAfterLast('/') + ".jpeg"
-                                    )
-                                }
-                                resource?.copyTo(file)
-                                func?.let { it(file) }
-                            }
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
-                        return false
+                val bitmap = Coil.execute(r).drawable?.toBitmap()
+                val file = when (source) {
+                    Source.Spotify.name -> {
+                        File(imageDir, url.substringAfterLast('/') + ".jpeg")
                     }
-                }).submit()
+                    Source.YouTube.name -> {
+                        File(
+                            imageDir,
+                            url.substringBeforeLast('/', url)
+                                .substringAfterLast(
+                                    '/',
+                                    url
+                                ) + ".jpeg"
+                        )
+                    }
+                    Source.Gaana.name -> {
+                        File(
+                            imageDir,
+                            (url.substringBeforeLast('/').substringAfterLast(
+                                '/'
+                            )) + ".jpeg"
+                        )
+                    }
+                    else -> File(imageDir, url.substringAfterLast('/') + ".jpeg")
+                }
+                if (bitmap != null) {
+                    file.writeBitmap(bitmap)
+                    func?.let { it(file) }
+                } else log("Foreground Service", "Album Art Could Not be Fetched")
+            }
         }
     }
 
@@ -660,7 +630,7 @@ class ForegroundService : Service(){
     private fun getNotification():Notification = NotificationCompat.Builder(this, channelId).run {
         setSmallIcon(R.drawable.ic_download_arrow)
         setContentTitle("Total: $total  Completed:$converted  Failed:$failed")
-        setNotificationSilent()
+        setSilent(true)
         setStyle(
             NotificationCompat.InboxStyle().run {
                 addLine(messageList[messageList.size - 1])

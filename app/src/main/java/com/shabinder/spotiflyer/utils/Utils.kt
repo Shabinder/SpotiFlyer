@@ -45,7 +45,7 @@ val mainActivity
 val sharedViewModel
     get() = MainActivity.getSharedViewModel()
 
-fun loadAllImages(context: Context? = mainActivity, images:List<String>? = null,source: Source) {
+fun loadAllImages( images:List<String>? = null,source: Source, context: Context? = mainActivity) {
     val serviceIntent = Intent(context, ForegroundService::class.java)
     images?.let {  serviceIntent.putStringArrayListExtra("imagesList",(it + source.name) as ArrayList<String>) }
     context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
@@ -105,7 +105,9 @@ fun isOnline(): Boolean {
 
 fun showDialog(title:String? = null, message: String? = null,response: String = "Ok"){
     //TODO
-    Toast.makeText(mainActivity,title ?: "No Internet",Toast.LENGTH_SHORT).show()
+    CoroutineScope(Dispatchers.Main).launch {
+        Toast.makeText(mainActivity,title ?: "No Internet",Toast.LENGTH_SHORT).show()
+    }
 }
 
 /**
