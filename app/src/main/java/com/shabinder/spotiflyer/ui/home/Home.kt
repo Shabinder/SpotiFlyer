@@ -2,6 +2,7 @@ package com.shabinder.spotiflyer.ui.home
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -21,24 +22,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
-import androidx.navigation.compose.navigate
-import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
+import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.navigation.navigateToPlatform
 import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
 import com.shabinder.spotiflyer.ui.colorAccent
 import com.shabinder.spotiflyer.ui.colorPrimary
-import com.shabinder.spotiflyer.utils.mainActivity
 import com.shabinder.spotiflyer.utils.openPlatform
 import com.shabinder.spotiflyer.utils.sharedViewModel
-import com.shabinder.spotiflyer.utils.showDialog
+import dev.chrisbanes.accompanist.glide.GlideImage
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun Home(navController: NavController, modifier: Modifier = Modifier) {
@@ -47,7 +50,6 @@ fun Home(navController: NavController, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
 
         val link by viewModel.link.collectAsState()
-        val selectedCategory by viewModel.selectedCategory.collectAsState()
 
         AuthenticationBanner(viewModel,modifier)
 
@@ -57,7 +59,7 @@ fun Home(navController: NavController, modifier: Modifier = Modifier) {
             navController,
             modifier
         )
-
+        val selectedCategory by viewModel.selectedCategory.collectAsState()
 
         HomeTabBar(
             selectedCategory,
@@ -68,10 +70,13 @@ fun Home(navController: NavController, modifier: Modifier = Modifier) {
 
         when(selectedCategory){
             HomeCategory.About -> AboutColumn()
-            HomeCategory.History -> HistoryColumn()
+            HomeCategory.History -> HistoryColumn(viewModel.downloadRecordList,navController)
         }
-
     }
+    //Update Download List
+    viewModel.getDownloadRecordList()
+    //reset Gradient
+    sharedViewModel.resetGradient()
 }
 
 
@@ -186,7 +191,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.fillMaxWidth().padding(8.dp)
+            modifier = modifier.fillMaxSize().padding(8.dp).weight(1f)
         ) {
             Text(
                 text = stringResource(id = R.string.made_with_love),
@@ -206,8 +211,52 @@ fun AboutColumn(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HistoryColumn() {
-    //TODO("Not yet implemented")
+fun HistoryColumn(
+    downloadRecordList: StateFlow<List<DownloadRecord>>,
+    navController: NavController
+) {
+    val list by downloadRecordList.collectAsState()
+
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        content = {
+            items(list) {
+                DownloadRecordItem(item = it,navController = navController)
+            }
+        },
+        modifier = Modifier.padding(top = 8.dp).fillMaxSize()
+    )
+}
+
+@Composable
+fun DownloadRecordItem(item: DownloadRecord,navController: NavController) {
+    Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {
+        val imgUri = item.coverUrl.toUri().buildUpon().scheme("https").build()
+        GlideImage(
+            data = imgUri,
+            //Loading Placeholder Makes Scrolling very stuttery
+//            loading = { Image(vectorResource(id = R.drawable.ic_song_placeholder)) },
+            error = { Image(vectorResource(id = R.drawable.ic_musicplaceholder)) },
+            contentScale = ContentScale.Inside,
+//            fadeIn = true,
+            modifier = Modifier.preferredHeight(75.dp).preferredWidth(90.dp)
+        )
+        Column(modifier = Modifier.padding(horizontal = 8.dp).preferredHeight(60.dp).weight(1f),verticalArrangement = Arrangement.SpaceEvenly) {
+            Text(item.name,maxLines = 1,overflow = TextOverflow.Ellipsis,style = SpotiFlyerTypography.h6,color = colorAccent)
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom,
+                modifier = Modifier.padding(horizontal = 8.dp).fillMaxSize()
+            ){
+                Text(item.type,fontSize = 13.sp)
+                Text("Tracks: ${item.totalFiles}",fontSize = 13.sp)
+            }
+        }
+        Image(
+            imageVector = vectorResource(id = R.drawable.ic_share_open),
+            modifier = Modifier.clickable(onClick = { navController.navigateToPlatform(item.link) })
+        )
+    }
 }
 
 @Composable
@@ -236,7 +285,7 @@ fun HomeTabBar(
     TabRow(
         selectedTabIndex = selectedIndex,
         indicator = indicator,
-        modifier = modifier
+        modifier = modifier,
     ) {
         categories.forEachIndexed { index, category ->
             Tab(
@@ -289,14 +338,16 @@ fun SearchPanel(
                     RoundedCornerShape(30.dp)
                 ),
             backgroundColor = Color.Black,
-            textStyle = AmbientTextStyle.current.merge(TextStyle(fontSize = 20.sp,color = Color.White)),
+            textStyle = AmbientTextStyle.current.merge(TextStyle(fontSize = 18.sp,color = Color.White)),
             shape = RoundedCornerShape(size = 30.dp),
             activeColor = Color.Transparent,
             inactiveColor = Color.Transparent
         )
         OutlinedButton(
             modifier = Modifier.padding(12.dp).wrapContentWidth(),
-            onClick = {navController.navigateToPlatform(link)},
+            onClick = {
+                navController.navigateToPlatform(link)
+            },
             border = BorderStroke(1.dp, Brush.horizontalGradient(listOf(colorPrimary, colorAccent)))
         ){
             Text(text = "Search",style = SpotiFlyerTypography.h6,modifier = Modifier.padding(4.dp))

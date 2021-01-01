@@ -15,19 +15,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.jetcaster.util.verticalGradientScrim
 import com.shabinder.spotiflyer.navigation.ComposeNavigation
 import com.shabinder.spotiflyer.navigation.navigateToPlatform
 import com.shabinder.spotiflyer.networking.SpotifyService
@@ -55,8 +55,7 @@ import com.shabinder.spotiflyer.utils.showDialog as showDialog1
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private var spotifyService : SpotifyService? = null
-    lateinit var navController: NavHostController
+    private lateinit var navController: NavHostController
     @Inject lateinit var moshi: Moshi
     @Inject lateinit var spotifyServiceTokenRequest: SpotifyServiceTokenRequest
 
@@ -70,20 +69,28 @@ class MainActivity : AppCompatActivity() {
             ComposeLearnTheme {
                 Providers(AmbientContentColor provides colorOffWhite) {
                     ProvideWindowInsets {
-                        Column {
-                            val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
+                        val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
+                        navController = rememberNavController()
 
+                        val gradientColor by sharedViewModel.gradientColor.collectAsState()
+
+                        Column(
+                            modifier = Modifier.fillMaxSize().verticalGradientScrim(
+                                color = gradientColor.copy(alpha = 0.38f),
+                                startYPercentage = 1f,
+                                endYPercentage = 0f,
+                                fixedHeight = 700f,
+                            )
+                        ) {
                             // Draw a scrim over the status bar which matches the app bar
                             Spacer(
-                                Modifier.background(appBarColor).fillMaxWidth().statusBarsHeight()
+                                Modifier.background(appBarColor).fillMaxWidth()
+                                    .statusBarsHeight()
                             )
-
                             AppBar(
                                 backgroundColor = appBarColor,
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            navController = rememberNavController()
-
                             ComposeNavigation(navController)
                         }
                     }
@@ -141,7 +148,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Adding my own new Spotify Web Api Requests!
+     * Adding my own Spotify Web Api Requests!
      * */
     private fun implementSpotifyService(token: String) {
         val httpClient: OkHttpClient.Builder = OkHttpClient.Builder()
@@ -154,25 +161,26 @@ class MainActivity : AppCompatActivity() {
             chain.proceed(request)
         }).addInterceptor(NetworkInterceptor())
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.spotify.com/v1/")
-            .client(httpClient.build())
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-
-        spotifyService = retrofit.create(SpotifyService::class.java)
-        sharedViewModel.spotifyService.value = spotifyService
+        val retrofit = Retrofit.Builder().run{
+            baseUrl("https://api.spotify.com/v1/")
+            client(httpClient.build())
+            addConverterFactory(MoshiConverterFactory.create(moshi))
+            build()
+        }
+        sharedViewModel.spotifyService.value = retrofit.create(SpotifyService::class.java)
     }
 
     fun authenticateSpotify() {
-        sharedViewModel.viewModelScope.launch {
-            log("Spotify Authentication","Started")
-            val token = spotifyServiceTokenRequest.getToken()
-            token.value?.let {
-                showDialog1("Success: Spotify Token Acquired")
-                implementSpotifyService(it.access_token)
+        if(sharedViewModel.spotifyService.value == null){
+            sharedViewModel.viewModelScope.launch {
+                log("Spotify Authentication","Started")
+                val token = spotifyServiceTokenRequest.getToken()
+                token.value?.let {
+                    showDialog1("Success: Spotify Token Acquired")
+                    implementSpotifyService(it.access_token)
+                }
+                log("Spotify Token", token.value.toString())
             }
-            log("Spotify Token", token.value.toString())
         }
     }
 
@@ -227,7 +235,8 @@ fun AppBar(
                 }
             }
         },
-        modifier = modifier
+        modifier = modifier,
+        elevation = 0.dp
     )
 }
 

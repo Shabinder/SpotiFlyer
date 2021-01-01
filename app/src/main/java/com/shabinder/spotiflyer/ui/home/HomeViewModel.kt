@@ -1,10 +1,17 @@
 package com.shabinder.spotiflyer.ui.home
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.shabinder.spotiflyer.database.DatabaseDAO
+import com.shabinder.spotiflyer.database.DownloadRecord
+import com.shabinder.spotiflyer.utils.sharedViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class HomeViewModel: ViewModel() {
+class HomeViewModel : ViewModel() {
 
     private val _link = MutableStateFlow("")
     val link:StateFlow<String>
@@ -30,6 +37,21 @@ class HomeViewModel: ViewModel() {
         _selectedCategory.value = s
     }
 
+    private val _downloadRecordList = MutableStateFlow<List<DownloadRecord>>(listOf())
+    val downloadRecordList: StateFlow<List<DownloadRecord>>
+        get() = _downloadRecordList
+
+    fun getDownloadRecordList() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                _downloadRecordList.value = sharedViewModel.databaseDAO.getRecord().toMutableList()
+            }
+        }
+    }
+
+    init {
+        getDownloadRecordList()
+    }
 }
 
 enum class HomeCategory {
