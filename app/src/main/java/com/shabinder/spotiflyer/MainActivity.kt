@@ -42,6 +42,8 @@ import com.tonyodev.fetch2.Status
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.statusBarsHeight
+import kotlinx.coroutines.*
+import okhttp3.Dispatcher
 import javax.inject.Inject
 
 /*
@@ -196,7 +198,20 @@ class MainActivity : AppCompatActivity() {
             if ("text/plain" == intent.type) {
                 intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
                     log("Intent Received", it)
-                    navController.navigateToTrackList(it)
+                    GlobalScope.launch {
+                        while(!this@MainActivity::navController.isInitialized){
+                            //Wait for Navigation Controller to initialize
+                            delay(200)
+                        }
+                        val filterLinkRegex = """http.+\w""".toRegex()
+                        withContext(Dispatchers.Main) {
+                            val string = it.replace("\n".toRegex(), " ")
+                            val link = filterLinkRegex.find(string)?.value.toString()
+                            log("Intent Link",link)
+                            sharedViewModel.updateLink(link)
+                            navController.navigateToTrackList(link)
+                        }
+                    }
                 }
             }
         }

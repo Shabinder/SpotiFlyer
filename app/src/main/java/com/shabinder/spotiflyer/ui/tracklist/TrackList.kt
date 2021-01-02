@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,11 +32,11 @@ import com.shabinder.spotiflyer.providers.querySpotify
 import com.shabinder.spotiflyer.providers.queryYoutube
 import com.shabinder.spotiflyer.ui.utils.calculateDominantColor
 import com.shabinder.spotiflyer.utils.downloadTracks
+import com.shabinder.spotiflyer.utils.log
 import com.shabinder.spotiflyer.utils.sharedViewModel
 import com.shabinder.spotiflyer.utils.showDialog
 import dev.chrisbanes.accompanist.coil.CoilImage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /*
 * UI for List of Tracks to be universally used.
@@ -50,17 +51,22 @@ fun TrackList(
 
     var result by remember(fullLink) { mutableStateOf<PlatformQueryResult?>(null) }
 
-    coroutineScope.launch {
+    coroutineScope.launch(Dispatchers.Default) {
+        @Suppress("UnusedEquals")//Add Delay if result is not Initialized yet.
+        try{result == null}catch(e:java.lang.IllegalStateException){delay(100)}
         if(result == null){
             result = when{
+                /*
+                * Using SharedViewModel's Link as NAVIGATION's Arg is buggy for links.
+                * */
                 //SPOTIFY
-                fullLink.contains("spotify",true) -> querySpotify(fullLink)
+                sharedViewModel.link.contains("spotify",true) -> querySpotify(sharedViewModel.link)
 
                 //YOUTUBE
-                fullLink.contains("youtube.com",true) || fullLink.contains("youtu.be",true) -> queryYoutube(fullLink)
+                sharedViewModel.link.contains("youtube.com",true) || sharedViewModel.link.contains("youtu.be",true) -> queryYoutube(sharedViewModel.link)
 
                 //GAANA
-                fullLink.contains("gaana",true) -> queryGaana(fullLink)
+                sharedViewModel.link.contains("gaana",true) -> queryGaana(sharedViewModel.link)
 
                 else -> {
                     showDialog("Link is Not Valid")
@@ -68,8 +74,10 @@ fun TrackList(
                 }
             }
         }
-        //Error Occurred And Has Been Shown to User
-        if(result == null) navController.popBackStack()
+        withContext(Dispatchers.Main){
+            //Error Occurred And Has Been Shown to User
+            if(result == null) navController.popBackStack()
+        }
     }
 
     sharedViewModel.updateTrackList(result?.trackList ?: listOf())
@@ -104,7 +112,6 @@ fun TrackList(
                             track.downloaded = DownloadStatus.Queued
                         }
                     }
-                    showDialog("Downloading All Tracks")
                 },
                 modifier = Modifier.padding(bottom = 24.dp).align(Alignment.BottomCenter)
             )
@@ -135,6 +142,9 @@ fun CoverImage(
         Text(
             text = title,
             style = SpotiFlyerTypography.h5,
+            maxLines = 2,
+            textAlign = TextAlign.Center,
+            overflow = TextOverflow.Ellipsis,
             //color = colorAccent,
         )
     }

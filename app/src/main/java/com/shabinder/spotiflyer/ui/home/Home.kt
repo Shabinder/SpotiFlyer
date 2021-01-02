@@ -49,8 +49,8 @@ fun Home(navController: NavController, modifier: Modifier = Modifier) {
         AuthenticationBanner(sharedViewModel.isAuthenticated,modifier)
 
         SearchPanel(
-            viewModel.link,
-            viewModel::updateLink,
+            sharedViewModel.link,
+            sharedViewModel::updateLink,
             navController,
             modifier
         )

@@ -47,6 +47,16 @@ class SharedViewModel @ViewModelInject constructor(
         isAuthenticated = s
     }
 
+    /*
+    * Nav Gives Error on YT links with ? sign
+    * */
+    var link by mutableStateOf("")
+        private set
+
+    fun updateLink(s:String) {
+        link = s
+    }
+
 
     val trackList = mutableStateListOf<TrackDetails>()
 

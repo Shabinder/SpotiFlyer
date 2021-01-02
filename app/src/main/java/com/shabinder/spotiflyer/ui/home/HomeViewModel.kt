@@ -13,13 +13,6 @@ import androidx.compose.runtime.setValue
 
 class HomeViewModel : ViewModel() {
 
-    var link by mutableStateOf("")
-    private set
-
-    fun updateLink(s:String) {
-        link = s
-    }
-
     var selectedCategory by mutableStateOf(HomeCategory.About)
     private set
 

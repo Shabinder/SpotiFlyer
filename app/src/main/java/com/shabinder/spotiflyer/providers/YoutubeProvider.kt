@@ -47,6 +47,7 @@ suspend fun queryYoutube(fullLink: String): PlatformQueryResult?{
     val link = fullLink.removePrefix("https://").removePrefix("http://")
     if(link.contains("playlist",true) || link.contains("list",true)){
         // Given Link is of a Playlist
+        log("YT Play",link)
         val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&")
         return getYTPlaylist(
             playlistId,
@@ -78,7 +79,7 @@ suspend fun getYTPlaylist(
     searchId: String,
     ytDownloader: YoutubeDownloader,
     databaseDAO: DatabaseDAO,
-):PlatformQueryResult{
+):PlatformQueryResult?{
     val result = PlatformQueryResult(
         folderType = "",
         subFolder = "",
@@ -147,10 +148,12 @@ suspend fun getYTPlaylist(
             }
             queryActiveTracks()
         } catch (e: Exception) {
+            e.printStackTrace()
             showDialog("An Error Occurred While Processing!")
         }
     }
-    return result
+    return if(result.title.isNotBlank()) result
+        else null
 }
 
 @SuppressLint("DefaultLocale")
@@ -158,7 +161,7 @@ suspend fun getYTTrack(
     searchId:String,
     ytDownloader: YoutubeDownloader,
     databaseDAO: DatabaseDAO
-):PlatformQueryResult {
+):PlatformQueryResult? {
     val result = PlatformQueryResult(
         folderType = "",
         subFolder = "",
@@ -219,8 +222,10 @@ suspend fun getYTTrack(
             }
             queryActiveTracks()
         } catch (e: Exception) {
+            e.printStackTrace()
             showDialog("An Error Occurred While Processing!")
         }
     }
-    return result
+    return if(result.title.isNotBlank()) result
+    else null
 }
