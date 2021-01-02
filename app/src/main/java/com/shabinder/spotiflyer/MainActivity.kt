@@ -15,8 +15,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,16 +32,16 @@ import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.razorpay.Checkout
 import com.razorpay.PaymentResultListener
+import com.shabinder.spotiflyer.di.Directories
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.navigation.ComposeNavigation
 import com.shabinder.spotiflyer.navigation.navigateToTrackList
-import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
 import com.shabinder.spotiflyer.ui.ComposeLearnTheme
 import com.shabinder.spotiflyer.ui.appNameStyle
 import com.shabinder.spotiflyer.ui.colorOffWhite
 import com.shabinder.spotiflyer.utils.*
-import com.squareup.moshi.Moshi
 import com.tonyodev.fetch2.Status
+import dagger.hilt.EntryPoints
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.statusBarsHeight
@@ -54,13 +52,12 @@ import javax.inject.Inject
 * This is App's God Activity
 * */
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), PaymentResultListener {
+class MainActivity: AppCompatActivity(), PaymentResultListener {
 
     private lateinit var navController: NavHostController
     private lateinit var updateUIReceiver: BroadcastReceiver
     private lateinit var queryReceiver: BroadcastReceiver
-    @Inject lateinit var moshi: Moshi
-    @Inject lateinit var spotifyServiceTokenRequest: SpotifyServiceTokenRequest
+    @Inject lateinit var directories: Directories
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,15 +69,14 @@ class MainActivity : AppCompatActivity(), PaymentResultListener {
             ComposeLearnTheme {
                 Providers(AmbientContentColor provides colorOffWhite) {
                     ProvideWindowInsets {
-                        val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.7f)
+                        val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.65f)
                         navController = rememberNavController()
 
                         Column(
                             modifier = Modifier.fillMaxSize().verticalGradientScrim(
                                 color = sharedViewModel.gradientColor.copy(alpha = 0.38f),
-                                startYPercentage = 1f,
+                                startYPercentage = 0.29f,
                                 endYPercentage = 0f,
-                                fixedHeight = 700f,
                             )
                         ) {
                             // Draw a scrim over the status bar which matches the app bar
@@ -92,7 +88,13 @@ class MainActivity : AppCompatActivity(), PaymentResultListener {
                                 backgroundColor = appBarColor,
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            ComposeNavigation(navController)
+                            ComposeNavigation(
+                                this@MainActivity,
+                                navController,
+                                sharedViewModel.spotifyProvider,
+                                sharedViewModel.gaanaProvider,
+                                sharedViewModel.youtubeProvider,
+                            )
                         }
                     }
                 }
@@ -106,7 +108,7 @@ class MainActivity : AppCompatActivity(), PaymentResultListener {
         requestStoragePermission()
         disableDozeMode()
         checkIfLatestVersion()
-        createDirectories()
+        createDirectories(directories.defaultDir(),directories.imageDir())
         handleIntentFromExternalActivity()
     }
 
@@ -296,6 +298,7 @@ fun AppBar(
 
 
 //@Preview(showBackground = true)
+/*
 @Composable
 fun DefaultPreview() {
     ComposeLearnTheme {
@@ -315,4 +318,4 @@ fun DefaultPreview() {
             }
         }
     }
-}
+}*/

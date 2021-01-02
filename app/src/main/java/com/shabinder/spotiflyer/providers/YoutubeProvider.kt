@@ -18,214 +18,224 @@
 package com.shabinder.spotiflyer.providers
 
 import android.annotation.SuppressLint
+import android.content.Context
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
+import com.shabinder.spotiflyer.di.DefaultDir
+import com.shabinder.spotiflyer.di.Directories
+import com.shabinder.spotiflyer.di.ImageDir
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.PlatformQueryResult
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.utils.*
-import com.shabinder.spotiflyer.utils.Provider.imageDir
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/*
-* YT Album Art Schema
-* HI-RES Url: https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"
-* Normal Url: https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
-* */
+@Singleton
+class YoutubeProvider @Inject constructor(
+    private val directories: Directories,
+    private val ytDownloader: YoutubeDownloader,
+    private val databaseDAO: DatabaseDAO,
+    @ApplicationContext private val ctx : Context,
+) {
+    /*
+    * YT Album Art Schema
+    * HI-RES Url: https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"
+    * Normal Url: https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
+    * */
+    private val sampleDomain2 = "youtu.be"
+    private val sampleDomain1 = "youtube.com"
 
-private const val sampleDomain2 = "youtu.be"
-private const val sampleDomain1 = "youtube.com"
+    private val defaultDir
+        get() = directories.defaultDir()
+    private val imageDir
+        get() = directories.imageDir()
 
-/*
+    /*
 * Sending a Result as null = Some Error Occurred!
 * */
-suspend fun queryYoutube(fullLink: String): PlatformQueryResult?{
-    val link = fullLink.removePrefix("https://").removePrefix("http://")
-    if(link.contains("playlist",true) || link.contains("list",true)){
-        // Given Link is of a Playlist
-        log("YT Play",link)
-        val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&")
-        return getYTPlaylist(
-            playlistId,
-            sharedViewModel.ytDownloader,
-            sharedViewModel.databaseDAO
+    suspend fun queryYoutube(fullLink: String): PlatformQueryResult?{
+        val link = fullLink.removePrefix("https://").removePrefix("http://")
+        if(link.contains("playlist",true) || link.contains("list",true)){
+            // Given Link is of a Playlist
+            log("YT Play",link)
+            val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&")
+            return getYTPlaylist(
+                playlistId
+            )
+        }else{//Given Link is of a Video
+            var searchId = "error"
+            if(link.contains(sampleDomain1,true) ){
+                searchId =  link.substringAfterLast("=","error")
+            }
+            if(link.contains(sampleDomain2,true) ){
+                searchId = link.substringAfterLast("/","error")
+            }
+            return if(searchId != "error") {
+                getYTTrack(
+                    searchId
+                )
+            }else{
+                showDialog("Your Youtube Link is not of a Video!!")
+                null
+            }
+        }
+    }
+
+    private suspend fun getYTPlaylist(
+        searchId: String
+    ):PlatformQueryResult?{
+        val result = PlatformQueryResult(
+            folderType = "",
+            subFolder = "",
+            title = "",
+            coverUrl = "",
+            trackList = listOf(),
+            Source.YouTube
         )
-    }else{//Given Link is of a Video
-        var searchId = "error"
-        if(link.contains(sampleDomain1,true) ){
-            searchId =  link.substringAfterLast("=","error")
-        }
-        if(link.contains(sampleDomain2,true) ){
-            searchId = link.substringAfterLast("/","error")
-        }
-        return if(searchId != "error") {
-            getYTTrack(
-                searchId,
-                sharedViewModel.ytDownloader,
-                sharedViewModel.databaseDAO
-            )
-        }else{
-            showDialog("Your Youtube Link is not of a Video!!")
-            null
-        }
-    }
-}
+        with(result) {
+            try {
+                log("YT Playlist", searchId)
+                val playlist = ytDownloader.getPlaylist(searchId)
+                val playlistDetails = playlist.details()
+                val name = playlistDetails.title()
+                subFolder = removeIllegalChars(name)
+                val videos = playlist.videos()
 
-suspend fun getYTPlaylist(
-    searchId: String,
-    ytDownloader: YoutubeDownloader,
-    databaseDAO: DatabaseDAO,
-):PlatformQueryResult?{
-    val result = PlatformQueryResult(
-        folderType = "",
-        subFolder = "",
-        title = "",
-        coverUrl = "",
-        trackList = listOf(),
-        Source.YouTube
-    )
-    with(result) {
-        try {
-            log("YT Playlist", searchId)
-            val playlist = ytDownloader.getPlaylist(searchId)
-            val playlistDetails = playlist.details()
-            val name = playlistDetails.title()
-            subFolder = removeIllegalChars(name)
-            val videos = playlist.videos()
+                coverUrl = "https://i.ytimg.com/vi/${
+                    videos.firstOrNull()?.videoId()
+                }/hqdefault.jpg"
+                title = name
 
-            coverUrl = "https://i.ytimg.com/vi/${
-                videos.firstOrNull()?.videoId()
-            }/hqdefault.jpg"
-            title = name
-
-            trackList = videos.map {
-                TrackDetails(
-                    title = it.title(),
-                    artists = listOf(it.author().toString()),
-                    durationSec = it.lengthSeconds(),
-                    albumArt = File(
-                        imageDir() + it.videoId() + ".jpeg"
-                    ),
-                    source = Source.YouTube,
-                    albumArtURL = "https://i.ytimg.com/vi/${it.videoId()}/hqdefault.jpg",
-                    downloaded = if (File(
-                            finalOutputDir(
-                                itemName = it.title(),
-                                type = folderType,
-                                subFolder = subFolder
-                            )
-                        ).exists()
-                    )
-                        DownloadStatus.Downloaded
-                    else {
-                        DownloadStatus.NotDownloaded
-                    },
-                    outputFile = finalOutputDir(it.title(), folderType, subFolder, ".m4a"),
-                    videoID = it.videoId()
-                )
-            }
-
-            withContext(Dispatchers.IO) {
-                databaseDAO.insert(
-                    DownloadRecord(
-                        type = "PlayList",
-                        name = if (name.length > 17) {
-                            "${name.subSequence(0, 16)}..."
-                        } else {
-                            name
+                trackList = videos.map {
+                    TrackDetails(
+                        title = it.title(),
+                        artists = listOf(it.author().toString()),
+                        durationSec = it.lengthSeconds(),
+                        albumArt = File(imageDir + it.videoId() + ".jpeg"),
+                        source = Source.YouTube,
+                        albumArtURL = "https://i.ytimg.com/vi/${it.videoId()}/hqdefault.jpg",
+                        downloaded = if (File(
+                                finalOutputDir(
+                                    itemName = it.title(),
+                                    type = folderType,
+                                    subFolder = subFolder,
+                                    defaultDir
+                                )
+                            ).exists()
+                        )
+                            DownloadStatus.Downloaded
+                        else {
+                            DownloadStatus.NotDownloaded
                         },
-                        link = "https://www.youtube.com/playlist?list=$searchId",
-                        coverUrl = "https://i.ytimg.com/vi/${
-                            videos.firstOrNull()?.videoId()
-                        }/hqdefault.jpg",
-                        totalFiles = videos.size,
+                        outputFile = finalOutputDir(it.title(), folderType, subFolder, defaultDir,".m4a"),
+                        videoID = it.videoId()
                     )
-                )
+                }
+
+                withContext(Dispatchers.IO) {
+                    databaseDAO.insert(
+                        DownloadRecord(
+                            type = "PlayList",
+                            name = if (name.length > 17) {
+                                "${name.subSequence(0, 16)}..."
+                            } else {
+                                name
+                            },
+                            link = "https://www.youtube.com/playlist?list=$searchId",
+                            coverUrl = "https://i.ytimg.com/vi/${
+                                videos.firstOrNull()?.videoId()
+                            }/hqdefault.jpg",
+                            totalFiles = videos.size,
+                        )
+                    )
+                }
+                queryActiveTracks(ctx)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showDialog("An Error Occurred While Processing!")
             }
-            queryActiveTracks()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            showDialog("An Error Occurred While Processing!")
         }
-    }
-    return if(result.title.isNotBlank()) result
+        return if(result.title.isNotBlank()) result
         else null
-}
-
-@SuppressLint("DefaultLocale")
-suspend fun getYTTrack(
-    searchId:String,
-    ytDownloader: YoutubeDownloader,
-    databaseDAO: DatabaseDAO
-):PlatformQueryResult? {
-    val result = PlatformQueryResult(
-        folderType = "",
-        subFolder = "",
-        title = "",
-        coverUrl = "",
-        trackList = listOf(),
-        Source.YouTube
-    )
-    with(result) {
-        try {
-            log("YT Video", searchId)
-            val video = ytDownloader.getVideo(searchId)
-            coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
-            val detail = video?.details()
-            val name = detail?.title()?.replace(detail.author()!!.toUpperCase(), "", true)
-                ?: detail?.title() ?: ""
-            log("YT View Model", detail.toString())
-            trackList = listOf(
-                TrackDetails(
-                    title = name,
-                    artists = listOf(detail?.author().toString()),
-                    durationSec = detail?.lengthSeconds() ?: 0,
-                    albumArt = File(imageDir(), "$searchId.jpeg"),
-                    source = Source.YouTube,
-                    albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
-                    downloaded = if (File(
-                            finalOutputDir(
-                                itemName = name,
-                                type = folderType,
-                                subFolder = subFolder
-                            )
-                        ).exists()
-                    )
-                        DownloadStatus.Downloaded
-                    else {
-                        DownloadStatus.NotDownloaded
-                    },
-                    outputFile = finalOutputDir(name, folderType, subFolder, ".m4a"),
-                    videoID = searchId
-                )
-            )
-            title = name
-
-            withContext(Dispatchers.IO) {
-                databaseDAO.insert(
-                    DownloadRecord(
-                        type = "Track",
-                        name = if (name.length > 17) {
-                            "${name.subSequence(0, 16)}..."
-                        } else {
-                            name
-                        },
-                        link = "https://www.youtube.com/watch?v=$searchId",
-                        coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
-                        totalFiles = 1,
-                    )
-                )
-            }
-            queryActiveTracks()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            showDialog("An Error Occurred While Processing!")
-        }
     }
-    return if(result.title.isNotBlank()) result
-    else null
+
+    @SuppressLint("DefaultLocale")
+    private suspend fun getYTTrack(
+        searchId:String,
+    ):PlatformQueryResult? {
+        val result = PlatformQueryResult(
+            folderType = "",
+            subFolder = "",
+            title = "",
+            coverUrl = "",
+            trackList = listOf(),
+            Source.YouTube
+        )
+        with(result) {
+            try {
+                log("YT Video", searchId)
+                val video = ytDownloader.getVideo(searchId)
+                coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
+                val detail = video?.details()
+                val name = detail?.title()?.replace(detail.author()!!.toUpperCase(), "", true)
+                    ?: detail?.title() ?: ""
+                log("YT View Model", detail.toString())
+                trackList = listOf(
+                    TrackDetails(
+                        title = name,
+                        artists = listOf(detail?.author().toString()),
+                        durationSec = detail?.lengthSeconds() ?: 0,
+                        albumArt = File(imageDir, "$searchId.jpeg"),
+                        source = Source.YouTube,
+                        albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
+                        downloaded = if (File(
+                                finalOutputDir(
+                                    itemName = name,
+                                    type = folderType,
+                                    subFolder = subFolder,
+                                    defaultDir = defaultDir
+                                )
+                            ).exists()
+                        )
+                            DownloadStatus.Downloaded
+                        else {
+                            DownloadStatus.NotDownloaded
+                        },
+                        outputFile = finalOutputDir(name, folderType, subFolder, defaultDir,".m4a"),
+                        videoID = searchId
+                    )
+                )
+                title = name
+
+                withContext(Dispatchers.IO) {
+                    databaseDAO.insert(
+                        DownloadRecord(
+                            type = "Track",
+                            name = if (name.length > 17) {
+                                "${name.subSequence(0, 16)}..."
+                            } else {
+                                name
+                            },
+                            link = "https://www.youtube.com/watch?v=$searchId",
+                            coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
+                            totalFiles = 1,
+                        )
+                    )
+                }
+                queryActiveTracks(ctx)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showDialog("An Error Occurred While Processing!")
+            }
+        }
+        return if(result.title.isNotBlank()) result
+        else null
+    }
 }

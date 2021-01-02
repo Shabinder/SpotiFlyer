@@ -14,14 +14,17 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.rounded.*
+import androidx.compose.material.icons.rounded.CardGiftcard
+import androidx.compose.material.icons.rounded.Flag
+import androidx.compose.material.icons.rounded.InsertLink
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -29,21 +32,26 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.viewModel
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.razorpay.Checkout
+import com.shabinder.spotiflyer.MainActivity
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.navigation.navigateToTrackList
 import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
 import com.shabinder.spotiflyer.ui.colorAccent
 import com.shabinder.spotiflyer.ui.colorPrimary
-import com.shabinder.spotiflyer.utils.*
+import com.shabinder.spotiflyer.utils.isOnline
+import com.shabinder.spotiflyer.utils.openPlatform
+import com.shabinder.spotiflyer.utils.sharedViewModel
+import com.shabinder.spotiflyer.utils.showDialog
 import dev.chrisbanes.accompanist.coil.CoilImage
 import org.json.JSONObject
 
 @Composable
-fun Home(navController: NavController, modifier: Modifier = Modifier) {
+fun Home(navController: NavController, mainActivity: MainActivity, modifier: Modifier = Modifier) {
     val viewModel: HomeViewModel = viewModel()
 
     Column(modifier = modifier) {
@@ -65,7 +73,7 @@ fun Home(navController: NavController, modifier: Modifier = Modifier) {
         )
 
         when(viewModel.selectedCategory){
-            HomeCategory.About -> AboutColumn()
+            HomeCategory.About -> AboutColumn(mainActivity)
             HomeCategory.History -> HistoryColumn(viewModel.downloadRecordList,navController)
         }
     }
@@ -77,7 +85,8 @@ fun Home(navController: NavController, modifier: Modifier = Modifier) {
 
 
 @Composable
-fun AboutColumn(modifier: Modifier = Modifier) {
+fun AboutColumn(mainActivity: MainActivity,modifier: Modifier = Modifier) {
+    val ctx = AmbientContext.current
     ScrollableColumn(modifier.fillMaxSize(),contentPadding = PaddingValues(16.dp)) {
         Card(
             modifier = modifier.fillMaxWidth(),
@@ -94,17 +103,17 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                     Icon(
                         imageVector = vectorResource(id = R.drawable.ic_spotify_logo), tint = Color.Unspecified,
                         modifier = Modifier.clickable(
-                            onClick = { openPlatform("com.spotify.music","http://open.spotify.com") })
+                            onClick = { openPlatform("com.spotify.music","http://open.spotify.com",ctx) })
                     )
                     Spacer(modifier = modifier.padding(start = 24.dp))
                     Icon(imageVector = vectorResource(id = R.drawable.ic_gaana ),tint = Color.Unspecified,
                         modifier = Modifier.clickable(
-                            onClick = { openPlatform("com.gaana","http://gaana.com") })
+                            onClick = { openPlatform("com.gaana","http://gaana.com",ctx) })
                     )
                     Spacer(modifier = modifier.padding(start = 24.dp))
                     Icon(imageVector = vectorResource(id = R.drawable.ic_youtube),tint = Color.Unspecified,
                         modifier = Modifier.clickable(
-                            onClick = { openPlatform("com.google.android.youtube","http://m.youtube.com") })
+                            onClick = { openPlatform("com.google.android.youtube","http://m.youtube.com",ctx) })
                     )
                 }
             }
@@ -123,7 +132,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.padding(top = 6.dp))
                 Row(verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth().clickable(
-                        onClick = { openPlatform("http://github.com/Shabinder/SpotiFlyer") })
+                        onClick = { openPlatform("http://github.com/Shabinder/SpotiFlyer",ctx) })
                         .padding(vertical = 6.dp)
                 ) {
                     Icon(imageVector = vectorResource(id = R.drawable.ic_github ),tint = Color.LightGray)
@@ -141,7 +150,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                 }
                 Row(
                     modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        .clickable(onClick = { openPlatform("http://github.com/Shabinder/SpotiFlyer") }),
+                        .clickable(onClick = { openPlatform("http://github.com/Shabinder/SpotiFlyer", ctx) }),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(Icons.Rounded.Flag.copy(defaultHeight = 32.dp,defaultWidth = 32.dp))
@@ -159,7 +168,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                 }
                 Row(
                     modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        .clickable(onClick = { startPayment() }),
+                        .clickable(onClick = { startPayment(mainActivity) }),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(Icons.Rounded.CardGiftcard.copy(defaultHeight = 32.dp,defaultWidth = 32.dp))
@@ -185,7 +194,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                             }
 
                             val shareIntent = Intent.createChooser(sendIntent, null)
-                            mainActivity.startActivity(shareIntent)
+                            ctx.startActivity(shareIntent)
                         }),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -245,6 +254,7 @@ fun HistoryColumn(
 
 @Composable
 fun DownloadRecordItem(item: DownloadRecord,navController: NavController) {
+    val ctx = AmbientContext.current
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {
         val imgUri = item.coverUrl.toUri().buildUpon().scheme("https").build()
         CoilImage(
@@ -270,14 +280,14 @@ fun DownloadRecordItem(item: DownloadRecord,navController: NavController) {
         Image(
             imageVector = vectorResource(id = R.drawable.ic_share_open),
             modifier = Modifier.clickable(onClick = {
-                if(!isOnline()) showDialog("Check Your Internet Connection")
+                if(!isOnline(ctx)) showDialog("Check Your Internet Connection")
                 else navController.navigateToTrackList(item.link)
             })
         )
     }
 }
 
-private fun startPayment() {
+private fun startPayment(mainActivity: MainActivity) {
     /*
     *  You need to pass current activity in order to let Razorpay create CheckoutActivity
     * */
@@ -365,7 +375,7 @@ fun SearchPanel(
     navController: NavController,
     modifier: Modifier = Modifier
 ){
-
+    val ctx = AmbientContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.padding(top = 16.dp)
@@ -395,7 +405,7 @@ fun SearchPanel(
             onClick = {
                 if(link.isBlank()) showDialog("Enter A Link!")
                 else{
-                    if(!isOnline()) showDialog("Check Your Internet Connection")
+                    if(!isOnline(ctx)) showDialog("Check Your Internet Connection")
                     else navController.navigateToTrackList(link)
                 }
             },

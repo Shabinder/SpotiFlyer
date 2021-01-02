@@ -18,18 +18,22 @@
 package com.shabinder.spotiflyer
 
 import android.content.Intent
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.networking.GaanaInterface
 import com.shabinder.spotiflyer.networking.SpotifyService
+import com.shabinder.spotiflyer.providers.GaanaProvider
+import com.shabinder.spotiflyer.providers.SpotifyProvider
+import com.shabinder.spotiflyer.providers.YoutubeProvider
 import com.shabinder.spotiflyer.ui.colorPrimaryDark
 import com.shabinder.spotiflyer.utils.log
 import com.tonyodev.fetch2.Status
@@ -38,7 +42,10 @@ class SharedViewModel @ViewModelInject constructor(
     val databaseDAO: DatabaseDAO,
     val spotifyService: SpotifyService,
     val gaanaInterface : GaanaInterface,
-    val ytDownloader: YoutubeDownloader
+    val ytDownloader: YoutubeDownloader,
+    val gaanaProvider: GaanaProvider,
+    val spotifyProvider: SpotifyProvider,
+    val youtubeProvider: YoutubeProvider
 ) : ViewModel() {
     var isAuthenticated by mutableStateOf(false)
         private set
@@ -110,7 +117,7 @@ class SharedViewModel @ViewModelInject constructor(
         }
     }
 
-    var gradientColor by mutableStateOf(colorPrimaryDark)
+    var gradientColor by mutableStateOf(Color.Transparent)
     private set
 
     fun updateGradientColor(color: Color) {

@@ -6,8 +6,6 @@ import androidx.compose.runtime.setValue
 import com.shabinder.spotiflyer.models.spotify.Token
 import com.shabinder.spotiflyer.utils.TokenStore
 import com.shabinder.spotiflyer.utils.log
-import com.shabinder.spotiflyer.utils.showDialog
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response

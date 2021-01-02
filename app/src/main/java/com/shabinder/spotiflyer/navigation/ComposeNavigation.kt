@@ -5,13 +5,22 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
-import androidx.navigation.compose.popUpTo
+import com.shabinder.spotiflyer.MainActivity
+import com.shabinder.spotiflyer.providers.GaanaProvider
+import com.shabinder.spotiflyer.providers.SpotifyProvider
+import com.shabinder.spotiflyer.providers.YoutubeProvider
 import com.shabinder.spotiflyer.ui.home.Home
 import com.shabinder.spotiflyer.ui.tracklist.TrackList
 import com.shabinder.spotiflyer.utils.sharedViewModel
 
 @Composable
-fun ComposeNavigation(navController: NavHostController) {
+fun ComposeNavigation(
+    mainActivity: MainActivity,
+    navController: NavHostController,
+    spotifyProvider: SpotifyProvider,
+    gaanaProvider: GaanaProvider,
+    youtubeProvider: YoutubeProvider
+) {
     NavHost(
         navController = navController,
         startDestination = "home"
@@ -19,7 +28,7 @@ fun ComposeNavigation(navController: NavHostController) {
 
         //HomeScreen - Starting Point
         composable("home") {
-            Home(navController = navController)
+            Home(navController = navController, mainActivity)
         }
 
         //Spotify Screen
@@ -30,7 +39,10 @@ fun ComposeNavigation(navController: NavHostController) {
         ) {
             TrackList(
                 fullLink = it.arguments?.getString("link") ?: "error",
-                navController = navController
+                navController = navController,
+                spotifyProvider,
+                gaanaProvider,
+                youtubeProvider
             )
         }
     }

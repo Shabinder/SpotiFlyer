@@ -1,6 +1,7 @@
 package com.shabinder.spotiflyer.utils
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -53,23 +54,23 @@ fun YoutubeVideo.getData(): Format?{
         }
     }
 }
-fun openPlatform(packageName:String, websiteAddress:String){
-    val manager: PackageManager = mainActivity.packageManager
+fun openPlatform(packageName:String, websiteAddress:String,context: Context){
+    val manager: PackageManager = context.packageManager
     try {
         val intent = manager.getLaunchIntentForPackage(packageName)
             ?: throw PackageManager.NameNotFoundException()
         intent.addCategory(Intent.CATEGORY_LAUNCHER)
-        mainActivity.startActivity(intent)
+        context.startActivity(intent)
     } catch (e: PackageManager.NameNotFoundException) {
         val uri: Uri =
             Uri.parse(websiteAddress)
         val intent = Intent(Intent.ACTION_VIEW, uri)
-        mainActivity.startActivity(intent)
+        context.startActivity(intent)
     }
 }
 
-fun openPlatform(websiteAddress:String){
+fun openPlatform(websiteAddress:String,context: Context){
     val uri = Uri.parse(websiteAddress)
     val intent = Intent(Intent.ACTION_VIEW, uri)
-    mainActivity.startActivity(intent)
+    context.startActivity(intent)
 }

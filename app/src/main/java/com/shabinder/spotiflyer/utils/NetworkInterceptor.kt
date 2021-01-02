@@ -17,18 +17,23 @@
 
 package com.shabinder.spotiflyer.utils
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.Interceptor
 import okhttp3.Protocol
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
+import javax.inject.Inject
 
 const val NoInternetErrorCode = 222
 
-class NetworkInterceptor: Interceptor {
+class NetworkInterceptor @Inject constructor(
+    @ApplicationContext private val ctx : Context
+) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         log("Network Requesting Debug",chain.request().url.toString())
 
-        return if (!isOnline()){
+        return if (!isOnline(ctx)){
             //No Internet Connection
             showDialog()
             //Lets Stop the Incoming Request and send Dummy Response

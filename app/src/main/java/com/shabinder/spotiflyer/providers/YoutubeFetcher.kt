@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.downloadHelper
+package com.shabinder.spotiflyer.providers
 
 import android.annotation.SuppressLint
 import com.beust.klaxon.JsonArray

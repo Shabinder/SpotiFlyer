@@ -26,7 +26,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import com.shabinder.spotiflyer.utils.log
 import kotlin.math.pow
 
 /**

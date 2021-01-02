@@ -17,58 +17,50 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
-/**
- * mainActivity Instance to use whereEver Needed , as Its God Activity.
- * (i.e, almost Active Throughout App's Lifecycle )
-*/
-val mainActivity
-    get() = MainActivity.getInstance()
-
 val sharedViewModel
     get() = MainActivity.getSharedViewModel()
 
-fun loadAllImages( images:List<String>? = null,source: Source, context: Context? = mainActivity) {
+fun loadAllImages( images:List<String>? = null,source: Source, context: Context) {
     val serviceIntent = Intent(context, ForegroundService::class.java)
     images?.let {  serviceIntent.putStringArrayListExtra("imagesList",(it + source.name) as ArrayList<String>) }
-    context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
+    context.let { ContextCompat.startForegroundService(it, serviceIntent) }
 }
 
 fun downloadTracks(
     trackList: ArrayList<TrackDetails>,
-    context: Context? = mainActivity
+    context: Context
 ) {
     if(!trackList.isNullOrEmpty()){
         loadAllImages(
             trackList.map { it.albumArtURL },
-            trackList.first().source
+            trackList.first().source,
+            context
         )
         val serviceIntent = Intent(context, ForegroundService::class.java)
         serviceIntent.putParcelableArrayListExtra("object",trackList)
-        context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
+        context.let { ContextCompat.startForegroundService(it, serviceIntent) }
     }
 }
 
-fun queryActiveTracks(context:Context? = mainActivity) {
+fun queryActiveTracks(context:Context?) {
     val serviceIntent = Intent(context, ForegroundService::class.java).apply {
         action = "query"
     }
     context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
 }
-
-fun finalOutputDir(itemName:String ,type:String, subFolder:String,extension:String = ".mp3"): String{
-    return Provider.defaultDir + removeIllegalChars(type) + File.separator +
-            if(subFolder.isEmpty())"" else { removeIllegalChars(subFolder) + File.separator} +
-            removeIllegalChars(itemName) + extension
-}
+fun finalOutputDir(itemName:String ,type:String, subFolder:String,defaultDir:String,extension:String = ".mp3" ): String =
+    defaultDir + removeIllegalChars(type) + File.separator +
+        if(subFolder.isEmpty())"" else { removeIllegalChars(subFolder) + File.separator} +
+        removeIllegalChars(itemName) + extension
 
 /**
  * Util. Function To Check Connection Status
  * */
 @Suppress("DEPRECATION")
-fun isOnline(): Boolean {
+fun isOnline(ctx:Context): Boolean {
     var result = false
     val connectivityManager =
-        mainActivity.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
     connectivityManager?.let {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             it.getNetworkCapabilities(connectivityManager.activeNetwork)?.apply {
@@ -81,7 +73,7 @@ fun isOnline(): Boolean {
             }
         } else {
             val netInfo =
-                (mainActivity.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo
+                (ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo
             result = netInfo != null && netInfo.isConnected
         }
     }
@@ -92,7 +84,7 @@ fun isOnline(): Boolean {
 fun showDialog(title:String? = null, message: String? = null,response: String = "Ok"){
     //TODO
     CoroutineScope(Dispatchers.Main).launch {
-        Toast.makeText(mainActivity,title ?: "No Internet",Toast.LENGTH_SHORT).show()
+        Toast.makeText(MainActivity.getInstance(),title ?: "No Internet",Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -161,11 +153,11 @@ fun removeIllegalChars(fileName: String): String {
     return name
 }
 
-fun createDirectories() {
-    createDirectory(Provider.defaultDir)
-    createDirectory(Provider.imageDir())
-    createDirectory(Provider.defaultDir + "Tracks/")
-    createDirectory(Provider.defaultDir + "Albums/")
-    createDirectory(Provider.defaultDir + "Playlists/")
-    createDirectory(Provider.defaultDir + "YT_Downloads/")
+fun createDirectories(defaultDir:String,imageDir:String) {
+    createDirectory(defaultDir)
+    createDirectory(imageDir)
+    createDirectory(defaultDir + "Tracks/")
+    createDirectory(defaultDir + "Albums/")
+    createDirectory(defaultDir + "Playlists/")
+    createDirectory(defaultDir + "YT_Downloads/")
 }

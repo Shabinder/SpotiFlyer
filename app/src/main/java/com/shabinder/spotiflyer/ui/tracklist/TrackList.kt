@@ -1,9 +1,7 @@
 package com.shabinder.spotiflyer.ui.tracklist
 
+import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,14 +24,13 @@ import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.PlatformQueryResult
 import com.shabinder.spotiflyer.models.TrackDetails
+import com.shabinder.spotiflyer.providers.GaanaProvider
+import com.shabinder.spotiflyer.providers.SpotifyProvider
+import com.shabinder.spotiflyer.providers.YoutubeProvider
 import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
 import com.shabinder.spotiflyer.ui.colorAccent
-import com.shabinder.spotiflyer.providers.queryGaana
-import com.shabinder.spotiflyer.providers.querySpotify
-import com.shabinder.spotiflyer.providers.queryYoutube
 import com.shabinder.spotiflyer.ui.utils.calculateDominantColor
 import com.shabinder.spotiflyer.utils.downloadTracks
-import com.shabinder.spotiflyer.utils.log
 import com.shabinder.spotiflyer.utils.sharedViewModel
 import com.shabinder.spotiflyer.utils.showDialog
 import dev.chrisbanes.accompanist.coil.CoilImage
@@ -45,6 +43,9 @@ import kotlinx.coroutines.*
 fun TrackList(
     fullLink: String,
     navController: NavController,
+    spotifyProvider: SpotifyProvider,
+    gaanaProvider: GaanaProvider,
+    youtubeProvider: YoutubeProvider,
     modifier: Modifier = Modifier
 ){
     val coroutineScope = rememberCoroutineScope()
@@ -60,13 +61,16 @@ fun TrackList(
                 * Using SharedViewModel's Link as NAVIGATION's Arg is buggy for links.
                 * */
                 //SPOTIFY
-                sharedViewModel.link.contains("spotify",true) -> querySpotify(sharedViewModel.link)
+                sharedViewModel.link.contains("spotify",true) ->
+                    spotifyProvider.querySpotify(sharedViewModel.link)
 
                 //YOUTUBE
-                sharedViewModel.link.contains("youtube.com",true) || sharedViewModel.link.contains("youtu.be",true) -> queryYoutube(sharedViewModel.link)
+                sharedViewModel.link.contains("youtube.com",true) || sharedViewModel.link.contains("youtu.be",true) ->
+                    youtubeProvider.queryYoutube(sharedViewModel.link)
 
                 //GAANA
-                sharedViewModel.link.contains("gaana",true) -> queryGaana(sharedViewModel.link)
+                sharedViewModel.link.contains("gaana",true) ->
+                    gaanaProvider.queryGaana(sharedViewModel.link)
 
                 else -> {
                     showDialog("Link is Not Valid")
@@ -83,6 +87,7 @@ fun TrackList(
     sharedViewModel.updateTrackList(result?.trackList ?: listOf())
 
     result?.let{
+        val ctx = AmbientContext.current
         Box(modifier = modifier.fillMaxSize()){
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -94,7 +99,7 @@ fun TrackList(
                         TrackCard(
                             track = item,
                             onDownload = {
-                                downloadTracks(arrayListOf(item))
+                                downloadTracks(arrayListOf(item),ctx)
                                 sharedViewModel.updateTrackStatus(index,DownloadStatus.Queued)
                             },
                         )
@@ -106,7 +111,7 @@ fun TrackList(
                 onClick = {
                     val finalList = sharedViewModel.trackList.filter{it.downloaded == DownloadStatus.NotDownloaded}
                     if (finalList.isNullOrEmpty()) showDialog("Not Downloading Any Song")
-                    else downloadTracks(finalList as ArrayList<TrackDetails>)
+                    else downloadTracks(finalList as ArrayList<TrackDetails>,ctx)
                     for (track in sharedViewModel.trackList) {
                         if (track.downloaded == DownloadStatus.NotDownloaded) {
                             track.downloaded = DownloadStatus.Queued
@@ -126,12 +131,14 @@ fun CoverImage(
     scope: CoroutineScope,
     modifier: Modifier = Modifier,
 ) {
+    val ctx = AmbientContext.current
     Column(
         modifier.padding(vertical = 8.dp).fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val imgUri = coverURL.toUri().buildUpon().scheme("https").build()
         CoilImage(
-            data = coverURL,
+            data = imgUri,
             contentScale = ContentScale.Crop,
             loading = { Image(vectorResource(id = R.drawable.ic_musicplaceholder)) },
             modifier = Modifier
@@ -149,7 +156,7 @@ fun CoverImage(
         )
     }
     scope.launch {
-        updateGradient(coverURL)
+        updateGradient(coverURL, ctx)
     }
 }
 
@@ -187,8 +194,8 @@ fun TrackCard(
                 verticalAlignment = Alignment.Bottom,
                 modifier = Modifier.padding(horizontal = 8.dp).fillMaxSize()
             ){
-                Text("${track.artists.firstOrNull()}...",fontSize = 13.sp)
-                Text("${track.durationSec/60} minutes, ${track.durationSec%60} sec",fontSize = 13.sp)
+                Text("${track.artists.firstOrNull()}...",fontSize = 12.sp,maxLines = 1)
+                Text("${track.durationSec/60} min, ${track.durationSec%60} sec",fontSize = 12.sp,maxLines = 1,overflow = TextOverflow.Ellipsis)
             }
         }
         when(track.downloaded){
@@ -216,7 +223,7 @@ fun TrackCard(
     }
 }
 
-suspend fun updateGradient(imageURL:String){
-    calculateDominantColor(imageURL)?.color
+suspend fun updateGradient(imageURL:String,ctx:Context){
+    calculateDominantColor(imageURL,ctx)?.color
         ?.let { sharedViewModel.updateGradientColor(it) }
 }

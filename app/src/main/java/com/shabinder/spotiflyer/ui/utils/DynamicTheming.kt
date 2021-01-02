@@ -17,27 +17,14 @@
 package com.shabinder.spotiflyer.ui.utils
 
 import android.content.Context
-import androidx.collection.LruCache
-import androidx.compose.animation.animate
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientContext
 import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
 import coil.Coil
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import coil.size.Scale
-import com.shabinder.spotiflyer.utils.mainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -45,9 +32,9 @@ import kotlinx.coroutines.withContext
 data class DominantColors(val color: Color, val onColor: Color)
 
 
-suspend fun calculateDominantColor(url: String): DominantColors? {
+suspend fun calculateDominantColor(url: String,ctx:Context): DominantColors? {
     // we calculate the swatches in the image, and return the first valid color
-    return calculateSwatchesInImage(mainActivity, url)
+    return calculateSwatchesInImage(ctx, url)
         // First we want to sort the list by the color's population
         .sortedByDescending { swatch -> swatch.population }
         // Then we want to find the first valid color

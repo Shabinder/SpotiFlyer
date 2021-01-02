@@ -41,18 +41,18 @@ import com.arthenica.mobileffmpeg.FFmpeg
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.spotiflyer.R
-import com.shabinder.spotiflyer.downloadHelper.getYTTracks
-import com.shabinder.spotiflyer.downloadHelper.sortByBestMatch
+import com.shabinder.spotiflyer.di.Directories
+import com.shabinder.spotiflyer.providers.getYTTracks
+import com.shabinder.spotiflyer.providers.sortByBestMatch
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.networking.YoutubeMusicApi
 import com.shabinder.spotiflyer.networking.makeJsonBody
 import com.shabinder.spotiflyer.utils.*
-import com.shabinder.spotiflyer.utils.Provider.defaultDir
-import com.shabinder.spotiflyer.utils.Provider.imageDir
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
+import dagger.hilt.EntryPoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import retrofit2.Call
@@ -81,13 +81,16 @@ class ForegroundService : Service(){
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
     private var messageList = mutableListOf("", "", "", "","")
-    private val imageDir:String
-        get() = imageDir(this)
     private lateinit var cancelIntent:PendingIntent
     private lateinit var fetch:Fetch
     private lateinit var downloadManager : DownloadManager
     @Inject lateinit var ytDownloader: YoutubeDownloader
     @Inject lateinit var youtubeMusicApi: YoutubeMusicApi
+    @Inject lateinit var directories:Directories
+    private val defaultDir
+        get() = directories.defaultDir()
+    private val imageDir
+        get() = directories.imageDir()
 
     override fun onBind(intent: Intent): IBinder? = null
 
