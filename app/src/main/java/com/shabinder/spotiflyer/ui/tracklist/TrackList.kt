@@ -1,19 +1,14 @@
 package com.shabinder.spotiflyer.ui.tracklist
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.ExtendedFloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,7 +24,6 @@ import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.PlatformQueryResult
 import com.shabinder.spotiflyer.models.TrackDetails
-import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
 import com.shabinder.spotiflyer.ui.colorAccent
 import com.shabinder.spotiflyer.providers.queryGaana
@@ -37,7 +31,6 @@ import com.shabinder.spotiflyer.providers.querySpotify
 import com.shabinder.spotiflyer.providers.queryYoutube
 import com.shabinder.spotiflyer.ui.utils.calculateDominantColor
 import com.shabinder.spotiflyer.utils.downloadTracks
-import com.shabinder.spotiflyer.utils.loadAllImages
 import com.shabinder.spotiflyer.utils.sharedViewModel
 import com.shabinder.spotiflyer.utils.showDialog
 import dev.chrisbanes.accompanist.coil.CoilImage
@@ -79,6 +72,7 @@ fun TrackList(
         if(result == null) navController.popBackStack()
     }
 
+    sharedViewModel.updateTrackList(result?.trackList ?: listOf())
 
     result?.let{
         Box(modifier = modifier.fillMaxSize()){
@@ -88,13 +82,13 @@ fun TrackList(
                     item {
                         CoverImage(it.title,it.coverUrl,coroutineScope)
                     }
-                    items(it.trackList) { item ->
+                    itemsIndexed(sharedViewModel.trackList) { index, item ->
                         TrackCard(
                             track = item,
                             onDownload = {
-                                showDialog("Downloading ${it.title}")
-                                downloadTracks(arrayListOf(it))
-                            }
+                                downloadTracks(arrayListOf(item))
+                                sharedViewModel.updateTrackStatus(index,DownloadStatus.Queued)
+                            },
                         )
                     }
                 },
@@ -102,17 +96,12 @@ fun TrackList(
             )
             DownloadAllButton(
                 onClick = {
-                    loadAllImages(
-                        it.trackList.map { it.albumArtURL },
-                        Source.Spotify
-                    )
-                    val finalList = it.trackList.filter{it.downloaded == DownloadStatus.NotDownloaded}
+                    val finalList = sharedViewModel.trackList.filter{it.downloaded == DownloadStatus.NotDownloaded}
                     if (finalList.isNullOrEmpty()) showDialog("Not Downloading Any Song")
                     else downloadTracks(finalList as ArrayList<TrackDetails>)
-                    for (track in it.trackList) {
+                    for (track in sharedViewModel.trackList) {
                         if (track.downloaded == DownloadStatus.NotDownloaded) {
                             track.downloaded = DownloadStatus.Queued
-                            //adapter.notifyItemChanged(viewModel.trackList.value!!.indexOf(track))
                         }
                     }
                     showDialog("Downloading All Tracks")
@@ -168,7 +157,7 @@ fun DownloadAllButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
 @Composable
 fun TrackCard(
     track:TrackDetails,
-    onDownload:(TrackDetails)->Unit
+    onDownload:(TrackDetails)->Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
         val imgUri = track.albumArtURL.toUri().buildUpon().scheme("https").build()
@@ -192,7 +181,28 @@ fun TrackCard(
                 Text("${track.durationSec/60} minutes, ${track.durationSec%60} sec",fontSize = 13.sp)
             }
         }
-        Image(vectorResource(id = R.drawable.ic_arrow), Modifier.clickable(onClick = { onDownload(track) }))
+        when(track.downloaded){
+            DownloadStatus.Downloaded -> {
+                Image(vectorResource(id = R.drawable.ic_tick))
+            }
+            DownloadStatus.Queued -> {
+                CircularProgressIndicator()
+            }
+            DownloadStatus.Failed -> {
+                Image(vectorResource(id = R.drawable.ic_error))
+            }
+            DownloadStatus.Downloading -> {
+                CircularProgressIndicator(progress = track.progress.toFloat()/100f)
+            }
+            DownloadStatus.Converting -> {
+                CircularProgressIndicator(progress = 100f,color = colorAccent)
+            }
+            DownloadStatus.NotDownloaded -> {
+                Image(vectorResource(id = R.drawable.ic_arrow), Modifier.clickable(onClick = {
+                    onDownload(track)
+                }))
+            }
+        }
     }
 }
 

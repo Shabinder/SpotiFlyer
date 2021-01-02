@@ -56,6 +56,10 @@ fun downloadTracks(
     context: Context? = mainActivity
 ) {
     if(!trackList.isNullOrEmpty()){
+        loadAllImages(
+            trackList.map { it.albumArtURL },
+            trackList.first().source
+        )
         val serviceIntent = Intent(context, ForegroundService::class.java)
         serviceIntent.putParcelableArrayListExtra("object",trackList)
         context?.let { ContextCompat.startForegroundService(it, serviceIntent) }

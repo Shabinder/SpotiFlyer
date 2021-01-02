@@ -1,8 +1,10 @@
 package com.shabinder.spotiflyer
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -27,6 +29,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.jetcaster.util.verticalGradientScrim
+import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.navigation.ComposeNavigation
 import com.shabinder.spotiflyer.navigation.navigateToTrackList
 import com.shabinder.spotiflyer.networking.SpotifyServiceTokenRequest
@@ -35,6 +38,7 @@ import com.shabinder.spotiflyer.ui.appNameStyle
 import com.shabinder.spotiflyer.ui.colorOffWhite
 import com.shabinder.spotiflyer.utils.*
 import com.squareup.moshi.Moshi
+import com.tonyodev.fetch2.Status
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.statusBarsHeight
@@ -47,6 +51,8 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 
     private lateinit var navController: NavHostController
+    private lateinit var updateUIReceiver: BroadcastReceiver
+    private lateinit var queryReceiver: BroadcastReceiver
     @Inject lateinit var moshi: Moshi
     @Inject lateinit var spotifyServiceTokenRequest: SpotifyServiceTokenRequest
 
@@ -100,6 +106,56 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         handleIntentFromExternalActivity(intent)
+    }
+
+    private fun initializeBroadcast(){
+        val intentFilter = IntentFilter().apply {
+            addAction(Status.QUEUED.name)
+            addAction(Status.FAILED.name)
+            addAction(Status.DOWNLOADING.name)
+            addAction("Progress")
+            addAction("Converting")
+            addAction("track_download_completed")
+        }
+        updateUIReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                //UI update here
+                if (intent != null) {
+                    sharedViewModel.updateTrackStatus(intent)
+                }
+            }
+        }
+        val queryFilter = IntentFilter().apply { addAction("query_result") }
+        queryReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                //UI update here
+                if (intent != null){
+                    @Suppress("UNCHECKED_CAST")
+                    val trackList = intent.getSerializableExtra("tracks") as HashMap<String, DownloadStatus>?
+                    trackList?.let { list ->
+                        log("Service Response", "${list.size} Tracks Active")
+                        for (it in list) {
+                            val position: Int = sharedViewModel.trackList.map { it.title }.indexOf(it.key)
+                            log("BroadCast Received","$position, ${it.value} , ${it.key}")
+                            sharedViewModel.updateTrackStatus(position,it.value)
+                        }
+                    }
+                }
+            }
+        }
+        registerReceiver(updateUIReceiver, intentFilter)
+        registerReceiver(queryReceiver, queryFilter)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initializeBroadcast()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(updateUIReceiver)
+        unregisterReceiver(queryReceiver)
     }
 
     @SuppressLint("BatteryLife")

@@ -17,21 +17,23 @@
 
 package com.shabinder.spotiflyer
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import android.content.Intent
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.database.DatabaseDAO
+import com.shabinder.spotiflyer.models.DownloadStatus
+import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.networking.GaanaInterface
 import com.shabinder.spotiflyer.networking.SpotifyService
 import com.shabinder.spotiflyer.ui.colorPrimaryDark
-import dagger.hilt.android.scopes.ActivityRetainedScoped
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.shabinder.spotiflyer.utils.log
+import com.tonyodev.fetch2.Status
 
-@ActivityRetainedScoped
 class SharedViewModel @ViewModelInject constructor(
     val databaseDAO: DatabaseDAO,
     val spotifyService: SpotifyService,
@@ -43,6 +45,59 @@ class SharedViewModel @ViewModelInject constructor(
 
     fun authenticated(s:Boolean) {
         isAuthenticated = s
+    }
+
+
+    val trackList = mutableStateListOf<TrackDetails>()
+
+    fun updateTrackList(list:List<TrackDetails>){
+        trackList.clear()
+        trackList.addAll(list)
+    }
+    fun updateTrackStatus(position:Int, status: DownloadStatus){
+        if(position != -1){
+            val track = trackList[position].apply { downloaded = status }
+            trackList[position] = track
+        }
+    }
+
+    fun updateTrackStatus(intent: Intent){
+        val trackDetails = intent.getParcelableExtra<TrackDetails?>("track")
+        trackDetails?.let {
+            val position: Int =
+                trackList.map { trackState -> trackState.title }.indexOf(it.title)
+//            log("TrackList", trackList.value.joinToString("\n") { trackState -> trackState.title })
+            log("BroadCast Received", "$position, ${intent.action} , ${it.title}")
+            if (position != -1) {
+                trackList.getOrNull(position)?.let{ track ->
+                    when (intent.action) {
+                        Status.QUEUED.name -> {
+                            track.downloaded = DownloadStatus.Queued
+                        }
+                        Status.FAILED.name -> {
+                            track.downloaded = DownloadStatus.Failed
+                        }
+                        Status.DOWNLOADING.name -> {
+                            track.downloaded = DownloadStatus.Downloading
+                        }
+                        "Progress" -> {
+                            //Progress Update
+                            track.progress = intent.getIntExtra("progress", 0)
+                            track.downloaded = DownloadStatus.Downloading
+                        }
+                        "Converting" -> {
+                            //Progress Update
+                            track.downloaded = DownloadStatus.Converting
+                        }
+                        "track_download_completed" -> {
+                            track.downloaded = DownloadStatus.Downloaded
+                        }
+                    }
+                    trackList[position] = track
+                    log("SharedVM","TrackListUpdated")
+                }
+            }
+        }
     }
 
     var gradientColor by mutableStateOf(colorPrimaryDark)

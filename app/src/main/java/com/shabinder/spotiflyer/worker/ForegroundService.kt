@@ -190,7 +190,6 @@ class ForegroundService : Service(){
                                             trackDurationSec = it.durationSec
                                         ).keys.firstOrNull()
                                         log("Service VideoID", videoId ?: "Not Found")
-                                        //println(response.body().toString())
                                         if (videoId.isNullOrBlank()) {
                                             sendTrackBroadcast(Status.FAILED.name, it)
                                             failed++
@@ -536,45 +535,45 @@ class ForegroundService : Service(){
         * Last Element of this List defines Its Source
         * */
         val source = urlList.last()
+        log("Image","Fetching All ")
+        for (url in urlList.subList(0, urlList.size - 1)) {
+            log("Image","Fetching")
+            val imgUri = url.toUri().buildUpon().scheme("https").build()
 
-        for (url in urlList.subList(0, urlList.size - 2)) {
-            withContext(Dispatchers.IO) {
-                val imgUri = url.toUri().buildUpon().scheme("https").build()
+            val r = ImageRequest.Builder(this@ForegroundService)
+                .data(imgUri)
+                .build()
 
-                val r = ImageRequest.Builder(this@ForegroundService)
-                    .data(imgUri)
-                    .build()
-
-                val bitmap = Coil.execute(r).drawable?.toBitmap()
-                val file = when (source) {
-                    Source.Spotify.name -> {
-                        File(imageDir, url.substringAfterLast('/') + ".jpeg")
-                    }
-                    Source.YouTube.name -> {
-                        File(
-                            imageDir,
-                            url.substringBeforeLast('/', url)
-                                .substringAfterLast(
-                                    '/',
-                                    url
-                                ) + ".jpeg"
-                        )
-                    }
-                    Source.Gaana.name -> {
-                        File(
-                            imageDir,
-                            (url.substringBeforeLast('/').substringAfterLast(
-                                '/'
-                            )) + ".jpeg"
-                        )
-                    }
-                    else -> File(imageDir, url.substringAfterLast('/') + ".jpeg")
+            val bitmap = Coil.execute(r).drawable?.toBitmap()
+            val file = when (source) {
+                Source.Spotify.name -> {
+                    File(imageDir, url.substringAfterLast('/') + ".jpeg")
                 }
-                if (bitmap != null) {
-                    file.writeBitmap(bitmap)
-                    func?.let { it(file) }
-                } else log("Foreground Service", "Album Art Could Not be Fetched")
+                Source.YouTube.name -> {
+                    File(
+                        imageDir,
+                        url.substringBeforeLast('/', url)
+                            .substringAfterLast(
+                                '/',
+                                url
+                            ) + ".jpeg"
+                    )
+                }
+                Source.Gaana.name -> {
+                    File(
+                        imageDir,
+                        (url.substringBeforeLast('/').substringAfterLast(
+                            '/'
+                        )) + ".jpeg"
+                    )
+                }
+                else -> File(imageDir, url.substringAfterLast('/') + ".jpeg")
             }
+            if (bitmap != null) {
+                file.writeBitmap(bitmap)
+                func?.let { it(file) }
+                log("Image","Saved")
+            } else log("Foreground Service", "Album Art Could Not be Fetched")
         }
     }
 
