@@ -117,7 +117,9 @@ class ForegroundService : Service(){
                 "query" -> {
                     val response = Intent().apply {
                         action = "query_result"
-                        putExtra("tracks", allTracksStatus)
+                        synchronized(allTracksStatus){
+                            putExtra("tracks", allTracksStatus)
+                        }
                     }
                     sendBroadcast(response)
                 }

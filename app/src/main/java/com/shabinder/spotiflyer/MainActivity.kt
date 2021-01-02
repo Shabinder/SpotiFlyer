@@ -29,6 +29,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.jetcaster.util.verticalGradientScrim
+import com.github.javiersantos.appupdater.AppUpdater
+import com.github.javiersantos.appupdater.enums.Display
+import com.github.javiersantos.appupdater.enums.UpdateFrom
+import com.razorpay.Checkout
+import com.razorpay.PaymentResultListener
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.navigation.ComposeNavigation
 import com.shabinder.spotiflyer.navigation.navigateToTrackList
@@ -43,14 +48,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.statusBarsHeight
 import kotlinx.coroutines.*
-import okhttp3.Dispatcher
 import javax.inject.Inject
 
 /*
 * This is App's God Activity
 * */
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), PaymentResultListener {
 
     private lateinit var navController: NavHostController
     private lateinit var updateUIReceiver: BroadcastReceiver
@@ -98,11 +102,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initialize() {
+        Checkout.preload(applicationContext)
         requestStoragePermission()
         disableDozeMode()
-        //checkIfLatestVersion()
+        checkIfLatestVersion()
         createDirectories()
         handleIntentFromExternalActivity()
+    }
+
+    private fun checkIfLatestVersion() {
+        AppUpdater(this,0).run {
+            setDisplay(Display.NOTIFICATION)
+            showAppUpdated(true)//true:Show App is Updated Dialog
+            setUpdateFrom(UpdateFrom.XML)
+            setUpdateXML("https://raw.githubusercontent.com/Shabinder/SpotiFlyer/master/app/src/main/res/xml/app_update.xml")
+            setCancelable(false)
+            start()
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -208,7 +224,6 @@ class MainActivity : AppCompatActivity() {
                             val string = it.replace("\n".toRegex(), " ")
                             val link = filterLinkRegex.find(string)?.value.toString()
                             log("Intent Link",link)
-                            sharedViewModel.updateLink(link)
                             navController.navigateToTrackList(link)
                         }
                     }
@@ -227,6 +242,24 @@ class MainActivity : AppCompatActivity() {
     init {
         instance = this
     }
+
+    override fun onPaymentError(errorCode: Int, response: String?) {
+        try{
+            showDialog("Payment Failed", "$response")
+        }catch (e: Exception){
+            log("Razorpay Payment","Exception in onPaymentSuccess $response")
+        }
+    }
+
+    override fun onPaymentSuccess(razorpayPaymentId: String?) {
+        try{
+            showDialog("Payment Successful", "ThankYou!")
+        }catch (e: Exception){
+            showDialog("Razorpay Payment, Error Occurred.")
+            log("Razorpay Payment","Exception in onPaymentSuccess, ${e.message}")
+        }
+    }
+
 }
 
 @Composable

@@ -1,5 +1,6 @@
 package com.shabinder.spotiflyer.ui.home
 
+import android.content.Intent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,15 +31,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
+import com.razorpay.Checkout
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.database.DownloadRecord
 import com.shabinder.spotiflyer.navigation.navigateToTrackList
 import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
 import com.shabinder.spotiflyer.ui.colorAccent
 import com.shabinder.spotiflyer.ui.colorPrimary
+import com.shabinder.spotiflyer.utils.mainActivity
 import com.shabinder.spotiflyer.utils.openPlatform
 import com.shabinder.spotiflyer.utils.sharedViewModel
-import dev.chrisbanes.accompanist.glide.GlideImage
+import com.shabinder.spotiflyer.utils.showDialog
+import dev.chrisbanes.accompanist.coil.CoilImage
+import org.json.JSONObject
 
 @Composable
 fun Home(navController: NavController, modifier: Modifier = Modifier) {
@@ -137,7 +142,11 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         )
                     }
                 }
-                Row(modifier = modifier.fillMaxWidth().padding(vertical = 6.dp),verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
+                        .clickable(onClick = { openPlatform("http://github.com/Shabinder/SpotiFlyer") }),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(Icons.Rounded.Flag.copy(defaultHeight = 32.dp,defaultWidth = 32.dp))
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
@@ -151,7 +160,11 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         )
                     }
                 }
-                Row(modifier = modifier.fillMaxWidth().padding(vertical = 6.dp),verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
+                        .clickable(onClick = { startPayment() }),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(Icons.Rounded.CardGiftcard.copy(defaultHeight = 32.dp,defaultWidth = 32.dp))
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
@@ -165,7 +178,20 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         )
                     }
                 }
-                Row(modifier = modifier.fillMaxWidth().padding(vertical = 6.dp),verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
+                        .clickable(onClick = {
+                            val sendIntent: Intent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, "Hey, checkout this excellent Music Downloader http://github.com/Shabinder/SpotiFlyer")
+                                type = "text/plain"
+                            }
+
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+                            mainActivity.startActivity(shareIntent)
+                        }),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(Icons.Rounded.Share.copy(defaultHeight = 32.dp,defaultWidth = 32.dp))
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
@@ -224,11 +250,11 @@ fun HistoryColumn(
 fun DownloadRecordItem(item: DownloadRecord,navController: NavController) {
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {
         val imgUri = item.coverUrl.toUri().buildUpon().scheme("https").build()
-        GlideImage(
+        CoilImage(
             data = imgUri,
             //Loading Placeholder Makes Scrolling very stuttery
 //            loading = { Image(vectorResource(id = R.drawable.ic_song_placeholder)) },
-            error = { Image(vectorResource(id = R.drawable.ic_musicplaceholder)) },
+            error = {Image(vectorResource(id = R.drawable.ic_musicplaceholder))},
             contentScale = ContentScale.Inside,
 //            fadeIn = true,
             modifier = Modifier.preferredHeight(75.dp).preferredWidth(90.dp)
@@ -246,10 +272,42 @@ fun DownloadRecordItem(item: DownloadRecord,navController: NavController) {
         }
         Image(
             imageVector = vectorResource(id = R.drawable.ic_share_open),
-            modifier = Modifier.clickable(onClick = { navController.navigateToTrackList(item.link) })
+            modifier = Modifier.clickable(onClick = {
+                navController.navigateToTrackList(item.link)
+            })
         )
     }
 }
+
+private fun startPayment() {
+    /*
+    *  You need to pass current activity in order to let Razorpay create CheckoutActivity
+    * */
+    val co = Checkout().apply {
+        setKeyID("rzp_live_3ZQeoFYOxjmXye")
+        setImage(R.drawable.ic_launcher_foreground)
+    }
+
+    try {
+        val preFill = JSONObject()
+
+        val options = JSONObject().apply {
+            put("name","SpotiFlyer")
+            put("description","Thanks For the Donation!")
+            //You can omit the image option to fetch the image from dashboard
+            //put("image","https://github.com/Shabinder/SpotiFlyer/raw/master/app/SpotifyDownload.png")
+            put("currency","INR")
+            put("amount","4900")
+            put("prefill",preFill)
+        }
+
+        co.open(mainActivity,options)
+    }catch (e: Exception){
+        showDialog("Error in payment: "+ e.message)
+        e.printStackTrace()
+    }
+}
+
 
 @Composable
 fun AuthenticationBanner(isAuthenticated: Boolean, modifier: Modifier) {

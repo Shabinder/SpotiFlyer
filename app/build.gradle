@@ -5,6 +5,8 @@ plugins {
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
     id 'kotlinx-serialization'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 kapt {
@@ -127,9 +129,6 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-scalars:2.9.0"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1"
 
-    //Glide-Image Loading
-    implementation "dev.chrisbanes.accompanist:accompanist-glide:0.4.1"
-
     //Coil-Image Loading
     implementation "dev.chrisbanes.accompanist:accompanist-coil:$coil_version"
     implementation "dev.chrisbanes.accompanist:accompanist-insets:$coil_version"
@@ -140,8 +139,15 @@ dependencies {
     //Extras
     implementation 'me.xdrop:fuzzywuzzy:1.3.1'
     implementation 'com.mpatric:mp3agic:0.9.1'
+    implementation 'com.razorpay:checkout:1.6.4'
+    implementation "com.github.amitbd1508:AppUpdater:4.1.0"
     implementation "androidx.tonyodev.fetch2:xfetch2:3.1.5"
     implementation 'com.github.sealedtx:java-youtube-downloader:2.4.4'
+
+    //Crashlytics & Analytics
+    implementation platform('com.google.firebase:firebase-bom:26.2.0')
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
 
     //Test
     testImplementation 'junit:junit:4.13.1'

@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 
 class HomeViewModel : ViewModel() {
 
@@ -25,6 +26,7 @@ class HomeViewModel : ViewModel() {
     fun getDownloadRecordList() {
         viewModelScope.launch {
             withContext(Dispatchers.IO){
+                delay(100) //TEMP
                 downloadRecordList = sharedViewModel.databaseDAO.getRecord()
             }
         }

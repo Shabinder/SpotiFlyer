@@ -8,6 +8,7 @@ import androidx.navigation.compose.*
 import androidx.navigation.compose.popUpTo
 import com.shabinder.spotiflyer.ui.home.Home
 import com.shabinder.spotiflyer.ui.tracklist.TrackList
+import com.shabinder.spotiflyer.utils.sharedViewModel
 
 @Composable
 fun ComposeNavigation(navController: NavHostController) {
@@ -36,6 +37,7 @@ fun ComposeNavigation(navController: NavHostController) {
 }
 
 fun NavController.navigateToTrackList(link:String, singleInstance: Boolean = true, inclusive:Boolean = false) {
+    sharedViewModel.updateLink(link)
     navigate("track_list/$link") {
         launchSingleTop = singleInstance
         popUpTo(route = "home") {
