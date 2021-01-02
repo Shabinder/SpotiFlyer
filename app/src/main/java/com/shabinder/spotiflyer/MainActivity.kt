@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity(), PaymentResultListener {
     private fun checkIfLatestVersion() {
         AppUpdater(this,0).run {
             setDisplay(Display.NOTIFICATION)
-            showAppUpdated(true)//true:Show App is Updated Dialog
+            showAppUpdated(false)//true:Show App is Updated Dialog
             setUpdateFrom(UpdateFrom.XML)
             setUpdateXML("https://raw.githubusercontent.com/Shabinder/SpotiFlyer/master/app/src/main/res/xml/app_update.xml")
             setCancelable(false)
@@ -280,15 +280,15 @@ fun AppBar(
                 )
             }
         },
-        actions = {
+        /*actions = {
             Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                 IconButton(
-                    onClick = { /* TODO: Open Preferences*/ }
+                    onClick = { *//* TODO: Open Preferences*//* }
                 ) {
                     Icon(Icons.Filled.Settings, tint = Color.Gray)
                 }
             }
-        },
+        },*/
         modifier = modifier,
         elevation = 0.dp
     )

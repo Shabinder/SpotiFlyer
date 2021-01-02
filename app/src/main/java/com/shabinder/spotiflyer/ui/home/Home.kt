@@ -38,10 +38,7 @@ import com.shabinder.spotiflyer.navigation.navigateToTrackList
 import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
 import com.shabinder.spotiflyer.ui.colorAccent
 import com.shabinder.spotiflyer.ui.colorPrimary
-import com.shabinder.spotiflyer.utils.mainActivity
-import com.shabinder.spotiflyer.utils.openPlatform
-import com.shabinder.spotiflyer.utils.sharedViewModel
-import com.shabinder.spotiflyer.utils.showDialog
+import com.shabinder.spotiflyer.utils.*
 import dev.chrisbanes.accompanist.coil.CoilImage
 import org.json.JSONObject
 
@@ -273,7 +270,8 @@ fun DownloadRecordItem(item: DownloadRecord,navController: NavController) {
         Image(
             imageVector = vectorResource(id = R.drawable.ic_share_open),
             modifier = Modifier.clickable(onClick = {
-                navController.navigateToTrackList(item.link)
+                if(!isOnline()) showDialog("Check Your Internet Connection")
+                else navController.navigateToTrackList(item.link)
             })
         )
     }
@@ -395,7 +393,11 @@ fun SearchPanel(
         OutlinedButton(
             modifier = Modifier.padding(12.dp).wrapContentWidth(),
             onClick = {
-                navController.navigateToTrackList(link)
+                if(link.isBlank()) showDialog("Enter A Link!")
+                else{
+                    if(!isOnline()) showDialog("Check Your Internet Connection")
+                    else navController.navigateToTrackList(link)
+                }
             },
             border = BorderStroke(1.dp, Brush.horizontalGradient(listOf(colorPrimary, colorAccent)))
         ){
