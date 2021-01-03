@@ -1,6 +1,5 @@
 /*
- * Copyright (C)  2020  Shabinder Singh
- *
+ * Copyright (c)  2021  Shabinder Singh
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -11,28 +10,21 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.shabinder.spotiflyer.providers
 
-import android.content.Context
-import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
-import com.shabinder.spotiflyer.di.DefaultDir
-import com.shabinder.spotiflyer.di.ImageDir
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.PlatformQueryResult
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.gaana.GaanaTrack
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.networking.GaanaInterface
-import com.shabinder.spotiflyer.utils.finalOutputDir
+import com.shabinder.spotiflyer.networking.GaanaApi
 import com.shabinder.spotiflyer.utils.log
-import com.shabinder.spotiflyer.utils.queryActiveTracks
 import com.shabinder.spotiflyer.utils.showDialog
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -41,18 +33,11 @@ import javax.inject.Singleton
 
 @Singleton
 class GaanaProvider @Inject constructor(
-    @DefaultDir private val defaultDir: String,
-    @ImageDir private val imageDir: String,
-    private val gaanaInterface: GaanaInterface,
-    private val databaseDAO: DatabaseDAO,
-    @ApplicationContext private val ctx : Context
-){
+    private val gaanaApi: GaanaApi,
+):BaseProvider() {
     private val gaanaPlaceholderImageUrl = "https://a10.gaanacdn.com/images/social/gaana_social.jpg"
 
-    suspend fun queryGaana(
-        fullLink: String,
-    ):PlatformQueryResult?{
-
+    override suspend fun query(fullLink: String): PlatformQueryResult?{
         //Link Schema: https://gaana.com/type/link
         val gaanaLink = fullLink.substringAfter("gaana.com/")
 
@@ -87,7 +72,7 @@ class GaanaProvider @Inject constructor(
         with(result) {
             when (type) {
                 "song" -> {
-                    gaanaInterface.getGaanaSong(seokey = link).value?.tracks?.firstOrNull()?.also {
+                    gaanaApi.getGaanaSong(seokey = link).value?.tracks?.firstOrNull()?.also {
                         folderType = "Tracks"
                         subFolder = ""
                         if (File(
@@ -118,7 +103,7 @@ class GaanaProvider @Inject constructor(
                     }
                 }
                 "album" -> {
-                    gaanaInterface.getGaanaAlbum(seokey = link).value?.also {
+                    gaanaApi.getGaanaAlbum(seokey = link).value?.also {
                         folderType = "Albums"
                         subFolder = link
                         it.tracks.forEach { track ->
@@ -151,7 +136,7 @@ class GaanaProvider @Inject constructor(
                     }
                 }
                 "playlist" -> {
-                    gaanaInterface.getGaanaPlaylist(seokey = link).value?.also {
+                    gaanaApi.getGaanaPlaylist(seokey = link).value?.also {
                         folderType = "Playlists"
                         subFolder = link
                         it.tracks.forEach { track ->
@@ -189,12 +174,12 @@ class GaanaProvider @Inject constructor(
                     subFolder = link
                     coverUrl = gaanaPlaceholderImageUrl
                     val artistDetails =
-                        gaanaInterface.getGaanaArtistDetails(seokey = link).value?.artist?.firstOrNull()
+                        gaanaApi.getGaanaArtistDetails(seokey = link).value?.artist?.firstOrNull()
                             ?.also {
                                 title = it.name
                                 coverUrl = it.artworkLink ?: gaanaPlaceholderImageUrl
                             }
-                    gaanaInterface.getGaanaArtistTracks(seokey = link).value?.also {
+                    gaanaApi.getGaanaArtistTracks(seokey = link).value?.also {
                         it.tracks.forEach { track ->
                             if (File(
                                     finalOutputDir(

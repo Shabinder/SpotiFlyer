@@ -1,6 +1,5 @@
 /*
- * Copyright (C)  2020  Shabinder Singh
- *
+ * Copyright (c)  2021  Shabinder Singh
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -11,8 +10,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.shabinder.spotiflyer.networking
@@ -27,7 +26,7 @@ import retrofit2.http.Url
 
 const val gaana_token = "b2e6d7fbc136547a940516e9b77e5990"
 
-interface GaanaInterface {
+interface GaanaApi {
 
     /*
     * Api Request:  http://api.gaana.com/?type=playlist&subtype=playlist_detail&seokey=gaana-dj-hindi-top-50-1&token=b2e6d7fbc136547a940516e9b77e5990&format=JSON

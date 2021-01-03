@@ -1,3 +1,19 @@
+/*
+ * Copyright (c)  2021  Shabinder Singh
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.shabinder.spotiflyer.ui.home
 
 import android.content.Intent
@@ -51,7 +67,10 @@ import dev.chrisbanes.accompanist.coil.CoilImage
 import org.json.JSONObject
 
 @Composable
-fun Home(navController: NavController, mainActivity: MainActivity, modifier: Modifier = Modifier) {
+fun Home(
+    navController: NavController,
+    mainActivity: MainActivity,
+    modifier: Modifier = Modifier) {
     val viewModel: HomeViewModel = viewModel()
 
     Column(modifier = modifier) {
@@ -212,26 +231,6 @@ fun AboutColumn(mainActivity: MainActivity,modifier: Modifier = Modifier) {
                     }
                 }
             }
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.fillMaxSize().padding(8.dp).weight(1f)
-        ) {
-            Text(
-                text = stringResource(id = R.string.made_with_love),
-                color = colorPrimary,
-                fontSize = 22.sp
-            )
-            Spacer(modifier = Modifier.padding(start = 4.dp))
-            Icon(vectorResource(id = R.drawable.ic_heart),tint = Color.Unspecified)
-            Spacer(modifier = Modifier.padding(start = 4.dp))
-            Text(
-                text = stringResource(id = R.string.in_india),
-                color = colorPrimary,
-                fontSize = 22.sp
-            )
         }
     }
 }

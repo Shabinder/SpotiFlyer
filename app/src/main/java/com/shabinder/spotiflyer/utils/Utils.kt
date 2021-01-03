@@ -1,3 +1,19 @@
+/*
+ * Copyright (c)  2021  Shabinder Singh
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.shabinder.spotiflyer.utils
 
 import android.content.Context
@@ -42,17 +58,6 @@ fun downloadTracks(
     }
 }
 
-fun queryActiveTracks(context:Context?) {
-    val serviceIntent = Intent(context, ForegroundService::class.java).apply {
-        action = "query"
-    }
-    context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
-}
-fun finalOutputDir(itemName:String ,type:String, subFolder:String,defaultDir:String,extension:String = ".mp3" ): String =
-    defaultDir + removeIllegalChars(type) + File.separator +
-        if(subFolder.isEmpty())"" else { removeIllegalChars(subFolder) + File.separator} +
-        removeIllegalChars(itemName) + extension
-
 /**
  * Util. Function To Check Connection Status
  * */
@@ -88,16 +93,6 @@ fun showDialog(title:String? = null, message: String? = null,response: String = 
     }
 }
 
-/**
- *Extension Function For Copying Files!
- **/
-fun File.copyTo(file: File) {
-    inputStream().use { input ->
-        file.outputStream().use { output ->
-            input.copyTo(output)
-        }
-    }
-}
 fun createDirectory(dir:String){
     val yourAppDir = File(dir)
 

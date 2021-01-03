@@ -1,6 +1,5 @@
 /*
- * Copyright (C)  2020  Shabinder Singh
- *
+ * Copyright (c)  2021  Shabinder Singh
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -11,8 +10,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.shabinder.spotiflyer.worker
@@ -42,17 +41,16 @@ import com.github.kiulian.downloader.YoutubeDownloader
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.di.Directories
-import com.shabinder.spotiflyer.providers.getYTTracks
-import com.shabinder.spotiflyer.providers.sortByBestMatch
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.networking.YoutubeMusicApi
 import com.shabinder.spotiflyer.networking.makeJsonBody
+import com.shabinder.spotiflyer.providers.getYTTracks
+import com.shabinder.spotiflyer.providers.sortByBestMatch
 import com.shabinder.spotiflyer.utils.*
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
-import dagger.hilt.EntryPoints
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import retrofit2.Call
@@ -146,6 +144,9 @@ class ForegroundService : Service(){
                     total += size
                     isSingleDownload = (size == 1)
                 }
+                list.forEach { track ->
+                    allTracksStatus[track.title] = DownloadStatus.Queued
+                }
                 updateNotification()
                 downloadAllTracks(list)
             }
@@ -173,48 +174,44 @@ class ForegroundService : Service(){
     private fun downloadAllTracks(trackList: List<TrackDetails>) {
         trackList.forEach {
             serviceScope.launch {
-                if (it.downloaded == DownloadStatus.Downloaded) {//Download Already Present!!
+                if (!it.videoID.isNullOrBlank()) {//Video ID already known!
+                    downloadTrack(it.videoID!!, it)
                 } else {
-                    allTracksStatus[it.title] = DownloadStatus.Queued
-                    if (!it.videoID.isNullOrBlank()) {//Video ID already known!
-                        downloadTrack(it.videoID!!, it)
-                    } else {
-                        val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
-                        val jsonBody = makeJsonBody(searchQuery.trim()).toJsonString()
-                        youtubeMusicApi.getYoutubeMusicResponse(jsonBody).enqueue(
-                            object : Callback<String> {
-                                override fun onResponse(
-                                    call: Call<String>,
-                                    response: Response<String>
-                                ) {
-                                    serviceScope.launch {
-                                        val videoId = sortByBestMatch(
-                                            getYTTracks(response.body().toString()),
-                                            trackName = it.title,
-                                            trackArtists = it.artists,
-                                            trackDurationSec = it.durationSec
-                                        ).keys.firstOrNull()
-                                        log("Service VideoID", videoId ?: "Not Found")
-                                        if (videoId.isNullOrBlank()) {
-                                            sendTrackBroadcast(Status.FAILED.name, it)
-                                            failed++
-                                            updateNotification()
-                                            allTracksStatus[it.title] = DownloadStatus.Failed
-                                        } else {//Found Youtube Video ID
-                                            downloadTrack(videoId, it)
-                                        }
+                    val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
+                    val jsonBody = makeJsonBody(searchQuery.trim()).toJsonString()
+                    youtubeMusicApi.getYoutubeMusicResponse(jsonBody).enqueue(
+                        object : Callback<String> {
+                            override fun onResponse(
+                                call: Call<String>,
+                                response: Response<String>
+                            ) {
+                                serviceScope.launch {
+                                    val videoId = sortByBestMatch(
+                                        getYTTracks(response.body().toString()),
+                                        trackName = it.title,
+                                        trackArtists = it.artists,
+                                        trackDurationSec = it.durationSec
+                                    ).keys.firstOrNull()
+                                    log("Service VideoID", videoId ?: "Not Found")
+                                    if (videoId.isNullOrBlank()) {
+                                        sendTrackBroadcast(Status.FAILED.name, it)
+                                        failed++
+                                        updateNotification()
+                                        allTracksStatus[it.title] = DownloadStatus.Failed
+                                    } else {//Found Youtube Video ID
+                                        downloadTrack(videoId, it)
                                     }
                                 }
-
-                                override fun onFailure(call: Call<String>, t: Throwable) {
-                                    if (t.message.toString()
-                                            .contains("Failed to connect")
-                                    ) showDialog("Failed, Check Your Internet Connection!")
-                                    log("YT API Req. Fail", t.message.toString())
-                                }
                             }
-                        )
-                    }
+
+                            override fun onFailure(call: Call<String>, t: Throwable) {
+                                if (t.message.toString()
+                                        .contains("Failed to connect")
+                                ) showDialog("Failed, Check Your Internet Connection!")
+                                log("YT API Req. Fail", t.message.toString())
+                            }
+                        }
+                    )
                 }
             }
         }

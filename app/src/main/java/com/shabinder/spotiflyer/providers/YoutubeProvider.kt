@@ -1,6 +1,5 @@
 /*
- * Copyright (C)  2020  Shabinder Singh
- *
+ * Copyright (c)  2021  Shabinder Singh
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -11,26 +10,22 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.shabinder.spotiflyer.providers
 
 import android.annotation.SuppressLint
-import android.content.Context
 import com.github.kiulian.downloader.YoutubeDownloader
-import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
-import com.shabinder.spotiflyer.di.DefaultDir
-import com.shabinder.spotiflyer.di.Directories
-import com.shabinder.spotiflyer.di.ImageDir
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.PlatformQueryResult
 import com.shabinder.spotiflyer.models.TrackDetails
 import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.utils.*
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.shabinder.spotiflyer.utils.log
+import com.shabinder.spotiflyer.utils.removeIllegalChars
+import com.shabinder.spotiflyer.utils.showDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -39,11 +34,8 @@ import javax.inject.Singleton
 
 @Singleton
 class YoutubeProvider @Inject constructor(
-    private val directories: Directories,
     private val ytDownloader: YoutubeDownloader,
-    private val databaseDAO: DatabaseDAO,
-    @ApplicationContext private val ctx : Context,
-) {
+): BaseProvider() {
     /*
     * YT Album Art Schema
     * HI-RES Url: https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"
@@ -52,15 +44,7 @@ class YoutubeProvider @Inject constructor(
     private val sampleDomain2 = "youtu.be"
     private val sampleDomain1 = "youtube.com"
 
-    private val defaultDir
-        get() = directories.defaultDir()
-    private val imageDir
-        get() = directories.imageDir()
-
-    /*
-* Sending a Result as null = Some Error Occurred!
-* */
-    suspend fun queryYoutube(fullLink: String): PlatformQueryResult?{
+    override suspend fun query(fullLink: String): PlatformQueryResult?{
         val link = fullLink.removePrefix("https://").removePrefix("http://")
         if(link.contains("playlist",true) || link.contains("list",true)){
             // Given Link is of a Playlist

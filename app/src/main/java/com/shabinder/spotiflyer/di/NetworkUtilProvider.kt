@@ -1,3 +1,19 @@
+/*
+ * Copyright (c)  2021  Shabinder Singh
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.shabinder.spotiflyer.di
 
 import android.util.Base64
@@ -27,27 +43,23 @@ object NetworkUtilProvider {
 
     @Provides
     @Singleton
-    fun getYTDownloader(): YoutubeDownloader {
-        return YoutubeDownloader()
-    }
+    fun provideYTDownloader(): YoutubeDownloader = YoutubeDownloader()
 
     @Provides
     @Singleton
-    fun getSpotifyService(authInterceptor: SpotifyAuthInterceptor,okHttpClient: OkHttpClient.Builder,moshi: Moshi) :SpotifyService{
-        val retrofit = Retrofit.Builder().run{
+    fun provideSpotifyApi(authInterceptor: SpotifyAuthInterceptor,okHttpClient: OkHttpClient.Builder,moshi: Moshi) :SpotifyApi =
+        Retrofit.Builder().run{
             baseUrl("https://api.spotify.com/v1/")
             client(okHttpClient.addInterceptor(authInterceptor).build())
             addConverterFactory(MoshiConverterFactory.create(moshi))
             build()
-        }
-        return retrofit.create(SpotifyService::class.java)
-    }
+        }.create(SpotifyApi::class.java)
 
 
     @Provides
     @Singleton
-    fun getSpotifyTokenInterface(moshi: Moshi,networkInterceptor: NetworkInterceptor): SpotifyServiceTokenRequest {
-        val httpClient2: OkHttpClient.Builder = OkHttpClient.Builder()
+    fun provideSpotifyTokenInterface(moshi: Moshi,networkInterceptor: NetworkInterceptor): SpotifyServiceTokenRequest {
+        val httpClient: OkHttpClient.Builder = OkHttpClient.Builder()
             .addInterceptor(Interceptor { chain ->
                 val request: Request =
                     chain.request().newBuilder()
@@ -65,7 +77,7 @@ object NetworkUtilProvider {
 
         val retrofit = Retrofit.Builder()
             .baseUrl("https://accounts.spotify.com/")
-            .client(httpClient2.build())
+            .client(httpClient.build())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
         return retrofit.create(SpotifyServiceTokenRequest::class.java)
@@ -73,41 +85,35 @@ object NetworkUtilProvider {
 
     @Provides
     @Singleton
-    fun getGaanaInterface(moshi: Moshi, okHttpClient: OkHttpClient.Builder): GaanaInterface {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.gaana.com/")
-            .client(okHttpClient.build())
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-        return retrofit.create(GaanaInterface::class.java)
-    }
+    fun provideGaanaApi(moshi: Moshi, okHttpClient: OkHttpClient.Builder): GaanaApi
+        = Retrofit.Builder().run {
+            baseUrl("https://api.gaana.com/")
+            client(okHttpClient.build())
+            addConverterFactory(MoshiConverterFactory.create(moshi))
+            build()
+    }.create(GaanaApi::class.java)
 
     @Provides
     @Singleton
-    fun getYoutubeMusicApi(moshi: Moshi): YoutubeMusicApi {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://music.youtube.com/youtubei/v1/")
-            .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-        return retrofit.create(YoutubeMusicApi::class.java)
-    }
+    fun provideYoutubeMusicApi(moshi: Moshi): YoutubeMusicApi
+        = Retrofit.Builder().run {
+            baseUrl("https://music.youtube.com/youtubei/v1/")
+            addConverterFactory(ScalarsConverterFactory.create())
+            addConverterFactory(MoshiConverterFactory.create(moshi))
+            build()
+        }.create(YoutubeMusicApi::class.java)
 
     @Provides
     @Singleton
-    fun okHttpClient(networkInterceptor: NetworkInterceptor): OkHttpClient.Builder {
-        return OkHttpClient.Builder()
+    fun provideOkHttpClient(networkInterceptor: NetworkInterceptor): OkHttpClient.Builder =
+        OkHttpClient.Builder()
             .readTimeout(1, TimeUnit.MINUTES)
             .writeTimeout(1, TimeUnit.MINUTES)
             .addInterceptor(networkInterceptor)
 
-    }
-
     @Provides
     @Singleton
-    fun getMoshi(): Moshi {
-        return Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-    }
+    fun provideMoshi(): Moshi = Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .build()
 }

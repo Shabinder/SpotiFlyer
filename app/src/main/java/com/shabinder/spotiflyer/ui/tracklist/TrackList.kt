@@ -1,3 +1,19 @@
+/*
+ * Copyright (c)  2021  Shabinder Singh
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.shabinder.spotiflyer.ui.tracklist
 
 import android.content.Context
@@ -62,15 +78,15 @@ fun TrackList(
                 * */
                 //SPOTIFY
                 sharedViewModel.link.contains("spotify",true) ->
-                    spotifyProvider.querySpotify(sharedViewModel.link)
+                    spotifyProvider.query(sharedViewModel.link)
 
                 //YOUTUBE
                 sharedViewModel.link.contains("youtube.com",true) || sharedViewModel.link.contains("youtu.be",true) ->
-                    youtubeProvider.queryYoutube(sharedViewModel.link)
+                    youtubeProvider.query(sharedViewModel.link)
 
                 //GAANA
                 sharedViewModel.link.contains("gaana",true) ->
-                    gaanaProvider.queryGaana(sharedViewModel.link)
+                    gaanaProvider.query(sharedViewModel.link)
 
                 else -> {
                     showDialog("Link is Not Valid")
@@ -110,13 +126,15 @@ fun TrackList(
             DownloadAllButton(
                 onClick = {
                     val finalList = sharedViewModel.trackList.filter{it.downloaded == DownloadStatus.NotDownloaded}
-                    if (finalList.isNullOrEmpty()) showDialog("Not Downloading Any Song")
+                    if (finalList.isNullOrEmpty()) showDialog("All Songs are Processed")
                     else downloadTracks(finalList as ArrayList<TrackDetails>,ctx)
-                    for (track in sharedViewModel.trackList) {
-                        if (track.downloaded == DownloadStatus.NotDownloaded) {
-                            track.downloaded = DownloadStatus.Queued
+                    val list = sharedViewModel.trackList.map {
+                        if(it.downloaded == DownloadStatus.NotDownloaded){
+                            it.downloaded = DownloadStatus.Queued
                         }
+                        it
                     }
+                    sharedViewModel.updateTrackList(list)
                 },
                 modifier = Modifier.padding(bottom = 24.dp).align(Alignment.BottomCenter)
             )

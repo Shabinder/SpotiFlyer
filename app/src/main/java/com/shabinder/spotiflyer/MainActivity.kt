@@ -1,3 +1,19 @@
+/*
+ * Copyright (c)  2021  Shabinder Singh
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.shabinder.spotiflyer
 
 import android.annotation.SuppressLint
@@ -11,13 +27,16 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.DpPropKey
+import androidx.compose.animation.core.*
+import androidx.compose.animation.transition
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.res.vectorResource
@@ -26,27 +45,23 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.jetcaster.util.verticalGradientScrim
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.razorpay.Checkout
 import com.razorpay.PaymentResultListener
-import com.shabinder.spotiflyer.di.Directories
 import com.shabinder.spotiflyer.models.DownloadStatus
-import com.shabinder.spotiflyer.navigation.ComposeNavigation
 import com.shabinder.spotiflyer.navigation.navigateToTrackList
 import com.shabinder.spotiflyer.ui.ComposeLearnTheme
 import com.shabinder.spotiflyer.ui.appNameStyle
 import com.shabinder.spotiflyer.ui.colorOffWhite
+import com.shabinder.spotiflyer.ui.home.*
+import com.shabinder.spotiflyer.ui.splash.Splash
 import com.shabinder.spotiflyer.utils.*
 import com.tonyodev.fetch2.Status
-import dagger.hilt.EntryPoints
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
-import dev.chrisbanes.accompanist.insets.statusBarsHeight
 import kotlinx.coroutines.*
-import javax.inject.Inject
 
 /*
 * This is App's God Activity
@@ -57,7 +72,6 @@ class MainActivity: AppCompatActivity(), PaymentResultListener {
     private lateinit var navController: NavHostController
     private lateinit var updateUIReceiver: BroadcastReceiver
     private lateinit var queryReceiver: BroadcastReceiver
-    @Inject lateinit var directories: Directories
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,31 +83,22 @@ class MainActivity: AppCompatActivity(), PaymentResultListener {
             ComposeLearnTheme {
                 Providers(AmbientContentColor provides colorOffWhite) {
                     ProvideWindowInsets {
-                        val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.65f)
-                        navController = rememberNavController()
 
-                        Column(
-                            modifier = Modifier.fillMaxSize().verticalGradientScrim(
-                                color = sharedViewModel.gradientColor.copy(alpha = 0.38f),
-                                startYPercentage = 0.29f,
-                                endYPercentage = 0f,
+                        navController = rememberNavController()
+                        var splashShown by remember { mutableStateOf(SplashState.Shown) }
+                        val transition = transition(splashTransitionDefinition, splashShown)
+
+                        Box{
+                            Splash(
+                                modifier = Modifier.alpha(transition[splashAlphaKey]),
+                                onTimeout = { splashShown = SplashState.Completed }
                             )
-                        ) {
-                            // Draw a scrim over the status bar which matches the app bar
-                            Spacer(
-                                Modifier.background(appBarColor).fillMaxWidth()
-                                    .statusBarsHeight()
-                            )
-                            AppBar(
-                                backgroundColor = appBarColor,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            ComposeNavigation(
+                            MainScreen(
+                                Modifier.alpha(transition[contentAlphaKey]),
                                 this@MainActivity,
+                                sharedViewModel,
                                 navController,
-                                sharedViewModel.spotifyProvider,
-                                sharedViewModel.gaanaProvider,
-                                sharedViewModel.youtubeProvider,
+                                transition[contentTopPaddingKey]
                             )
                         }
                     }
@@ -108,7 +113,10 @@ class MainActivity: AppCompatActivity(), PaymentResultListener {
         requestStoragePermission()
         disableDozeMode()
         checkIfLatestVersion()
-        createDirectories(directories.defaultDir(),directories.imageDir())
+        createDirectories(
+            sharedViewModel.directories.defaultDir(),
+            sharedViewModel.directories.imageDir()
+        )
         handleIntentFromExternalActivity()
     }
 
@@ -296,6 +304,35 @@ fun AppBar(
     )
 }
 
+enum class SplashState { Shown, Completed }
+
+private val splashAlphaKey = FloatPropKey("Splash alpha")
+private val contentAlphaKey = FloatPropKey("Content alpha")
+private val contentTopPaddingKey = DpPropKey("Top padding")
+
+private val splashTransitionDefinition = transitionDefinition<SplashState> {
+    state(SplashState.Shown) {
+        this[splashAlphaKey] = 1f
+        this[contentAlphaKey] = 0f
+        this[contentTopPaddingKey] = 100.dp
+    }
+    state(SplashState.Completed) {
+        this[splashAlphaKey] = 0f
+        this[contentAlphaKey] = 1f
+        this[contentTopPaddingKey] = 0.dp
+    }
+    transition {
+        splashAlphaKey using tween(
+            durationMillis = 100
+        )
+        contentAlphaKey using tween(
+            durationMillis = 300
+        )
+        contentTopPaddingKey using spring(
+            stiffness = Spring.StiffnessLow
+        )
+    }
+}
 
 //@Preview(showBackground = true)
 /*

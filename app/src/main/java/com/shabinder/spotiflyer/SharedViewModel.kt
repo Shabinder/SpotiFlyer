@@ -1,6 +1,5 @@
 /*
- * Copyright (C)  2020  Shabinder Singh
- *
+ * Copyright (c)  2021  Shabinder Singh
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -11,8 +10,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.shabinder.spotiflyer
@@ -25,12 +24,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
-import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.spotiflyer.database.DatabaseDAO
+import com.shabinder.spotiflyer.di.Directories
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.TrackDetails
-import com.shabinder.spotiflyer.networking.GaanaInterface
-import com.shabinder.spotiflyer.networking.SpotifyService
+import com.shabinder.spotiflyer.networking.GaanaApi
+import com.shabinder.spotiflyer.networking.SpotifyApi
 import com.shabinder.spotiflyer.providers.GaanaProvider
 import com.shabinder.spotiflyer.providers.SpotifyProvider
 import com.shabinder.spotiflyer.providers.YoutubeProvider
@@ -40,9 +39,9 @@ import com.tonyodev.fetch2.Status
 
 class SharedViewModel @ViewModelInject constructor(
     val databaseDAO: DatabaseDAO,
-    val spotifyService: SpotifyService,
-    val gaanaInterface : GaanaInterface,
-    val ytDownloader: YoutubeDownloader,
+    val spotifyApi: SpotifyApi,
+    val gaanaApi : GaanaApi,
+    val directories: Directories,
     val gaanaProvider: GaanaProvider,
     val spotifyProvider: SpotifyProvider,
     val youtubeProvider: YoutubeProvider

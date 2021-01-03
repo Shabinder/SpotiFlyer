@@ -1,6 +1,5 @@
 /*
- * Copyright (C)  2020  Shabinder Singh
- *
+ * Copyright (c)  2021  Shabinder Singh
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -11,18 +10,13 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.shabinder.spotiflyer.providers
 
-import android.content.Context
-import com.shabinder.spotiflyer.database.DatabaseDAO
 import com.shabinder.spotiflyer.database.DownloadRecord
-import com.shabinder.spotiflyer.di.DefaultDir
-import com.shabinder.spotiflyer.di.Directories
-import com.shabinder.spotiflyer.di.ImageDir
 import com.shabinder.spotiflyer.models.DownloadStatus
 import com.shabinder.spotiflyer.models.PlatformQueryResult
 import com.shabinder.spotiflyer.models.TrackDetails
@@ -30,13 +24,10 @@ import com.shabinder.spotiflyer.models.spotify.Album
 import com.shabinder.spotiflyer.models.spotify.Image
 import com.shabinder.spotiflyer.models.spotify.Source
 import com.shabinder.spotiflyer.models.spotify.Track
-import com.shabinder.spotiflyer.networking.GaanaInterface
-import com.shabinder.spotiflyer.networking.SpotifyService
-import com.shabinder.spotiflyer.utils.finalOutputDir
+import com.shabinder.spotiflyer.networking.GaanaApi
+import com.shabinder.spotiflyer.networking.SpotifyApi
 import com.shabinder.spotiflyer.utils.log
-import com.shabinder.spotiflyer.utils.queryActiveTracks
 import com.shabinder.spotiflyer.utils.showDialog
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -45,18 +36,11 @@ import javax.inject.Singleton
 
 @Singleton
 class SpotifyProvider @Inject constructor(
-    private val directories: Directories,
-    private val spotifyService: SpotifyService,
-    private val gaanaInterface: GaanaInterface,
-    private val databaseDAO: DatabaseDAO,
-    @ApplicationContext private val ctx : Context
-) {
-    private val defaultDir
-        get() = directories.defaultDir()
-    private val imageDir
-        get() = directories.imageDir()
+    private val spotifyApi: SpotifyApi,
+    private val gaanaApi: GaanaApi,
+):BaseProvider() {
 
-    suspend fun querySpotify(fullLink: String):PlatformQueryResult?{
+    override suspend fun query(fullLink: String): PlatformQueryResult?{
         var spotifyLink =
             "https://" + fullLink.substringAfterLast("https://").substringBefore(" ").trim()
 
@@ -103,7 +87,7 @@ class SpotifyProvider @Inject constructor(
         with(result) {
             when (type) {
                 "track" -> {
-                    spotifyService.getTrack(link).value?.also {
+                    spotifyApi.getTrack(link).value?.also {
                         folderType = "Tracks"
                         subFolder = ""
                         if (File(
@@ -136,7 +120,7 @@ class SpotifyProvider @Inject constructor(
                 }
 
                 "album" -> {
-                    val albumObject = spotifyService.getAlbum(link).value
+                    val albumObject = spotifyApi.getAlbum(link).value
                     folderType = "Albums"
                     subFolder = albumObject?.name.toString()
                     albumObject?.tracks?.items?.forEach {
@@ -185,8 +169,8 @@ class SpotifyProvider @Inject constructor(
                 }
 
                 "playlist" -> {
-                    log("Spotify Service", spotifyService.toString())
-                    val playlistObject = spotifyService.getPlaylist(link).value
+                    log("Spotify Service", spotifyApi.toString())
+                    val playlistObject = spotifyApi.getPlaylist(link).value
                     folderType = "Playlists"
                     subFolder = playlistObject?.name.toString()
                     val tempTrackList = mutableListOf<Track>()
@@ -212,7 +196,7 @@ class SpotifyProvider @Inject constructor(
                     while (moreTracksAvailable) {
                         //Check For More Tracks If available
                         val moreTracks =
-                            spotifyService.getPlaylistTracks(link, offset = tempTrackList.size).value
+                            spotifyApi.getPlaylistTracks(link, offset = tempTrackList.size).value
                         moreTracks?.items?.forEach {
                             it.track?.let { it1 -> tempTrackList.add(it1) }
                         }
@@ -255,7 +239,7 @@ class SpotifyProvider @Inject constructor(
     private fun resolveLink(
         url:String
     ):String {
-        val response = gaanaInterface.getResponse(url).execute().body()?.string().toString()
+        val response = gaanaApi.getResponse(url).execute().body()?.string().toString()
         val regex = """https://open\.spotify\.com.+\w""".toRegex()
         return regex.find(response)?.value.toString()
     }

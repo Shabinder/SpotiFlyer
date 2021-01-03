@@ -1,6 +1,5 @@
 /*
- * Copyright (C)  2020  Shabinder Singh
- *
+ * Copyright (c)  2021  Shabinder Singh
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -11,8 +10,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.shabinder.spotiflyer.utils
@@ -24,9 +23,11 @@ import okhttp3.Protocol
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import javax.inject.Inject
+import javax.inject.Singleton
 
-const val NoInternetErrorCode = 222
+private const val NoInternetErrorCode = 222
 
+@Singleton
 class NetworkInterceptor @Inject constructor(
     @ApplicationContext private val ctx : Context
 ) : Interceptor {
@@ -57,13 +58,12 @@ class NetworkInterceptor @Inject constructor(
             }
         }
     }
-}
-
-fun createEmptyResponse(chain: Interceptor.Chain, message:String = "Error") = Response.Builder().run {
+    private fun createEmptyResponse(chain: Interceptor.Chain, message:String = "Error") = Response.Builder().run {
         code(NoInternetErrorCode) // code(200.300) = successful else = unsuccessful
         body("{}".toResponseBody(null)) // Empty Object
         protocol(Protocol.HTTP_2)
         message(message)
         request(chain.request())
         build()
+    }
 }
