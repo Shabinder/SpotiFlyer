@@ -8,12 +8,12 @@
 
 -Supports- Playlist, Albums, Tracks. _(If You know Any Source for Episodes/Podcasts create an Issue sharing It.)_
 
+[![SpotiFlyer App](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=SpotiFlyer&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/latest/)
 [![Build Status](https://github.com/Shabinder/SpotiFlyer/blob/master/app/build_passing.svg)](https://github.com/Shabinder/SpotiFlyer/releases)
 ![API](https://img.shields.io/badge/API-22%2B-brightgreen.svg)
 [![GitHub stars](https://img.shields.io/github/stars/Shabinder/SpotiFlyer?style=social)](https://github.com/Shabinder/SpotiFlyer/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/Shabinder/SpotiFlyer?style=social)](https://github.com/Shabinder/SpotiFlyer/network/members)
 [![GitHub watchers](https://img.shields.io/github/watchers/Shabinder/SpotiFlyer?style=social)](https://github.com/Shabinder/SpotiFlyer/watchers)
-[![SpotiFlyer App](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=SpotiFlyer&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/latest/)
 
 SpotiFlyer is an **Android App**(Written in **Kotlin**), which **aims** to work as:
   - **Downloads**: Albums, Tracks and Playlists,etc 
@@ -49,7 +49,7 @@ All contributions are welcome, from code to documentation to graphics to design 
 ### Want to discuss? 💬
 Have any questions, doubts or want to present your opinions, views? You're always welcome. You can [start discussions](https://github.com/Shabinder/SpotiFlyer/discussions).
 
-### Todos
+### Todos 📄
  - Write **Tests**.
  - Support for Podcasts/Episodes and Shows.
  - Implementation To mute whenever Spotify Ad Plays.
