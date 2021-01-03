@@ -125,7 +125,7 @@ class MainActivity: AppCompatActivity(), PaymentResultListener {
             setDisplay(Display.NOTIFICATION)
             showAppUpdated(false)//true:Show App is Updated Dialog
             setUpdateFrom(UpdateFrom.XML)
-            setUpdateXML("https://raw.githubusercontent.com/Shabinder/SpotiFlyer/master/app/src/main/res/xml/app_update.xml")
+            setUpdateXML("https://raw.githubusercontent.com/Shabinder/SpotiFlyer/Compose/app/src/main/res/xml/app_update.xml")
             setCancelable(false)
             start()
         }
