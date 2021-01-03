@@ -15,6 +15,8 @@
 [![GitHub forks](https://img.shields.io/github/forks/Shabinder/SpotiFlyer?style=social)](https://github.com/Shabinder/SpotiFlyer/network/members)
 [![GitHub watchers](https://img.shields.io/github/watchers/Shabinder/SpotiFlyer?style=social)](https://github.com/Shabinder/SpotiFlyer/watchers)
 
+***Encourage this repo by giving it a Star⭐ .***
+
 SpotiFlyer is an **Android App**(Written in **Kotlin**), which **aims** to work as:
   - **Downloads**: Albums, Tracks and Playlists,etc 
   - Extension To **mute** whenever a Spotify Ad Plays.(TODO)
