@@ -40,8 +40,8 @@ android {
         //Some Os's Don't give Access to Music Dir , In API 29 if we Target 30
         //noinspection OldTargetApi
         targetSdkVersion 29
-        versionCode 12
-        versionName "2.0"
+        versionCode 13
+        versionName "2.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

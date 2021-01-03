@@ -228,7 +228,6 @@ class SpotifyProvider @Inject constructor(
                 }
             }
         }
-        queryActiveTracks(ctx)
         return result
     }
 

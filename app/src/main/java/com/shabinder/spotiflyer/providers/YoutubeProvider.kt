@@ -140,7 +140,6 @@ class YoutubeProvider @Inject constructor(
                         )
                     )
                 }
-                queryActiveTracks(ctx)
             } catch (e: Exception) {
                 e.printStackTrace()
                 showDialog("An Error Occurred While Processing!")
@@ -213,7 +212,6 @@ class YoutubeProvider @Inject constructor(
                         )
                     )
                 }
-                queryActiveTracks(ctx)
             } catch (e: Exception) {
                 e.printStackTrace()
                 showDialog("An Error Occurred While Processing!")

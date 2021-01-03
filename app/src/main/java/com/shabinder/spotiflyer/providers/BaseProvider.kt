@@ -38,13 +38,6 @@ abstract class BaseProvider {
     * */
     abstract suspend fun query(fullLink:String):PlatformQueryResult?
 
-    protected fun queryActiveTracks(context:Context?) {
-        val serviceIntent = Intent(context, ForegroundService::class.java).apply {
-            action = "query"
-        }
-        context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
-    }
-
     protected val defaultDir
         get() = directories.defaultDir()
     protected val imageDir

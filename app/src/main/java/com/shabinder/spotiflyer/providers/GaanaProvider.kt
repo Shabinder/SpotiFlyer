@@ -210,7 +210,6 @@ class GaanaProvider @Inject constructor(
                 else -> {//TODO Handle Error}
                 }
             }
-            queryActiveTracks(ctx)
             return result
         }
     }

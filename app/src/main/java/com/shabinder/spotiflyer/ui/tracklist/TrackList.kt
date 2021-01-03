@@ -17,6 +17,7 @@
 package com.shabinder.spotiflyer.ui.tracklist
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.shabinder.spotiflyer.R
@@ -49,6 +51,7 @@ import com.shabinder.spotiflyer.ui.utils.calculateDominantColor
 import com.shabinder.spotiflyer.utils.downloadTracks
 import com.shabinder.spotiflyer.utils.sharedViewModel
 import com.shabinder.spotiflyer.utils.showDialog
+import com.shabinder.spotiflyer.worker.ForegroundService
 import dev.chrisbanes.accompanist.coil.CoilImage
 import kotlinx.coroutines.*
 
@@ -64,6 +67,7 @@ fun TrackList(
     youtubeProvider: YoutubeProvider,
     modifier: Modifier = Modifier
 ){
+    val context = AmbientContext.current
     val coroutineScope = rememberCoroutineScope()
 
     var result by remember(fullLink) { mutableStateOf<PlatformQueryResult?>(null) }
@@ -101,6 +105,7 @@ fun TrackList(
     }
 
     sharedViewModel.updateTrackList(result?.trackList ?: listOf())
+    queryActiveTracks(context)
 
     result?.let{
         val ctx = AmbientContext.current
@@ -240,7 +245,12 @@ fun TrackCard(
         }
     }
 }
-
+private fun queryActiveTracks(context:Context?) {
+    val serviceIntent = Intent(context, ForegroundService::class.java).apply {
+        action = "query"
+    }
+    context?.let { ContextCompat.startForegroundService(it, serviceIntent) }
+}
 suspend fun updateGradient(imageURL:String,ctx:Context){
     calculateDominantColor(imageURL,ctx)?.color
         ?.let { sharedViewModel.updateGradientColor(it) }
