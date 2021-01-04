@@ -49,7 +49,7 @@ fun Splash(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
             delay(SplashWaitTime)
             currentOnTimeout()
         }
-        Image(imageVector = vectorResource(id = R.drawable.ic_launcher_foreground),Modifier.preferredSize(300.dp))
+        Image(imageVector = vectorResource(id = R.drawable.ic_spotiflyer_logo))
         MadeInIndia(Modifier.align(Alignment.BottomCenter))
     }
 }

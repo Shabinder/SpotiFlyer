@@ -272,38 +272,6 @@ class MainActivity: AppCompatActivity(), PaymentResultListener {
 
 }
 
-@Composable
-fun AppBar(
-    backgroundColor: Color,
-    modifier: Modifier = Modifier
-) {
-    TopAppBar(
-        backgroundColor = backgroundColor,
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    imageVector = vectorResource(R.drawable.ic_launcher_foreground)
-                )
-                Text(
-                    text = "SpotiFlyer",
-                    style = appNameStyle
-                )
-            }
-        },
-        /*actions = {
-            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
-                IconButton(
-                    onClick = { *//* TODO: Open Preferences*//* }
-                ) {
-                    Icon(Icons.Filled.Settings, tint = Color.Gray)
-                }
-            }
-        },*/
-        modifier = modifier,
-        elevation = 0.dp
-    )
-}
-
 enum class SplashState { Shown, Completed }
 
 private val splashAlphaKey = FloatPropKey("Splash alpha")

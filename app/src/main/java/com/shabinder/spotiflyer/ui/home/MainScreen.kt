@@ -16,19 +16,26 @@
 
 package com.shabinder.spotiflyer.ui.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.jetcaster.util.verticalGradientScrim
-import com.shabinder.spotiflyer.AppBar
 import com.shabinder.spotiflyer.MainActivity
+import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.SharedViewModel
 import com.shabinder.spotiflyer.navigation.ComposeNavigation
+import com.shabinder.spotiflyer.ui.appNameStyle
 import dev.chrisbanes.accompanist.insets.statusBarsHeight
 
 @Composable
@@ -67,4 +74,38 @@ fun MainScreen(
             sharedViewModel.youtubeProvider
         )
     }
+}
+
+@Composable
+fun AppBar(
+    backgroundColor: Color,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        backgroundColor = backgroundColor,
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    imageVector = vectorResource(R.drawable.ic_spotiflyer_logo),
+                    Modifier.preferredSize(32.dp)
+                )
+                Spacer(Modifier.padding(horizontal = 4.dp))
+                Text(
+                    text = "SpotiFlyer",
+                    style = appNameStyle
+                )
+            }
+        },
+        /*actions = {
+            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+                IconButton(
+                    onClick = { *//* TODO: Open Preferences*//* }
+                ) {
+                    Icon(Icons.Filled.Settings, tint = Color.Gray)
+                }
+            }
+        },*/
+        modifier = modifier,
+        elevation = 0.dp
+    )
 }
