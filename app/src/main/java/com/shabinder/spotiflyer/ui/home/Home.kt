@@ -124,15 +124,20 @@ fun AboutColumn(mainActivity: MainActivity,modifier: Modifier = Modifier) {
                         modifier = Modifier.clickable(
                             onClick = { openPlatform("com.spotify.music","http://open.spotify.com",ctx) })
                     )
-                    Spacer(modifier = modifier.padding(start = 24.dp))
+                    Spacer(modifier = modifier.padding(start = 16.dp))
                     Icon(imageVector = vectorResource(id = R.drawable.ic_gaana ),tint = Color.Unspecified,
                         modifier = Modifier.clickable(
                             onClick = { openPlatform("com.gaana","http://gaana.com",ctx) })
                     )
-                    Spacer(modifier = modifier.padding(start = 24.dp))
+                    Spacer(modifier = modifier.padding(start = 16.dp))
                     Icon(imageVector = vectorResource(id = R.drawable.ic_youtube),tint = Color.Unspecified,
                         modifier = Modifier.clickable(
                             onClick = { openPlatform("com.google.android.youtube","http://m.youtube.com",ctx) })
+                    )
+                    Spacer(modifier = modifier.padding(start = 12.dp))
+                    Icon(imageVector = vectorResource(id = R.drawable.ic_youtube_music_logo),tint = Color.Unspecified,
+                        modifier = Modifier.clickable(
+                            onClick = { openPlatform("com.google.android.apps.youtube.music","https://music.youtube.com/",ctx) })
                     )
                 }
             }

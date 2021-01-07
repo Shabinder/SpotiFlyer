@@ -49,7 +49,6 @@ class SpotifyProvider @Inject constructor(
             spotifyLink = resolveLink(spotifyLink)
         }
 
-
         val link = spotifyLink.substringAfterLast('/', "Error").substringBefore('?')
         val type = spotifyLink.substringBeforeLast('/', "Error").substringAfterLast('/')
 

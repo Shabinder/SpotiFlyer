@@ -41,25 +41,31 @@ class YoutubeProvider @Inject constructor(
     * HI-RES Url: https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"
     * Normal Url: https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
     * */
-    private val sampleDomain2 = "youtu.be"
-    private val sampleDomain1 = "youtube.com"
+    private val sampleDomain1 = "music.youtube.com"
+    private val sampleDomain2 = "youtube.com"
+    private val sampleDomain3 = "youtu.be"
 
     override suspend fun query(fullLink: String): PlatformQueryResult?{
         val link = fullLink.removePrefix("https://").removePrefix("http://")
         if(link.contains("playlist",true) || link.contains("list",true)){
             // Given Link is of a Playlist
             log("YT Play",link)
-            val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&")
+            val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&").substringBefore("?")
             return getYTPlaylist(
                 playlistId
             )
         }else{//Given Link is of a Video
             var searchId = "error"
-            if(link.contains(sampleDomain1,true) ){
-                searchId =  link.substringAfterLast("=","error")
-            }
-            if(link.contains(sampleDomain2,true) ){
-                searchId = link.substringAfterLast("/","error")
+            when{
+                link.contains(sampleDomain1,true) -> {//Youtube Music
+                    searchId = link.substringAfterLast("/","error").substringBefore("&").substringAfterLast("=")
+                }
+                link.contains(sampleDomain2,true) -> {//Standard Youtube Link
+                    searchId =  link.substringAfterLast("=","error").substringBefore("&")
+                }
+                link.contains(sampleDomain3,true) -> {//Shortened Youtube Link
+                    searchId = link.substringAfterLast("/","error").substringBefore("&")
+                }
             }
             return if(searchId != "error") {
                 getYTTrack(
@@ -214,7 +220,7 @@ class YoutubeProvider @Inject constructor(
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                showDialog("An Error Occurred While Processing!")
+                showDialog("An Error Occurred While Processing!,$searchId")
             }
         }
         return if(result.title.isNotBlank()) result

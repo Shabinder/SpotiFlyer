@@ -40,8 +40,8 @@ android {
         //Some Os's Don't give Access to Music Dir , In API 29 if we Target 30
         //noinspection OldTargetApi
         targetSdkVersion 29
-        versionCode 13
-        versionName "2.0.1"
+        versionCode 14
+        versionName "2.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -160,7 +160,7 @@ dependencies {
     implementation 'com.razorpay:checkout:1.6.4'
     implementation "com.github.amitbd1508:AppUpdater:4.1.0"
     implementation "androidx.tonyodev.fetch2:xfetch2:3.1.5"
-    implementation 'com.github.sealedtx:java-youtube-downloader:2.4.4'
+    implementation 'com.github.sealedtx:java-youtube-downloader:2.4.6'
 
     //Crashlytics & Analytics
     implementation platform('com.google.firebase:firebase-bom:26.2.0')
