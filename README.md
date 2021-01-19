@@ -9,8 +9,11 @@
 -Supports- Playlist, Albums, Tracks. _(If You know Any Source for Episodes/Podcasts create an Issue sharing It.)_
 
 [![SpotiFlyer App](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=SpotiFlyer&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/latest/)
+[![Downloads](https://img.shields.io/github/downloads/Shabinder/SpotiFlyer/total?style=for-the-badge&logo=android&color=17B2E7)](https://github.com/Shabinder/SpotiFlyer/releases)
+</br>
 [![Build Status](https://github.com/Shabinder/SpotiFlyer/blob/master/app/build_passing.svg)](https://github.com/Shabinder/SpotiFlyer/releases)
 ![API](https://img.shields.io/badge/API-22%2B-brightgreen.svg)
+</br>
 [![GitHub stars](https://img.shields.io/github/stars/Shabinder/SpotiFlyer?style=social)](https://github.com/Shabinder/SpotiFlyer/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/Shabinder/SpotiFlyer?style=social)](https://github.com/Shabinder/SpotiFlyer/network/members)
 [![GitHub watchers](https://img.shields.io/github/watchers/Shabinder/SpotiFlyer?style=social)](https://github.com/Shabinder/SpotiFlyer/watchers)
@@ -35,7 +38,7 @@ SpotiFlyer is an **Android App**(Written in **Kotlin**), which **aims** to work 
 The latest release and pre-release versions are available on GitHub.
 Or to save a click, [this link](https://github.com/Shabinder/SpotiFlyer/releases/latest) should always point to the most recent release.
 
-[![SpotiFlyer App](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=SpotiFlyer&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/latest/)
+[![Downloads](https://img.shields.io/github/downloads/Shabinder/SpotiFlyer/total?style=for-the-badge&logo=android&color=17B2E7)](https://github.com/Shabinder/SpotiFlyer/releases)
 
 ### App Highlights
  - **Jetpack Compose.**
