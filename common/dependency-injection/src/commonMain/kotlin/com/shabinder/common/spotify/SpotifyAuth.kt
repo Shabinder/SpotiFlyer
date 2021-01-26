@@ -1,6 +1,5 @@
-package com.shabinder.common
+package com.shabinder.common.spotify
 
-import com.shabinder.common.spotify.Token
 import io.ktor.client.*
 import io.ktor.client.features.auth.*
 import io.ktor.client.features.auth.providers.*
@@ -16,19 +15,21 @@ suspend fun authenticateSpotify(): Token {
     }
 }
 
-private val spotifyAuthClient = HttpClient {
-    val clientId = "694d8bf4f6ec420fa66ea7fb4c68f89d"
-    val clientSecret = "02ca2d4021a7452dae2328b47a6e8fe8"
+private val spotifyAuthClient by lazy {
+    HttpClient {
+        val clientId = "694d8bf4f6ec420fa66ea7fb4c68f89d"
+        val clientSecret = "02ca2d4021a7452dae2328b47a6e8fe8"
 
-    install(Auth) {
-        basic {
-            sendWithoutRequest = true
-            username = clientId
-            password = clientSecret
+        install(Auth) {
+            basic {
+                sendWithoutRequest = true
+                username = clientId
+                password = clientSecret
+            }
         }
-    }
-    install(JsonFeature) {
-        serializer = kotlinxSerializer
+        install(JsonFeature) {
+            serializer = kotlinxSerializer
+        }
     }
 }
 

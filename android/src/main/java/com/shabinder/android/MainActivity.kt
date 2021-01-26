@@ -5,12 +5,13 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.setContent
-import com.shabinder.common.authenticateSpotify
+import com.shabinder.common.spotify.authenticateSpotify
 import com.shabinder.common.ui.SpotiFlyerMain
+import com.shabinder.common.youtube.YoutubeMusic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),YoutubeMusic {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -18,7 +19,9 @@ class MainActivity : AppCompatActivity() {
             SpotiFlyerMain()
             scope.launch(Dispatchers.IO) {
                 val token = authenticateSpotify()
+                val response = getYoutubeMusicResponse("filhaal")
                 Log.i("Spotify",token.toString())
+                Log.i("Youtube",response)
             }
         }
     }
