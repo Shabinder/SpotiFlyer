@@ -44,4 +44,7 @@ interface SpotifyRequests {
         return spotifyRequestsClient.get("$BASE_URL/albums/$id")
     }
 
+    suspend fun getResponse(url:String):String{
+        return spotifyRequestsClient.get(url)
+    }
 }

@@ -11,10 +11,12 @@ android {
         minSdkVersion(Versions.minSdkVersion)
         targetSdkVersion(Versions.targetSdkVersion)
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion = Versions.composeVersion
         kotlinCompilerVersion = Versions.kotlinVersion
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -23,7 +25,9 @@ android {
     sourceSets {
         named("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
+            java.srcDirs("src/androidMain/kotlin")
             res.srcDirs("src/androidMain/res")
         }
     }
+
 }

@@ -11,17 +11,14 @@ import com.shabinder.common.youtube.YoutubeMusic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity(),YoutubeMusic {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val scope = rememberCoroutineScope()
             SpotiFlyerMain()
             scope.launch(Dispatchers.IO) {
-                val token = authenticateSpotify()
-                val response = getYoutubeMusicResponse("filhaal")
-                Log.i("Spotify",token.toString())
-                Log.i("Youtube",response)
+
             }
         }
     }

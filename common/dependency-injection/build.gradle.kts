@@ -6,7 +6,7 @@ plugins {
 
 kotlin {
     sourceSets {
-        named("commonMain") {
+        commonMain {
             dependencies {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
@@ -20,13 +20,13 @@ kotlin {
                 implementation(Ktor.auth)
             }
         }
-        named("androidMain"){
+        androidMain {
             dependencies{
                 implementation(Ktor.clientAndroid)
 
             }
         }
-        named("desktopMain"){
+        desktopMain {
             dependencies{
                 //implementation(Ktor.clientDesktop)
             }

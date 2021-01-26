@@ -10,7 +10,5 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import org.kodein.di.DI
-
-val networking = DI.Module("Networking"){
-    
-}
+import org.kodein.di.bind
+import org.kodein.di.singleton
