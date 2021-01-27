@@ -11,9 +11,9 @@
 [![SpotiFlyer App](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=SpotiFlyer&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/latest/)
 [![Downloads](https://img.shields.io/github/downloads/Shabinder/SpotiFlyer/total?style=for-the-badge&logo=android&color=17B2E7)](https://github.com/Shabinder/SpotiFlyer/releases)
 </br>
-[![Build Status](https://github.com/Shabinder/SpotiFlyer/blob/master/app/build_passing.svg)](https://github.com/Shabinder/SpotiFlyer/releases)
+<!--[![Build Status](https://github.com/Shabinder/SpotiFlyer/blob/master/app/build_passing.svg)](https://github.com/Shabinder/SpotiFlyer/releases)
 ![API](https://img.shields.io/badge/API-22%2B-brightgreen.svg)
-</br>
+</br>-->
 [![GitHub stars](https://img.shields.io/github/stars/Shabinder/SpotiFlyer?style=social)](https://github.com/Shabinder/SpotiFlyer/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/Shabinder/SpotiFlyer?style=social)](https://github.com/Shabinder/SpotiFlyer/network/members)
 [![GitHub watchers](https://img.shields.io/github/watchers/Shabinder/SpotiFlyer?style=social)](https://github.com/Shabinder/SpotiFlyer/watchers)
