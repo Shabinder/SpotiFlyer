@@ -1,0 +1,31 @@
+CREATE TABLE IF NOT EXISTS DownloadRecord (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    type TEXT NOT NULL,
+    name TEXT NOT NULL,
+    link TEXT NOT NULL UNIQUE ON CONFLICT REPLACE ,
+    coverUrl TEXT NOT NULL,
+    totalFiles INTEGER NOT NULL DEFAULT 1
+);
+
+selectAll:
+SELECT *
+FROM DownloadRecord;
+
+select:
+SELECT *
+FROM DownloadRecord
+WHERE link = :link;
+
+add:
+INSERT OR REPLACE INTO DownloadRecord (type, name, link, coverUrl, totalFiles)
+VALUES (?,?,?,?,?);
+
+delete:
+DELETE FROM DownloadRecord
+WHERE link = :link;
+
+getLastInsertId:
+SELECT last_insert_rowid();
+
+clear:
+DELETE FROM DownloadRecord;

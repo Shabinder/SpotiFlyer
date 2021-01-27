@@ -5,7 +5,7 @@ plugins {
 }
 
 sqldelight {
-    database("TodoDatabase") {
+    database("DownloadRecordDatabase") {
         packageName = "com.shabinder.database"
     }
 }
