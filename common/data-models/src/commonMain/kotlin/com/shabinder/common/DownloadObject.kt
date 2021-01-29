@@ -29,7 +29,7 @@ data class TrackDetails(
     var comment:String?=null,
     var lyrics:String?=null,
     var trackUrl:String?=null,
-    //TODO var albumArt: File,
+    var albumArtPath: String,
     var albumArtURL: String,
     var source: Source,
     var downloaded: DownloadStatus = DownloadStatus.NotDownloaded,

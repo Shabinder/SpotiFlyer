@@ -64,6 +64,9 @@ dependencies {
     //Compose-Navigation
     implementation(Androidx.composeNavigation)
 
+    implementation(Koin.android)
+    implementation(Koin.androidViewModel)
+
     //Lifecycle
     Versions.androidLifecycle.let{
         implementation("androidx.lifecycle:lifecycle-runtime-ktx:$it")

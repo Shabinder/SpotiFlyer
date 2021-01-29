@@ -16,13 +16,24 @@
 
 package com.shabinder.common.providers
 
+import co.touchlab.kermit.Kermit
 import com.shabinder.common.*
+import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.spotify.*
-import com.shabinder.spotiflyer.database.DownloadRecord
+import com.shabinder.database.DownloadRecordDatabase
+import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class SpotifyProvider: PlatformDir(),SpotifyRequests {
+class SpotifyProvider(
+    override val httpClient: HttpClient,
+    private val database: DownloadRecordDatabase,
+    private val logger: Kermit,
+    private val dir: Dir,
+) :SpotifyRequests {
+
+    private val db:DownloadRecordDatabaseQueries
+        get() = database.downloadRecordDatabaseQueries
 
     suspend fun query(fullLink: String): PlatformQueryResult?{
         var spotifyLink =
@@ -70,12 +81,12 @@ class SpotifyProvider: PlatformDir(),SpotifyRequests {
                     getTrack(link).also {
                         folderType = "Tracks"
                         subFolder = ""
-                        if (isPresent(
-                                finalOutputDir(
+                        if (dir.isPresent(
+                                dir.finalOutputDir(
                                     it.name.toString(),
                                     folderType,
                                     subFolder,
-                                    defaultDir()
+                                    dir.defaultDir()
                                 )
                             )
                         ) {//Download Already Present!!
@@ -86,14 +97,12 @@ class SpotifyProvider: PlatformDir(),SpotifyRequests {
                         coverUrl = (it.album?.images?.elementAtOrNull(1)?.url
                             ?: it.album?.images?.elementAtOrNull(0)?.url).toString()
                         withContext(Dispatchers.Default) {
-                            databaseDAO.insert(
-                                DownloadRecord(
+                            db.add(
                                     type = "Track",
                                     name = title,
                                     link = "https://open.spotify.com/$type/$link",
                                     coverUrl = coverUrl,
                                     totalFiles = 1,
-                                )
                             )
                         }
                     }
@@ -102,14 +111,14 @@ class SpotifyProvider: PlatformDir(),SpotifyRequests {
                 "album" -> {
                     val albumObject = getAlbum(link)
                     folderType = "Albums"
-                    subFolder = albumObject?.name.toString()
-                    albumObject?.tracks?.items?.forEach {
-                        if (isPresent(
-                                finalOutputDir(
+                    subFolder = albumObject.name.toString()
+                    albumObject.tracks?.items?.forEach {
+                        if (dir.isPresent(
+                                dir.finalOutputDir(
                                     it.name.toString(),
                                     folderType,
                                     subFolder,
-                                    defaultDir()
+                                    dir.defaultDir()
                                 )
                             )
                         ) {//Download Already Present!!
@@ -124,7 +133,7 @@ class SpotifyProvider: PlatformDir(),SpotifyRequests {
                             )
                         )
                     }
-                    albumObject.tracks?.items?.toTrackDetailsList(folderType, subFolder).let {it ->
+                    albumObject.tracks?.items?.toTrackDetailsList(folderType, subFolder).let {
                         if (it.isNullOrEmpty()) {
                             //TODO Handle Error
                         } else {
@@ -133,14 +142,12 @@ class SpotifyProvider: PlatformDir(),SpotifyRequests {
                             coverUrl = (albumObject.images?.elementAtOrNull(1)?.url
                                 ?: albumObject.images?.elementAtOrNull(0)?.url).toString()
                             withContext(Dispatchers.Default) {
-                                databaseDAO.insert(
-                                    DownloadRecord(
-                                        type = "Album",
-                                        name = title,
-                                        link = "https://open.spotify.com/$type/$link",
-                                        coverUrl = coverUrl,
-                                        totalFiles = trackList.size,
-                                    )
+                                db.add(
+                                    type = "Album",
+                                    name = title,
+                                    link = "https://open.spotify.com/$type/$link",
+                                    coverUrl = coverUrl,
+                                    totalFiles = trackList.size.toLong(),
                                 )
                             }
                         }
@@ -153,14 +160,14 @@ class SpotifyProvider: PlatformDir(),SpotifyRequests {
                     subFolder = playlistObject.name.toString()
                     val tempTrackList = mutableListOf<Track>()
                     //log("Tracks Fetched", playlistObject.tracks?.items?.size.toString())
-                    playlistObject?.tracks?.items?.forEach {
+                    playlistObject.tracks?.items?.forEach {
                         it.track?.let { it1 ->
-                            if (isPresent(
-                                    finalOutputDir(
+                            if (dir.isPresent(
+                                    dir.finalOutputDir(
                                         it1.name.toString(),
                                         folderType,
                                         subFolder,
-                                        defaultDir()
+                                        dir.defaultDir()
                                     )
                                 )
                             ) {//Download Already Present!!
@@ -186,14 +193,12 @@ class SpotifyProvider: PlatformDir(),SpotifyRequests {
                     coverUrl = playlistObject.images?.elementAtOrNull(1)?.url
                         ?: playlistObject.images?.firstOrNull()?.url.toString()
                     withContext(Dispatchers.Default) {
-                        databaseDAO.insert(
-                            DownloadRecord(
-                                type = "Playlist",
-                                name = title,
-                                link = "https://open.spotify.com/$type/$link",
-                                coverUrl = coverUrl,
-                                totalFiles = tempTrackList.size,
-                            )
+                        db.add(
+                            type = "Playlist",
+                            name = title,
+                            link = "https://open.spotify.com/$type/$link",
+                            coverUrl = coverUrl,
+                            totalFiles = tempTrackList.size.toLong(),
                         )
                     }
                 }
@@ -226,8 +231,7 @@ class SpotifyProvider: PlatformDir(),SpotifyRequests {
             title = it.name.toString(),
             artists = it.artists?.map { artist -> artist?.name.toString() } ?: listOf(),
             durationSec = (it.duration_ms/1000).toInt(),
-//            albumArt = File(
-//                imageDir + (it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg"),
+            albumArtPath = dir.imageDir() + (it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg",
             albumName = it.album?.name,
             year = it.album?.release_date,
             comment = "Genres:${it.album?.genres?.joinToString()}",
@@ -235,7 +239,7 @@ class SpotifyProvider: PlatformDir(),SpotifyRequests {
             downloaded = it.downloaded,
             source = Source.Spotify,
             albumArtURL = it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString(),
-            outputFile = finalOutputDir(it.name.toString(),type, subFolder,defaultDir(),".m4a")
+            outputFile = dir.finalOutputDir(it.name.toString(),type, subFolder,dir.defaultDir(),".m4a")
         )
     }
 }

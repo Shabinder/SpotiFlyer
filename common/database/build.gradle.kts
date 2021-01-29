@@ -15,19 +15,23 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(Deps.Badoo.Reaktive.reaktive)
+                // SQL Delight
+                implementation(SqlDelight.runtime)
+                implementation(SqlDelight.coroutineExtensions)
+                api(Extras.kermit)
             }
         }
 
         androidMain {
             dependencies {
                 implementation(SqlDelight.androidDriver)
-                implementation(SqlDelight.sqliteDriver)
             }
         }
 
         desktopMain {
             dependencies {
                 implementation(SqlDelight.sqliteDriver)
+                implementation(SqlDelight.jdbcDriver)
             }
         }
 

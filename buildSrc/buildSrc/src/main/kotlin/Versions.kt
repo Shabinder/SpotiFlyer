@@ -9,6 +9,10 @@ object Versions {
     const val coilVersion = "0.4.1"
     //DI
     const val kodein = "7.2.0"
+    const val koin = "3.0.0-alpha-4"
+
+    //Logger
+    const val kermit = "0.1.8"
 
     //Internet
     const val ktor = "1.5.0"
@@ -27,7 +31,12 @@ object Versions {
     const val targetSdkVersion = 29
     const val androidLifecycle = "2.3.0-rc01"
 }
-
+object Koin {
+    val core = "org.koin:koin-core:${Versions.koin}"
+    val test = "org.koin:koin-test:${Versions.koin}"
+    val android = "org.koin:koin-android:${Versions.koin}"
+    val androidViewModel = "org.koin:koin-androidx-viewmodel:${Versions.koin}"
+}
 object Androidx{
     const val appCompat = "androidx.appcompat:appcompat:1.2.0"
     const val core = "androidx.core:core-ktx:1.5.0-beta01"
@@ -62,7 +71,7 @@ object Ktor {
 
     val auth = "io.ktor:ktor-client-auth:${Versions.ktor}"
     val clientAndroid = "io.ktor:ktor-client-android:${Versions.ktor}"
-    val clientDesktop = "io.ktor:ktor-client-curl:${Versions.ktor}"
+    val clientCurl = "io.ktor:ktor-client-curl:${Versions.ktor}"
     val clientApache = "io.ktor:ktor-client-apache:${Versions.ktor}"
     val slf4j = "org.slf4j:slf4j-simple:${Versions.slf4j}"
     val clientIos = "io.ktor:ktor-client-ios:${Versions.ktor}"
@@ -71,10 +80,11 @@ object Ktor {
 }
 
 object Extras {
-    val youtubeDownloader = "com.github.sealedtx:java-youtube-downloader:2.4.6"
-    val fuzzyWuzzy = "me.xdrop:fuzzywuzzy:1.3.1"
-    val mp3agic = "com.mpatric:mp3agic:0.9.1"
-    val jsonKlaxon = "com.beust:klaxon:5.4"
+    const val youtubeDownloader = "com.github.sealedtx:java-youtube-downloader:2.4.6"
+    const val fuzzyWuzzy = "me.xdrop:fuzzywuzzy:1.3.1"
+    const val mp3agic = "com.mpatric:mp3agic:0.9.1"
+    const val jsonKlaxon = "com.beust:klaxon:5.4"
+    const val kermit = "co.touchlab:kermit:${Versions.kermit}"
     object Android {
         val razorpay = "com.razorpay:checkout:1.6.4"
         val fetch = "androidx.tonyodev.fetch2:xfetch2:3.1.5"

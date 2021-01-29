@@ -16,23 +16,22 @@
 
 package com.shabinder.common
 
-import android.annotation.SuppressLint
+import co.touchlab.kermit.Kermit
 import com.github.kiulian.downloader.YoutubeDownloader
-import com.shabinder.common.PlatformDir
-import com.shabinder.common.providers.BaseProvider
-import com.shabinder.spotiflyer.database.DownloadRecord
-import com.shabinder.spotiflyer.models.DownloadStatus
-import com.shabinder.spotiflyer.models.PlatformQueryResult
-import com.shabinder.spotiflyer.models.TrackDetails
-import com.shabinder.spotiflyer.models.spotify.Source
-import com.shabinder.spotiflyer.utils.log
-import com.shabinder.spotiflyer.utils.removeIllegalChars
-import com.shabinder.spotiflyer.utils.showDialog
-import java.io.File
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.shabinder.common.database.DownloadRecordDatabaseQueries
+import com.shabinder.common.spotify.Source
+import com.shabinder.database.DownloadRecordDatabase
+import io.ktor.client.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class YoutubeProvider(ytDownloader: YoutubeDownloader): PlatformDir() {
+actual class YoutubeProvider actual constructor(
+    private val httpClient: HttpClient,
+    private val database: DownloadRecordDatabase,
+    private val logger: Kermit,
+    private val dir: Dir,
+){
+    private val ytDownloader: YoutubeDownloader = YoutubeDownloader()
 
     /*
     * YT Album Art Schema
@@ -43,11 +42,14 @@ class YoutubeProvider(ytDownloader: YoutubeDownloader): PlatformDir() {
     private val sampleDomain2 = "youtube.com"
     private val sampleDomain3 = "youtu.be"
 
-    override suspend fun query(fullLink: String): PlatformQueryResult?{
+    private val db: DownloadRecordDatabaseQueries
+        get() = database.downloadRecordDatabaseQueries
+
+    actual suspend fun query(fullLink: String): PlatformQueryResult?{
         val link = fullLink.removePrefix("https://").removePrefix("http://")
         if(link.contains("playlist",true) || link.contains("list",true)){
             // Given Link is of a Playlist
-            log("YT Play",link)
+            logger.i{ link }
             val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&").substringBefore("?")
             return getYTPlaylist(
                 playlistId
@@ -70,7 +72,7 @@ class YoutubeProvider(ytDownloader: YoutubeDownloader): PlatformDir() {
                     searchId
                 )
             }else{
-                showDialog("Your Youtube Link is not of a Video!!")
+                logger.d{"Your Youtube Link is not of a Video!!"}
                 null
             }
         }
@@ -87,9 +89,8 @@ class YoutubeProvider(ytDownloader: YoutubeDownloader): PlatformDir() {
             trackList = listOf(),
             Source.YouTube
         )
-        with(result) {
+        result.apply {
             try {
-                log("YT Playlist", searchId)
                 val playlist = ytDownloader.getPlaylist(searchId)
                 val playlistDetails = playlist.details()
                 val name = playlistDetails.title()
@@ -106,54 +107,52 @@ class YoutubeProvider(ytDownloader: YoutubeDownloader): PlatformDir() {
                         title = it.title(),
                         artists = listOf(it.author().toString()),
                         durationSec = it.lengthSeconds(),
-                        albumArt = File(imageDir + it.videoId() + ".jpeg"),
+                        albumArtPath = dir.imageDir() + it.videoId() + ".jpeg",
                         source = Source.YouTube,
                         albumArtURL = "https://i.ytimg.com/vi/${it.videoId()}/hqdefault.jpg",
-                        downloaded = if (File(
-                                finalOutputDir(
+                        downloaded = if (dir.isPresent(
+                                dir.finalOutputDir(
                                     itemName = it.title(),
                                     type = folderType,
                                     subFolder = subFolder,
-                                    defaultDir
+                                    dir.defaultDir()
                                 )
-                            ).exists()
+                            )
                         )
                             DownloadStatus.Downloaded
                         else {
                             DownloadStatus.NotDownloaded
                         },
-                        outputFile = finalOutputDir(it.title(), folderType, subFolder, defaultDir,".m4a"),
+                        outputFile = dir.finalOutputDir(it.title(), folderType, subFolder, dir.defaultDir(),".m4a"),
                         videoID = it.videoId()
                     )
                 }
 
                 withContext(Dispatchers.IO) {
-                    databaseDAO.insert(
-                        DownloadRecord(
-                            type = "PlayList",
-                            name = if (name.length > 17) {
-                                "${name.subSequence(0, 16)}..."
-                            } else {
-                                name
-                            },
-                            link = "https://www.youtube.com/playlist?list=$searchId",
-                            coverUrl = "https://i.ytimg.com/vi/${
-                                videos.firstOrNull()?.videoId()
-                            }/hqdefault.jpg",
-                            totalFiles = videos.size,
-                        )
+                    db.add(
+                        type = "PlayList",
+                        name = if (name.length > 17) {
+                            "${name.subSequence(0, 16)}..."
+                        } else {
+                            name
+                        },
+                        link = "https://www.youtube.com/playlist?list=$searchId",
+                        coverUrl = "https://i.ytimg.com/vi/${
+                            videos.firstOrNull()?.videoId()
+                        }/hqdefault.jpg",
+                        totalFiles = videos.size.toLong(),
                     )
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                showDialog("An Error Occurred While Processing!")
+                logger.d{"An Error Occurred While Processing!"}
             }
         }
         return if(result.title.isNotBlank()) result
         else null
     }
 
-    @SuppressLint("DefaultLocale")
+    @Suppress("DefaultLocale")
     private suspend fun getYTTrack(
         searchId:String,
     ):PlatformQueryResult? {
@@ -164,46 +163,44 @@ class YoutubeProvider(ytDownloader: YoutubeDownloader): PlatformDir() {
             coverUrl = "",
             trackList = listOf(),
             Source.YouTube
-        )
-        with(result) {
+        ).apply{
             try {
-                log("YT Video", searchId)
+                logger.i{searchId}
                 val video = ytDownloader.getVideo(searchId)
                 coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
                 val detail = video?.details()
                 val name = detail?.title()?.replace(detail.author()!!.toUpperCase(), "", true)
                     ?: detail?.title() ?: ""
-                log("YT View Model", detail.toString())
+                //logger.i{ detail.toString() }
                 trackList = listOf(
                     TrackDetails(
                         title = name,
                         artists = listOf(detail?.author().toString()),
                         durationSec = detail?.lengthSeconds() ?: 0,
-                        albumArt = File(imageDir, "$searchId.jpeg"),
+                        albumArtPath = dir.imageDir() + "$searchId.jpeg",
                         source = Source.YouTube,
                         albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
-                        downloaded = if (File(
-                                finalOutputDir(
+                        downloaded = if (dir.isPresent(
+                                dir.finalOutputDir(
                                     itemName = name,
                                     type = folderType,
                                     subFolder = subFolder,
-                                    defaultDir = defaultDir
+                                    defaultDir = dir.defaultDir()
                                 )
-                            ).exists()
+                            )
                         )
                             DownloadStatus.Downloaded
                         else {
                             DownloadStatus.NotDownloaded
                         },
-                        outputFile = finalOutputDir(name, folderType, subFolder, defaultDir,".m4a"),
+                        outputFile = dir.finalOutputDir(name, folderType, subFolder, dir.defaultDir(),".m4a"),
                         videoID = searchId
                     )
                 )
                 title = name
 
                 withContext(Dispatchers.IO) {
-                    databaseDAO.insert(
-                        DownloadRecord(
+                    db.add(
                             type = "Track",
                             name = if (name.length > 17) {
                                 "${name.subSequence(0, 16)}..."
@@ -213,12 +210,11 @@ class YoutubeProvider(ytDownloader: YoutubeDownloader): PlatformDir() {
                             link = "https://www.youtube.com/watch?v=$searchId",
                             coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
                             totalFiles = 1,
-                        )
                     )
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                showDialog("An Error Occurred While Processing!,$searchId")
+                logger.e{"An Error Occurred While Processing!,$searchId"}
             }
         }
         return if(result.title.isNotBlank()) result

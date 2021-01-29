@@ -16,16 +16,27 @@
 
 package com.shabinder.common.providers
 
+import co.touchlab.kermit.Kermit
 import com.shabinder.common.*
+import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.gaana.GaanaRequests
 import com.shabinder.common.gaana.GaanaTrack
 import com.shabinder.common.spotify.Source
+import com.shabinder.database.DownloadRecordDatabase
+import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class GaanaProvider: PlatformDir(),GaanaRequests {
+class GaanaProvider(
+    override val httpClient: HttpClient,
+    private val database: DownloadRecordDatabase,
+    private val logger: Kermit,
+    private val dir: Dir,
+): GaanaRequests {
 
     private val gaanaPlaceholderImageUrl = "https://a10.gaanacdn.com/images/social/gaana_social.jpg"
+    private val db: DownloadRecordDatabaseQueries
+        get() = database.downloadRecordDatabaseQueries
 
     suspend fun query(fullLink: String): PlatformQueryResult?{
         //Link Schema: https://gaana.com/type/link
@@ -62,12 +73,12 @@ class GaanaProvider: PlatformDir(),GaanaRequests {
                     getGaanaSong(seokey = link).tracks.firstOrNull()?.also {
                         folderType = "Tracks"
                         subFolder = ""
-                        if (isPresent(
-                                finalOutputDir(
+                        if (dir.isPresent(
+                                dir.finalOutputDir(
                                     it.track_title,
                                     folderType,
                                     subFolder,
-                                    defaultDir()
+                                    dir.defaultDir()
                                 )
                             )) {//Download Already Present!!
                             it.downloaded = DownloadStatus.Downloaded
@@ -76,14 +87,12 @@ class GaanaProvider: PlatformDir(),GaanaRequests {
                         title = it.track_title
                         coverUrl = it.artworkLink
                         withContext(Dispatchers.Default) {
-                            databaseDAO.insert(
-                                DownloadRecord(
-                                    type = "Track",
-                                    name = title,
-                                    link = "https://gaana.com/$type/$link",
-                                    coverUrl = coverUrl,
-                                    totalFiles = 1,
-                                )
+                            db.add(
+                                type = "Track",
+                                name = title,
+                                link = "https://gaana.com/$type/$link",
+                                coverUrl = coverUrl,
+                                totalFiles = 1,
                             )
                         }
                     }
@@ -93,12 +102,12 @@ class GaanaProvider: PlatformDir(),GaanaRequests {
                         folderType = "Albums"
                         subFolder = link
                         it.tracks.forEach { track ->
-                            if (isPresent(
-                                    finalOutputDir(
+                            if (dir.isPresent(
+                                    dir.finalOutputDir(
                                         track.track_title,
                                         folderType,
                                         subFolder,
-                                        defaultDir()
+                                        dir.defaultDir()
                                     )
                                 )
                             ) {//Download Already Present!!
@@ -109,14 +118,12 @@ class GaanaProvider: PlatformDir(),GaanaRequests {
                         title = link
                         coverUrl = it.custom_artworks.size_480p
                         withContext(Dispatchers.Default) {
-                            databaseDAO.insert(
-                                DownloadRecord(
-                                    type = "Album",
-                                    name = title,
-                                    link = "https://gaana.com/$type/$link",
-                                    coverUrl = coverUrl,
-                                    totalFiles = trackList.size,
-                                )
+                            db.add(
+                                type = "Album",
+                                name = title,
+                                link = "https://gaana.com/$type/$link",
+                                coverUrl = coverUrl,
+                                totalFiles = trackList.size.toLong(),
                             )
                         }
                     }
@@ -126,12 +133,12 @@ class GaanaProvider: PlatformDir(),GaanaRequests {
                         folderType = "Playlists"
                         subFolder = link
                         it.tracks.forEach { track ->
-                            if (isPresent(
-                                    finalOutputDir(
+                            if (dir.isPresent(
+                                    dir.finalOutputDir(
                                         track.track_title,
                                         folderType,
                                         subFolder,
-                                        defaultDir()
+                                        dir.defaultDir()
                                     )
                                 )
                             ) {//Download Already Present!!
@@ -143,14 +150,12 @@ class GaanaProvider: PlatformDir(),GaanaRequests {
                         //coverUrl.value = "TODO"
                         coverUrl = gaanaPlaceholderImageUrl
                         withContext(Dispatchers.Default) {
-                            databaseDAO.insert(
-                                DownloadRecord(
-                                    type = "Playlist",
-                                    name = title,
-                                    link = "https://gaana.com/$type/$link",
-                                    coverUrl = coverUrl,
-                                    totalFiles = it.tracks.size,
-                                )
+                            db.add(
+                                type = "Playlist",
+                                name = title,
+                                link = "https://gaana.com/$type/$link",
+                                coverUrl = coverUrl,
+                                totalFiles = it.tracks.size.toLong(),
                             )
                         }
                     }
@@ -167,12 +172,12 @@ class GaanaProvider: PlatformDir(),GaanaRequests {
                             }
                     getGaanaArtistTracks(seokey = link).also {
                         it.tracks.forEach { track ->
-                            if (isPresent(
-                                    finalOutputDir(
+                            if (dir.isPresent(
+                                    dir.finalOutputDir(
                                         track.track_title,
                                         folderType,
                                         subFolder,
-                                        defaultDir()
+                                        dir.defaultDir()
                                     )
                                 )
                             ) {//Download Already Present!!
@@ -181,14 +186,12 @@ class GaanaProvider: PlatformDir(),GaanaRequests {
                         }
                         trackList = it.tracks.toTrackDetailsList(folderType, subFolder)
                         withContext(Dispatchers.Default) {
-                            databaseDAO.insert(
-                                DownloadRecord(
-                                    type = "Artist",
-                                    name = artistDetails?.name ?: link,
-                                    link = "https://gaana.com/$type/$link",
-                                    coverUrl = coverUrl,
-                                    totalFiles = trackList.size,
-                                )
+                            db.add(
+                                type = "Artist",
+                                name = artistDetails?.name ?: link,
+                                link = "https://gaana.com/$type/$link",
+                                coverUrl = coverUrl,
+                                totalFiles = trackList.size.toLong(),
                             )
                         }
                     }
@@ -205,8 +208,7 @@ class GaanaProvider: PlatformDir(),GaanaRequests {
             title = it.track_title,
             artists = it.artist.map { artist -> artist?.name.toString() },
             durationSec = it.duration,
-//            albumArt = File(
-//                imageDir + (it.artworkLink.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg"),
+            albumArtPath = dir.imageDir() + (it.artworkLink.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg",
             albumName = it.album_title,
             year = it.release_date,
             comment = "Genres:${it.genre?.map { genre -> genre?.name }?.reduceOrNull { acc, s -> acc + s  }}",
@@ -214,7 +216,7 @@ class GaanaProvider: PlatformDir(),GaanaRequests {
             downloaded = it.downloaded ?: DownloadStatus.NotDownloaded,
             source = Source.Gaana,
             albumArtURL = it.artworkLink,
-            outputFile = finalOutputDir(it.track_title,type, subFolder,defaultDir(),".m4a")
+            outputFile = dir.finalOutputDir(it.track_title,type, subFolder,dir.defaultDir(),".m4a")
         )
     }
 }

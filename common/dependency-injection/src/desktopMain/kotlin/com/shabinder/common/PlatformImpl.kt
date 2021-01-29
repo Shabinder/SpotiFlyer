@@ -2,7 +2,7 @@ package com.shabinder.common
 
 import java.io.File
 
-actual open class PlatformDir{
+actual open class Dir{
 
     actual fun fileSeparator(): String = File.separator
 

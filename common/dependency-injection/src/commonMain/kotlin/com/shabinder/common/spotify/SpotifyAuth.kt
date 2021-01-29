@@ -1,5 +1,6 @@
 package com.shabinder.common.spotify
 
+import com.shabinder.common.kotlinxSerializer
 import io.ktor.client.*
 import io.ktor.client.features.auth.*
 import io.ktor.client.features.auth.providers.*
@@ -32,8 +33,3 @@ private val spotifyAuthClient by lazy {
         }
     }
 }
-
-val kotlinxSerializer = KotlinxSerializer( kotlinx.serialization.json.Json {
-    isLenient = true
-    ignoreUnknownKeys = true
-})

@@ -1,14 +1,15 @@
 package com.shabinder.common.gaana
 
-import com.shabinder.common.spotify.kotlinxSerializer
 import io.ktor.client.*
-import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 
 private const val TOKEN = "b2e6d7fbc136547a940516e9b77e5990"
 private const val BASE_URL = "https://api.gaana.com/"
 
 interface GaanaRequests {
+
+    val httpClient:HttpClient
+
     /*
         * Api Request:  http://api.gaana.com/?type=playlist&subtype=playlist_detail&seokey=gaana-dj-hindi-top-50-1&token=b2e6d7fbc136547a940516e9b77e5990&format=JSON
         *
@@ -89,13 +90,5 @@ interface GaanaRequests {
         return httpClient.get(
             "$BASE_URL/?type=$type&subtype=$subtype&seokey=$seokey&token=$TOKEN&format=$format&limit=$limit"
         )
-    }
-}
-
-val httpClient by lazy {
-    HttpClient {
-        install(JsonFeature) {
-            serializer = kotlinxSerializer
-        }
     }
 }
