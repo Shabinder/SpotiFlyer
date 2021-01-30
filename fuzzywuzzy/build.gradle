@@ -1,0 +1,49 @@
+buildscript {
+    apply from: "$rootDir/fuzzywuzzy/gradle/dependencies.gradle"
+
+    repositories {
+        google()
+        maven { url 'https://dl.bintray.com/jetbrains/kotlin-native-dependencies' }
+        maven { url "https://plugins.gradle.org/m2/" }
+        jcenter()
+    }
+
+    dependencies {
+        classpath deps.plugins.kotlin
+        classpath deps.plugins.dokka
+        classpath deps.plugins.node
+    }
+}
+apply from: "$rootDir/fuzzywuzzy/gradle/dependencies.gradle"
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        
+    }
+
+    group = GROUP
+    version = VERSION_NAME
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+/*def addDependency(Upload task, String groupId, String artifactId, String version, String type) {
+    task.repositories.withType(org.gradle.api.artifacts.maven.MavenDeployer) { mavenDeployer ->
+        task.doFirst {
+            mavenDeployer.pom.whenConfigured {
+                // For whatever reason we can't 'new' these ourselves. Clone an existing instance instead.
+                def dependency = it.dependencies.get(0).clone()
+                dependency.groupId = groupId
+                dependency.artifactId = artifactId
+                dependency.version = version
+                dependency.type = type
+                it.dependencies.add(dependency)
+            }
+        }
+    }
+}*/
+

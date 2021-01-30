@@ -12,6 +12,7 @@ buildscript{
         mavenLocal()
         google()
         jcenter()
+        maven(url = "https://jitpack.io")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 
@@ -23,7 +24,8 @@ buildscript{
 }
 
 repositories {
-	jcenter()
+    maven(url = "https://jitpack.io")
+    jcenter()
     mavenLocal()
     google()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")

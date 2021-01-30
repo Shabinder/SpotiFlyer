@@ -10,6 +10,7 @@ kotlin {
             dependencies {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
+                implementation(project(":fuzzywuzzy:app"))
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
                 implementation(Ktor.clientCore)
                 implementation(Ktor.clientCio)
@@ -24,7 +25,8 @@ kotlin {
                 api(Extras.kermit)
                 api(Extras.jsonKlaxon)
                 api(Extras.youtubeDownloader)
-                api(Extras.fuzzyWuzzy)
+                //api(Extras.fuzzyWuzzy)
+                //api("com.github.willowtreeapps:fuzzywuzzy-kotlin:v0.1.1")
             }
         }
         androidMain {

@@ -3,6 +3,7 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven(url = "https://jitpack.io")
     }
 }
 
@@ -14,6 +15,7 @@ include(
     ":common:compose-ui",
     ":common:data-models",
     ":common:dependency-injection",
+    ":fuzzywuzzy:app",
     ":android",
     ":desktop"
 )

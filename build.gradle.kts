@@ -11,6 +11,9 @@ allprojects {
         maven(url = "https://dl.bintray.com/ekito/koin")
         maven(url = "https://kotlin.bintray.com/kotlin-js-wrappers/")
         maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        flatDir {
+            dirs("fuzzywuzzy")
+        }
     }
 }
 buildscript {

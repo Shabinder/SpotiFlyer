@@ -1,0 +1,14 @@
+ext.versions = [
+        kotlin          : '1.3.30',
+        kotlinCoroutines: '1.2.0',
+        dokka           : '0.9.17',
+        nodePlugin: '1.2.0'
+]
+ext.deps = [
+        plugins: [
+                android: 'com.android.tools.build:gradle:3.3.0',
+                kotlin : "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
+                dokka  : "org.jetbrains.dokka:dokka-gradle-plugin:${versions.dokka}",
+                node   : "com.moowork.gradle:gradle-node-plugin:${versions.nodePlugin}"
+        ]
+]

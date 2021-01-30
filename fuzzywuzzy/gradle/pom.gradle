@@ -1,0 +1,29 @@
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "WillowTree"
+            name "WillowTree Team"
+            organization "WillowTree"
+            organizationUrl "http://www.willowtreeapps.com"
+        }
+    }
+
+    scm {
+        url "https://github.com/willowtreeapps/fuzzywuzzy-kotlin"
+    }
+}
+
+project.ext.configureMavenCentralMetadata = { pom ->
+    def root = asNode()
+    root.appendNode('name', project.name)
+    root.appendNode('description', 'FuzzyWuzzy-Kotlin is a port of the python fuzzy string matching library to Kotlin Multiplatform (JVM, Native, JS, Wasm)')
+    root.appendNode('url', 'https://github.com/willowtreeapps/fuzzywuzzy-kotlin')
+    root.children().last() + pomConfig
+}

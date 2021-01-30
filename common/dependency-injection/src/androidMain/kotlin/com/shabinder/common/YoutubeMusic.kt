@@ -2,17 +2,16 @@ package com.shabinder.common
 
 import android.annotation.SuppressLint
 import co.touchlab.kermit.Logger
-import com.shabinder.common.YoutubeTrack
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
+import com.willowtreeapps.fuzzywuzzy.diffutils.FuzzySearch
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
-import me.xdrop.fuzzywuzzy.FuzzySearch
 import kotlin.math.absoluteValue
 
 private const val apiKey = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30"
@@ -199,12 +198,12 @@ actual class YoutubeMusic actual constructor(
 
             if(result.type == "Song"){
                 for (artist in trackArtists){
-                    if(FuzzySearch.ratio(artist.toLowerCase(),result.artist?.toLowerCase()) > 85)
+                    if(FuzzySearch.ratio(artist.toLowerCase(),result.artist?.toLowerCase() ?: "") > 85)
                         artistMatchNumber++
                 }
             }else{//i.e. is a Video
                 for (artist in trackArtists) {
-                    if(FuzzySearch.partialRatio(artist.toLowerCase(),result.name?.toLowerCase()) > 85)
+                    if(FuzzySearch.partialRatio(artist.toLowerCase(),result.name?.toLowerCase() ?: "") > 85)
                         artistMatchNumber++
                 }
             }
