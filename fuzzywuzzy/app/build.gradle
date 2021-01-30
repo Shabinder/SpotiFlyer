@@ -24,15 +24,17 @@ kotlin {
         }
     }
 
+/*
+    wasm32("wasm")
     iosArm64("ios")
     iosX64("iosSim")
     macosX64("macos")
     mingwX64("win")
-    wasm32("wasm")
     linuxArm32Hfp("linArm32")
     linuxMips32("linMips32")
     linuxMipsel32("linMipsel32")
     linuxX64("lin64")
+*/
 
     sourceSets {
         commonMain {
@@ -81,16 +83,16 @@ kotlin {
                 implementation kotlin("stdlib-js")
             }
         }
-        nativeMain {
+        /*nativeMain {
             kotlin.srcDir('src/nativeMain/kotlin')
-        }
+        }*/
 
-        iosSimMain.dependsOn iosMain
-        iosSimTest.dependsOn iosTest
+        //iosSimMain.dependsOn iosMain
+        //iosSimTest.dependsOn iosTest
 
-        configure([targets.ios, targets.iosSim, targets.macos, targets.win, targets.linArm32, targets.linMips32, targets.linMipsel32, targets.lin64]) {
+        /*configure([targets.ios, targets.iosSim, targets.macos, targets.win, targets.linArm32, targets.linMips32, targets.linMipsel32, targets.lin64]) {
             compilations.main.source(sourceSets.nativeMain)
-        }
+        }*/
     }
 }
 

@@ -5,6 +5,7 @@ import com.shabinder.common.database.createDb
 import com.shabinder.common.database.getLogger
 import com.shabinder.common.providers.GaanaProvider
 import com.shabinder.common.providers.SpotifyProvider
+import com.shabinder.common.providers.YoutubeMusic
 import io.ktor.client.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
@@ -24,6 +25,7 @@ fun commonModule(enableNetworkLogs: Boolean) = module {
     single { Dir() }
     single { createDb() }
     single { Kermit(getLogger()) }
+    single { YoutubeMusic(get(),get()) }
     single { SpotifyProvider(get(),get(),get(),get()) }
     single { GaanaProvider(get(),get(),get(),get()) }
     single { YoutubeProvider(get(),get(),get(),get()) }

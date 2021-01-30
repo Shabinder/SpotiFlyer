@@ -1,32 +1,30 @@
-package com.shabinder.common
+package com.shabinder.common.providers
 
 import co.touchlab.kermit.Logger
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Parser
+import com.shabinder.common.YoutubeTrack
+import com.willowtreeapps.fuzzywuzzy.diffutils.FuzzySearch
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonObject
-import me.xdrop.fuzzywuzzy.FuzzySearch
+import kotlinx.serialization.json.*
 import kotlin.math.absoluteValue
 
 private const val apiKey = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30"
 
-actual class YoutubeMusic actual constructor(
+class YoutubeMusic constructor(
     private val logger: Logger,
     private val httpClient:HttpClient,
 ) {
-    private val tag = "YTMUSIC"
-    actual fun getYTTracks(response: String):List<YoutubeTrack>{
+    private val tag = "YT Music"
+    suspend fun getYTTracks(query: String):List<YoutubeTrack>{
         val youtubeTracks = mutableListOf<YoutubeTrack>()
 
-        val stringBuilder: StringBuilder = StringBuilder(response)
-        val responseObj: JsonObject = Parser.default().parse(stringBuilder) as JsonObject
-        val contentBlocks = responseObj.obj("contents")?.obj("sectionListRenderer")?.array<JsonObject>("contents")
-        val resultBlocks = mutableListOf<JsonArray<JsonObject>>()
+        val responseObj = Json.parseToJsonElement(getYoutubeMusicResponse(query))
+        val contentBlocks = responseObj.jsonObject["contents"]
+            ?.jsonObject?.get("sectionListRenderer")
+            ?.jsonObject?.get("contents")?.jsonArray
+
+        val resultBlocks = mutableListOf<JsonArray>()
         if (contentBlocks != null) {
             for (cBlock in contentBlocks){
                 /**
@@ -35,11 +33,12 @@ actual class YoutubeMusic actual constructor(
                  *results for xyz, search for abc instead') we have no use for them, the for
                  *loop below if throw a keyError if we don't ignore them
                  */
-                if(cBlock.containsKey("itemSectionRenderer")){
+                if(cBlock.jsonObject.containsKey("itemSectionRenderer")){
                     continue
                 }
 
-                for(contents in cBlock.obj("musicShelfRenderer")?.array<JsonObject>("contents") ?: listOf()){
+                for(contents in cBlock.jsonObject["musicShelfRenderer"]?.jsonObject?.get("contents")?.jsonArray
+                    ?: listOf()){
                     /**
                      *  apparently content Blocks without an 'overlay' field don't have linkBlocks
                      *  I have no clue what they are and why there even exist
@@ -50,21 +49,24 @@ actual class YoutubeMusic actual constructor(
                     TODO check and correct
                     }*/
 
-                    val result = contents.obj("musicResponsiveListItemRenderer")
-                        ?.array<JsonObject>("flexColumns")
+                    val result = contents.jsonObject["musicResponsiveListItemRenderer"]
+                        ?.jsonObject?.get("flexColumns")?.jsonArray
 
                     //Add the linkBlock
-                    val linkBlock = contents.obj("musicResponsiveListItemRenderer")
-                        ?.obj("overlay")
-                        ?.obj("musicItemThumbnailOverlayRenderer")
-                        ?.obj("content")
-                        ?.obj("musicPlayButtonRenderer")
-                        ?.obj("playNavigationEndpoint")
+                    val linkBlock = contents.jsonObject["musicResponsiveListItemRenderer"]
+                        ?.jsonObject?.get("overlay")
+                        ?.jsonObject?.get("musicItemThumbnailOverlayRenderer")
+                        ?.jsonObject?.get("content")
+                        ?.jsonObject?.get("musicPlayButtonRenderer")
+                        ?.jsonObject?.get("playNavigationEndpoint")
 
                     // detailsBlock is always a list, so we just append the linkBlock to it
                     // instead of carrying along all the other junk from "musicResponsiveListItemRenderer"
-                    linkBlock?.let { result?.add(it) }
-                    result?.let { resultBlocks.add(it) }
+                    val finalResult = buildJsonArray {
+                        result?.let { add(it) }
+                        linkBlock?.let { add(it) }
+                    }
+                    resultBlocks.add(finalResult)
                 }
             }
 
@@ -88,7 +90,7 @@ actual class YoutubeMusic actual constructor(
             !       4 - Duration (hh:mm:ss)
             !
             ! We blindly gather all the details we get our hands on, then
-            ! cherrypick the details we need based on  their index numbers,
+            ! cherry pick the details we need based on  their index numbers,
             ! we do so only if their Type is 'Song' or 'Video
             */
 
@@ -108,18 +110,17 @@ actual class YoutubeMusic actual constructor(
                 ! result[:-1] ,i.e., skip last element in array '
                 */
                 for(detail in result.subList(0,result.size-1)){
-                    if(detail.obj("musicResponsiveListItemFlexColumnRenderer")?.size!! < 2) continue
+                    if(detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]?.jsonObject?.size?:0 < 2) continue
 
                     // if not a dummy, collect All Variables
-                    val details = detail.obj("musicResponsiveListItemFlexColumnRenderer")
-                        ?.obj("text")
-                        ?.array<JsonObject>("runs") ?: listOf()
+                    val details = detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]
+                        ?.jsonObject?.get("text")
+                        ?.jsonObject?.get("runs")?.jsonArray ?: listOf()
+
                     for (d in details){
-                        d["text"]?.let {
-                            if(it.toString() != " • "){
-                                availableDetails.add(
-                                    it.toString()
-                                )
+                        d.jsonObject["text"]?.jsonPrimitive?.contentOrNull?.let {
+                            if(it != " • "){
+                                availableDetails.add(it)
                             }
                         }
                     }
@@ -142,7 +143,7 @@ actual class YoutubeMusic actual constructor(
                     ! reference the dict keys by index
                     */
 
-                    val videoId:String? = result.last().obj("watchEndpoint")?.get("videoId") as String?
+                    val videoId:String? = result.last().jsonObject["watchEndpoint"]?.jsonObject?.get("videoId")?.jsonPrimitive?.content
                     val ytTrack = YoutubeTrack(
                         name = availableDetails[0],
                         type = availableDetails[1],
@@ -151,7 +152,6 @@ actual class YoutubeMusic actual constructor(
                         videoId = videoId
                     )
                     youtubeTracks.add(ytTrack)
-
                 }
             }
         }
@@ -159,10 +159,11 @@ actual class YoutubeMusic actual constructor(
         return youtubeTracks
     }
 
-    actual fun sortByBestMatch(ytTracks:List<YoutubeTrack>,
-                               trackName:String,
-                               trackArtists:List<String>,
-                               trackDurationSec:Int,
+    fun sortByBestMatch(
+        ytTracks:List<YoutubeTrack>,
+        trackName:String,
+        trackArtists:List<String>,
+        trackDurationSec:Int,
     ):Map<String,Int>{
         /*
         * "linksWithMatchValue" is map with Youtube VideoID and its rating/match with 100 as Max Value
@@ -196,12 +197,12 @@ actual class YoutubeMusic actual constructor(
 
             if(result.type == "Song"){
                 for (artist in trackArtists){
-                    if(FuzzySearch.ratio(artist.toLowerCase(),result.artist?.toLowerCase()) > 85)
+                    if(FuzzySearch.ratio(artist.toLowerCase(),result.artist?.toLowerCase() ?: "") > 85)
                         artistMatchNumber++
                 }
             }else{//i.e. is a Video
                 for (artist in trackArtists) {
-                    if(FuzzySearch.partialRatio(artist.toLowerCase(),result.name?.toLowerCase()) > 85)
+                    if(FuzzySearch.partialRatio(artist.toLowerCase(),result.name?.toLowerCase() ?: "") > 85)
                         artistMatchNumber++
                 }
             }
@@ -231,7 +232,7 @@ actual class YoutubeMusic actual constructor(
         return linksWithMatchValue.toList().sortedByDescending { it.second }.toMap()
     }
 
-    actual suspend fun getYoutubeMusicResponse(query: String):String{
+    private suspend fun getYoutubeMusicResponse(query: String):String{
         return httpClient.post("https://music.youtube.com/youtubei/v1/search?alt=json&key=$apiKey"){
             contentType(ContentType.Application.Json)
             headers{
