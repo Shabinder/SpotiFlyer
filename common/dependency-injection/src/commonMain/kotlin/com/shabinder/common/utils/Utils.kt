@@ -1,4 +1,4 @@
-package com.shabinder.common
+package com.shabinder.common.utils
 
 /**
  * Removing Illegal Chars from File Name

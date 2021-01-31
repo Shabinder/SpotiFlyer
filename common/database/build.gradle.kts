@@ -5,7 +5,7 @@ plugins {
 }
 
 sqldelight {
-    database("DownloadRecordDatabase") {
+    database("Database") {
         packageName = "com.shabinder.database"
     }
 }
@@ -14,7 +14,8 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(Deps.Badoo.Reaktive.reaktive)
+                implementation(project(":common:data-models"))
+                implementation(Badoo.Reaktive.reaktive)
                 // SQL Delight
                 implementation(SqlDelight.runtime)
                 implementation(SqlDelight.coroutineExtensions)

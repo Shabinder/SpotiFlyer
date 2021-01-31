@@ -1,7 +1,7 @@
 package com.shabinder.common
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.database.createDb
+import com.shabinder.common.database.createDatabase
 import com.shabinder.common.database.getLogger
 import com.shabinder.common.providers.GaanaProvider
 import com.shabinder.common.providers.SpotifyProvider
@@ -22,9 +22,10 @@ fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclarat
     }
 
 fun commonModule(enableNetworkLogs: Boolean) = module {
-    single { Dir() }
-    single { createDb() }
+    single { Dir(get()) }
+    single { createDatabase() }
     single { Kermit(getLogger()) }
+    single { TokenStore(get(),get()) }
     single { YoutubeMusic(get(),get()) }
     single { SpotifyProvider(get(),get(),get(),get()) }
     single { GaanaProvider(get(),get(),get(),get()) }

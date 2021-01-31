@@ -20,7 +20,8 @@ import co.touchlab.kermit.Kermit
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.spotify.Source
-import com.shabinder.database.DownloadRecordDatabase
+import com.shabinder.common.utils.removeIllegalChars
+import com.shabinder.database.Database
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -28,7 +29,7 @@ import org.koin.core.KoinComponent
 
 actual class YoutubeProvider actual constructor(
     private val httpClient: HttpClient,
-    private val database: DownloadRecordDatabase,
+    private val database: Database,
     private val logger: Kermit,
     private val dir: Dir,
 ){

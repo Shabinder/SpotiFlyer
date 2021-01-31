@@ -22,14 +22,14 @@ import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.gaana.GaanaRequests
 import com.shabinder.common.gaana.GaanaTrack
 import com.shabinder.common.spotify.Source
-import com.shabinder.database.DownloadRecordDatabase
+import com.shabinder.database.Database
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class GaanaProvider(
     override val httpClient: HttpClient,
-    private val database: DownloadRecordDatabase,
+    private val database: Database,
     private val logger: Kermit,
     private val dir: Dir,
 ): GaanaRequests {

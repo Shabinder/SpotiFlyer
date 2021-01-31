@@ -20,6 +20,7 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common:database"))
+                implementation(project(":common:dependency-injection"))
                 implementation(project(":common:compose-ui"))
             }
         }

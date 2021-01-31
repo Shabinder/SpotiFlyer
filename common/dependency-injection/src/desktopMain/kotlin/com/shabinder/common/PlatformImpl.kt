@@ -1,8 +1,9 @@
 package com.shabinder.common
 
+import co.touchlab.kermit.Kermit
 import java.io.File
 
-actual open class Dir{
+actual open class Dir actual constructor(private val logger: Kermit) {
 
     actual fun fileSeparator(): String = File.separator
 
@@ -14,4 +15,20 @@ actual open class Dir{
 
     actual fun isPresent(path: String): Boolean = File(path).exists()
 
+    actual fun createDirectory(dirPath:String){
+        val yourAppDir = File(dirPath)
+
+        if(!yourAppDir.exists() && !yourAppDir.isDirectory)
+        { // create empty directory
+            if (yourAppDir.mkdirs())
+            {logger.i{"$dirPath created"}}
+            else
+            {
+                logger.e{"Unable to create Dir: $dirPath!"}
+            }
+        }
+        else {
+            logger.i { "$dirPath already exists" }
+        }
+    }
 }

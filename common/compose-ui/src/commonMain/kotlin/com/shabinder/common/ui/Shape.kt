@@ -14,14 +14,14 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.common.spotify
+package com.shabinder.spotiflyer.ui
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Shapes
+import androidx.compose.ui.unit.dp
 
-@Serializable
-data class Token(
-    var access_token:String?,
-    var token_type:String?,
-    @SerialName("expires_in") var expiry:Long?
+val SpotiFlyerShapes = Shapes(
+        small = RoundedCornerShape(percent = 50),
+        medium = RoundedCornerShape(size = 8.dp),
+        large = RoundedCornerShape(size = 0.dp)
 )

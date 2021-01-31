@@ -1,12 +1,12 @@
 package com.shabinder.common
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.database.DownloadRecordDatabase
+import com.shabinder.database.Database
 import io.ktor.client.*
 
 expect class YoutubeProvider(
     httpClient: HttpClient,
-    database: DownloadRecordDatabase,
+    database: Database,
     logger: Kermit,
     dir: Dir
 ) {
