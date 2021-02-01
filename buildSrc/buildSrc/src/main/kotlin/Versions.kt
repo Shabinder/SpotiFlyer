@@ -75,6 +75,8 @@ object MVIKotlin {
     const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
     const val mvikotlin = "com.arkivanov.mvikotlin:mvikotlin:$VERSION"
     const val mvikotlinMain = "com.arkivanov.mvikotlin:mvikotlin-main:$VERSION"
+    const val coroutines = "com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$VERSION"
+    const val keepers = "com.arkivanov.mvikotlin:keepers:$VERSION"
     const val mvikotlinMainIosX64 = "com.arkivanov.mvikotlin:mvikotlin-main-iosx64:$VERSION"
     const val mvikotlinMainIosArm64 = "com.arkivanov.mvikotlin:mvikotlin-main-iosarm64:$VERSION"
     const val mvikotlinLogging = "com.arkivanov.mvikotlin:mvikotlin-logging:$VERSION"

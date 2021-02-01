@@ -1,30 +1,43 @@
 package com.shabinder.common.main
 
-import com.arkivanov.decompose.value.Value
+import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import com.badoo.reaktive.base.Consumer
 import com.shabinder.common.DownloadRecord
+import com.shabinder.common.main.integration.SpotiFlyerMainImpl
+import com.shabinder.common.utils.Consumer
 import com.shabinder.database.Database
+import kotlinx.coroutines.flow.Flow
 
 interface SpotiFlyerMain {
 
-    val models: Value<Model>
+    val models: Flow<State>
 
-    fun onDownloadRecordClicked(link: String)
+    /*
+    * We Intend to Move to List Screen
+    * Note: Implementation in Root
+    * */
+    fun onLinkSearch(link: String)
 
+    /*
+    * Update TextBox's Text
+    * */
     fun onInputLinkChanged(link: String)
 
     interface Dependencies {
+        fun mainOutput(searched: Output): Consumer<Output>
         val storeFactory: StoreFactory
         val database: Database
-        val mainOutput: Consumer<Output>
+    }
+    sealed class Output {
+        data class Search(val link: String) : Output()
     }
 
-    data class Model(
-        val record: List<DownloadRecord>,
-        val link: String
+    data class State(
+        val records: List<DownloadRecord> = emptyList(),
+        val link: String = ""
     )
-    sealed class Output {
-        data class Searched(val link: String) : Output()
-    }
 }
+
+@Suppress("FunctionName") // Factory function
+fun SpotiFlyerMain(componentContext: ComponentContext, dependencies: SpotiFlyerMain.Dependencies): SpotiFlyerMain =
+    SpotiFlyerMainImpl(componentContext, dependencies)

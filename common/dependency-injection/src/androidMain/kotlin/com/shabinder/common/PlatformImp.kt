@@ -2,10 +2,11 @@ package com.shabinder.common
 
 import android.content.Context
 import android.os.Environment
+import co.touchlab.kermit.Kermit
 import com.shabinder.common.database.appContext
 import java.io.File
 
-actual open class Dir {
+actual open class Dir actual constructor(logger: Kermit) {
 
     private val context:Context
         get() = appContext
@@ -21,4 +22,6 @@ actual open class Dir {
                 "SpotiFlyer"+ File.separator
 
     actual fun isPresent(path: String): Boolean = File(path).exists()
+    actual fun createDirectory(dirPath: String) {
+    }
 }
