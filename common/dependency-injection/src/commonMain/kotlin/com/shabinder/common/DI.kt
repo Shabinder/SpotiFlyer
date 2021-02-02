@@ -10,6 +10,8 @@ import io.ktor.client.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.logging.*
+import io.ktor.client.request.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
@@ -38,6 +40,17 @@ val kotlinxSerializer = KotlinxSerializer( Json {
     ignoreUnknownKeys = true
 })
 
+fun isInternetAvailable(): Boolean {
+    return runBlocking {
+        try {
+            ktorHttpClient.head<String>("http://google.com")
+            true
+        } catch (e: Exception) {
+            println(e.message)
+            false
+        }
+    }
+}
 fun createHttpClient(enableNetworkLogs: Boolean,serializer: KotlinxSerializer = kotlinxSerializer) = HttpClient {
     install(JsonFeature) {
         this.serializer = serializer
@@ -49,3 +62,4 @@ fun createHttpClient(enableNetworkLogs: Boolean,serializer: KotlinxSerializer = 
         }
     }
 }
+val ktorHttpClient = HttpClient {}

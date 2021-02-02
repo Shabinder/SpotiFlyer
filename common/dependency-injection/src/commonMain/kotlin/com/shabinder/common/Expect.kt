@@ -1,5 +1,6 @@
 package com.shabinder.common
 
+import androidx.compose.runtime.Composable
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.utils.removeIllegalChars
 
@@ -9,6 +10,7 @@ expect fun shareApp()
 
 expect fun giveDonation()
 
+expect fun downloadTracks(list: List<TrackDetails>)
 
 expect open class Dir(
     logger: Kermit

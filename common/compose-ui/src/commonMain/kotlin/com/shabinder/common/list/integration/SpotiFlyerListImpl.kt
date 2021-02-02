@@ -20,15 +20,19 @@ internal class SpotiFlyerListImpl(
         instanceKeeper.getStore {
             SpotiFlyerListStoreProvider(
                 storeFactory = storeFactory,
-                database = database,
+                fetchQuery = fetchQuery,
                 link = link
             ).provide()
         }
 
     override val models: Flow<State> = store.states
 
-    override fun onDownloadClicked(trackList: List<TrackDetails>) {
-        store.accept(Intent.StartDownload(trackList))
+    override fun onDownloadAllClicked(trackList: List<TrackDetails>) {
+        store.accept(Intent.StartDownloadAll(trackList))
+    }
+
+    override fun onDownloadClicked(wholeTrackList: List<TrackDetails>, trackIndex: Int) {
+        store.accept(Intent.StartDownload(wholeTrackList,trackIndex))
     }
 
     override fun onBackPressed(){

@@ -2,9 +2,11 @@ package com.shabinder.common.list
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
+import com.shabinder.common.FetchPlatformQueryResult
 import com.shabinder.common.PlatformQueryResult
 import com.shabinder.common.TrackDetails
 import com.shabinder.common.list.integration.SpotiFlyerListImpl
+import com.shabinder.common.utils.Consumer
 import com.shabinder.database.Database
 import kotlinx.coroutines.flow.Flow
 
@@ -13,10 +15,13 @@ interface SpotiFlyerList {
     val models: Flow<State>
 
     /*
-    * For Single Track Download -> list(that track)
-    * For Download All -> Model.tracks
+    * Download All Tracks(after filtering already Downloaded)
     * */
-    fun onDownloadClicked(trackList:List<TrackDetails>)
+    fun onDownloadAllClicked(trackList:List<TrackDetails>)
+    /*
+    * Download All Tracks(after filtering already Downloaded)
+    * */
+    fun onDownloadClicked(wholeTrackList:List<TrackDetails>,trackIndex:Int)
 
     /*
     * To Pop and return back to Main Screen
@@ -25,15 +30,15 @@ interface SpotiFlyerList {
 
     interface Dependencies {
         val storeFactory: StoreFactory
-        val database: Database
+        val fetchQuery: FetchPlatformQueryResult
         val link: String
-        fun listOutput(finished: Output.Finished)
+        fun listOutput(finished: Output.Finished): Consumer<Output>
     }
     sealed class Output {
         object Finished : Output()
     }
     data class State(
-        val result:PlatformQueryResult? = null,
+        val queryResult:PlatformQueryResult? = null,
         val link:String = ""
     )
 }

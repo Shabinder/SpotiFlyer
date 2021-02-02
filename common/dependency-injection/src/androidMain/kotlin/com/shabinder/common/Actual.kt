@@ -6,6 +6,22 @@ import co.touchlab.kermit.Kermit
 import com.shabinder.common.database.appContext
 import java.io.File
 
+actual fun openPlatform(platformID:String ,platformLink:String){
+    //TODO
+}
+
+actual fun shareApp(){
+    //TODO
+}
+
+actual fun giveDonation(){
+    //TODO
+}
+
+actual fun downloadTracks(list: List<TrackDetails>){
+    //TODO
+}
+
 actual open class Dir actual constructor(logger: Kermit) {
 
     private val context:Context

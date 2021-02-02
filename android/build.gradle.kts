@@ -22,6 +22,7 @@ android {
         versionCode = Versions.versionCode
         versionName = Versions.versionName
     }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
@@ -29,6 +30,7 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
     compileOptions {
         // Flag to enable support for the new language APIs
         //coreLibraryDesugaringEnabled = true

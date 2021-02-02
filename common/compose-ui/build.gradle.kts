@@ -18,6 +18,12 @@ kotlin {
                 //implementation(Badoo.Reaktive.reaktive)
                 implementation(Decompose.decompose)
                 implementation(Decompose.extensionsCompose)
+
+                //Coil-Image Loading
+                Versions.coilVersion.let{
+                    implementation("dev.chrisbanes.accompanist:accompanist-coil:$it")
+                    implementation("dev.chrisbanes.accompanist:accompanist-insets:$it")
+                }
             }
         }
     }

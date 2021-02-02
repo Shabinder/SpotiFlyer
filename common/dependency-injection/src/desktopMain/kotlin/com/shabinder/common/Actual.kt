@@ -3,6 +3,22 @@ package com.shabinder.common
 import co.touchlab.kermit.Kermit
 import java.io.File
 
+actual fun openPlatform(platformID:String ,platformLink:String){
+    //TODO
+}
+
+actual fun shareApp(){
+    //TODO
+}
+
+actual fun giveDonation(){
+    //TODO
+}
+
+actual fun downloadTracks(list: List<TrackDetails>){
+    //TODO
+}
+
 actual open class Dir actual constructor(private val logger: Kermit) {
 
     actual fun fileSeparator(): String = File.separator
