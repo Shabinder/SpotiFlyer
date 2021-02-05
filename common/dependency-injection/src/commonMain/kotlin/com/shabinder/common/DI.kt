@@ -51,7 +51,7 @@ fun isInternetAvailable(): Boolean {
         }
     }
 }
-fun createHttpClient(enableNetworkLogs: Boolean,serializer: KotlinxSerializer = kotlinxSerializer) = HttpClient {
+fun createHttpClient(enableNetworkLogs: Boolean = false,serializer: KotlinxSerializer = kotlinxSerializer) = HttpClient {
     install(JsonFeature) {
         this.serializer = serializer
     }

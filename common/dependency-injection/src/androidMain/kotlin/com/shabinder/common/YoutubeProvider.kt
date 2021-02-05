@@ -25,7 +25,6 @@ import com.shabinder.database.Database
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.koin.core.KoinComponent
 
 actual class YoutubeProvider actual constructor(
     private val httpClient: HttpClient,
@@ -108,7 +107,7 @@ actual class YoutubeProvider actual constructor(
                         title = it.title(),
                         artists = listOf(it.author().toString()),
                         durationSec = it.lengthSeconds(),
-                        albumArtPath = dir.imageDir() + it.videoId() + ".jpeg",
+                        albumArtPath = dir.imageCacheDir() + it.videoId() + ".jpeg",
                         source = Source.YouTube,
                         albumArtURL = "https://i.ytimg.com/vi/${it.videoId()}/hqdefault.jpg",
                         downloaded = if (dir.isPresent(
@@ -178,7 +177,7 @@ actual class YoutubeProvider actual constructor(
                         title = name,
                         artists = listOf(detail?.author().toString()),
                         durationSec = detail?.lengthSeconds() ?: 0,
-                        albumArtPath = dir.imageDir() + "$searchId.jpeg",
+                        albumArtPath = dir.imageCacheDir() + "$searchId.jpeg",
                         source = Source.YouTube,
                         albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
                         downloaded = if (dir.isPresent(

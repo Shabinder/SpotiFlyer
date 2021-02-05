@@ -12,3 +12,5 @@ expect fun ImageLoad(
     errorResource: ImageBitmap? = null,
     modifier: Modifier = Modifier
 )
+
+expect fun showPopUpMessage(text: String)

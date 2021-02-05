@@ -24,10 +24,8 @@ kotlin {
                 api(Koin.test)
 
                 api(Extras.kermit)
-                api(Extras.jsonKlaxon)
                 api(Extras.youtubeDownloader)
-                //api(Extras.fuzzyWuzzy)
-                //api("com.github.willowtreeapps:fuzzywuzzy-kotlin:v0.1.1")
+                api(Extras.mp3agic)
             }
         }
         androidMain {

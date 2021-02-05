@@ -231,7 +231,7 @@ class SpotifyProvider(
             title = it.name.toString(),
             artists = it.artists?.map { artist -> artist?.name.toString() } ?: listOf(),
             durationSec = (it.duration_ms/1000).toInt(),
-            albumArtPath = dir.imageDir() + (it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg",
+            albumArtPath = dir.imageCacheDir() + (it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg",
             albumName = it.album?.name,
             year = it.album?.release_date,
             comment = "Genres:${it.album?.genres?.joinToString()}",

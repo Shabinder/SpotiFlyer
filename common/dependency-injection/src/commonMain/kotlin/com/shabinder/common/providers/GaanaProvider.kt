@@ -208,7 +208,7 @@ class GaanaProvider(
             title = it.track_title,
             artists = it.artist.map { artist -> artist?.name.toString() },
             durationSec = it.duration,
-            albumArtPath = dir.imageDir() + (it.artworkLink.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg",
+            albumArtPath = dir.imageCacheDir() + (it.artworkLink.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg",
             albumName = it.album_title,
             year = it.release_date,
             comment = "Genres:${it.genre?.map { genre -> genre?.name }?.reduceOrNull { acc, s -> acc + s  }}",
