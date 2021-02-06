@@ -5,6 +5,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.*
 import com.shabinder.common.list.integration.SpotiFlyerListImpl
+import com.shabinder.common.spotify.Source
 import com.shabinder.common.utils.Consumer
 import com.shabinder.database.Database
 import kotlinx.coroutines.flow.Flow
@@ -43,7 +44,10 @@ interface SpotiFlyerList {
         object Finished : Output()
     }
     data class State(
-        val queryResult:PlatformQueryResult? = null,
+        val queryResult:PlatformQueryResult? = PlatformQueryResult(
+            "","",
+            "Loading","", emptyList(),
+            Source.Spotify),
         val link:String = ""
     )
 }

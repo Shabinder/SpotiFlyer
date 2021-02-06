@@ -1,12 +1,9 @@
 package com.shabinder.common.list
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ExtendedFloatingActionButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -14,6 +11,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -21,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.shabinder.common.DownloadStatus
 import com.shabinder.common.Picture
 import com.shabinder.common.TrackDetails
-import com.shabinder.common.ui.ImageLoad
+import com.shabinder.common.ui.*
 import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
 import com.shabinder.spotiflyer.ui.colorAccent
 import kotlinx.coroutines.CoroutineScope
@@ -89,13 +87,13 @@ fun TrackCard(
         }
         when(track.downloaded){
             DownloadStatus.Downloaded -> {
-                //Image(vectorResource(id = R.drawable.ic_tick))
+                DownloadImageTick()
             }
             DownloadStatus.Queued -> {
                 CircularProgressIndicator()
             }
             DownloadStatus.Failed -> {
-                //Image(vectorResource(id = R.drawable.ic_error))
+                DownloadImageError()
             }
             DownloadStatus.Downloading -> {
                 CircularProgressIndicator(progress = track.progress.toFloat()/100f)
@@ -104,9 +102,9 @@ fun TrackCard(
                 CircularProgressIndicator(progress = 100f,color = colorAccent)
             }
             DownloadStatus.NotDownloaded -> {
-                /*Image(vectorResource(id = R.drawable.ic_arrow), Modifier.clickable(onClick = {
+                DownloadImageArrow(Modifier.clickable(onClick = {
                     downloadTrack()
-                }))*/
+                }))
             }
         }
     }
@@ -151,7 +149,7 @@ fun DownloadAllButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     ExtendedFloatingActionButton(
         text = { Text("Download All") },
         onClick = onClick,
-        //icon = { Icon(imageVector = Image(R.drawable.ic_download_arrow),tint = Color.Black) },
+        icon = { Icon(imageVector = DownloadAllImage(),tint = Color.Black) },
         backgroundColor = colorAccent,
         modifier = modifier
     )

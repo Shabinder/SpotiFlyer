@@ -2,6 +2,9 @@ package com.shabinder.common
 
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.awt.image.BufferedImage
 import java.io.*
 import java.lang.Exception
@@ -43,7 +46,7 @@ actual open class Dir actual constructor(private val logger: Kermit) {
         File(imageCacheDir()).deleteRecursively()
     }
 
-    actual fun cacheImage(picture: Picture) {
+    actual suspend fun cacheImage(picture: Picture) {
         try {
             val path = imageCacheDir() + picture.name
 
@@ -137,8 +140,9 @@ actual open class Dir actual constructor(private val logger: Kermit) {
                     result.width,
                     result.height
                 )
-
-                cacheImage(picture)
+                GlobalScope.launch(Dispatchers.IO) { //TODO Refactor
+                    cacheImage(picture)
+                }
                 picture
             } else null
         } catch (e: Exception) {

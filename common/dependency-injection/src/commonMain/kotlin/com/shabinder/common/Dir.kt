@@ -17,7 +17,7 @@ expect open class Dir(
     fun defaultDir(): String
     fun imageCacheDir(): String
     fun createDirectory(dirPath:String)
-    fun cacheImage(picture: Picture)
+    suspend fun cacheImage(picture: Picture)
     fun loadImage(url:String, cachePath:String = imageCacheDir() + getNameURL(url)):Picture?
     suspend fun clearCache()
     suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, path: String, trackDetails: TrackDetails)
