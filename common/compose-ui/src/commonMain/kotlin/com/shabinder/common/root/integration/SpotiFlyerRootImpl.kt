@@ -8,6 +8,7 @@ import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
 import com.arkivanov.decompose.value.Value
+import com.shabinder.common.Dir
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.root.SpotiFlyerRoot
@@ -48,6 +49,7 @@ internal class SpotiFlyerRootImpl(
             componentContext = componentContext,
             dependencies = object : SpotiFlyerList.Dependencies, Dependencies by this {
                 override val fetchQuery = fetchPlatformQueryResult
+                override val dir: Dir = directories
                 override val link: String = link
 
                 override fun listOutput(finished: SpotiFlyerList.Output.Finished): Consumer<SpotiFlyerList.Output> =

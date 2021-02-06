@@ -20,6 +20,7 @@ class YoutubeMusic constructor(
         val youtubeTracks = mutableListOf<YoutubeTrack>()
 
         val responseObj = Json.parseToJsonElement(getYoutubeMusicResponse(query))
+
         val contentBlocks = responseObj.jsonObject["contents"]
             ?.jsonObject?.get("sectionListRenderer")
             ?.jsonObject?.get("contents")?.jsonArray

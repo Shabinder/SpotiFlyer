@@ -9,12 +9,30 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.core.net.toUri
+import com.shabinder.common.Picture
 import com.shabinder.common.database.appContext
 import dev.chrisbanes.accompanist.coil.CoilImage
 
+@Composable
+actual fun ImageLoad(
+    pic: Picture?,
+    modifier: Modifier
+){
+    Image(pic?.image?.asImageBitmap(), vectorResource(R.drawable.music) ,"Image",modifier)
+}
+
+@Composable
+fun Image(pic: ImageBitmap?, placeholder:ImageVector, desc: String,modifier:Modifier = Modifier) {
+    if(pic == null) Image(placeholder,desc,modifier) else Image(pic,desc,modifier)
+}
+
+/*
 @Composable
 actual fun ImageLoad(
     url:String,
@@ -31,6 +49,7 @@ actual fun ImageLoad(
         modifier = modifier
     )
 }
+*/
 
 @Composable
 actual fun Toast(

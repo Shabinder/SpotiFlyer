@@ -1,10 +1,9 @@
 package com.shabinder.common.list
 
+import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import com.shabinder.common.FetchPlatformQueryResult
-import com.shabinder.common.PlatformQueryResult
-import com.shabinder.common.TrackDetails
+import com.shabinder.common.*
 import com.shabinder.common.list.integration.SpotiFlyerListImpl
 import com.shabinder.common.utils.Consumer
 import com.shabinder.database.Database
@@ -28,9 +27,15 @@ interface SpotiFlyerList {
     * */
     fun onBackPressed()
 
+    /*
+    * Load Image from cache/Internet and cache it
+    * */
+    fun loadImage(url:String):Picture?
+
     interface Dependencies {
         val storeFactory: StoreFactory
         val fetchQuery: FetchPlatformQueryResult
+        val dir: Dir
         val link: String
         fun listOutput(finished: Output.Finished): Consumer<Output>
     }

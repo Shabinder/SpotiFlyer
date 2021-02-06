@@ -1,5 +1,6 @@
 package com.shabinder.common.list
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
@@ -18,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shabinder.common.DownloadStatus
+import com.shabinder.common.Picture
 import com.shabinder.common.TrackDetails
 import com.shabinder.common.ui.ImageLoad
 import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
@@ -40,12 +42,13 @@ fun SpotiFlyerListContent(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             content = {
                 item {
-                    CoverImage(result.title, result.coverUrl, coroutineScope)
+                    CoverImage(result.title, result.coverUrl, coroutineScope,component::loadImage)
                 }
                 itemsIndexed(result.trackList) { index, item ->
                     TrackCard(
                         track = item,
                         downloadTrack = { component.onDownloadClicked(result.trackList,index) },
+                        loadImage = component::loadImage
                     )
                 }
             },
@@ -62,10 +65,12 @@ fun SpotiFlyerListContent(
 fun TrackCard(
     track: TrackDetails,
     downloadTrack:()->Unit,
+    loadImage:(String)->Picture?
 ) {
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+        val pic:Picture? = loadImage(track.albumArtURL)
         ImageLoad(
-            url = track.albumArtURL,
+            pic = pic,
             modifier = Modifier
                 .preferredWidth(75.dp)
                 .preferredHeight(90.dp)
@@ -112,14 +117,16 @@ fun CoverImage(
     title: String,
     coverURL: String,
     scope: CoroutineScope,
+    loadImage: (String) -> Picture?,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier.padding(vertical = 8.dp).fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val pic = loadImage(coverURL)
         ImageLoad(
-            url = coverURL,
+            pic,
             modifier = Modifier
                 .preferredWidth(210.dp)
                 .preferredHeight(230.dp)

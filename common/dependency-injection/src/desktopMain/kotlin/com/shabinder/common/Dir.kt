@@ -2,7 +2,11 @@ package com.shabinder.common
 
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
+import java.awt.image.BufferedImage
 import java.io.*
+import java.lang.Exception
+import java.net.HttpURLConnection
+import java.net.URL
 import java.nio.charset.StandardCharsets
 import javax.imageio.ImageIO
 
@@ -76,5 +80,70 @@ actual open class Dir actual constructor(private val logger: Kermit) {
             .removeAllTags()
             .setId3v1Tags(trackDetails)
             .setId3v2TagsAndSaveFile(trackDetails,path)
+    }
+
+    actual fun loadImage(url: String, cachePath: String):Picture? {
+        var picture: Picture? = loadCachedImage(cachePath)
+        if (picture == null) picture = freshImage(url,cachePath)
+        return picture
+    }
+
+    private fun loadCachedImage(cachePath: String): Picture? {
+        return try {
+            val read = BufferedReader(
+                InputStreamReader(
+                    FileInputStream(cachePath + cacheImagePostfix()),
+                    StandardCharsets.UTF_8
+                )
+            )
+
+            val source = read.readLine()
+            val width = read.readLine().toInt()
+            val height = read.readLine().toInt()
+
+            read.close()
+
+            val result: BufferedImage? = ImageIO.read(File(cachePath))
+
+            if (result != null) {
+                Picture(
+                    source,
+                    getNameURL(source),
+                    result,
+                    width,
+                    height
+                )
+            }else null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+    private fun freshImage(url:String,cachePath: String):Picture?{
+        return try {
+            val source = URL(url)
+            val connection: HttpURLConnection = source.openConnection() as HttpURLConnection
+            connection.connectTimeout = 5000
+            connection.connect()
+
+            val input: InputStream = connection.inputStream
+            val result: BufferedImage? = ImageIO.read(input)
+
+            if (result != null) {
+                val picture = Picture(
+                    url,
+                    getNameURL(url),
+                    result,
+                    result.width,
+                    result.height
+                )
+
+                cacheImage(picture)
+                picture
+            } else null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }

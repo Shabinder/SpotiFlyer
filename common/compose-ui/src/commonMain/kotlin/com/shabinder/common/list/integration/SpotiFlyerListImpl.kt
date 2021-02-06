@@ -2,6 +2,7 @@ package com.shabinder.common.list.integration
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.extensions.coroutines.states
+import com.shabinder.common.Picture
 import com.shabinder.common.TrackDetails
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.list.SpotiFlyerList.Dependencies
@@ -38,4 +39,6 @@ internal class SpotiFlyerListImpl(
     override fun onBackPressed(){
         listOutput(SpotiFlyerList.Output.Finished)
     }
+
+    override fun loadImage(url: String): Picture? = dir.loadImage(url)
 }

@@ -18,29 +18,9 @@ expect open class Dir(
     fun imageCacheDir(): String
     fun createDirectory(dirPath:String)
     fun cacheImage(picture: Picture)
+    fun loadImage(url:String, cachePath:String = imageCacheDir() + getNameURL(url)):Picture?
     suspend fun clearCache()
     suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, path: String, trackDetails: TrackDetails)
-}
-
-suspend fun Dir.downloadFile(url: String): Flow<DownloadResult> {
-    return flow {
-        val client = createHttpClient()
-        val response = client.get<HttpStatement>(url).execute()
-        val data = ByteArray(response.contentLength()!!.toInt())
-        var offset = 0
-        do {
-            val currentRead = response.content.readAvailable(data, offset, data.size)
-            offset += currentRead
-            val progress = (offset * 100f / data.size).roundToInt()
-            emit(DownloadResult.Progress(progress))
-        } while (currentRead > 0)
-        if (response.status.isSuccess()) {
-            emit(DownloadResult.Success(data))
-        } else {
-            emit(DownloadResult.Error("File not downloaded"))
-        }
-        client.close()
-    }
 }
 
 suspend fun downloadFile(url: String): Flow<DownloadResult> {
@@ -65,7 +45,7 @@ suspend fun downloadFile(url: String): Flow<DownloadResult> {
 }
 
 fun Dir.cacheImagePostfix():String = "info"
-fun Dir.getNameURL(url: String): String {
+fun getNameURL(url: String): String {
     return url.substring(url.lastIndexOf('/') + 1, url.length)
 }
 /*

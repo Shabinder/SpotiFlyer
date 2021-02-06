@@ -2,14 +2,11 @@ package com.shabinder.common.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.unit.Dp
+import com.shabinder.common.Picture
 
 @Composable
 actual fun ImageLoad(
-    url:String,
-    loadingResource: ImageBitmap?,
-    errorResource: ImageBitmap?,
+    pic: Picture?,
     modifier: Modifier
 ){
 
