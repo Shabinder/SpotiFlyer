@@ -1,3 +1,5 @@
+import org.jetbrains.compose.compose
+
 plugins {
     id("multiplatform-compose-setup")
     id("android-setup")
@@ -7,6 +9,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                implementation(compose.materialIconsExtended)
                 implementation(project(":common:dependency-injection"))
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))

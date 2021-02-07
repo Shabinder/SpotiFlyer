@@ -53,6 +53,7 @@ android {
 }
 dependencies {
     implementation(compose.material)
+    implementation(compose.materialIconsExtended)
     implementation(project(":common:database"))
     implementation(project(":common:compose-ui"))
     implementation(project(":common:dependency-injection"))
@@ -68,9 +69,11 @@ dependencies {
 
     implementation(Koin.android)
     implementation(Koin.androidViewModel)
+
     //DECOMPOSE
     implementation(Decompose.decompose)
     implementation(Decompose.extensionsCompose)
+
     //Lifecycle
     Versions.androidLifecycle.let{
         implementation("androidx.lifecycle:lifecycle-runtime-ktx:$it")

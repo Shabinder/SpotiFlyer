@@ -2,20 +2,20 @@
 
 object Versions {
     const val versionName = "2.2"
-    const val kotlinVersion = "1.4.21"
+    const val kotlinVersion = "1.4.30"
 
     const val coroutinesVersion = "1.4.2"
-    const val composeVersion = "1.0.0-alpha10"
+    const val composeVersion = "1.0.0-alpha11"
     const val coilVersion = "0.4.1"
     //DI
     const val kodein = "7.2.0"
-    const val koin = "3.0.0-alpha-4"
+    const val koin = "3.0.1-alpha-1"
 
     //Logger
     const val kermit = "0.1.8"
 
     //Internet
-    const val ktor = "1.5.0"
+    const val ktor = "1.5.1"
 
     const val kotlinxSerialization = "1.0.1"
     //Database
@@ -41,7 +41,7 @@ object Androidx{
     const val appCompat = "androidx.appcompat:appcompat:1.2.0"
     const val core = "androidx.core:core-ktx:1.5.0-beta01"
     const val palette = "androidx.palette:palette-ktx:1.0.0"
-    const val composeNavigation = "androidx.navigation:navigation-compose:1.0.0-alpha05"
+    const val composeNavigation = "androidx.navigation:navigation-compose:1.0.0-alpha06"
     const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutinesVersion}"
 
     const val junit = "androidx.test.ext:junit:1.1.2"
@@ -58,7 +58,7 @@ object JetBrains {
 
     object Compose {
         // __LATEST_COMPOSE_RELEASE_VERSION__
-        private const val VERSION = "0.3.0-build140"
+        private const val VERSION = "0.3.0-build149"
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
         const val materialIcon = "androidx.compose.material:material-icons-extended:${Versions.composeVersion}"
     }
