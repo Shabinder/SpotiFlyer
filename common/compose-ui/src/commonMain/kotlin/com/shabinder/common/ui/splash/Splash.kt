@@ -14,7 +14,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.ui.splash
+package com.shabinder.common.ui.splash
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -27,14 +27,9 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shabinder.spotiflyer.R
-import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
-import com.shabinder.spotiflyer.ui.colorAccent
-import com.shabinder.spotiflyer.ui.colorPrimary
+import com.shabinder.common.ui.*
 import kotlinx.coroutines.delay
 
 private const val SplashWaitTime: Long = 1100
@@ -49,7 +44,7 @@ fun Splash(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
             delay(SplashWaitTime)
             currentOnTimeout()
         }
-        Image(imageVector = vectorResource(id = R.drawable.ic_spotiflyer_logo))
+        Image(imageVector = SpotiFlyerLogo())
         MadeInIndia(Modifier.align(Alignment.BottomCenter))
     }
 }
@@ -67,15 +62,15 @@ fun MadeInIndia(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(id = R.string.made_with_love),
+                text = "Made with ",
                 color = colorPrimary,
                 fontSize = 22.sp
             )
             Spacer(modifier = Modifier.padding(start = 4.dp))
-            Icon(vectorResource(id = R.drawable.ic_heart),tint = Color.Unspecified)
+            Icon(HeartIcon(),tint = Color.Unspecified)
             Spacer(modifier = Modifier.padding(start = 4.dp))
             Text(
-                text = stringResource(id = R.string.in_india),
+                text = " in India",
                 color = colorPrimary,
                 fontSize = 22.sp
             )

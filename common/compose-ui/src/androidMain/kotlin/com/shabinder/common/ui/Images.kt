@@ -34,3 +34,23 @@ actual fun DownloadImageArrow(modifier: Modifier){
 
 @Composable
 actual fun DownloadAllImage() = vectorResource(R.drawable.ic_download_arrow)
+
+@Composable
+actual fun SpotiFlyerLogo() = vectorResource(R.drawable.ic_spotiflyer_logo)
+
+@Composable
+actual fun HeartIcon() = vectorResource(R.drawable.ic_heart)
+
+@Composable
+actual fun SpotifyLogo() = vectorResource(R.drawable.ic_spotify_logo)
+
+@Composable
+actual fun GaanaLogo() = vectorResource(R.drawable.ic_gaana)
+
+@Composable
+actual fun YoutubeLogo() = vectorResource(R.drawable.ic_youtube)
+
+@Composable
+actual fun YoutubeMusicLogo() = vectorResource(R.drawable.ic_youtube_music_logo)
+@Composable
+actual fun GithubLogo() = vectorResource(R.drawable.ic_github)

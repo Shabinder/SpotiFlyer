@@ -91,6 +91,13 @@ dependencies {
         implementation(fetch)
     }
 
+    implementation(MVIKotlin.mvikotlin)
+    implementation(MVIKotlin.mvikotlinMain)
+    implementation(MVIKotlin.mvikotlinLogging)
+    implementation(MVIKotlin.mvikotlinTimeTravel)
+    implementation(Decompose.decompose)
+    implementation(Decompose.extensionsCompose)
+
     //Test
     testImplementation("junit:junit:4.13.1")
     androidTestImplementation(Androidx.junit)

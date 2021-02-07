@@ -32,6 +32,7 @@ fun commonModule(enableNetworkLogs: Boolean) = module {
     single { SpotifyProvider(get(),get(),get(),get()) }
     single { GaanaProvider(get(),get(),get(),get()) }
     single { YoutubeProvider(get(),get(),get(),get()) }
+    single { FetchPlatformQueryResult(get(),get(),get(),get()) }
     single { createHttpClient(enableNetworkLogs = enableNetworkLogs) }
 }
 

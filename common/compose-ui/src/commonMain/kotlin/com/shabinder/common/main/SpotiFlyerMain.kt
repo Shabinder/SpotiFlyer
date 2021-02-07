@@ -2,7 +2,9 @@ package com.shabinder.common.main
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
+import com.shabinder.common.Dir
 import com.shabinder.common.DownloadRecord
+import com.shabinder.common.Picture
 import com.shabinder.common.main.integration.SpotiFlyerMainImpl
 import com.shabinder.common.utils.Consumer
 import com.shabinder.database.Database
@@ -23,10 +25,21 @@ interface SpotiFlyerMain {
     * */
     fun onInputLinkChanged(link: String)
 
+    /*
+    * change TabBar Selected Category
+    * */
+    fun selectCategory(category: HomeCategory)
+
+    /*
+    * Load Image from cache/Internet and cache it
+    * */
+    fun loadImage(url:String):Picture?
+
     interface Dependencies {
         fun mainOutput(searched: Output): Consumer<Output>
         val storeFactory: StoreFactory
         val database: Database
+        val dir: Dir
     }
     sealed class Output {
         data class Search(val link: String) : Output()
@@ -34,8 +47,12 @@ interface SpotiFlyerMain {
 
     data class State(
         val records: List<DownloadRecord> = emptyList(),
-        val link: String = ""
+        val link: String = "",
+        val selectedCategory: HomeCategory = HomeCategory.About
     )
+    enum class HomeCategory {
+        About, History
+    }
 }
 
 @Suppress("FunctionName") // Factory function

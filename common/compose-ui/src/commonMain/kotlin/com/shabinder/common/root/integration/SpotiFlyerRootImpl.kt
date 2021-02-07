@@ -41,6 +41,7 @@ internal class SpotiFlyerRootImpl(
             componentContext = componentContext,
             dependencies = object : SpotiFlyerMain.Dependencies, Dependencies by this {
                 override fun mainOutput(searched: SpotiFlyerMain.Output): Consumer<SpotiFlyerMain.Output> = Consumer(::onMainOutput)
+                override val dir: Dir = directories
             }
         )
 

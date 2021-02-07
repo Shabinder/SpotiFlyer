@@ -13,7 +13,7 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 import javax.imageio.ImageIO
 
-actual open class Dir actual constructor(private val logger: Kermit) {
+actual class Dir actual constructor(private val logger: Kermit) {
 
     actual fun fileSeparator(): String = File.separator
 
@@ -85,7 +85,8 @@ actual open class Dir actual constructor(private val logger: Kermit) {
             .setId3v2TagsAndSaveFile(trackDetails,path)
     }
 
-    actual fun loadImage(url: String, cachePath: String):Picture? {
+    actual fun loadImage(url: String):Picture? {
+        val cachePath = imageCacheDir() + getNameURL(url)
         var picture: Picture? = loadCachedImage(cachePath)
         if (picture == null) picture = freshImage(url,cachePath)
         return picture

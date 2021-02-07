@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt
 
-expect open class Dir(
+expect class Dir(
     logger: Kermit,
 ) {
     fun isPresent(path:String):Boolean
@@ -18,7 +18,7 @@ expect open class Dir(
     fun imageCacheDir(): String
     fun createDirectory(dirPath:String)
     suspend fun cacheImage(picture: Picture)
-    fun loadImage(url:String, cachePath:String = imageCacheDir() + getNameURL(url)):Picture?
+    fun loadImage(url:String):Picture?
     suspend fun clearCache()
     suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, path: String, trackDetails: TrackDetails)
 }

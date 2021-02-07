@@ -20,8 +20,8 @@ import com.shabinder.common.DownloadStatus
 import com.shabinder.common.Picture
 import com.shabinder.common.TrackDetails
 import com.shabinder.common.ui.*
-import com.shabinder.spotiflyer.ui.SpotiFlyerTypography
-import com.shabinder.spotiflyer.ui.colorAccent
+import com.shabinder.common.ui.SpotiFlyerTypography
+import com.shabinder.common.ui.colorAccent
 import kotlinx.coroutines.CoroutineScope
 
 @Composable

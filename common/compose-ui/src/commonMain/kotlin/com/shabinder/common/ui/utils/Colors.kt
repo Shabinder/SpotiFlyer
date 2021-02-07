@@ -14,7 +14,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.ui.utils
+package com.shabinder.common.ui.utils
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver

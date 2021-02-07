@@ -14,9 +14,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.example.jetcaster.util
+package com.shabinder.common.ui.utils
 
-import androidx.annotation.FloatRange
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,8 +40,10 @@ import kotlin.math.pow
  */
 fun Modifier.verticalGradientScrim(
     color: Color,
-    @FloatRange(from = 0.0, to = 1.0) startYPercentage: Float = 0f,
-    @FloatRange(from = 0.0, to = 1.0) endYPercentage: Float = 1f,
+    //@FloatRange(from = 0.0, to = 1.0)
+    startYPercentage: Float = 0f,
+    //@FloatRange(from = 0.0, to = 1.0)
+    endYPercentage: Float = 1f,
     decay: Float = 1.0f,
     numStops: Int = 16,
     fixedHeight: Float? = null

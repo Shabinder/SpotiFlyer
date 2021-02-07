@@ -7,6 +7,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.shabinder.common.DownloadRecord
 import com.shabinder.common.giveDonation
+import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.State
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
 import com.shabinder.common.openPlatform
@@ -49,6 +50,7 @@ internal class SpotiFlyerMainStoreProvider(
 
     private sealed class Result {
         data class ItemsLoaded(val items: List<DownloadRecord>) : Result()
+        data class CategoryChanged(val category: SpotiFlyerMain.HomeCategory) : Result()
         data class LinkChanged(val link: String) : Result()
     }
 
@@ -65,6 +67,7 @@ internal class SpotiFlyerMainStoreProvider(
                 is Intent.GiveDonation -> giveDonation()
                 is Intent.ShareApp -> shareApp()
                 is Intent.SetLink -> dispatch(Result.LinkChanged(link = intent.link))
+                is Intent.SelectCategory -> dispatch(Result.CategoryChanged(intent.category))
             }
         }
     }
@@ -74,6 +77,7 @@ internal class SpotiFlyerMainStoreProvider(
              when (result) {
                 is Result.ItemsLoaded -> copy(records = result.items)
                 is Result.LinkChanged -> copy(link = result.link)
-            }
+                is Result.CategoryChanged -> copy(selectedCategory = result.category)
+             }
     }
 }

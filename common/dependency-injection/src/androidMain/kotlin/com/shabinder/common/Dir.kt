@@ -7,13 +7,16 @@ import android.os.Environment
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.common.database.appContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.*
 import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
 
-actual open class Dir actual constructor(
+actual class Dir actual constructor(
     private val logger: Kermit
 ) {
 
@@ -53,7 +56,7 @@ actual open class Dir actual constructor(
         File(imageCacheDir()).deleteRecursively()
     }
 
-    actual fun cacheImage(picture: Picture) {
+    actual suspend fun cacheImage(picture: Picture) {
         try {
             val path = imageCacheDir() + picture.name
             FileOutputStream(path).use { out ->
@@ -92,9 +95,10 @@ actual open class Dir actual constructor(
             .setId3v2TagsAndSaveFile(trackDetails,path)
     }
 
-    actual fun loadImage(url: String, cachePath: String):Picture? {
+    actual fun loadImage(url: String):Picture? {
+        val cachePath = imageCacheDir() + getNameURL(url)
         var picture: Picture? = loadCachedImage(cachePath)
-        if (picture == null) picture = freshImage(url,cachePath)
+        if (picture == null) picture = freshImage(url)
         return picture
     }
 
@@ -129,7 +133,7 @@ actual open class Dir actual constructor(
             null
         }
     }
-    private fun freshImage(url:String,cachePath: String):Picture?{
+    private fun freshImage(url:String):Picture?{
         return try {
             val source = URL(url)
             val connection: HttpURLConnection = source.openConnection() as HttpURLConnection
@@ -147,8 +151,9 @@ actual open class Dir actual constructor(
                     result.width,
                     result.height
                 )
-
-                cacheImage(picture)
+                GlobalScope.launch(Dispatchers.IO) {
+                    cacheImage(picture)
+                }
                 picture
             } else null
         } catch (e: Exception) {

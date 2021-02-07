@@ -9,6 +9,7 @@ internal interface SpotiFlyerMainStore: Store<Intent, SpotiFlyerMain.State, Noth
     sealed class Intent {
         data class OpenPlatform(val platformID:String,val platformLink:String):Intent()
         data class SetLink(val link:String):Intent()
+        data class SelectCategory(val category: SpotiFlyerMain.HomeCategory):Intent()
         object GiveDonation : Intent()
         object ShareApp: Intent()
     }

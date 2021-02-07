@@ -32,3 +32,24 @@ actual fun DownloadImageArrow(modifier: Modifier){
 
 @Composable
 actual fun DownloadAllImage():ImageVector = vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_download_arrow.xml")
+
+@Composable
+actual fun SpotiFlyerLogo():ImageVector = vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_spotiflyer_logo.xml")
+
+@Composable
+actual fun HeartIcon():ImageVector = vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_heart.xml")
+
+@Composable
+actual fun SpotifyLogo():ImageVector = vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_spotify_logo.xml")
+
+@Composable
+actual fun YoutubeLogo():ImageVector = vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_youtube.xml")
+
+@Composable
+actual fun GaanaLogo():ImageVector = vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_gaana.xml")
+
+@Composable
+actual fun YoutubeMusicLogo():ImageVector = vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_youtube_music_logo.xml")
+
+@Composable
+actual fun GithubLogo():ImageVector = vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_github.xml")

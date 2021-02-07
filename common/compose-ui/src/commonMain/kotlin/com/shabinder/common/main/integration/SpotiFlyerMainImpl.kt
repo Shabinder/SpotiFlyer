@@ -2,6 +2,7 @@ package com.shabinder.common.main.integration
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.extensions.coroutines.states
+import com.shabinder.common.Picture
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.*
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
@@ -31,4 +32,10 @@ internal class SpotiFlyerMainImpl(
     override fun onInputLinkChanged(link: String) {
         store.accept(Intent.SetLink(link))
     }
+
+    override fun selectCategory(category: HomeCategory) {
+        store.accept(Intent.SelectCategory(category))
+    }
+
+    override fun loadImage(url: String): Picture? = dir.loadImage(url)
 }

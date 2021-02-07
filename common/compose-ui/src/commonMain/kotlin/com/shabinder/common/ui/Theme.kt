@@ -14,13 +14,13 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.ui
+package com.shabinder.common.ui
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 
 @Composable
-fun ComposeLearnTheme(content: @Composable() () -> Unit) {
+fun SpotiFlyerTheme(content: @Composable() () -> Unit) {
     MaterialTheme(
             colors = SpotiFlyerColors,
             typography = SpotiFlyerTypography,
