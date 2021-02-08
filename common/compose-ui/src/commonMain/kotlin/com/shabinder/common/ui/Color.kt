@@ -20,6 +20,10 @@ import androidx.compose.material.Colors
 import androidx.compose.material.darkColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.colorspace.ColorSpaces
+import androidx.compose.ui.graphics.colorspace.Illuminant
+import androidx.compose.ui.graphics.colorspace.Rgb
+import androidx.compose.ui.graphics.colorspace.TransferParameters
 import androidx.compose.ui.graphics.compositeOver
 
 val colorPrimary = Color(0xFFFC5C7D)
@@ -29,26 +33,31 @@ val colorRedError = Color(0xFFFF9494)
 val colorSuccessGreen = Color(0xFF59C351)
 val darkBackgroundColor = Color(0xFF000000)
 val colorOffWhite = Color(0xFFE7E7E7)
+val transparent = Color(0x00000000)
+val unspecifiedColor =Color(0f, 0f, 0f, 0f)
+val black = Color(0xFF000000)
+val lightGray = Color(0xFFCCCCCC)
 
 val SpotiFlyerColors = darkColors(
     primary = colorPrimary,
-    onPrimary = Color.Black,
+    onPrimary = black,
     primaryVariant = colorPrimaryDark,
     secondary = colorAccent,
-    onSecondary = Color.Black,
+    onSecondary = black,
     error = colorRedError,
-    onError = Color.Black,
+    onError = black,
     surface = darkBackgroundColor,
     background = darkBackgroundColor,
-    onSurface = Color.LightGray,
-    onBackground = Color.LightGray
+    onSurface = lightGray,
+    onBackground = lightGray
 )
 
 /**
  * Return the fully opaque color that results from compositing [onSurface] atop [surface] with the
  * given [alpha]. Useful for situations where semi-transparent colors are undesirable.
  */
+/*
 @Composable
 fun Colors.compositedOnSurface(alpha: Float): Color {
     return onSurface.copy(alpha = alpha).compositeOver(surface)
-}
+}*/

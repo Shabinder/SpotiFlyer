@@ -7,18 +7,18 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorXmlResource
 
 @Composable
-actual fun DownloadImageTick(modifier: Modifier){
+actual fun DownloadImageTick(){
     Image(
         vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_tick.xml"),
-        modifier
+        "Downloaded"
     )
 }
 
 @Composable
-actual fun DownloadImageError(modifier: Modifier){
+actual fun DownloadImageError(){
     Image(
         vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_error.xml"),
-        modifier
+        "Can't Download"
     )
 }
 
@@ -26,6 +26,7 @@ actual fun DownloadImageError(modifier: Modifier){
 actual fun DownloadImageArrow(modifier: Modifier){
     Image(
         vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_arrow.xml"),
+        "Download",
         modifier
     )
 }

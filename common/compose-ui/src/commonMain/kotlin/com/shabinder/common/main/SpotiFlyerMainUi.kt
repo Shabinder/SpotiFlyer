@@ -11,7 +11,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.Composable
@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -98,7 +97,7 @@ fun HomeTabBar(
                     icon = {
                         when (category) {
                             HomeCategory.About -> Icon(Icons.Outlined.Info,"Info Tab")
-                            HomeCategory.History -> Icon(Icons.Outlined.DateRange,"History Tab")
+                            HomeCategory.History -> Icon(Icons.Outlined.History,"History Tab")
                         }
                     }
                 )
@@ -121,21 +120,21 @@ fun SearchPanel(
             value = link,
             onValueChange = updateLink ,
             leadingIcon = {
-                Icon(Icons.Rounded.AddLink,"Link Text Box",tint = Color.LightGray)
+                Icon(Icons.Rounded.AddLink,"Link Text Box",tint = Color(0xFFCCCCCC))//LightGray
             },
-            label = { Text(text = "Paste Link Here...",color = Color.LightGray) },
+            label = { Text(text = "Paste Link Here...",color = Color(0xFFCCCCCC)) },
             singleLine = true,
-            textStyle = LocalTextStyle.current.merge(TextStyle(fontSize = 18.sp,color = Color.White)),
+            //textStyle = LocalTextStyle.current.merge(TextStyle(fontSize = 18.sp,color = Color.White)),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
             modifier = modifier.padding(12.dp).fillMaxWidth()
                 .border(
                     BorderStroke(2.dp, Brush.horizontalGradient(listOf(colorPrimary, colorAccent))),
                     RoundedCornerShape(30.dp)
                 ),
-            backgroundColor = Color.Black,
+            backgroundColor = Color(0xFF000000),
             shape = RoundedCornerShape(size = 30.dp),
-            activeColor = Color.Transparent,
-            inactiveColor = Color.Transparent,
+            activeColor = transparent,
+            inactiveColor = transparent,
         )
         OutlinedButton(
             modifier = Modifier.padding(12.dp).wrapContentWidth(),
@@ -156,10 +155,10 @@ fun SearchPanel(
 @Composable
 fun AboutColumn(modifier: Modifier = Modifier) {
     //TODO Make Scrollable
-    Column(modifier.fillMaxSize()) {
+    Column(modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         Card(
             modifier = modifier.fillMaxWidth(),
-            border = BorderStroke(1.dp,Color.Gray)
+            border = BorderStroke(1.dp,Color(0xFF888888))//Gray
         ) {
             Column(modifier.padding(12.dp)) {
                 Text(
@@ -172,28 +171,28 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                     Icon(
                         imageVector = SpotifyLogo(),
                         "Open Spotify",
-                        tint = Color.Unspecified,
+                        tint = unspecifiedColor,
                         modifier = Modifier.clickable(
                             onClick = { openPlatform("com.spotify.music","http://open.spotify.com") })
                     )
                     Spacer(modifier = modifier.padding(start = 16.dp))
                     Icon(imageVector = GaanaLogo(),
                         "Open Gaana",
-                        tint = Color.Unspecified,
+                        tint = unspecifiedColor,
                         modifier = Modifier.clickable(
                             onClick = { openPlatform("com.gaana","http://gaana.com") })
                     )
                     Spacer(modifier = modifier.padding(start = 16.dp))
                     Icon(imageVector = YoutubeLogo(),
                         "Open Youtube",
-                        tint = Color.Unspecified,
+                        tint = unspecifiedColor,
                         modifier = Modifier.clickable(
                             onClick = { openPlatform("com.google.android.youtube","http://m.youtube.com") })
                     )
                     Spacer(modifier = modifier.padding(start = 12.dp))
                     Icon(imageVector = YoutubeMusicLogo(),
                         "Open Youtube Music",
-                        tint = Color.Unspecified,
+                        tint = unspecifiedColor,
                         modifier = Modifier.clickable(
                             onClick = { openPlatform("com.google.android.apps.youtube.music","https://music.youtube.com/") })
                     )
@@ -203,7 +202,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.padding(top = 8.dp))
         Card(
             modifier = modifier.fillMaxWidth(),
-            border = BorderStroke(1.dp,Color.Gray)
+            border = BorderStroke(1.dp,Color(0xFF888888))//Gray
         ) {
             Column(modifier.padding(12.dp)) {
                 Text(
@@ -217,7 +216,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         onClick = { openPlatform("","http://github.com/Shabinder/SpotiFlyer") })
                         .padding(vertical = 6.dp)
                 ) {
-                    Icon(imageVector = GithubLogo(),"Open Project Repo",tint = Color.LightGray)
+                    Icon(imageVector = GithubLogo(),"Open Project Repo",tint = Color(0xFFCCCCCC))
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
                         Text(

@@ -2,14 +2,14 @@
 
 object Versions {
     const val versionName = "2.2"
-    const val kotlinVersion = "1.4.30"
+    const val kotlinVersion = "1.4.21-2"
 
     const val coroutinesVersion = "1.4.2"
-    const val composeVersion = "1.0.0-alpha11"
+    const val compose = "1.0.0-alpha11"
     const val coilVersion = "0.4.1"
     //DI
     const val kodein = "7.2.0"
-    const val koin = "3.0.1-alpha-1"
+    const val koin = "3.0.0-alpha-4"
 
     //Logger
     const val kermit = "0.1.8"
@@ -46,6 +46,16 @@ object Androidx{
 
     const val junit = "androidx.test.ext:junit:1.1.2"
     const val expresso = "androidx.test.espresso:espresso-core:3.3.0"
+
+    object Compose{
+        const val materialIcon = "androidx.compose.material:material-icons-extended:${Versions.compose}"
+        const val ui = "androidx.compose.ui:ui:${Versions.compose}"
+        const val uiGraphics = "androidx.compose.ui:ui-graphics:${Versions.compose}"
+        const val uiTooling = "androidx.compose.ui:ui-tooling:${Versions.compose}"
+        const val foundationLayout = "androidx.compose.foundation:foundation-layout:${Versions.compose}"
+        const val material = "androidx.compose.material:material:${Versions.compose}"
+        const val runtimeLiveData = "androidx.compose.runtime:runtime-livedata:${Versions.compose}"
+    }
 }
 object JetBrains {
     object Kotlin {
@@ -58,9 +68,8 @@ object JetBrains {
 
     object Compose {
         // __LATEST_COMPOSE_RELEASE_VERSION__
-        private const val VERSION = "0.3.0-build149"
+        private const val VERSION = "0.3.0-build146"
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
-        const val materialIcon = "androidx.compose.material:material-icons-extended:${Versions.composeVersion}"
     }
 }
 object Decompose {

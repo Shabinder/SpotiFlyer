@@ -44,7 +44,7 @@ fun Splash(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
             delay(SplashWaitTime)
             currentOnTimeout()
         }
-        Image(imageVector = SpotiFlyerLogo())
+        Image(imageVector = SpotiFlyerLogo(),"SpotiFlyer Logo")
         MadeInIndia(Modifier.align(Alignment.BottomCenter))
     }
 }
@@ -67,7 +67,7 @@ fun MadeInIndia(
                 fontSize = 22.sp
             )
             Spacer(modifier = Modifier.padding(start = 4.dp))
-            Icon(HeartIcon(),tint = Color.Unspecified)
+            Icon(HeartIcon(),"Love",tint = unspecifiedColor)
             Spacer(modifier = Modifier.padding(start = 4.dp))
             Text(
                 text = " in India",

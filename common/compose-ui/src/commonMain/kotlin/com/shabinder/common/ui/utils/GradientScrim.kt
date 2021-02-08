@@ -38,6 +38,7 @@ import kotlin.math.pow
  * @param numStops The number of color stops to draw in the gradient. Higher numbers result in
  * the higher visual quality at the cost of draw performance. Defaults to `16`.
  */
+/*
 fun Modifier.verticalGradientScrim(
     color: Color,
     //@FloatRange(from = 0.0, to = 1.0)
@@ -79,3 +80,4 @@ fun Modifier.verticalGradientScrim(
         drawRect(brush = brush)
     }
 }
+*/

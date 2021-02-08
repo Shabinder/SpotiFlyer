@@ -5,7 +5,6 @@ plugins {
 
 group = "com.shabinder"
 version = "2.1"
-
 buildscript{
     repositories {
         // TODO: remove after new build is published
@@ -17,12 +16,11 @@ buildscript{
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:4.0.2")
+        classpath("com.android.tools.build:gradle:4.0.1")
         classpath(JetBrains.Compose.gradlePlugin)
         classpath(JetBrains.Kotlin.gradlePlugin)
     }
 }
-
 repositories {
     maven(url = "https://jitpack.io")
     jcenter()
@@ -32,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:4.0.2")
+    implementation("com.android.tools.build:gradle:4.0.1")
     implementation(JetBrains.Compose.gradlePlugin)
     implementation(JetBrains.Kotlin.gradlePlugin)
     implementation(JetBrains.Kotlin.serialization)

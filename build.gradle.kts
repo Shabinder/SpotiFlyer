@@ -12,14 +12,11 @@ allprojects {
         maven(url = "https://kotlin.bintray.com/kotlinx/")
         maven(url = "https://kotlin.bintray.com/kotlin-js-wrappers/")
         maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        flatDir {
-            dirs("fuzzywuzzy")
-        }
     }
 }
 buildscript {
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
+        classpath(JetBrains.Kotlin.gradlePlugin)
     }
 }
 

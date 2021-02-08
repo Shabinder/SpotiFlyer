@@ -1,5 +1,3 @@
-//import gradle.kotlin.dsl.accessors._2e8a70bdda5e56ec477a6ff432ddf9d7.android
-
 plugins {
     id("com.android.library")
 }
@@ -12,10 +10,10 @@ android {
         targetSdkVersion(Versions.targetSdkVersion)
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = Versions.composeVersion
+    /*composeOptions {
+        kotlinCompilerExtensionVersion = Versions.compose
         kotlinCompilerVersion = Versions.kotlinVersion
-    }
+    }*/
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

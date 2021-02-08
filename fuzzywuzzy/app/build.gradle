@@ -14,7 +14,7 @@ final pathSeparator = System.properties["path.separator"]
 
 kotlin {
     jvm()
-    js() {
+    /*js() {
         [compileKotlinJs, compileTestKotlinJs].each { configuration ->
             configuration.kotlinOptions {
                 moduleKind = 'umd'
@@ -22,7 +22,7 @@ kotlin {
                 metaInfo = true
             }
         }
-    }
+    }*/
 
 /*
     wasm32("wasm")
@@ -63,7 +63,7 @@ kotlin {
                 implementation 'junit:junit:4.12'
             }
         }
-        jsMain {
+        /*jsMain {
             kotlin.srcDir('src/jsMain/kotlin')
             dependencies {
                 implementation kotlin("stdlib-js")
@@ -82,7 +82,7 @@ kotlin {
                 implementation kotlin("test-js")
                 implementation kotlin("stdlib-js")
             }
-        }
+        }*/
         /*nativeMain {
             kotlin.srcDir('src/nativeMain/kotlin')
         }*/
@@ -97,8 +97,8 @@ kotlin {
 }
 
 //Workaround to copy kotlin libraries so they are visible during testing
-def jsLibDir = "$compileKotlinJs.destinationDir/lib"
-def jsTestLibDir = "$compileTestKotlinJs.destinationDir/lib"
+//def jsLibDir = "$compileKotlinJs.destinationDir/lib"
+//def jsTestLibDir = "$compileTestKotlinJs.destinationDir/lib"
 
 //uncomment below to test JS.  This conflicts with iOS config
 /*
@@ -130,6 +130,7 @@ jsTestClasses.dependsOn copyJsTestDependencies
 
 
 
+/*
 node {
     version = nodeVersion
     download = true
@@ -192,4 +193,5 @@ publishing {
         artifactId = artifactId.replace(project.name, 'fuzzywuzzy-kotlin')
     }
 }
+*/
 

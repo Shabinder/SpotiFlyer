@@ -1,9 +1,9 @@
 import org.jetbrains.compose.compose
 
 plugins {
-    id("org.jetbrains.compose")
     id("com.android.application")
     kotlin("android")
+    id("org.jetbrains.compose")
 }
 
 group = "com.shabinder"
@@ -46,6 +46,25 @@ android {
             exclude(group = "androidx.compose.ui")
         }
     }
+    // Remove After upgrading dependency
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            if (requested.group.contains("org.jetbrains.compose")) {
+                useVersion("0.3.0-build146")
+                because("wait for decompose to upgrade too")
+            }
+        }
+    }
+    buildFeatures {
+        compose = true
+    }
+    packagingOptions {
+        exclude("META-INF/*")
+    }
+    composeOptions {
+        kotlinCompilerVersion = Versions.kotlinVersion
+        //kotlinCompilerExtensionVersion = Versions.compose
+    }
     kotlinOptions {
         jvmTarget = "1.8"
         useIR = true
@@ -54,18 +73,20 @@ android {
 dependencies {
     implementation(compose.material)
     implementation(compose.materialIconsExtended)
+
     implementation(project(":common:database"))
     implementation(project(":common:compose-ui"))
     implementation(project(":common:dependency-injection"))
     implementation(project(":common:data-models"))
     implementation(Androidx.appCompat)
+/*
     implementation(Androidx.coroutines)
     implementation(Androidx.core)
     implementation(Androidx.palette)
-    //implementation(JetBrains.Compose.materialIcon)
+*/
 
     //Compose-Navigation
-    implementation(Androidx.composeNavigation)
+    //implementation(Androidx.composeNavigation)
 
     implementation(Koin.android)
     implementation(Koin.androidViewModel)
@@ -73,6 +94,7 @@ dependencies {
     //DECOMPOSE
     implementation(Decompose.decompose)
     implementation(Decompose.extensionsCompose)
+/*
 
     //Lifecycle
     Versions.androidLifecycle.let{
@@ -87,6 +109,7 @@ dependencies {
         implementation("dev.chrisbanes.accompanist:accompanist-coil:$it")
         implementation("dev.chrisbanes.accompanist:accompanist-insets:$it")
     }
+*/
 
     Extras.Android.apply {
         implementation(appUpdator)
@@ -112,7 +135,8 @@ dependencies {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-        freeCompilerArgs = listOf("-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check",
+        freeCompilerArgs = listOf("-Xallow-jvm-ir-dependencies","-Xallow-unstable-dependencies",
+            "-Xskip-prerelease-check",
             "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi"
         )
     }

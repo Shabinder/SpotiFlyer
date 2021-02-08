@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
-expect fun DownloadImageTick(modifier: Modifier = Modifier)
+expect fun DownloadImageTick()
 
 @Composable
 expect fun DownloadAllImage():ImageVector
@@ -32,7 +32,7 @@ expect fun GithubLogo():ImageVector
 expect fun HeartIcon():ImageVector
 
 @Composable
-expect fun DownloadImageError(modifier: Modifier = Modifier)
+expect fun DownloadImageError()
 
 @Composable
-expect fun DownloadImageArrow(modifier: Modifier = Modifier)
+expect fun DownloadImageArrow(modifier: Modifier)

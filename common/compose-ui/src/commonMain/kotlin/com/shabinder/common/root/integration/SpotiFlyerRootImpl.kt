@@ -33,7 +33,7 @@ internal class SpotiFlyerRootImpl(
     private fun createChild(configuration: Configuration, componentContext: ComponentContext): Child =
         when (configuration) {
             is Configuration.Main -> Child.Main(spotiFlyerMain(componentContext))
-            is Configuration.Edit -> Child.List(spotiFlyerList(componentContext, link = configuration.link))
+            is Configuration.List -> Child.List(spotiFlyerList(componentContext, link = configuration.link))
         }
 
     private fun spotiFlyerMain(componentContext: ComponentContext): SpotiFlyerMain =
@@ -60,7 +60,7 @@ internal class SpotiFlyerRootImpl(
 
     private fun onMainOutput(output: SpotiFlyerMain.Output): Unit =
         when (output) {
-            is SpotiFlyerMain.Output.Search -> router.push(Configuration.Edit(link = output.link))
+            is SpotiFlyerMain.Output.Search -> router.push(Configuration.List(link = output.link))
         }
 
     private fun onListOutput(output: SpotiFlyerList.Output): Unit =
@@ -73,6 +73,6 @@ internal class SpotiFlyerRootImpl(
         object Main : Configuration()
 
         @Parcelize
-        data class Edit(val link: String) : Configuration()
+        data class List(val link: String) : Configuration()
     }
 }

@@ -3,30 +3,29 @@ package com.shabinder.common.ui
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 
 @Composable
-actual fun DownloadImageTick(modifier: Modifier){
+actual fun DownloadImageTick(){
     Image(
-        vectorResource(R.drawable.ic_tick),
-        "Download Done",
-        modifier
+        painterResource(R.drawable.ic_tick),
+        "Download Done"
     )
 }
 
 @Composable
-actual fun DownloadImageError(modifier: Modifier){
+actual fun DownloadImageError(){
     Image(
-        vectorResource(R.drawable.ic_error),
-        "Error! Cant Download this track",
-        modifier
+        painterResource(R.drawable.ic_error),
+        "Error! Cant Download this track"
     )
 }
 
 @Composable
 actual fun DownloadImageArrow(modifier: Modifier){
     Image(
-        vectorResource(R.drawable.ic_arrow),
+        painterResource(R.drawable.ic_arrow),
         "Start Download",
         modifier
     )
