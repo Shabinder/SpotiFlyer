@@ -27,7 +27,6 @@ val colorSuccessGreen = Color(0xFF59C351)
 val darkBackgroundColor = Color(0xFF000000)
 val colorOffWhite = Color(0xFFE7E7E7)
 val transparent = Color(0x00000000)
-val unspecifiedColor =Color(0f, 0f, 0f, 0f)
 val black = Color(0xFF000000)
 val lightGray = Color(0xFFCCCCCC)
 

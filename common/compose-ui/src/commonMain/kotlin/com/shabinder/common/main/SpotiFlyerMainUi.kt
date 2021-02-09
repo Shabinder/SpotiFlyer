@@ -14,23 +14,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shabinder.common.models.DownloadRecord
-import com.shabinder.common.di.Picture
 import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
 import com.shabinder.common.di.openPlatform
 import com.shabinder.common.ui.*
 import com.shabinder.common.ui.SpotiFlyerTypography
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun SpotiFlyerMainContent(component: SpotiFlyerMain){
@@ -120,18 +121,18 @@ fun SearchPanel(
             value = link,
             onValueChange = updateLink ,
             leadingIcon = {
-                Icon(Icons.Rounded.Edit,"Link Text Box",tint = Color(0xFFCCCCCC))//LightGray
+                Icon(Icons.Rounded.Edit,"Link Text Box",tint = Color.LightGray)
             },
-            label = { Text(text = "Paste Link Here...",color = Color(0xFFCCCCCC)) },
+            label = { Text(text = "Paste Link Here...",color = Color.LightGray) },
             singleLine = true,
-            //textStyle = LocalTextStyle.current.merge(TextStyle(fontSize = 18.sp,color = Color.White)),
+            textStyle = TextStyle.Default.merge(TextStyle(fontSize = 18.sp,color = Color.White)),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
             modifier = modifier.padding(12.dp).fillMaxWidth()
                 .border(
                     BorderStroke(2.dp, Brush.horizontalGradient(listOf(colorPrimary, colorAccent))),
                     RoundedCornerShape(30.dp)
                 ),
-            backgroundColor = Color(0xFF000000),
+            backgroundColor = Color.Black,
             shape = RoundedCornerShape(size = 30.dp),
             activeColor = transparent,
             inactiveColor = transparent,
@@ -158,7 +159,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         Card(
             modifier = modifier.fillMaxWidth(),
-            border = BorderStroke(1.dp,Color(0xFF888888))//Gray
+            border = BorderStroke(1.dp,Color.Gray)
         ) {
             Column(modifier.padding(12.dp)) {
                 Text(
@@ -171,28 +172,28 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                     Icon(
                         imageVector = SpotifyLogo(),
                         "Open Spotify",
-                        tint = unspecifiedColor,
+                        tint = Color.Unspecified,
                         modifier = Modifier.clickable(
                             onClick = { openPlatform("com.spotify.music","http://open.spotify.com") })
                     )
                     Spacer(modifier = modifier.padding(start = 16.dp))
                     Icon(imageVector = GaanaLogo(),
                         "Open Gaana",
-                        tint = unspecifiedColor,
+                        tint = Color.Unspecified,
                         modifier = Modifier.clickable(
                             onClick = { openPlatform("com.gaana","http://gaana.com") })
                     )
                     Spacer(modifier = modifier.padding(start = 16.dp))
                     Icon(imageVector = YoutubeLogo(),
                         "Open Youtube",
-                        tint = unspecifiedColor,
+                        tint = Color.Unspecified,
                         modifier = Modifier.clickable(
                             onClick = { openPlatform("com.google.android.youtube","http://m.youtube.com") })
                     )
                     Spacer(modifier = modifier.padding(start = 12.dp))
                     Icon(imageVector = YoutubeMusicLogo(),
                         "Open Youtube Music",
-                        tint = unspecifiedColor,
+                        tint = Color.Unspecified,
                         modifier = Modifier.clickable(
                             onClick = { openPlatform("com.google.android.apps.youtube.music","https://music.youtube.com/") })
                     )
@@ -202,7 +203,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.padding(top = 8.dp))
         Card(
             modifier = modifier.fillMaxWidth(),
-            border = BorderStroke(1.dp,Color(0xFF888888))//Gray
+            border = BorderStroke(1.dp,Color.Gray)//Gray
         ) {
             Column(modifier.padding(12.dp)) {
                 Text(
@@ -300,7 +301,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
 @Composable
 fun HistoryColumn(
     list: List<DownloadRecord>,
-    loadImage:(String)-> Picture?,
+    loadImage:suspend (String)-> ImageBitmap?,
     onItemClicked: (String) -> Unit
 ) {
     LazyColumn(
@@ -321,13 +322,18 @@ fun HistoryColumn(
 @Composable
 fun DownloadRecordItem(
     item: DownloadRecord,
-    loadImage:(String)-> Picture?,
+    loadImage:suspend (String)-> ImageBitmap?,
     onItemClicked:(String)->Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {
-        val pic = loadImage(item.coverUrl)
+        val scope = rememberCoroutineScope()
+        var pic by mutableStateOf<ImageBitmap?>(null)
+        scope.launch(Dispatchers.Unconfined) {
+            pic = loadImage(item.coverUrl)
+        }
         ImageLoad(
             pic,
+            "Album Art",
             modifier = Modifier.preferredHeight(75.dp).preferredWidth(90.dp)
         )
         Column(modifier = Modifier.padding(horizontal = 8.dp).preferredHeight(60.dp).weight(1f),verticalArrangement = Arrangement.SpaceEvenly) {
@@ -343,7 +349,7 @@ fun DownloadRecordItem(
         }
         Image(
             imageVector = Icons.Rounded.Share,
-            "Share App",
+            "Research",
             modifier = Modifier.clickable(onClick = {
                 //if(!isOnline(ctx)) showDialog("Check Your Internet Connection") else
                 onItemClicked(item.link)

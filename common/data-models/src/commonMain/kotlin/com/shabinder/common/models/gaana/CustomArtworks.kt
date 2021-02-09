@@ -18,6 +18,9 @@ package com.shabinder.common.models.gaana
 
 import kotlinx.serialization.SerialName
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class CustomArtworks (
     @SerialName("40x40")  val  size_40p : String,
     @SerialName("80x80")  val  size_80p : String,

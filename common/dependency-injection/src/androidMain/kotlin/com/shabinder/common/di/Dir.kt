@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.common.models.TrackDetails
@@ -57,25 +59,11 @@ actual class Dir actual constructor(
         File(imageCacheDir()).deleteRecursively()
     }
 
-    actual suspend fun cacheImage(picture: Picture) {
+    actual suspend fun cacheImage(image: Any,path:String) {
         try {
-            val path = imageCacheDir() + picture.name
             FileOutputStream(path).use { out ->
-                picture.image.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                (image as? Bitmap)?.compress(Bitmap.CompressFormat.JPEG, 100, out)
             }
-
-            val bw =
-                BufferedWriter(
-                    OutputStreamWriter(
-                        FileOutputStream(path + cacheImagePostfix()), StandardCharsets.UTF_8
-                    )
-                )
-
-            bw.write(picture.source)
-            bw.write("\r\n${picture.width}")
-            bw.write("\r\n${picture.height}")
-            bw.close()
-
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -96,45 +84,20 @@ actual class Dir actual constructor(
             .setId3v2TagsAndSaveFile(trackDetails,path)
     }
 
-    actual fun loadImage(url: String): Picture? {
+    actual suspend fun loadImage(url: String): ImageBitmap? {
         val cachePath = imageCacheDir() + getNameURL(url)
-        var picture: Picture? = loadCachedImage(cachePath)
-        if (picture == null) picture = freshImage(url)
-        return picture
+        return (loadCachedImage(cachePath) ?: freshImage(url))?.asImageBitmap()
     }
 
-    private fun loadCachedImage(cachePath: String): Picture? {
+    private fun loadCachedImage(cachePath: String): Bitmap? {
         return try {
-            val read = BufferedReader(
-                InputStreamReader(
-                    FileInputStream(cachePath + cacheImagePostfix()),
-                    StandardCharsets.UTF_8
-                )
-            )
-
-            val source = read.readLine()
-            val width = read.readLine().toInt()
-            val height = read.readLine().toInt()
-
-            read.close()
-
-            val result: Bitmap? = BitmapFactory.decodeFile(cachePath)
-
-            if (result != null) {
-                com.shabinder.common.di.Picture(
-                    source,
-                    getNameURL(source),
-                    result,
-                    width,
-                    height
-                )
-            }else null
+            BitmapFactory.decodeFile(cachePath)
         } catch (e: Exception) {
             e.printStackTrace()
             null
         }
     }
-    private fun freshImage(url:String): Picture?{
+    private suspend fun freshImage(url:String): Bitmap?{
         return try {
             val source = URL(url)
             val connection: HttpURLConnection = source.openConnection() as HttpURLConnection
@@ -145,17 +108,10 @@ actual class Dir actual constructor(
             val result: Bitmap? = BitmapFactory.decodeStream(input)
 
             if (result != null) {
-                val picture = com.shabinder.common.di.Picture(
-                    url,
-                    getNameURL(url),
-                    result,
-                    result.width,
-                    result.height
-                )
                 GlobalScope.launch(Dispatchers.IO) {
-                    cacheImage(picture)
+                    cacheImage(result,imageCacheDir() + getNameURL(url))
                 }
-                picture
+                result
             } else null
         } catch (e: Exception) {
             e.printStackTrace()

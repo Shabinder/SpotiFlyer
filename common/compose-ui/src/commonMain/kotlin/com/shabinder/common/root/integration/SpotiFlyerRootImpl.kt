@@ -14,6 +14,7 @@ import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
+import com.shabinder.common.ui.showPopUpMessage
 import com.shabinder.common.utils.Consumer
 
 internal class SpotiFlyerRootImpl(
@@ -40,7 +41,7 @@ internal class SpotiFlyerRootImpl(
         SpotiFlyerMain(
             componentContext = componentContext,
             dependencies = object : SpotiFlyerMain.Dependencies, Dependencies by this {
-                override fun mainOutput(searched: SpotiFlyerMain.Output): Consumer<SpotiFlyerMain.Output> = Consumer(::onMainOutput)
+                override val mainOutput: Consumer<SpotiFlyerMain.Output> = Consumer(::onMainOutput)
                 override val dir: Dir = directories
             }
         )
@@ -52,16 +53,16 @@ internal class SpotiFlyerRootImpl(
                 override val fetchQuery = fetchPlatformQueryResult
                 override val dir: Dir = directories
                 override val link: String = link
-
-                override fun listOutput(finished: SpotiFlyerList.Output.Finished): Consumer<SpotiFlyerList.Output> =
-                    Consumer(::onListOutput)
+                override val listOutput : Consumer<SpotiFlyerList.Output> = Consumer(::onListOutput)
             }
         )
 
-    private fun onMainOutput(output: SpotiFlyerMain.Output): Unit =
+    private fun onMainOutput(output: SpotiFlyerMain.Output){
+        showPopUpMessage("Button Pressed")
         when (output) {
             is SpotiFlyerMain.Output.Search -> router.push(Configuration.List(link = output.link))
         }
+    }
 
     private fun onListOutput(output: SpotiFlyerList.Output): Unit =
         when (output) {

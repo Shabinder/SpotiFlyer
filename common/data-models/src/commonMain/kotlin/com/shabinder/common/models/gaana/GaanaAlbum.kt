@@ -16,6 +16,9 @@
 
 package com.shabinder.common.models.gaana
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class GaanaAlbum (
     val tracks : List<GaanaTrack>,
     val count : Int,

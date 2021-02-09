@@ -35,6 +35,10 @@ actual fun DownloadImageArrow(modifier: Modifier){
 actual fun DownloadAllImage():ImageVector = vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_download_arrow.xml")
 
 @Composable
+actual fun PlaceHolderImage():ImageVector =    vectorXmlResource("common/compose-ui/src/main/res/drawable/music.xml")
+
+
+@Composable
 actual fun SpotiFlyerLogo():ImageVector = vectorXmlResource("common/compose-ui/src/main/res/drawable/ic_spotiflyer_logo.xml")
 
 @Composable

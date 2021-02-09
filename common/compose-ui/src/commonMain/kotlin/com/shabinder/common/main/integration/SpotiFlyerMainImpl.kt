@@ -1,8 +1,8 @@
 package com.shabinder.common.main.integration
 
+import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.extensions.coroutines.states
-import com.shabinder.common.di.Picture
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.*
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
@@ -26,7 +26,7 @@ internal class SpotiFlyerMainImpl(
     override val models: Flow<State> = store.states
 
     override fun onLinkSearch(link: String) {
-        mainOutput(Output.Search(link = link))
+        mainOutput.callback(Output.Search(link = link))
     }
 
     override fun onInputLinkChanged(link: String) {
@@ -37,5 +37,5 @@ internal class SpotiFlyerMainImpl(
         store.accept(Intent.SelectCategory(category))
     }
 
-    override fun loadImage(url: String): Picture? = dir.loadImage(url)
+    override suspend fun loadImage(url: String): ImageBitmap? = dir.loadImage(url)
 }

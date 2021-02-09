@@ -1,5 +1,6 @@
 package com.shabinder.common.di
 
+import androidx.compose.ui.graphics.ImageBitmap
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.TrackDetails
@@ -18,8 +19,8 @@ expect class Dir(
     fun defaultDir(): String
     fun imageCacheDir(): String
     fun createDirectory(dirPath:String)
-    suspend fun cacheImage(picture: Picture)
-    fun loadImage(url:String): Picture?
+    suspend fun cacheImage(image: Any,path: String) // in Android = ImageBitmap, Desktop = BufferedImage
+    suspend fun loadImage(url:String): ImageBitmap?
     suspend fun clearCache()
     suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, path: String, trackDetails: TrackDetails)
 }
@@ -44,8 +45,6 @@ suspend fun downloadFile(url: String): Flow<DownloadResult> {
         client.close()
     }
 }
-
-fun Dir.cacheImagePostfix():String = "info"
 fun getNameURL(url: String): String {
     return url.substring(url.lastIndexOf('/') + 1, url.length)
 }

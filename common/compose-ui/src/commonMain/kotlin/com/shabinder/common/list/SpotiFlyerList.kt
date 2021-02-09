@@ -1,10 +1,10 @@
 package com.shabinder.common.list
 
+import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
-import com.shabinder.common.di.Picture
 import com.shabinder.common.list.integration.SpotiFlyerListImpl
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.utils.Consumer
@@ -33,14 +33,14 @@ interface SpotiFlyerList {
     /*
     * Load Image from cache/Internet and cache it
     * */
-    fun loadImage(url:String): Picture?
+    suspend fun loadImage(url:String): ImageBitmap?
 
     interface Dependencies {
         val storeFactory: StoreFactory
         val fetchQuery: FetchPlatformQueryResult
         val dir: Dir
         val link: String
-        fun listOutput(finished: Output.Finished): Consumer<Output>
+        val listOutput: Consumer<Output>
     }
     sealed class Output {
         object Finished : Output()

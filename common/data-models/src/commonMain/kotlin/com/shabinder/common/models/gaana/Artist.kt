@@ -24,5 +24,5 @@ data class Artist (
 	val popularity : Int,
 	val seokey : String,
 	val name : String,
-	@SerialName("artwork_175x175")var artworkLink :String?
+	@SerialName("artwork_175x175")var artworkLink :String? = null
 )

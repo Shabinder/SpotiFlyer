@@ -5,25 +5,23 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shabinder.common.models.DownloadStatus
-import com.shabinder.common.di.Picture
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.ui.*
 import com.shabinder.common.ui.SpotiFlyerTypography
 import com.shabinder.common.ui.colorAccent
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun SpotiFlyerListContent(
@@ -64,12 +62,17 @@ fun SpotiFlyerListContent(
 fun TrackCard(
     track: TrackDetails,
     downloadTrack:()->Unit,
-    loadImage:(String)-> Picture?
+    loadImage:suspend (String)-> ImageBitmap?
 ) {
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
-        val pic: Picture? = loadImage(track.albumArtURL)
+        var pic by mutableStateOf<ImageBitmap?>(null)
+        val scope = rememberCoroutineScope()
+        scope.launch {
+            pic = loadImage(track.albumArtURL)
+        }
         ImageLoad(
             pic = pic,
+            "Album Art",
             modifier = Modifier
                 .preferredWidth(75.dp)
                 .preferredHeight(90.dp)
@@ -116,16 +119,20 @@ fun CoverImage(
     title: String,
     coverURL: String,
     scope: CoroutineScope,
-    loadImage: (String) -> Picture?,
+    loadImage: suspend (String) -> ImageBitmap?,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier.padding(vertical = 8.dp).fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val pic = loadImage(coverURL)
+        var pic by mutableStateOf<ImageBitmap?>(null)
+        scope.launch {
+            pic = loadImage(coverURL)
+        }
         ImageLoad(
             pic,
+            "Cover Image",
             modifier = Modifier
                 .preferredWidth(210.dp)
                 .preferredHeight(230.dp)

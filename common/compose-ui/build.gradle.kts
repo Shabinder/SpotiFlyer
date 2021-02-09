@@ -13,6 +13,7 @@ kotlin {
                 implementation(compose.materialIconsExtended)
                 //implementation("org.jetbrains.compose.material:material-icons-extended:0.3.0-build150")
                 implementation(project(":common:dependency-injection"))
+                //implementation("com.alialbaali.kamel:kamel-image:0.0.7")
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
                 implementation(SqlDelight.coroutineExtensions)

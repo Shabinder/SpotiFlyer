@@ -9,31 +9,3 @@ import com.shabinder.common.di.Picture
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
-
-@Composable
-actual fun ImageLoad(
-    pic: Picture?,
-    modifier: Modifier
-){
-    if(pic == null) {
-        Image(
-            vectorXmlResource("common/compose-ui/src/main/res/drawable/music.xml"),
-            "",
-            modifier
-        )
-    }
-    else{
-        Image(
-            org.jetbrains.skija.Image.makeFromEncoded(
-            toByteArray(pic.image)
-        ).asImageBitmap(),
-            "Image",
-            modifier = modifier
-        )
-    }
-}
-fun toByteArray(bitmap: BufferedImage) : ByteArray {
-    val baOs = ByteArrayOutputStream()
-    ImageIO.write(bitmap, "png", baOs)
-    return baOs.toByteArray()
-}

@@ -9,6 +9,7 @@ import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.di.createDirectories
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRootContent
 import com.shabinder.common.ui.SpotiFlyerTheme
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
                     SpotiFlyerRootContent(rootComponent(::spotiFlyerRoot))
             }
         }
+        dir.createDirectories()
     }
 
 
