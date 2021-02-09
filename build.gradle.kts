@@ -14,12 +14,7 @@ allprojects {
         maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
-buildscript {
-    dependencies {
-        classpath(JetBrains.Kotlin.gradlePlugin)
-    }
-}
-
+/*
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check",
@@ -27,4 +22,4 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
             "-Xuse-experimental=kotlinx.coroutines.TheAnnotationYouWantToDisable"
         )
     }
-}
+}*/

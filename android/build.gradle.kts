@@ -55,20 +55,17 @@ android {
             }
         }
     }
-    buildFeatures {
-        compose = true
-    }
     packagingOptions {
         exclude("META-INF/*")
     }
-    composeOptions {
-        kotlinCompilerVersion = Versions.kotlinVersion
-        //kotlinCompilerExtensionVersion = Versions.compose
+    /*
+    buildFeatures {
+        compose = true
     }
     kotlinOptions {
         jvmTarget = "1.8"
         useIR = true
-    }
+    }*/
 }
 dependencies {
     implementation(compose.material)
@@ -79,11 +76,6 @@ dependencies {
     implementation(project(":common:dependency-injection"))
     implementation(project(":common:data-models"))
     implementation(Androidx.appCompat)
-/*
-    implementation(Androidx.coroutines)
-    implementation(Androidx.core)
-    implementation(Androidx.palette)
-*/
 
     //Compose-Navigation
     //implementation(Androidx.composeNavigation)
@@ -95,6 +87,9 @@ dependencies {
     implementation(Decompose.decompose)
     implementation(Decompose.extensionsCompose)
 /*
+    implementation(Androidx.coroutines)
+    implementation(Androidx.core)
+    implementation(Androidx.palette)
 
     //Lifecycle
     Versions.androidLifecycle.let{
@@ -132,10 +127,12 @@ dependencies {
     //Desugaring
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.1")
 }
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-        freeCompilerArgs = listOf("-Xallow-jvm-ir-dependencies","-Xallow-unstable-dependencies",
+        freeCompilerArgs = listOf(
+            "-Xallow-jvm-ir-dependencies","-Xallow-unstable-dependencies",
             "-Xskip-prerelease-check",
             "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi"
         )

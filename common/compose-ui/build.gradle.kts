@@ -10,8 +10,8 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                //implementation(compose.materialIconsExtended)
-                implementation("org.jetbrains.compose.material:material-icons-extended:0.3.0-build150")
+                implementation(compose.materialIconsExtended)
+                //implementation("org.jetbrains.compose.material:material-icons-extended:0.3.0-build150")
                 implementation(project(":common:dependency-injection"))
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
@@ -30,14 +30,14 @@ kotlin {
         }
     }
 }
-
+/*
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-        useIR = true
+        //useIR = true
         freeCompilerArgs = listOf("-Xallow-jvm-ir-dependencies",
             "-Xallow-unstable-dependencies","-Xskip-prerelease-check",
             "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-Xuse-experimental=kotlinx.coroutines.TheAnnotationYouWantToDisable"
         )
     }
-}
+}*/

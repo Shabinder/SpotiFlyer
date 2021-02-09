@@ -5,10 +5,9 @@ object Versions {
     const val kotlinVersion = "1.4.21-2"
 
     const val coroutinesVersion = "1.4.2"
-    const val compose = "1.0.0-alpha11"
+    //const val compose = "1.0.0-alpha11"
     const val coilVersion = "0.4.1"
     //DI
-    const val kodein = "7.2.0"
     const val koin = "3.0.0-alpha-4"
 
     //Logger
@@ -39,7 +38,7 @@ object Koin {
 }
 object Androidx{
     const val appCompat = "androidx.appcompat:appcompat:1.2.0"
-    const val core = "androidx.core:core-ktx:1.5.0-beta01"
+    const val core = "androidx.core:core-ktx:1.3.2"
     const val palette = "androidx.palette:palette-ktx:1.0.0"
     const val composeNavigation = "androidx.navigation:navigation-compose:1.0.0-alpha06"
     const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutinesVersion}"
@@ -47,7 +46,7 @@ object Androidx{
     const val junit = "androidx.test.ext:junit:1.1.2"
     const val expresso = "androidx.test.espresso:espresso-core:3.3.0"
 
-    object Compose{
+    /*object Compose{
         const val materialIcon = "androidx.compose.material:material-icons-extended:${Versions.compose}"
         const val ui = "androidx.compose.ui:ui:${Versions.compose}"
         const val uiGraphics = "androidx.compose.ui:ui-graphics:${Versions.compose}"
@@ -55,7 +54,7 @@ object Androidx{
         const val foundationLayout = "androidx.compose.foundation:foundation-layout:${Versions.compose}"
         const val material = "androidx.compose.material:material:${Versions.compose}"
         const val runtimeLiveData = "androidx.compose.runtime:runtime-livedata:${Versions.compose}"
-    }
+    }*/
 }
 object JetBrains {
     object Kotlin {
