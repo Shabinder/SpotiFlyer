@@ -1,13 +1,15 @@
 package com.shabinder.common.list
 
-import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import com.shabinder.common.*
+import com.shabinder.common.di.Dir
+import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.di.Picture
 import com.shabinder.common.list.integration.SpotiFlyerListImpl
-import com.shabinder.common.spotify.Source
+import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.utils.Consumer
-import com.shabinder.database.Database
+import com.shabinder.common.models.PlatformQueryResult
+import com.shabinder.common.models.TrackDetails
 import kotlinx.coroutines.flow.Flow
 
 interface SpotiFlyerList {
@@ -21,7 +23,7 @@ interface SpotiFlyerList {
     /*
     * Download All Tracks(after filtering already Downloaded)
     * */
-    fun onDownloadClicked(wholeTrackList:List<TrackDetails>,trackIndex:Int)
+    fun onDownloadClicked(wholeTrackList:List<TrackDetails>, trackIndex:Int)
 
     /*
     * To Pop and return back to Main Screen
@@ -31,7 +33,7 @@ interface SpotiFlyerList {
     /*
     * Load Image from cache/Internet and cache it
     * */
-    fun loadImage(url:String):Picture?
+    fun loadImage(url:String): Picture?
 
     interface Dependencies {
         val storeFactory: StoreFactory
@@ -44,7 +46,7 @@ interface SpotiFlyerList {
         object Finished : Output()
     }
     data class State(
-        val queryResult:PlatformQueryResult? = PlatformQueryResult(
+        val queryResult: PlatformQueryResult? = PlatformQueryResult(
             "","",
             "Loading","", emptyList(),
             Source.Spotify),

@@ -25,10 +25,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shabinder.common.DownloadRecord
-import com.shabinder.common.Picture
+import com.shabinder.common.models.DownloadRecord
+import com.shabinder.common.di.Picture
 import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
-import com.shabinder.common.openPlatform
+import com.shabinder.common.di.openPlatform
 import com.shabinder.common.ui.*
 import com.shabinder.common.ui.SpotiFlyerTypography
 
@@ -120,7 +120,7 @@ fun SearchPanel(
             value = link,
             onValueChange = updateLink ,
             leadingIcon = {
-                Icon(Icons.Rounded.AddLink,"Link Text Box",tint = Color(0xFFCCCCCC))//LightGray
+                Icon(Icons.Rounded.Edit,"Link Text Box",tint = Color(0xFFCCCCCC))//LightGray
             },
             label = { Text(text = "Paste Link Here...",color = Color(0xFFCCCCCC)) },
             singleLine = true,
@@ -300,7 +300,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
 @Composable
 fun HistoryColumn(
     list: List<DownloadRecord>,
-    loadImage:(String)->Picture?,
+    loadImage:(String)-> Picture?,
     onItemClicked: (String) -> Unit
 ) {
     LazyColumn(
@@ -321,7 +321,7 @@ fun HistoryColumn(
 @Composable
 fun DownloadRecordItem(
     item: DownloadRecord,
-    loadImage:(String)->Picture?,
+    loadImage:(String)-> Picture?,
     onItemClicked:(String)->Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {

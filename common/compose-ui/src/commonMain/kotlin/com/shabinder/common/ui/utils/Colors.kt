@@ -16,11 +16,6 @@
 
 package com.shabinder.common.ui.utils
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.luminance
-import kotlin.math.max
-import kotlin.math.min
 /*
 
 fun Color.contrastAgainst(background: Color): Float {

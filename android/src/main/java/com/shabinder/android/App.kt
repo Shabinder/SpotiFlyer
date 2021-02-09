@@ -19,7 +19,7 @@ package com.shabinder.android
 import android.app.Application
 import com.shabinder.android.di.appModule
 import com.shabinder.common.database.appContext
-import com.shabinder.common.initKoin
+import com.shabinder.common.di.initKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.KoinComponent

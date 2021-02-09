@@ -1,7 +1,7 @@
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
-import com.shabinder.common.initKoin
+import com.shabinder.common.di.initKoin
 
 private val koin = initKoin(enableNetworkLogs = true).koin
 

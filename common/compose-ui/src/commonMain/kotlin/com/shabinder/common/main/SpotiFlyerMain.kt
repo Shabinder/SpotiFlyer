@@ -2,9 +2,9 @@ package com.shabinder.common.main
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import com.shabinder.common.Dir
-import com.shabinder.common.DownloadRecord
-import com.shabinder.common.Picture
+import com.shabinder.common.di.Dir
+import com.shabinder.common.models.DownloadRecord
+import com.shabinder.common.di.Picture
 import com.shabinder.common.main.integration.SpotiFlyerMainImpl
 import com.shabinder.common.utils.Consumer
 import com.shabinder.database.Database
@@ -33,7 +33,7 @@ interface SpotiFlyerMain {
     /*
     * Load Image from cache/Internet and cache it
     * */
-    fun loadImage(url:String):Picture?
+    fun loadImage(url:String): Picture?
 
     interface Dependencies {
         fun mainOutput(searched: Output): Consumer<Output>

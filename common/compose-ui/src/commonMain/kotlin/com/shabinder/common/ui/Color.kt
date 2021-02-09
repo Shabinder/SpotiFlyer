@@ -16,15 +16,8 @@
 
 package com.shabinder.common.ui
 
-import androidx.compose.material.Colors
 import androidx.compose.material.darkColors
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.colorspace.ColorSpaces
-import androidx.compose.ui.graphics.colorspace.Illuminant
-import androidx.compose.ui.graphics.colorspace.Rgb
-import androidx.compose.ui.graphics.colorspace.TransferParameters
-import androidx.compose.ui.graphics.compositeOver
 
 val colorPrimary = Color(0xFFFC5C7D)
 val colorPrimaryDark = Color(0xFFCE1CFF)

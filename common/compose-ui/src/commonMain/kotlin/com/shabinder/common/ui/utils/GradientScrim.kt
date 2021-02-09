@@ -16,17 +16,6 @@
 
 package com.shabinder.common.ui.utils
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import kotlin.math.pow
-
 /**
  * Draws a vertical gradient scrim in the foreground.
  *

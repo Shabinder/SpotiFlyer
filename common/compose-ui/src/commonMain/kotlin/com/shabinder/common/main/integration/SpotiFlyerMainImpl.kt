@@ -2,7 +2,7 @@ package com.shabinder.common.main.integration
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.extensions.coroutines.states
-import com.shabinder.common.Picture
+import com.shabinder.common.di.Picture
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.*
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent

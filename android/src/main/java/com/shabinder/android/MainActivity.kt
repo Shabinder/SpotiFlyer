@@ -7,8 +7,8 @@ import androidx.compose.ui.platform.setContent
 import com.arkivanov.decompose.extensions.compose.jetbrains.rootComponent
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
-import com.shabinder.common.Dir
-import com.shabinder.common.FetchPlatformQueryResult
+import com.shabinder.common.di.Dir
+import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRootContent
 import com.shabinder.common.ui.SpotiFlyerTheme

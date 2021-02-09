@@ -2,8 +2,8 @@ package com.shabinder.common.list.integration
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.extensions.coroutines.states
-import com.shabinder.common.Picture
-import com.shabinder.common.TrackDetails
+import com.shabinder.common.di.Picture
+import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.list.SpotiFlyerList.Dependencies
 import com.shabinder.common.list.SpotiFlyerList.State

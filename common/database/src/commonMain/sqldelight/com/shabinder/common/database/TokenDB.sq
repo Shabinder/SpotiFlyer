@@ -1,5 +1,5 @@
 CREATE TABLE Token (
-    index INTEGER NOT NULL DEFAULT 0 PRIMARY KEY ON CONFLICT REPLACE,
+    tokenIndex INTEGER NOT NULL DEFAULT 0 PRIMARY KEY ON CONFLICT REPLACE,
     accessToken TEXT NOT NULL,
     expiry INTEGER NOT NULL
 );
@@ -11,7 +11,7 @@ VALUES (?,?);
 select:
 SELECT *
 FROM Token
-WHERE index = 0;
+WHERE tokenIndex = 0;
 
 clear:
 DELETE FROM Token;

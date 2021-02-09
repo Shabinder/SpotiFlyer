@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.vectorXmlResource
-import com.shabinder.common.Picture
+import com.shabinder.common.di.Picture
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
@@ -18,6 +18,7 @@ actual fun ImageLoad(
     if(pic == null) {
         Image(
             vectorXmlResource("common/compose-ui/src/main/res/drawable/music.xml"),
+            "",
             modifier
         )
     }
@@ -26,6 +27,7 @@ actual fun ImageLoad(
             org.jetbrains.skija.Image.makeFromEncoded(
             toByteArray(pic.image)
         ).asImageBitmap(),
+            "Image",
             modifier = modifier
         )
     }

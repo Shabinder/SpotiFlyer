@@ -5,13 +5,13 @@ import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
-import com.shabinder.common.DownloadRecord
-import com.shabinder.common.giveDonation
+import com.shabinder.common.models.DownloadRecord
+import com.shabinder.common.di.giveDonation
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.State
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
-import com.shabinder.common.openPlatform
-import com.shabinder.common.shareApp
+import com.shabinder.common.di.openPlatform
+import com.shabinder.common.di.shareApp
 import com.shabinder.database.Database
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList

@@ -2,9 +2,13 @@ package com.shabinder.common.list.store
 
 import com.arkivanov.mvikotlin.core.store.*
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
-import com.shabinder.common.*
+import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.di.downloadTracks
 import com.shabinder.common.list.SpotiFlyerList.State
 import com.shabinder.common.list.store.SpotiFlyerListStore.Intent
+import com.shabinder.common.models.DownloadStatus
+import com.shabinder.common.models.PlatformQueryResult
+import com.shabinder.common.models.TrackDetails
 
 internal class SpotiFlyerListStoreProvider(
     private val storeFactory: StoreFactory,
