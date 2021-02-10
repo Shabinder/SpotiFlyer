@@ -1,0 +1,23 @@
+<!--
+  ~ Copyright (c)  2021  Shabinder Singh
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<vector android:height="42dp" android:viewportHeight="500"
+    android:viewportWidth="500" android:width="42dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#E11F23" android:pathData="M236.966,236.966m-236.966,0a236.966,236.966 0,1 1,473.932 0a236.966,236.966 0,1 1,-473.932 0"/>
+    <path android:fillColor="#E11F23" android:pathData="M404.518,69.38c92.541,92.549 92.549,242.593 0,335.142c-92.541,92.541 -242.593,92.545 -335.142,0L404.518,69.38z"/>
+    <path android:fillColor="#E11F23" android:pathData="M469.168,284.426L351.886,167.148l-138.322,15.749l-83.669,129.532l156.342,156.338C378.157,449.322 450.422,376.612 469.168,284.426z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M360.971,191.238c0,-19.865 -16.093,-35.966 -35.947,-35.966H156.372c-19.85,0 -35.94,16.105 -35.94,35.966v96.444c0,19.865 16.093,35.966 35.94,35.966h168.649c19.858,0 35.947,-16.105 35.947,-35.966v-96.444H360.971zM216.64,280.146v-90.584l68.695,45.294L216.64,280.146z"/>
+</vector>

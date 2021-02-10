@@ -1,0 +1,31 @@
+<!--
+  ~ Copyright (c)  2021  Shabinder Singh
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="42dp"
+    android:height="42dp" android:viewportWidth="496" android:viewportHeight="496">
+    <path android:fillColor="#6C9DFF" android:pathData="M248,92c-13.6,0 -24,-10.4 -24,-24V24c0,-13.6 10.4,-24 24,-24s24,10.4 24,24v44C272,80.8 261.6,92 248,92z"/>
+    <path android:fillColor="#DA3B7A" android:pathData="M248,496c-13.6,0 -24,-10.4 -24,-24v-44c0,-13.6 10.4,-24 24,-24s24,10.4 24,24v44C272,485.6 261.6,496 248,496z"/>
+    <path android:fillColor="#63BBFF" android:pathData="M157.6,116c-8,0 -16,-4 -20.8,-12l-21.6,-37.6c-6.4,-11.2 -2.4,-26.4 8.8,-32.8s26.4,-2.4 32.8,8.8L178.4,80c6.4,11.2 2.4,26.4 -8.8,32.8C166.4,114.4 161.6,116 157.6,116z"/>
+    <path android:fillColor="#E542A9" android:pathData="M360,465.6c-8,0 -16,-4 -20.8,-12L317.6,416c-6.4,-11.2 -2.4,-26.4 8.8,-32.8c11.2,-6.4 26.4,-2.4 32.8,8.8l21.6,37.6c6.4,11.2 2.4,26.4 -8.8,32.8C368,464.8 364,465.6 360,465.6z"/>
+    <path android:fillColor="#A1DCEC" android:pathData="M92,181.6c-4,0 -8,-0.8 -12,-3.2l-37.6,-21.6c-11.2,-6.4 -15.2,-21.6 -8.8,-32.8s21.6,-15.2 32.8,-8.8l37.6,21.6c11.2,6.4 15.2,21.6 8.8,32.8C108,177.6 100,181.6 92,181.6z"/>
+    <path android:fillColor="#B135FF" android:pathData="M442.4,384c-4,0 -8,-0.8 -12,-3.2L392,359.2c-11.2,-6.4 -15.2,-21.6 -8.8,-32.8c6.4,-11.2 21.6,-15.2 32.8,-8.8l37.6,21.6c11.2,6.4 15.2,21.6 8.8,32.8C458.4,380 450.4,384 442.4,384z"/>
+    <path android:fillColor="#F3FFFD" android:pathData="M68,272H24c-13.6,0 -24,-10.4 -24,-24s10.4,-24 24,-24h44c13.6,0 24,10.4 24,24S80.8,272 68,272z"/>
+    <path android:fillColor="#9254C8" android:pathData="M472,272h-44c-13.6,0 -24,-10.4 -24,-24s10.4,-24 24,-24h44c13.6,0 24,10.4 24,24S485.6,272 472,272z"/>
+    <path android:fillColor="#CE1CFF" android:pathData="M53.6,384c-8,0 -16,-4 -20.8,-12c-6.4,-11.2 -2.4,-26.4 8.8,-32.8l37.6,-21.6c11.2,-6.4 26.4,-2.4 32.8,8.8c6.4,11.2 2.4,26.4 -8.8,32.8l-37.6,21.6C62.4,383.2 58.4,384 53.6,384z"/>
+    <path android:fillColor="#6953E5" android:pathData="M404,181.6c-8,0 -16,-4 -20.8,-12c-6.4,-11.2 -2.4,-26.4 8.8,-32.8l37.6,-21.6c11.2,-6.4 26.4,-2.4 32.8,8.8s2.4,26.4 -8.8,32.8L416,178.4C412,180.8 408,181.6 404,181.6z"/>
+    <path android:fillColor="#DE339F" android:pathData="M136,465.6c-4,0 -8,-0.8 -12,-3.2c-11.2,-6.4 -15.2,-21.6 -8.8,-32.8l21.6,-37.6c6.4,-11.2 21.6,-15.2 32.8,-8.8c11.2,6.4 15.2,21.6 8.8,32.8l-21.6,37.6C152,461.6 144,465.6 136,465.6z"/>
+    <path android:fillColor="#5681FF" android:pathData="M338.4,116c-4,0 -8,-0.8 -12,-3.2c-11.2,-6.4 -15.2,-21.6 -8.8,-32.8l21.6,-37.6c6.4,-11.2 21.6,-15.2 32.8,-8.8c11.2,6.4 15.2,21.6 8.8,32.8L359.2,104C354.4,111.2 346.4,116 338.4,116z"/>
+</vector>
