@@ -22,6 +22,7 @@ import com.shabinder.common.ui.SpotiFlyerTypography
 import com.shabinder.common.ui.colorAccent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -68,7 +69,7 @@ fun TrackCard(
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
         var pic by mutableStateOf<ImageBitmap?>(null)
         val scope = rememberCoroutineScope()
-        scope.launch(Dispatchers.Unconfined) {
+        LaunchedEffect((1..10).random()){
             pic = loadImage(track.albumArtURL)
         }
         ImageLoad(
@@ -128,8 +129,10 @@ fun CoverImage(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         var pic by mutableStateOf<ImageBitmap?>(null)
-        scope.launch(Dispatchers.Unconfined) {
-            pic = loadImage(coverURL)
+        LaunchedEffect(true){
+            scope.launch(dispatcherIO) {
+                pic = loadImage(coverURL)
+            }
         }
         ImageLoad(
             pic,

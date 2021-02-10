@@ -23,10 +23,10 @@ kotlin {
                 implementation(Decompose.extensionsCompose)
 
                 //Coil-Image Loading
-                Versions.coilVersion.let{
+                /*Versions.coilVersion.let{
                     implementation("dev.chrisbanes.accompanist:accompanist-coil:$it")
                     implementation("dev.chrisbanes.accompanist:accompanist-insets:$it")
-                }
+                }*/
             }
         }
     }

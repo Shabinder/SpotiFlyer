@@ -328,7 +328,7 @@ fun DownloadRecordItem(
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {
         val scope = rememberCoroutineScope()
         var pic by mutableStateOf<ImageBitmap?>(null)
-        scope.launch(Dispatchers.Unconfined) {
+        scope.launch(dispatcherIO) {
             pic = loadImage(item.coverUrl)
         }
         ImageLoad(

@@ -43,7 +43,8 @@ actual fun PlaceHolderImage():ImageVector =    vectorXmlResource("drawable/music
 
 
 @Composable
-actual fun SpotiFlyerLogo():ImageVector = vectorXmlResource("drawable/ic_spotiflyer_logo.xml")
+actual fun SpotiFlyerLogo():ImageVector =
+    vectorXmlResource("drawable/ic_spotiflyer_logo.xml")
 
 @Composable
 actual fun HeartIcon():ImageVector = vectorXmlResource("drawable/ic_heart.xml")
