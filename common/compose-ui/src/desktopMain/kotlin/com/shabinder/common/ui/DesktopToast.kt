@@ -15,9 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+actual val dispatcherIO = Dispatchers.IO
 
 private val message: MutableState<String> = mutableStateOf("")
 private val state: MutableState<Boolean> = mutableStateOf(false)

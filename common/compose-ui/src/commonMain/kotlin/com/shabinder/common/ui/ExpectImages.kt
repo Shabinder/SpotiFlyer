@@ -1,3 +1,4 @@
+@file:Suppress("FunctionName")
 package com.shabinder.common.ui
 
 import androidx.compose.foundation.Image
@@ -16,6 +17,9 @@ expect fun DownloadImageTick()
 
 @Composable
 expect fun DownloadAllImage():ImageVector
+
+@Composable
+expect fun ShareImage():ImageVector
 
 @Composable
 expect fun PlaceHolderImage():ImageVector

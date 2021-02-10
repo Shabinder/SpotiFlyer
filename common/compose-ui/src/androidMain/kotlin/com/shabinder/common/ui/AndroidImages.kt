@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.shabinder.common.ui
 
 import androidx.compose.foundation.Image
@@ -33,6 +35,9 @@ actual fun DownloadImageArrow(modifier: Modifier){
 
 @Composable
 actual fun DownloadAllImage() = vectorResource(R.drawable.ic_download_arrow)
+
+@Composable
+actual fun ShareImage() = vectorResource(R.drawable.ic_share_open)
 
 @Composable
 actual fun PlaceHolderImage() = vectorResource(R.drawable.music)

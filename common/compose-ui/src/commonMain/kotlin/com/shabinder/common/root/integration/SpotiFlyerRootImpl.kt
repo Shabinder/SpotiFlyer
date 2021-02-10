@@ -14,7 +14,6 @@ import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
-import com.shabinder.common.ui.showPopUpMessage
 import com.shabinder.common.utils.Consumer
 
 internal class SpotiFlyerRootImpl(
@@ -57,12 +56,10 @@ internal class SpotiFlyerRootImpl(
             }
         )
 
-    private fun onMainOutput(output: SpotiFlyerMain.Output){
-        showPopUpMessage("Button Pressed")
+    private fun onMainOutput(output: SpotiFlyerMain.Output) =
         when (output) {
             is SpotiFlyerMain.Output.Search -> router.push(Configuration.List(link = output.link))
         }
-    }
 
     private fun onListOutput(output: SpotiFlyerList.Output): Unit =
         when (output) {

@@ -348,7 +348,7 @@ fun DownloadRecordItem(
             }
         }
         Image(
-            imageVector = Icons.Rounded.Share,
+            imageVector = ShareImage(),
             "Research",
             modifier = Modifier.clickable(onClick = {
                 //if(!isOnline(ctx)) showDialog("Check Your Internet Connection") else

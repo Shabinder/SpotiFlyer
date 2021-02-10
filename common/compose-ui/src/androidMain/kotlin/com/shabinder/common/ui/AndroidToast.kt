@@ -3,6 +3,9 @@ package com.shabinder.common.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import com.shabinder.common.database.appContext
+import kotlinx.coroutines.Dispatchers
+
+actual val dispatcherIO = Dispatchers.IO
 
 @Composable
 actual fun Toast(
