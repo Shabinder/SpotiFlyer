@@ -9,12 +9,16 @@ import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
+import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.database.Database
 import com.shabinder.common.root.integration.SpotiFlyerRootImpl
+import com.shabinder.common.utils.Consumer
 
 interface SpotiFlyerRoot {
 
     val routerState: Value<RouterState<*, Child>>
+
+    val callBacks: SpotiFlyerRootCallBacks
 
     sealed class Child {
         data class Main(val component: SpotiFlyerMain) : Child()

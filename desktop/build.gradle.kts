@@ -22,6 +22,10 @@ kotlin {
                 implementation(project(":common:database"))
                 implementation(project(":common:dependency-injection"))
                 implementation(project(":common:compose-ui"))
+                implementation(Decompose.decompose)
+                implementation(Decompose.extensionsCompose)
+                implementation(MVIKotlin.mvikotlin)
+                implementation(MVIKotlin.mvikotlinMain)
             }
         }
         val jvmTest by getting

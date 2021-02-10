@@ -2,7 +2,7 @@ package com.shabinder.common.di
 
 import com.shabinder.common.models.TrackDetails
 
-expect fun openPlatform(platformID:String ,platformLink:String)
+expect fun openPlatform(packageID:String, platformLink:String)
 
 expect fun shareApp()
 

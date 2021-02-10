@@ -18,7 +18,8 @@ import com.shabinder.common.ui.SpotiFlyerLogo
 import com.shabinder.common.ui.appNameStyle
 
 @Composable
-fun SpotiFlyerRootContent(component: SpotiFlyerRoot) {
+fun SpotiFlyerRootContent(component: SpotiFlyerRoot):SpotiFlyerRoot {
+
     val appBarColor = MaterialTheme.colors.surface
     Column(
         modifier = Modifier.fillMaxSize()
@@ -43,6 +44,7 @@ fun SpotiFlyerRootContent(component: SpotiFlyerRoot) {
             }
         }
     }
+    return component
 }
 
 @Composable

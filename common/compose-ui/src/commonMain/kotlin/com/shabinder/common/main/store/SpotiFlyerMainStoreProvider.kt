@@ -62,7 +62,7 @@ internal class SpotiFlyerMainStoreProvider(
         }
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) {
-            when (intent) {//TODO: Add Dispatchers where needed
+            when (intent) {
                 is Intent.OpenPlatform -> openPlatform(intent.platformID, intent.platformLink)
                 is Intent.GiveDonation -> giveDonation()
                 is Intent.ShareApp -> shareApp()

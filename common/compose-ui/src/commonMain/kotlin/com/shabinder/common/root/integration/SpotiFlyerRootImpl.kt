@@ -14,11 +14,12 @@ import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
+import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.utils.Consumer
 
 internal class SpotiFlyerRootImpl(
     componentContext: ComponentContext,
-    dependencies: Dependencies
+    dependencies: Dependencies,
 ) : SpotiFlyerRoot, ComponentContext by componentContext, Dependencies by dependencies {
 
     private val router =
@@ -29,6 +30,10 @@ internal class SpotiFlyerRootImpl(
         )
 
     override val routerState: Value<RouterState<*, Child>> = router.state
+
+    override val callBacks = object : SpotiFlyerRootCallBacks{
+        override fun searchLink(link: String) = onMainOutput(SpotiFlyerMain.Output.Search(link))
+    }
 
     private fun createChild(configuration: Configuration, componentContext: ComponentContext): Child =
         when (configuration) {

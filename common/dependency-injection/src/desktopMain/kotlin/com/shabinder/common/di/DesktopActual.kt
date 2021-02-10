@@ -2,7 +2,7 @@ package com.shabinder.common.di
 
 import com.shabinder.common.models.TrackDetails
 
-actual fun openPlatform(platformID:String ,platformLink:String){
+actual fun openPlatform(packageID:String, platformLink:String){
     //TODO
 }
 

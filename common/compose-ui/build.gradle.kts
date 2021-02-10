@@ -31,14 +31,3 @@ kotlin {
         }
     }
 }
-/*
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        //useIR = true
-        freeCompilerArgs = listOf("-Xallow-jvm-ir-dependencies",
-            "-Xallow-unstable-dependencies","-Xskip-prerelease-check",
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=kotlinx.coroutines.TheAnnotationYouWantToDisable"
-        )
-    }
-}*/
