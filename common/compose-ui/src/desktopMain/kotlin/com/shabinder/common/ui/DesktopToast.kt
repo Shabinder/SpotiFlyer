@@ -1,9 +1,6 @@
 package com.shabinder.common.ui
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -49,7 +46,7 @@ actual fun Toast(
             contentAlignment = Alignment.BottomCenter
         ) {
             Surface(
-                modifier = Modifier.preferredSize(300.dp, 70.dp),
+                modifier = Modifier.size(300.dp, 70.dp),
                 color = Color(23, 23, 23),
                 shape = RoundedCornerShape(4.dp)
             ) {

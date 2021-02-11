@@ -235,7 +235,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         .clickable(onClick = { openPlatform("","http://github.com/Shabinder/SpotiFlyer") }),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Rounded.Flag,"Help Translate",Modifier.preferredSize(32.dp))
+                    Icon(Icons.Rounded.Flag,"Help Translate",Modifier.size(32.dp))
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
                         Text(
@@ -334,9 +334,9 @@ fun DownloadRecordItem(
         ImageLoad(
             pic,
             "Album Art",
-            modifier = Modifier.preferredHeight(75.dp).preferredWidth(90.dp)
+            modifier = Modifier.height(75.dp).width(90.dp)
         )
-        Column(modifier = Modifier.padding(horizontal = 8.dp).preferredHeight(60.dp).weight(1f),verticalArrangement = Arrangement.SpaceEvenly) {
+        Column(modifier = Modifier.padding(horizontal = 8.dp).height(60.dp).weight(1f),verticalArrangement = Arrangement.SpaceEvenly) {
             Text(item.name,maxLines = 1,overflow = TextOverflow.Ellipsis,style = SpotiFlyerTypography.h6,color = colorAccent)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -366,7 +366,7 @@ fun HomeCategoryTabIndicator(
 ) {
     Spacer(
         modifier.padding(horizontal = 24.dp)
-            .preferredHeight(4.dp)
+            .height(4.dp)
             .background(color, RoundedCornerShape(topStartPercent = 100, topEndPercent = 100))
     )
 }

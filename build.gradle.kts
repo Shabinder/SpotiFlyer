@@ -14,12 +14,3 @@ allprojects {
         maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
-/*
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check",
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-Xuse-experimental=kotlinx.coroutines.TheAnnotationYouWantToDisable"
-        )
-    }
-}*/

@@ -76,11 +76,11 @@ fun TrackCard(
             pic = pic,
             "Album Art",
             modifier = Modifier
-                .preferredWidth(75.dp)
-                .preferredHeight(90.dp)
+                .width(75.dp)
+                .height(90.dp)
                 .clip(MaterialTheme.shapes.medium)
         )
-        Column(modifier = Modifier.padding(horizontal = 8.dp).preferredHeight(60.dp).weight(1f),verticalArrangement = Arrangement.SpaceEvenly) {
+        Column(modifier = Modifier.padding(horizontal = 8.dp).height(60.dp).weight(1f),verticalArrangement = Arrangement.SpaceEvenly) {
             Text(track.title,maxLines = 1,overflow = TextOverflow.Ellipsis,style = SpotiFlyerTypography.h6,color = colorAccent)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -138,8 +138,8 @@ fun CoverImage(
             pic,
             "Cover Image",
             modifier = Modifier
-                .preferredWidth(210.dp)
-                .preferredHeight(230.dp)
+                .width(210.dp)
+                .height(230.dp)
                 .clip(MaterialTheme.shapes.medium)
         )
         Text(

@@ -59,7 +59,7 @@ fun AppBar(
                 Image(
                     imageVector = SpotiFlyerLogo(),
                     "SpotiFlyer Logo",
-                    Modifier.preferredSize(32.dp),
+                    Modifier.size(32.dp),
                 )
                 Spacer(Modifier.padding(horizontal = 4.dp))
                 Text(
