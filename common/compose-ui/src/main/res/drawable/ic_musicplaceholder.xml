@@ -1,0 +1,28 @@
+<!--
+  ~ Copyright (c)  2021  Shabinder Singh
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="300dp"
+    android:height="300dp" android:viewportWidth="512" android:viewportHeight="512">
+    <path android:fillColor="#A3787878" android:pathData="m256,80a48.054,48.054 0,0 1,48 48v32h12a19.991,19.991 0,0 0,3.524 -39.671,63.984 63.984,0 0,0 -127.048,0 19.991,19.991 0,0 0,3.524 39.671h12v-32a48.054,48.054 0,0 1,48 -48z"/>
+    <path android:fillColor="#A3787878" android:pathData="m48,152a24.027,24.027 0,0 0,24 -24v-74.234l42.53,-14.176 -5.06,-15.18 -48,16a8,8 0,0 0,-5.47 7.59v57.376a24,24 0,1 0,-8 46.624zM48,120a8,8 0,1 1,-8 8,8.009 8.009,0 0,1 8,-8z"/>
+    <path android:fillColor="#A3787878" android:pathData="m485.006,17.76a7.993,7.993 0,0 0,-6.741 -1.569l-72,16a8,8 0,0 0,-6.265 7.809v57.376a24,24 0,1 0,16 22.624v-73.583l56,-12.444v47.4a24,24 0,1 0,16 22.627v-80a8,8 0,0 0,-2.994 -6.24zM392,128a8,8 0,1 1,8 -8,8.009 8.009,0 0,1 -8,8zM464,112a8,8 0,1 1,8 -8,8.009 8.009,0 0,1 -8,8z"/>
+    <path android:fillColor="#A3787878" android:pathData="m48,456h416v40h-416z"/>
+    <path android:fillColor="#A3787878" android:pathData="m64,376a16,16 0,0 0,-16 16v7h48v-7a16,16 0,0 0,-16 -16z"/>
+    <path android:fillColor="#A3787878" android:pathData="m24,416h464v24h-464z"/>
+    <path android:fillColor="#A3787878" android:pathData="M256,144m-48,0a48,48 0,1 1,96 0a48,48 0,1 1,-96 0"/>
+    <path android:fillColor="#A3787878" android:pathData="m368,400 l16,-160h-256l16,160zM256,296a24,24 0,1 1,-24 24,24 24,0 0,1 24,-24z"/>
+    <path android:fillColor="#A3787878" android:pathData="m168,224h176a32,32 0,0 0,-32 -32h-112a32,32 0,0 0,-32 32z"/>
+</vector>

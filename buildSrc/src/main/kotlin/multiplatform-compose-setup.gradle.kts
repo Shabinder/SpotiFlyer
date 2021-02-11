@@ -9,26 +9,36 @@ plugins {
 kotlin {
     jvm("desktop")
     android()
-
+    // Remove After upgrading dependency
+    /*configurations.all {
+        resolutionStrategy.eachDependency {
+            if (requested.group.contains("org.jetbrains.compose")) {
+                useVersion(JetBrains.Compose.VERSION)
+            }
+            if (requested.group.contains("androidx.compose")) {
+                useVersion(Versions.compose)
+            }
+        }
+    }*/
     sourceSets {
         named("commonMain") {
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material)
+                api(compose.runtime)
+                api(compose.foundation)
+                api(compose.material)
             }
         }
 
         named("androidMain") {
             dependencies {
-                implementation(Androidx.appCompat)
-                implementation(Androidx.core)
+                api("androidx.appcompat:appcompat:1.2.0")
+                api(Androidx.core)
             }
         }
 
         named("desktopMain") {
             dependencies {
-                implementation(compose.desktop.common)
+                api(compose.desktop.common)
             }
         }
     }

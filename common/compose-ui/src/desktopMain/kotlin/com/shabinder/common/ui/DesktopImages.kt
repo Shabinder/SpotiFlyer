@@ -6,6 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorXmlResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.platform.Font
 
 @Composable
 actual fun DownloadImageTick(){
@@ -14,6 +17,17 @@ actual fun DownloadImageTick(){
         "Downloaded"
     )
 }
+
+actual fun montserratFont() = FontFamily(
+    Font("font/montserrat_light.ttf", FontWeight.Light),
+    Font("font/montserrat_regular.ttf", FontWeight.Normal),
+    Font("font/montserrat_medium.ttf", FontWeight.Medium),
+    Font("font/montserrat_semibold.ttf", FontWeight.SemiBold),
+)
+
+actual fun pristineFont() = FontFamily(
+    Font("font/pristine_script.ttf", FontWeight.Bold)
+)
 
 @Composable
 actual fun DownloadImageError(){

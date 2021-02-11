@@ -15,7 +15,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":common:data-models"))
-                implementation(Badoo.Reaktive.reaktive)
+                //implementation(Badoo.Reaktive.reaktive)
                 // SQL Delight
                 implementation(SqlDelight.runtime)
                 implementation(SqlDelight.coroutineExtensions)

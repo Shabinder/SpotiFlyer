@@ -46,20 +46,10 @@ android {
             exclude(group = "androidx.compose.ui")
         }
     }
-    // Remove After upgrading dependency
-    configurations.all {
-        resolutionStrategy.eachDependency {
-            if (requested.group.contains("org.jetbrains.compose")) {
-                useVersion("0.3.0-build146")
-                because("wait for decompose to upgrade too")
-            }
-        }
-    }
     packagingOptions {
         exclude("META-INF/*")
     }
-    /*
-    buildFeatures {
+    /*buildFeatures {
         compose = true
     }
     kotlinOptions {
@@ -70,15 +60,12 @@ android {
 dependencies {
     implementation(compose.material)
     implementation(compose.materialIconsExtended)
+    implementation(Androidx.androidxActivity)
 
     implementation(project(":common:database"))
     implementation(project(":common:compose-ui"))
     implementation(project(":common:dependency-injection"))
     implementation(project(":common:data-models"))
-    implementation(Androidx.appCompat)
-
-    //Compose-Navigation
-    //implementation(Androidx.composeNavigation)
 
     implementation(Koin.android)
     implementation(Koin.androidViewModel)
@@ -87,10 +74,6 @@ dependencies {
     implementation(Decompose.decompose)
     implementation(Decompose.extensionsCompose)
 /*
-    implementation(Androidx.coroutines)
-    implementation(Androidx.core)
-    implementation(Androidx.palette)
-
     //Lifecycle
     Versions.androidLifecycle.let{
         implementation("androidx.lifecycle:lifecycle-runtime-ktx:$it")

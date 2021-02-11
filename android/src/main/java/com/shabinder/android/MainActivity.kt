@@ -7,8 +7,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import com.arkivanov.decompose.ComponentContext
-import androidx.compose.ui.platform.setContent
 import com.arkivanov.decompose.extensions.compose.jetbrains.rootComponent
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory

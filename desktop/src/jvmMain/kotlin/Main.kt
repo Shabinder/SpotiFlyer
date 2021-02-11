@@ -3,6 +3,7 @@ import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.rootComponent
 import com.arkivanov.mvikotlin.core.lifecycle.LifecycleRegistry
@@ -26,11 +27,14 @@ fun main(){
     lifecycle.resume()
 
     Window("SpotiFlyer") {
-        Surface(modifier = Modifier.fillMaxSize()) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Color.Black
+        ) {
             DesktopMaterialTheme(
-//                colors = SpotiFlyerColors,
-//                typography = SpotiFlyerTypography,
-//                shapes = SpotiFlyerShapes
+                colors = SpotiFlyerColors,
+                typography = SpotiFlyerTypography,
+                shapes = SpotiFlyerShapes
             ) {
                 SpotiFlyerRootContent(rootComponent(factory = ::spotiFlyerRoot))
             }

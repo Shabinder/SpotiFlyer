@@ -2,10 +2,11 @@
 
 object Versions {
     const val versionName = "2.2"
-    const val kotlinVersion = "1.4.21-2"
+    const val kotlinVersion = "1.4.30"
 
     const val coroutinesVersion = "1.4.2"
-    //const val compose = "1.0.0-alpha11"
+    //const val compose = "1.0.0-alpha12"
+
     const val coilVersion = "0.4.1"
     //DI
     const val koin = "3.0.0-alpha-4"
@@ -16,7 +17,7 @@ object Versions {
     //Internet
     const val ktor = "1.5.1"
 
-    const val kotlinxSerialization = "1.0.1"
+    const val kotlinxSerialization = "1.1.0-RC"
     //Database
     const val sqlDelight = "1.4.4"
 
@@ -37,10 +38,9 @@ object Koin {
     val androidViewModel = "org.koin:koin-androidx-viewmodel:${Versions.koin}"
 }
 object Androidx{
-    const val appCompat = "androidx.appcompat:appcompat:1.2.0"
+    const val androidxActivity = "androidx.activity:activity-compose:1.3.0-alpha02"
     const val core = "androidx.core:core-ktx:1.3.2"
     const val palette = "androidx.palette:palette-ktx:1.0.0"
-    const val composeNavigation = "androidx.navigation:navigation-compose:1.0.0-alpha06"
     const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutinesVersion}"
 
     const val junit = "androidx.test.ext:junit:1.1.2"
@@ -67,12 +67,12 @@ object JetBrains {
 
     object Compose {
         // __LATEST_COMPOSE_RELEASE_VERSION__
-        private const val VERSION = "0.3.0-build146"
+        const val VERSION = "0.3.0-build150"
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
     }
 }
 object Decompose {
-    private const val VERSION = "0.1.7"
+    private const val VERSION = "0.1.8"
     const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
     const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
     const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"
@@ -117,10 +117,9 @@ object Ktor {
 }
 
 object Extras {
-    const val youtubeDownloader = "com.github.sealedtx:java-youtube-downloader:2.4.6"
+    const val youtubeDownloader = "com.github.sealedtx:java-youtube-downloader:2.5.0"
     const val fuzzyWuzzy = "me.xdrop:fuzzywuzzy:1.3.1"
     const val mp3agic = "com.mpatric:mp3agic:0.9.1"
-    const val jsonKlaxon = "com.beust:klaxon:5.4"
     const val kermit = "co.touchlab:kermit:${Versions.kermit}"
     object Android {
         val razorpay = "com.razorpay:checkout:1.6.4"

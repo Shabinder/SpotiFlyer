@@ -23,48 +23,45 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-/*private val Montserrat = fontFamily(
-        font(R.font.montserrat_light, FontWeight.Light),
-        font(R.font.montserrat_regular, FontWeight.Normal),
-        font(R.font.montserrat_medium, FontWeight.Medium),
-        font(R.font.montserrat_semibold, FontWeight.SemiBold),
-)*/
+
+expect fun montserratFont():FontFamily
+expect fun pristineFont():FontFamily
 
 val SpotiFlyerTypography = Typography(
         h1 = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 96.sp,
                 fontWeight = FontWeight.Light,
                 lineHeight = 117.sp,
                 letterSpacing = (-1.5).sp
         ),
         h2 = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 60.sp,
                 fontWeight = FontWeight.Light,
                 lineHeight = 73.sp,
                 letterSpacing = (-0.5).sp
         ),
         h3 = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Normal,
                 lineHeight = 59.sp
         ),
         h4 = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 30.sp,
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 37.sp
         ),
         h5 = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 29.sp
         ),
         h6 = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 lineHeight = 26.sp,
@@ -72,49 +69,49 @@ val SpotiFlyerTypography = Typography(
 
         ),
         subtitle1 = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 20.sp,
                 letterSpacing = 0.5.sp
         ),
         subtitle2 = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 lineHeight = 17.sp,
                 letterSpacing = 0.1.sp
         ),
         body1 = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 lineHeight = 20.sp,
                 letterSpacing = 0.15.sp,
         ),
         body2 = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 20.sp,
                 letterSpacing = 0.25.sp
         ),
         button = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 16.sp,
                 letterSpacing = 1.25.sp
         ),
         caption = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 16.sp,
                 letterSpacing = 0.sp
         ),
         overline = TextStyle(
-                //fontFamily = Montserrat,
+                fontFamily = montserratFont(),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 16.sp,
@@ -123,7 +120,7 @@ val SpotiFlyerTypography = Typography(
 )
 
 val appNameStyle = TextStyle(
-        fontFamily = FontFamily.Cursive,
+        fontFamily = pristineFont(),
         fontSize = 40.sp,
         fontWeight = FontWeight.SemiBold,
         lineHeight = 42.sp,
