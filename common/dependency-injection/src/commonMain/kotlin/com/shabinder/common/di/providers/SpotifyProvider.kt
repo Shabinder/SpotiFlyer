@@ -19,8 +19,11 @@ package com.shabinder.common.di.providers
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.di.Dir
+import com.shabinder.common.di.TokenStore
 import com.shabinder.common.di.finalOutputDir
+import com.shabinder.common.di.kotlinxSerializer
 import com.shabinder.common.di.spotify.SpotifyRequests
+import com.shabinder.common.di.spotify.authenticateSpotify
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.spotify.Album
@@ -29,15 +32,39 @@ import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.models.spotify.Track
 import com.shabinder.database.Database
 import io.ktor.client.*
+import io.ktor.client.features.*
+import io.ktor.client.features.json.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SpotifyProvider(
-    override val httpClient: HttpClient,
+    private val tokenStore: TokenStore,
     private val database: Database,
     private val logger: Kermit,
     private val dir: Dir,
 ) : SpotifyRequests {
+
+    init {
+        logger.d { "Creating Spotify Provider" }
+        GlobalScope.launch(Dispatchers.Default) {
+            val token = tokenStore.getToken()
+            httpClient = HttpClient {
+                defaultRequest {
+                    header("Authorization","Bearer ${token.access_token}")
+                }
+                install(JsonFeature) {
+                    serializer = kotlinxSerializer
+                }
+            }
+            logger.d { "Spotify Provider Created with $token" }
+        }
+    }
+
+    override lateinit var httpClient: HttpClient
 
     private val db:DownloadRecordDatabaseQueries
         get() = database.downloadRecordDatabaseQueries

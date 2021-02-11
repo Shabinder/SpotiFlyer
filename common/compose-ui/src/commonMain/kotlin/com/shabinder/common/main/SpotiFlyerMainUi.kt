@@ -30,8 +30,6 @@ import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
 import com.shabinder.common.di.openPlatform
 import com.shabinder.common.ui.*
 import com.shabinder.common.ui.SpotiFlyerTypography
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun SpotiFlyerMainContent(component: SpotiFlyerMain){
@@ -326,13 +324,15 @@ fun DownloadRecordItem(
     onItemClicked:(String)->Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {
-        val scope = rememberCoroutineScope()
-        var pic by mutableStateOf<ImageBitmap?>(null)
-        scope.launch(dispatcherIO) {
-            pic = loadImage(item.coverUrl)
-        }
+        /*KamelImage(
+            lazyImageResource(item.coverUrl),
+            "Album Art",
+            modifier = Modifier.height(75.dp).width(90.dp),
+            crossfade = true,
+            onLoading = { PlaceHolderImage() }
+        )*/
         ImageLoad(
-            pic,
+            { loadImage(item.coverUrl) },
             "Album Art",
             modifier = Modifier.height(75.dp).width(90.dp)
         )

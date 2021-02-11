@@ -24,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun SpotiFlyerListContent(
@@ -67,13 +68,8 @@ fun TrackCard(
     loadImage:suspend (String)-> ImageBitmap?
 ) {
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
-        var pic by mutableStateOf<ImageBitmap?>(null)
-        val scope = rememberCoroutineScope()
-        LaunchedEffect((1..10).random()){
-            pic = loadImage(track.albumArtURL)
-        }
         ImageLoad(
-            pic = pic,
+            {loadImage(track.albumArtURL)},
             "Album Art",
             modifier = Modifier
                 .width(75.dp)
@@ -128,14 +124,8 @@ fun CoverImage(
         modifier.padding(vertical = 8.dp).fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var pic by mutableStateOf<ImageBitmap?>(null)
-        LaunchedEffect(true){
-            scope.launch(dispatcherIO) {
-                pic = loadImage(coverURL)
-            }
-        }
         ImageLoad(
-            pic,
+            { loadImage(coverURL) },
             "Cover Image",
             modifier = Modifier
                 .width(210.dp)

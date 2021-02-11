@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.PowerManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material.Surface
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.rootComponent
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
@@ -22,6 +23,7 @@ import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRootContent
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.ui.SpotiFlyerTheme
+import com.shabinder.common.ui.colorOffWhite
 import com.shabinder.database.Database
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
@@ -41,7 +43,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SpotiFlyerTheme {
+                Surface(contentColor = colorOffWhite) {
                     root = SpotiFlyerRootContent(rootComponent(::spotiFlyerRoot))
+                }
             }
         }
         initialise()

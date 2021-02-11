@@ -1,15 +1,25 @@
 @file:Suppress("FunctionName")
 package com.shabinder.common.ui
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import kotlinx.coroutines.withContext
 
 @Composable
-fun ImageLoad(pic: ImageBitmap?, desc: String, modifier:Modifier = Modifier, placeholder:ImageVector = PlaceHolderImage()) {
-    if(pic == null) Image(placeholder, desc, modifier) else Image(pic, desc, modifier)
+fun ImageLoad(loader: suspend () -> ImageBitmap?, desc: String = "Album Art", modifier:Modifier = Modifier, placeholder:ImageVector = PlaceHolderImage()) {
+    var pic by remember { mutableStateOf<ImageBitmap?>(null) }
+    Crossfade(pic){
+        if(pic == null) Image(placeholder, desc, modifier) else Image(pic!!, desc, modifier)
+    }
+    LaunchedEffect(loader){
+        withContext(dispatcherIO) {
+            pic = loader()
+        }
+    }
 }
 
 @Composable

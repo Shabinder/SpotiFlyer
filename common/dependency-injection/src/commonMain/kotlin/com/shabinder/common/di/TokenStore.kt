@@ -16,7 +16,7 @@ class TokenStore(
     private val db: TokenDBQueries
         get() = tokenDB.tokenDBQueries
 
-    private suspend fun save(token: TokenData){
+    private fun save(token: TokenData){
         if(!token.access_token.isNullOrBlank() && token.expiry != null)
             db.add(token.access_token!!, token.expiry!! + Clock.System.now().epochSeconds)
     }
@@ -25,6 +25,7 @@ class TokenStore(
         var token: TokenData? = db.select().executeAsOneOrNull()?.let {
             TokenData(it.accessToken,null,it.expiry)
         }
+        logger.d{"System Time:${Clock.System.now().epochSeconds} , Token Expiry:${token?.expiry}"}
         if(Clock.System.now().epochSeconds > token?.expiry ?:0 || token == null){
             logger.d{"Requesting New Token"}
             token = authenticateSpotify()

@@ -85,7 +85,7 @@ class GaanaProvider(
                                     dir.defaultDir()
                                 )
                             )) {//Download Already Present!!
-                            it.downloaded = com.shabinder.common.models.DownloadStatus.Downloaded
+                            it.downloaded = DownloadStatus.Downloaded
                         }
                         trackList = listOf(it).toTrackDetailsList(folderType, subFolder)
                         title = it.track_title
@@ -115,7 +115,7 @@ class GaanaProvider(
                                     )
                                 )
                             ) {//Download Already Present!!
-                                track.downloaded = com.shabinder.common.models.DownloadStatus.Downloaded
+                                track.downloaded = DownloadStatus.Downloaded
                             }
                         }
                         trackList = it.tracks.toTrackDetailsList(folderType, subFolder)
@@ -146,7 +146,7 @@ class GaanaProvider(
                                     )
                                 )
                             ) {//Download Already Present!!
-                                track.downloaded = com.shabinder.common.models.DownloadStatus.Downloaded
+                                track.downloaded = DownloadStatus.Downloaded
                             }
                         }
                         trackList = it.tracks.toTrackDetailsList(folderType, subFolder)
@@ -175,7 +175,7 @@ class GaanaProvider(
                                 coverUrl = it.artworkLink ?: gaanaPlaceholderImageUrl
                             }
                     getGaanaArtistTracks(seokey = link).also {
-                        it.tracks.forEach { track ->
+                        it.tracks?.forEach { track ->
                             if (dir.isPresent(
                                     dir.finalOutputDir(
                                         track.track_title,
@@ -185,10 +185,10 @@ class GaanaProvider(
                                     )
                                 )
                             ) {//Download Already Present!!
-                                track.downloaded = com.shabinder.common.models.DownloadStatus.Downloaded
+                                track.downloaded = DownloadStatus.Downloaded
                             }
                         }
-                        trackList = it.tracks.toTrackDetailsList(folderType, subFolder)
+                        trackList = it.tracks?.toTrackDetailsList(folderType, subFolder) ?: emptyList()
                         withContext(Dispatchers.Default) {
                             db.add(
                                 type = "Artist",

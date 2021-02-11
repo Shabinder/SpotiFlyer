@@ -17,6 +17,7 @@ import com.shabinder.common.root.SpotiFlyerRootContent
 import com.shabinder.common.ui.SpotiFlyerColors
 import com.shabinder.common.ui.SpotiFlyerShapes
 import com.shabinder.common.ui.SpotiFlyerTypography
+import com.shabinder.common.ui.colorOffWhite
 import com.shabinder.database.Database
 
 private val koin = initKoin(enableNetworkLogs = true).koin
@@ -29,7 +30,8 @@ fun main(){
     Window("SpotiFlyer") {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = Color.Black
+            color = Color.Black,
+            contentColor = colorOffWhite
         ) {
             DesktopMaterialTheme(
                 colors = SpotiFlyerColors,
