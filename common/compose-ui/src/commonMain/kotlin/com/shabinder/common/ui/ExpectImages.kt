@@ -2,6 +2,8 @@
 package com.shabinder.common.ui
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -12,13 +14,13 @@ import kotlinx.coroutines.withContext
 @Composable
 fun ImageLoad(loader: suspend () -> ImageBitmap?, desc: String = "Album Art", modifier:Modifier = Modifier, placeholder:ImageVector = PlaceHolderImage()) {
     var pic by remember { mutableStateOf<ImageBitmap?>(null) }
-    Crossfade(pic){
-        if(pic == null) Image(placeholder, desc, modifier) else Image(pic!!, desc, modifier)
-    }
     LaunchedEffect(loader){
         withContext(dispatcherIO) {
             pic = loader()
         }
+    }
+    Crossfade(pic){
+        if(pic == null) Image(placeholder, desc, modifier) else Image(pic!!, desc, modifier)
     }
 }
 

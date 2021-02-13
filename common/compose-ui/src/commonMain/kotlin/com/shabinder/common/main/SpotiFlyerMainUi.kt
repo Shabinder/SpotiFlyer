@@ -324,13 +324,6 @@ fun DownloadRecordItem(
     onItemClicked:(String)->Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {
-        /*KamelImage(
-            lazyImageResource(item.coverUrl),
-            "Album Art",
-            modifier = Modifier.height(75.dp).width(90.dp),
-            crossfade = true,
-            onLoading = { PlaceHolderImage() }
-        )*/
         ImageLoad(
             { loadImage(item.coverUrl) },
             "Album Art",

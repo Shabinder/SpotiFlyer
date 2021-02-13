@@ -20,8 +20,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BrokenImage
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,7 +32,8 @@ import androidx.compose.ui.unit.sp
 import com.shabinder.common.ui.*
 import kotlinx.coroutines.delay
 
-private const val SplashWaitTime: Long = 1100
+private const val SplashWaitTime: Long = 2000
+enum class SplashState { Shown, Completed }
 
 @Composable
 fun Splash(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
@@ -46,7 +45,7 @@ fun Splash(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
             delay(SplashWaitTime)
             currentOnTimeout()
         }
-        Image(imageVector = Icons.Default.BrokenImage/*SpotiFlyerLogo()*/,"SpotiFlyer Logo")
+        Image(imageVector = SpotiFlyerLogo(),"SpotiFlyer Logo")
         MadeInIndia(Modifier.align(Alignment.BottomCenter))
     }
 }
@@ -69,7 +68,7 @@ fun MadeInIndia(
                 fontSize = 22.sp
             )
             Spacer(modifier = Modifier.padding(start = 4.dp))
-            //Icon(HeartIcon(),"Love",tint = Color.Unspecified)
+            Icon(HeartIcon(),"Love",tint = Color.Unspecified)
             Spacer(modifier = Modifier.padding(start = 4.dp))
             Text(
                 text = " in India",
