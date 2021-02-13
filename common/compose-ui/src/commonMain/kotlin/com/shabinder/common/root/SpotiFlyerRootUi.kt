@@ -4,9 +4,9 @@ import androidx.compose.animation.core.*
 import androidx.compose.animation.core.Spring.StiffnessLow
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -108,15 +108,13 @@ fun AppBar(
                 )
             }
         },
-        /*actions = {
-            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+        actions = {
                 IconButton(
-                    onClick = { *//* TODO: Open Preferences*//* }
+                    onClick = {  /*TODO: Open Preferences*/ }
                 ) {
-                    Icon(Icons.Filled.Settings, tint = Color.Gray)
+                    Icon(Icons.Filled.Settings,"Preferences", tint = Color.Gray)
                 }
-            }
-        },*/
+        },
         modifier = modifier,
         elevation = 0.dp
     )

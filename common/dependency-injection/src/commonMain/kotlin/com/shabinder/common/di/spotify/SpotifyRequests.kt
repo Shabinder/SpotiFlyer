@@ -7,7 +7,7 @@ import com.shabinder.common.models.spotify.Track
 import io.ktor.client.*
 import io.ktor.client.request.*
 
-private const val BASE_URL = "https://api.spotify.com/v1/"
+private const val BASE_URL = "https://api.spotify.com/v1"
 
 interface SpotifyRequests {
 

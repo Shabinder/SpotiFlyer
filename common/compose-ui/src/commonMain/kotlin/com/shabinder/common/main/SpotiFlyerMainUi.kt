@@ -36,7 +36,6 @@ fun SpotiFlyerMainContent(component: SpotiFlyerMain){
     val model by component.models.collectAsState(SpotiFlyerMain.State())
 
     Column {
-
         SearchPanel(
             model.link,
             component::onInputLinkChanged,
