@@ -22,13 +22,24 @@ actual fun openPlatform(packageID:String, platformLink:String){
 }
 
 actual fun shareApp(){
-    //TODO
+    val sendIntent: Intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, "Hey, checkout this excellent Music Downloader http://github.com/Shabinder/SpotiFlyer")
+        type = "text/plain"
+    }
+
+    val shareIntent = Intent.createChooser(sendIntent, null)
+    appContext.startActivity(shareIntent)
 }
 
 actual fun giveDonation(){
     //TODO
 }
 
-actual fun downloadTracks(list: List<TrackDetails>){
+actual suspend fun downloadTracks(
+    list: List<TrackDetails>,
+    getYTIDBestMatch:suspend (String,TrackDetails)->String?,
+    saveFileWithMetaData:suspend (mp3ByteArray:ByteArray, trackDetails: TrackDetails) -> Unit
+){
     //TODO
 }

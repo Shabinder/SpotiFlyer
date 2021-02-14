@@ -25,9 +25,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.shabinder.common.di.giveDonation
 import com.shabinder.common.models.DownloadRecord
 import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
 import com.shabinder.common.di.openPlatform
+import com.shabinder.common.di.shareApp
 import com.shabinder.common.ui.*
 import com.shabinder.common.ui.SpotiFlyerTypography
 
@@ -73,10 +75,9 @@ fun HomeTabBar(
         )
     }
 
-    @Suppress("USELESS_CAST")//Showing Error in Latest Android Studio Canary
     TabRow(
         selectedTabIndex = selectedIndex,
-        indicator = indicator as @Composable (List<TabPosition>) -> Unit,
+        indicator = indicator,
         modifier = modifier,
     ) {
             categories.forEachIndexed { index, category ->
@@ -245,51 +246,44 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         )
                     }
                 }
-                /*Row(
+                Row(
                     modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        .clickable(onClick = { startPayment(mainActivity) }),
+                        .clickable(onClick = { giveDonation() }),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Rounded.MailOutline.copy(defaultHeight = 32.dp,defaultWidth = 32.dp))
+                    Icon(Icons.Rounded.MailOutline,"Support Developer")
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
                         Text(
-                            text = stringResource(R.string.donate),
+                            text = "Donate",
                             style = SpotiFlyerTypography.h6
                         )
                         Text(
-                            text = stringResource(R.string.donate_subtitle),
+                            text = "If you think I deserve to get paid for my work, you can leave me some money here.",
                             style = SpotiFlyerTypography.subtitle2
                         )
                     }
-                }*/
-                /*Row(
+                }
+                Row(
                     modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
                         .clickable(onClick = {
-                            val sendIntent: Intent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, "Hey, checkout this excellent Music Downloader http://github.com/Shabinder/SpotiFlyer")
-                                type = "text/plain"
-                            }
-
-                            val shareIntent = Intent.createChooser(sendIntent, null)
-                            ctx.startActivity(shareIntent)
+                            shareApp()
                         }),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Rounded.Share.copy(defaultHeight = 32.dp,defaultWidth = 32.dp))
+                    Icon(Icons.Rounded.Share,"Share SpotiFlyer App")
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
                         Text(
-                            text = stringResource(R.string.share),
+                            text = "Share",
                             style = SpotiFlyerTypography.h6
                         )
                         Text(
-                            text = stringResource(R.string.share_subtitle),
+                            text = "Share this app with your friends and family.",
                             style = SpotiFlyerTypography.subtitle2
                         )
                     }
-                }*/
+                }
             }
         }
     }

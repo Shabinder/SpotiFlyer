@@ -20,6 +20,7 @@ internal class SpotiFlyerListImpl(
     private val store =
         instanceKeeper.getStore {
             SpotiFlyerListStoreProvider(
+                dir = this.dir,
                 storeFactory = storeFactory,
                 fetchQuery = fetchQuery,
                 link = link

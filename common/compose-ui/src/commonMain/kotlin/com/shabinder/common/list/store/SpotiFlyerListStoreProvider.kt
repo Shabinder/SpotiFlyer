@@ -2,6 +2,7 @@ package com.shabinder.common.list.store
 
 import com.arkivanov.mvikotlin.core.store.*
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
+import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.downloadTracks
 import com.shabinder.common.list.SpotiFlyerList.State
@@ -9,8 +10,10 @@ import com.shabinder.common.list.store.SpotiFlyerListStore.Intent
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.ui.showPopUpMessage
 
 internal class SpotiFlyerListStoreProvider(
+    private val dir: Dir,
     private val storeFactory: StoreFactory,
     private val fetchQuery: FetchPlatformQueryResult,
     private val link: String
@@ -45,8 +48,8 @@ internal class SpotiFlyerListStoreProvider(
                 is Intent.StartDownloadAll -> {
                     val finalList =
                         intent.trackList.filter { it.downloaded == DownloadStatus.NotDownloaded }
-                    if (finalList.isNullOrEmpty()) //TODO showDialog("All Songs are Processed")
-                    else downloadTracks(finalList)
+                    if (finalList.isNullOrEmpty())  showPopUpMessage("All Songs are Processed")
+                    else downloadTracks(finalList,fetchQuery.youtubeMusic::getYTIDBestMatch,dir::saveFileWithMetadata)
 
                     val list = intent.trackList.map {
                         if (it.downloaded == DownloadStatus.NotDownloaded) {

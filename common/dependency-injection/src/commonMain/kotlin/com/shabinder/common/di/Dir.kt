@@ -2,6 +2,7 @@ package com.shabinder.common.di
 
 import androidx.compose.ui.graphics.ImageBitmap
 import co.touchlab.kermit.Kermit
+import com.shabinder.common.di.providers.YoutubeMusic
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.TrackDetails
 import io.ktor.client.request.*
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt
 
 expect class Dir(
-    logger: Kermit,
+    logger: Kermit
 ) {
     fun isPresent(path:String):Boolean
     fun fileSeparator(): String
@@ -23,7 +24,7 @@ expect class Dir(
     suspend fun cacheImage(image: Any,path: String) // in Android = ImageBitmap, Desktop = BufferedImage
     suspend fun loadImage(url:String): ImageBitmap?
     suspend fun clearCache()
-    suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, path: String, trackDetails: TrackDetails)
+    suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, trackDetails: TrackDetails)
 }
 
 suspend fun downloadFile(url: String): Flow<DownloadResult> {

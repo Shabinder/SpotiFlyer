@@ -1,6 +1,7 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Logger
+import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.YoutubeTrack
 import com.willowtreeapps.fuzzywuzzy.diffutils.FuzzySearch
 import io.ktor.client.*
@@ -16,6 +17,15 @@ class YoutubeMusic constructor(
     private val httpClient:HttpClient,
 ) {
     private val tag = "YT Music"
+
+    suspend fun getYTIDBestMatch(query: String,trackDetails: TrackDetails):String?{
+        return sortByBestMatch(
+            getYTTracks(query),
+            trackName = trackDetails.title,
+            trackArtists = trackDetails.artists,
+            trackDurationSec = trackDetails.durationSec
+        ).keys.firstOrNull()
+    }
     suspend fun getYTTracks(query: String):List<YoutubeTrack>{
         val youtubeTracks = mutableListOf<YoutubeTrack>()
 

@@ -23,7 +23,6 @@ import com.shabinder.common.di.TokenStore
 import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.kotlinxSerializer
 import com.shabinder.common.di.spotify.SpotifyRequests
-import com.shabinder.common.di.spotify.authenticateSpotify
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.spotify.Album
@@ -35,7 +34,6 @@ import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.request.*
-import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -273,7 +271,7 @@ class SpotifyProvider(
             downloaded = it.downloaded,
             source = Source.Spotify,
             albumArtURL = it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString(),
-            outputFile = dir.finalOutputDir(it.name.toString(),type, subFolder,dir.defaultDir(),".m4a")
+            outputFilePath = dir.finalOutputDir(it.name.toString(),type, subFolder,dir.defaultDir(),".m4a")
         )
     }
 }

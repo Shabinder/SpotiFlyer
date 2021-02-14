@@ -34,15 +34,16 @@ data class TrackDetails(
     var source: Source,
     var downloaded: DownloadStatus = DownloadStatus.NotDownloaded,
     var progress: Int = 2,//2 for visual progress bar hint
-    var outputFile: String,
+    var outputFilePath: String,
     var videoID:String? = null
 )
 
-enum class DownloadStatus{
-    Downloaded,
-    Downloading,
-    Queued,
-    NotDownloaded,
-    Converting,
-    Failed
+@Serializable
+sealed class DownloadStatus {
+    object Downloaded :DownloadStatus()
+    data class Downloading(val progress: Int = 0):DownloadStatus()
+    object Queued :DownloadStatus()
+    object NotDownloaded :DownloadStatus()
+    object Converting :DownloadStatus()
+    object Failed :DownloadStatus()
 }

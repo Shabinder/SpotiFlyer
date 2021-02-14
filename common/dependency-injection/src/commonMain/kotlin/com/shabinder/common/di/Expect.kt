@@ -8,4 +8,8 @@ expect fun shareApp()
 
 expect fun giveDonation()
 
-expect fun downloadTracks(list: List<TrackDetails>)
+expect suspend fun downloadTracks(
+    list: List<TrackDetails>,
+    getYTIDBestMatch:suspend (String,TrackDetails)->String?,
+    saveFileWithMetaData:suspend (mp3ByteArray:ByteArray, trackDetails: TrackDetails) -> Unit
+)

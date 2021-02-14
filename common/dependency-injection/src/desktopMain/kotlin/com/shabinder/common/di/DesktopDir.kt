@@ -61,16 +61,15 @@ actual class Dir actual constructor(private val logger: Kermit) {
     @Suppress("BlockingMethodInNonBlockingContext")
     actual suspend  fun saveFileWithMetadata(
             mp3ByteArray: ByteArray,
-            path: String,
             trackDetails: TrackDetails
     ) {
-        val file = File(path)
+        val file = File(trackDetails.outputFilePath)
         file.writeBytes(mp3ByteArray)
 
         Mp3File(file)
             .removeAllTags()
             .setId3v1Tags(trackDetails)
-            .setId3v2TagsAndSaveFile(trackDetails,path)
+            .setId3v2TagsAndSaveFile(trackDetails)
     }
 
     actual suspend fun loadImage(url: String): ImageBitmap? {

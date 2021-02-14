@@ -32,7 +32,7 @@ fun Mp3File.setId3v1Tags(track: TrackDetails): Mp3File {
 }
 
 @Suppress("BlockingMethodInNonBlockingContext")
-suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails, filePath:String){
+suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails){
     val id3v2Tag = ID3v24Tag().apply {
         artist = track.artists.joinToString(",")
         title = track.title
@@ -50,7 +50,7 @@ suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails, filePath:String
         fis.close()
         id3v2Tag.setAlbumImage(bytesArray, "image/jpeg")
         this.id3v2Tag = id3v2Tag
-        saveFile(filePath)
+        saveFile(track.outputFilePath)
     }catch (e: java.io.FileNotFoundException){
         try {
             //Image Still Not Downloaded!
@@ -61,7 +61,7 @@ suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails, filePath:String
                     is DownloadResult.Success -> {
                         id3v2Tag.setAlbumImage(it.byteArray, "image/jpeg")
                         this.id3v2Tag = id3v2Tag
-                        saveFile(filePath)
+                        saveFile(track.outputFilePath)
                     }
                     is DownloadResult.Progress -> {}//Nothing for Now , no progress bar to show
                 }
