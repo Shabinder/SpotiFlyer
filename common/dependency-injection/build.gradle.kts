@@ -32,10 +32,12 @@ kotlin {
         androidMain {
             dependencies{
                 implementation(Ktor.clientAndroid)
+                api(files("$rootDir/libs/mobile-ffmpeg.aar"))
             }
         }
         desktopMain {
             dependencies{
+                implementation("com.github.kokorin.jaffree:jaffree:0.9.10")
                 implementation(Ktor.clientApache)
                 implementation(Ktor.slf4j)
             }

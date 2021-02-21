@@ -7,9 +7,12 @@ import android.os.Environment
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
+import com.arthenica.mobileffmpeg.Config
+import com.arthenica.mobileffmpeg.FFmpeg
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.database.appContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -17,11 +20,11 @@ import java.io.*
 import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
-import java.nio.charset.StandardCharsets
 
 actual class Dir actual constructor(
     private val logger: Kermit
 ) {
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     private val context: Context
         get() = appContext
@@ -74,13 +77,34 @@ actual class Dir actual constructor(
         mp3ByteArray: ByteArray,
         trackDetails: TrackDetails
     ) {
-        val file = File(trackDetails.outputFilePath)
-        file.writeBytes(mp3ByteArray)
+        val m4aFile = File(trackDetails.outputFilePath)
+        /*
+        * Check , if Fetch was Used, File is saved Already, else write byteArray we Received
+        * */
+        if(!m4aFile.exists()) m4aFile.writeBytes(mp3ByteArray)
 
-        Mp3File(file)
-            .removeAllTags()
-            .setId3v1Tags(trackDetails)
-            .setId3v2TagsAndSaveFile(trackDetails)
+        FFmpeg.executeAsync(
+            "-i ${m4aFile.absolutePath} -y -b:a 160k -acodec libmp3lame -vn ${m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"}"
+        ){ _, returnCode ->
+            when (returnCode) {
+                Config.RETURN_CODE_SUCCESS -> {
+                    //FFMPEG task Completed
+                    logger.d{ "Async command execution completed successfully." }
+                    scope.launch {
+                        Mp3File(File(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"))
+                            .removeAllTags()
+                            .setId3v1Tags(trackDetails)
+                            .setId3v2TagsAndSaveFile(trackDetails)
+                    }
+                }
+                Config.RETURN_CODE_CANCEL -> {
+                    logger.d{"Async command execution cancelled by user."}
+                }
+                else -> {
+                    logger.d { "Async command execution failed with rc=$returnCode" }
+                }
+            }
+        }
     }
 
     actual suspend fun loadImage(url: String): ImageBitmap? {

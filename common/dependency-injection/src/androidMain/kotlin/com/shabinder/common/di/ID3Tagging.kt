@@ -74,8 +74,8 @@ suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails){
 
 fun Mp3File.saveFile(filePath: String){
     save(filePath.substringBeforeLast('.') + ".new.mp3")
-    val file = File(filePath)
-    file.delete()
+    val m4aFile = File(filePath)
+    m4aFile.delete()
     val newFile = File((filePath.substringBeforeLast('.') + ".new.mp3"))
-    newFile.renameTo(file)
+    newFile.renameTo(File(filePath.substringBeforeLast('.') + ".mp3"))
 }

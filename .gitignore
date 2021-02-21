@@ -112,3 +112,4 @@
 /buildSrc/build/
 /buildSrc/buildSrc/.gradle/
 /buildSrc/buildSrc/build/
+/desktop/build/

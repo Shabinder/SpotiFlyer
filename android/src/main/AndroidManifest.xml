@@ -55,5 +55,7 @@
             android:name="com.razorpay.ApiKey"
             android:value="rzp_live_3ZQeoFYOxjmXye"
             />
+
+        <service android:name="com.shabinder.spotiflyer.worker.ForegroundService"/>
     </application>
 </manifest>
