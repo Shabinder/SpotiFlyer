@@ -23,7 +23,8 @@ internal class SpotiFlyerListImpl(
                 dir = this.dir,
                 storeFactory = storeFactory,
                 fetchQuery = fetchQuery,
-                link = link
+                link = link,
+                downloadProgressFlow = downloadProgressFlow
             ).provide()
         }
 
@@ -33,8 +34,8 @@ internal class SpotiFlyerListImpl(
         store.accept(Intent.StartDownloadAll(trackList))
     }
 
-    override fun onDownloadClicked(wholeTrackList: List<TrackDetails>, trackIndex: Int) {
-        store.accept(Intent.StartDownload(wholeTrackList,trackIndex))
+    override fun onDownloadClicked(track:TrackDetails) {
+        store.accept(Intent.StartDownload(track))
     }
 
     override fun onBackPressed(){

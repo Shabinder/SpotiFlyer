@@ -7,9 +7,7 @@ import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 actual fun openPlatform(packageID:String, platformLink:String){
@@ -24,7 +22,7 @@ actual fun giveDonation(){
     //TODO
 }
 
-val DownloadProgressFlow = MutableStateFlow(Pair<String,DownloadStatus>("",DownloadStatus.Queued))
+val DownloadProgressFlow: MutableStateFlow<HashMap<String,DownloadStatus>> = MutableStateFlow(hashMapOf())
 
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,
@@ -38,7 +36,7 @@ actual suspend fun downloadTracks(
             val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
             val videoId = getYTIDBestMatch(searchQuery,it)
             if (videoId.isNullOrBlank()) {
-                DownloadProgressFlow.emit(Pair(it.title,DownloadStatus.Failed))
+                DownloadProgressFlow.emit(DownloadProgressFlow.value.apply { set(it.title,DownloadStatus.Failed) })
             } else {//Found Youtube Video ID
                 downloadTrack(videoId, it,saveFileWithMetaData)
             }
@@ -46,7 +44,7 @@ actual suspend fun downloadTracks(
     }
 }
 
-val ytDownloader = YoutubeDownloader()
+private val ytDownloader = YoutubeDownloader()
 
 suspend fun downloadTrack(
     videoID: String,
@@ -61,14 +59,14 @@ suspend fun downloadTrack(
             downloadFile(url).collect {
                 when(it){
                     is DownloadResult.Error -> {
-                        //TODO()
+                        DownloadProgressFlow.emit(DownloadProgressFlow.value.apply { set(trackDetails.title,DownloadStatus.Failed) })
                     }
                     is DownloadResult.Progress -> {
-                        DownloadProgressFlow.emit(Pair(trackDetails.title,DownloadStatus.Downloading(it.progress)))
+                        DownloadProgressFlow.emit(DownloadProgressFlow.value.apply { set(trackDetails.title,DownloadStatus.Downloading(it.progress)) })
                     }
-                    is DownloadResult.Success -> {
+                    is DownloadResult.Success -> {//Todo clear map
                         saveFileWithMetaData(it.byteArray,trackDetails)
-                        DownloadProgressFlow.emit(Pair(trackDetails.title,DownloadStatus.Downloaded))
+                        DownloadProgressFlow.emit(DownloadProgressFlow.value.apply { set(trackDetails.title,DownloadStatus.Downloaded) })
                     }
                 }
             }

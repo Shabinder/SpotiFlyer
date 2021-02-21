@@ -7,8 +7,8 @@ import com.shabinder.common.list.store.SpotiFlyerListStore.*
 
 internal interface SpotiFlyerListStore: Store<Intent, State, Nothing> {
     sealed class Intent {
-        data class StartDownloadAll(val trackList: List<TrackDetails>): Intent()
-        data class StartDownload(val wholeTrackList:  List<TrackDetails>, val trackIndex:Int): Intent()
         data class SearchLink(val link: String): Intent()
+        data class StartDownload(val track:TrackDetails): Intent()
+        data class StartDownloadAll(val trackList: List<TrackDetails>): Intent()
     }
 }

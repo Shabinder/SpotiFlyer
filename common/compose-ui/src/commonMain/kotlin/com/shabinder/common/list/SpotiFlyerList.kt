@@ -1,16 +1,20 @@
 package com.shabinder.common.list
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.list.integration.SpotiFlyerListImpl
+import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.utils.Consumer
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface SpotiFlyerList {
 
@@ -20,10 +24,11 @@ interface SpotiFlyerList {
     * Download All Tracks(after filtering already Downloaded)
     * */
     fun onDownloadAllClicked(trackList:List<TrackDetails>)
+
     /*
     * Download All Tracks(after filtering already Downloaded)
     * */
-    fun onDownloadClicked(wholeTrackList:List<TrackDetails>, trackIndex:Int)
+    fun onDownloadClicked(track:TrackDetails)
 
     /*
     * To Pop and return back to Main Screen
@@ -41,6 +46,7 @@ interface SpotiFlyerList {
         val dir: Dir
         val link: String
         val listOutput: Consumer<Output>
+        val downloadProgressFlow: StateFlow<HashMap<String,DownloadStatus>>
     }
     sealed class Output {
         object Finished : Output()
@@ -50,7 +56,8 @@ interface SpotiFlyerList {
             "","",
             "Loading","", emptyList(),
             Source.Spotify),
-        val link:String = ""
+        val link:String = "",
+        val trackList:SnapshotStateList<TrackDetails> = mutableStateListOf()
     )
 }
 

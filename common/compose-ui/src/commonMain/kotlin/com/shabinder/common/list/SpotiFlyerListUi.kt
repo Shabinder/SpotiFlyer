@@ -23,6 +23,7 @@ import com.shabinder.common.ui.colorAccent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -32,6 +33,7 @@ fun SpotiFlyerListContent(
     modifier: Modifier = Modifier
 ) {
     val model by component.models.collectAsState(SpotiFlyerList.State())
+
     val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -44,10 +46,10 @@ fun SpotiFlyerListContent(
                 item {
                     CoverImage(result.title, result.coverUrl, coroutineScope,component::loadImage)
                 }
-                itemsIndexed(result.trackList) { index, item ->
+                itemsIndexed(model.trackList) { index, item ->
                     TrackCard(
                         track = item,
-                        downloadTrack = { component.onDownloadClicked(result.trackList,index) },
+                        downloadTrack = { component.onDownloadClicked(item) },
                         loadImage = component::loadImage
                     )
                 }
@@ -88,22 +90,22 @@ fun TrackCard(
             }
         }
         when(track.downloaded){
-            DownloadStatus.Downloaded -> {
+            is DownloadStatus.Downloaded -> {
                 DownloadImageTick()
             }
-            DownloadStatus.Queued -> {
+            is DownloadStatus.Queued -> {
                 CircularProgressIndicator()
             }
-            DownloadStatus.Failed -> {
+            is DownloadStatus.Failed -> {
                 DownloadImageError()
             }
-            DownloadStatus.Downloading -> {
-                CircularProgressIndicator(progress = track.progress.toFloat()/100f)
+            is DownloadStatus.Downloading -> {
+                CircularProgressIndicator(progress = (track.downloaded as DownloadStatus.Downloading).progress.toFloat()/100f)
             }
-            DownloadStatus.Converting -> {
+            is DownloadStatus.Converting -> {
                 CircularProgressIndicator(progress = 100f,color = colorAccent)
             }
-            DownloadStatus.NotDownloaded -> {
+            is DownloadStatus.NotDownloaded -> {
                 DownloadImageArrow(Modifier.clickable(onClick = {
                     downloadTrack()
                 }))

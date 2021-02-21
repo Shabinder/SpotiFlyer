@@ -1,5 +1,6 @@
 package com.shabinder.common.di.providers
 
+import co.touchlab.kermit.Kermit
 import co.touchlab.kermit.Logger
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.YoutubeTrack
@@ -13,7 +14,7 @@ import kotlin.math.absoluteValue
 private const val apiKey = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30"
 
 class YoutubeMusic constructor(
-    private val logger: Logger,
+    private val logger: Kermit,
     private val httpClient:HttpClient,
 ) {
     private val tag = "YT Music"
@@ -166,7 +167,7 @@ class YoutubeMusic constructor(
                 }
             }
         }
-        logger.i(youtubeTracks.joinToString(" abc \n"),tag)
+        //logger.d(youtubeTracks.joinToString(" abc \n"),tag)
         return youtubeTracks
     }
 

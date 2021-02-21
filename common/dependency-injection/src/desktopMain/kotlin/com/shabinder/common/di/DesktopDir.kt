@@ -17,6 +17,10 @@ import javax.imageio.ImageIO
 
 actual class Dir actual constructor(private val logger: Kermit) {
 
+    init {
+        createDirectories()
+    }
+
     actual fun fileSeparator(): String = File.separator
 
     actual fun imageCacheDir(): String = System.getProperty("user.home") +
@@ -45,7 +49,7 @@ actual class Dir actual constructor(private val logger: Kermit) {
     }
 
     actual suspend fun clearCache() {
-        File(imageCacheDir()).deleteRecursively()
+        File(imageCacheDir()).  deleteRecursively()
     }
 
     actual suspend fun cacheImage(image: Any,path:String) {

@@ -19,6 +19,7 @@ import com.shabinder.android.utils.requestStoragePermission
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.createDirectories
+import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRootContent
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
@@ -26,6 +27,8 @@ import com.shabinder.common.ui.SpotiFlyerTheme
 import com.shabinder.common.ui.colorOffWhite
 import com.shabinder.database.Database
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.koin.android.ext.android.inject
 
 const val disableDozeCode = 1223
@@ -38,6 +41,9 @@ class MainActivity : ComponentActivity() {
     private lateinit var root: SpotiFlyerRoot
     private val callBacks: SpotiFlyerRootCallBacks
         get() = root.callBacks
+    //TODO pass updates from Foreground Service
+    private val downloadFlow = MutableStateFlow(hashMapOf<String, DownloadStatus>())
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +72,7 @@ class MainActivity : ComponentActivity() {
                 override val database = this@MainActivity.database
                 override val fetchPlatformQueryResult = this@MainActivity.fetcher
                 override val directories: Dir = this@MainActivity.dir
+                override val downloadProgressReport: StateFlow<HashMap<String, DownloadStatus>> = downloadFlow
             }
         )
 

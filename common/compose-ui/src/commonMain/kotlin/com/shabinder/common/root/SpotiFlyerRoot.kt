@@ -8,11 +8,13 @@ import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
+import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.database.Database
 import com.shabinder.common.root.integration.SpotiFlyerRootImpl
 import com.shabinder.common.utils.Consumer
+import kotlinx.coroutines.flow.StateFlow
 
 interface SpotiFlyerRoot {
 
@@ -30,6 +32,7 @@ interface SpotiFlyerRoot {
         val database: Database
         val fetchPlatformQueryResult: FetchPlatformQueryResult
         val directories: Dir
+        val downloadProgressReport: StateFlow<HashMap<String,DownloadStatus>>
     }
 }
 

@@ -11,11 +11,13 @@ import com.arkivanov.decompose.value.Value
 import com.shabinder.common.di.Dir
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
+import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.utils.Consumer
+import kotlinx.coroutines.flow.StateFlow
 
 internal class SpotiFlyerRootImpl(
     componentContext: ComponentContext,
@@ -58,6 +60,7 @@ internal class SpotiFlyerRootImpl(
                 override val dir: Dir = directories
                 override val link: String = link
                 override val listOutput : Consumer<SpotiFlyerList.Output> = Consumer(::onListOutput)
+                override val downloadProgressFlow = downloadProgressReport
             }
         )
 
