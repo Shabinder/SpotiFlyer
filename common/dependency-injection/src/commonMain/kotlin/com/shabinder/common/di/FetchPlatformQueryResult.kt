@@ -12,7 +12,7 @@ import kotlinx.coroutines.withContext
 class FetchPlatformQueryResult(
     private val gaanaProvider: GaanaProvider,
     private val spotifyProvider: SpotifyProvider,
-    private val youtubeProvider: YoutubeProvider,
+    val youtubeProvider: YoutubeProvider,
     val youtubeMusic: YoutubeMusic,
     private val database: Database
 ) {

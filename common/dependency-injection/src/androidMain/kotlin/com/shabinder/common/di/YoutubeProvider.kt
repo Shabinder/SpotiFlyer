@@ -34,7 +34,7 @@ actual class YoutubeProvider actual constructor(
     private val logger: Kermit,
     private val dir: Dir,
 ){
-    private val ytDownloader: YoutubeDownloader = YoutubeDownloader()
+    val ytDownloader: YoutubeDownloader = YoutubeDownloader()
     /*
     * YT Album Art Schema
     * HI-RES Url: https://i.ytimg.com/vi/$searchId/maxresdefault.jpg"

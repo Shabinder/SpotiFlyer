@@ -75,7 +75,7 @@ actual class Dir actual constructor(private val logger: Kermit) {
             .setId3v1Tags(trackDetails)
             .setId3v2TagsAndSaveFile(trackDetails)
     }
-
+    actual fun addToLibrary(path:String){}
     actual suspend fun loadImage(url: String): ImageBitmap? {
         val cachePath = imageCacheDir() + getNameURL(url)
         var picture: ImageBitmap? = loadCachedImage(cachePath)

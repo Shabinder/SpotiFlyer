@@ -17,8 +17,11 @@
 package com.shabinder.common.models
 
 import com.shabinder.common.models.spotify.Source
+import dev.icerock.moko.parcelize.Parcelable
+import dev.icerock.moko.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
+@Parcelize
 @Serializable
 data class TrackDetails(
     var title:String,
@@ -36,14 +39,15 @@ data class TrackDetails(
     var progress: Int = 2,//2 for visual progress bar hint
     var outputFilePath: String,
     var videoID:String? = null
-)
+):Parcelable
+
 
 @Serializable
-sealed class DownloadStatus {
-    object Downloaded :DownloadStatus()
-    data class Downloading(val progress: Int = 0):DownloadStatus()
-    object Queued :DownloadStatus()
-    object NotDownloaded :DownloadStatus()
-    object Converting :DownloadStatus()
-    object Failed :DownloadStatus()
+sealed class DownloadStatus:Parcelable {
+    @Parcelize object Downloaded :DownloadStatus()
+    @Parcelize data class Downloading(val progress: Int = 2):DownloadStatus()
+    @Parcelize object Queued :DownloadStatus()
+    @Parcelize object NotDownloaded :DownloadStatus()
+    @Parcelize object Converting :DownloadStatus()
+    @Parcelize object Failed :DownloadStatus()
 }

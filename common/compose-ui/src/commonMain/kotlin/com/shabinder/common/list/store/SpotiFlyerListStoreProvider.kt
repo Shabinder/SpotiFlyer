@@ -70,14 +70,13 @@ internal class SpotiFlyerListStoreProvider(
                     }
                     dispatch(Result.UpdateTrackList(list.toMutableList().updateTracksStatuses(downloadProgressFlow.value)))
                 }
-
                 is Intent.StartDownload -> {
+                    downloadTracks(listOf(intent.track),fetchQuery.youtubeMusic::getYTIDBestMatch,dir::saveFileWithMetadata)
                     dispatch(Result.UpdateTrackItem(intent.track.apply { downloaded = DownloadStatus.Queued }))
                 }
             }
         }
     }
-
     private object ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
              when (result) {

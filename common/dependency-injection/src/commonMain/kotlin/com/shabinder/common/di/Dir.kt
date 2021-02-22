@@ -25,6 +25,7 @@ expect class Dir(
     suspend fun loadImage(url:String): ImageBitmap?
     suspend fun clearCache()
     suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, trackDetails: TrackDetails)
+    fun addToLibrary(path:String)
 }
 
 suspend fun downloadFile(url: String): Flow<DownloadResult> {

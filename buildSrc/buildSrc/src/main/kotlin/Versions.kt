@@ -29,7 +29,7 @@ object Versions {
     const val minSdkVersion = 24
     const val compileSdkVersion = 30
     const val targetSdkVersion = 29
-    const val androidLifecycle = "2.3.0-rc01"
+    const val androidLifecycle = "2.3.0"
 }
 object Koin {
     val core = "org.koin:koin-core:${Versions.koin}"
@@ -123,7 +123,7 @@ object Extras {
     const val kermit = "co.touchlab:kermit:${Versions.kermit}"
     object Android {
         val razorpay = "com.razorpay:checkout:1.6.4"
-        val fetch = "androidx.tonyodev.fetch2:xfetch2:3.1.5"
+        val fetch = "androidx.tonyodev.fetch2:xfetch2:3.1.6"
         val appUpdator = "com.github.amitbd1508:AppUpdater:4.1.0"
     }
 }

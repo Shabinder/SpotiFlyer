@@ -12,6 +12,7 @@ import android.provider.Settings
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
+import com.tonyodev.fetch2.Fetch
 
 fun Activity.checkIfLatestVersion() {
     AppUpdater(this,0).run {

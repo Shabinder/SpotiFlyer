@@ -27,7 +27,7 @@ class YoutubeMusic constructor(
             trackDurationSec = trackDetails.durationSec
         ).keys.firstOrNull()
     }
-    suspend fun getYTTracks(query: String):List<YoutubeTrack>{
+    private suspend fun getYTTracks(query: String):List<YoutubeTrack>{
         val youtubeTracks = mutableListOf<YoutubeTrack>()
 
         val responseObj = Json.parseToJsonElement(getYoutubeMusicResponse(query))
@@ -121,23 +121,25 @@ class YoutubeMusic constructor(
                 ! other constituents of a result block will lead to errors, hence the 'in
                 ! result[:-1] ,i.e., skip last element in array '
                 */
-                for(detail in result.subList(0,result.size-1)){
-                    if(detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]?.jsonObject?.size?:0 < 2) continue
+                for(detailArray in result.subList(0,result.size-1)){
+                    for(detail in detailArray.jsonArray){
+                        if(detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]?.jsonObject?.size?:0 < 2) continue
 
-                    // if not a dummy, collect All Variables
-                    val details = detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]
-                        ?.jsonObject?.get("text")
-                        ?.jsonObject?.get("runs")?.jsonArray ?: listOf()
+                        // if not a dummy, collect All Variables
+                        val details = detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]
+                            ?.jsonObject?.get("text")
+                            ?.jsonObject?.get("runs")?.jsonArray ?: listOf()
 
-                    for (d in details){
-                        d.jsonObject["text"]?.jsonPrimitive?.contentOrNull?.let {
-                            if(it != " • "){
-                                availableDetails.add(it)
+                        for (d in details){
+                            d.jsonObject["text"]?.jsonPrimitive?.contentOrNull?.let {
+                                if(it != " • "){
+                                    availableDetails.add(it)
+                                }
                             }
                         }
                     }
                 }
-//            log("YT Music details",availableDetails.toString())
+                //logger.d("YT Music details"){availableDetails.toString()}
                 /*
                 ! Filter Out non-Song/Video results and incomplete results here itself
                 ! From what we know about detail order, note that [1] - indicate result type
@@ -171,7 +173,7 @@ class YoutubeMusic constructor(
         return youtubeTracks
     }
 
-    fun sortByBestMatch(
+    private fun sortByBestMatch(
         ytTracks:List<YoutubeTrack>,
         trackName:String,
         trackArtists:List<String>,
@@ -240,7 +242,7 @@ class YoutubeMusic constructor(
             val avgMatch = (artistMatch + durationMatch)/2
             linksWithMatchValue[result.videoId.toString()] = avgMatch.toInt()
         }
-        //log("YT Api Result", "$trackName - $linksWithMatchValue")
+        logger.d("YT Api Result"){"$trackName - $linksWithMatchValue"}
         return linksWithMatchValue.toList().sortedByDescending { it.second }.toMap()
     }
 

@@ -3,6 +3,7 @@ package com.shabinder.common.di
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.MediaScannerConnection
 import android.os.Environment
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -95,6 +96,7 @@ actual class Dir actual constructor(
                             .removeAllTags()
                             .setId3v1Tags(trackDetails)
                             .setId3v2TagsAndSaveFile(trackDetails)
+                        addToLibrary(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3")
                     }
                 }
                 Config.RETURN_CODE_CANCEL -> {
@@ -105,6 +107,13 @@ actual class Dir actual constructor(
                 }
             }
         }
+    }
+
+    actual fun addToLibrary(path:String) {
+        logger.d{"Scanning File"}
+        MediaScannerConnection.scanFile(
+            appContext,
+            listOf(path).toTypedArray(), null,null)
     }
 
     actual suspend fun loadImage(url: String): ImageBitmap? {
