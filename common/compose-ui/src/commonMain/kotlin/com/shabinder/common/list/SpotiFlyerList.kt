@@ -14,6 +14,7 @@ import com.shabinder.common.utils.Consumer
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface SpotiFlyerList {
@@ -40,13 +41,18 @@ interface SpotiFlyerList {
     * */
     suspend fun loadImage(url:String): ImageBitmap?
 
+    /*
+    * Sync Tracks Statuses
+    * */
+    fun onRefreshTracksStatuses()
+
     interface Dependencies {
         val storeFactory: StoreFactory
         val fetchQuery: FetchPlatformQueryResult
         val dir: Dir
         val link: String
         val listOutput: Consumer<Output>
-        val downloadProgressFlow: StateFlow<HashMap<String,DownloadStatus>>
+        val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>
     }
     sealed class Output {
         object Finished : Output()

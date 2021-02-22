@@ -242,7 +242,7 @@ class YoutubeMusic constructor(
             val avgMatch = (artistMatch + durationMatch)/2
             linksWithMatchValue[result.videoId.toString()] = avgMatch.toInt()
         }
-        logger.d("YT Api Result"){"$trackName - $linksWithMatchValue"}
+        //logger.d("YT Api Result"){"$trackName - $linksWithMatchValue"}
         return linksWithMatchValue.toList().sortedByDescending { it.second }.toMap()
     }
 

@@ -251,25 +251,30 @@ class ForegroundService : Service(),CoroutineScope{
         }
 
         override fun onCompleted(download: Download) {
-            launch {
-                val track = requestMap[download.request]
-                removeFromNotification("Downloading ${track?.title}")
-                try{
-                    track?.let {
-                        dir.saveFileWithMetadata(byteArrayOf(),it)
-                        allTracksStatus[it.title] = DownloadStatus.Converting
+            val track = requestMap[download.request]
+            try{
+                track?.let {
+                    val job = launch { dir.saveFileWithMetadata(byteArrayOf(),it) }
+                    allTracksStatus[it.title] = DownloadStatus.Converting
+                    sendTrackBroadcast("Converting",it)
+                    addToNotification("Processing ${it.title}")
+                    job.invokeOnCompletion { _ ->
+                        converted++
+                        sendTrackBroadcast(Status.COMPLETED.name,it)
+                        removeFromNotification("Processing ${it.title}")
                     }
-                    logger.d(tag){"${track?.title} Download Completed"}
-                }catch (
-                    e: KotlinNullPointerException
-                ){
-                    logger.d(tag){"${track?.title} Download Failed! Error:Fetch!!!!"}
-                    logger.d(tag){"${track?.title} Requesting Download thru Android DM"}
-                    downloadUsingDM(download.request.url, download.request.file, track!!)
-                    downloaded++
-                    requestMap.remove(download.request)
                 }
+                logger.d(tag){"${track?.title} Download Completed"}
+            }catch (
+                e: KotlinNullPointerException
+            ){
+                logger.d(tag){"${track?.title} Download Failed! Error:Fetch!!!!"}
+                logger.d(tag){"${track?.title} Requesting Download thru Android DM"}
+                downloadUsingDM(download.request.url, download.request.file, track!!)
             }
+            downloaded++
+            requestMap.remove(download.request)
+            removeFromNotification("Downloading ${track?.title}")
         }
 
         override fun onDeleted(download: Download) {
@@ -427,7 +432,7 @@ class ForegroundService : Service(),CoroutineScope{
             fetch.removeAll()
             updateNotification()
             cleanFiles(File(dir.defaultDir()))
-            cleanFiles(File(dir.imageCacheDir()))
+            //TODO cleanFiles(File(dir.imageCacheDir()))
             messageList = mutableListOf("","","","","")
             releaseWakeLock()
             serviceJob.cancel()

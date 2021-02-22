@@ -33,8 +33,7 @@ import com.shabinder.common.ui.colorOffWhite
 import com.shabinder.database.Database
 import com.tonyodev.fetch2.Status
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import org.koin.android.ext.android.inject
 
 const val disableDozeCode = 1223
@@ -47,8 +46,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var root: SpotiFlyerRoot
     private val callBacks: SpotiFlyerRootCallBacks
         get() = root.callBacks
-    //TODO pass updates from Foreground Service
-    private val downloadFlow = MutableStateFlow(hashMapOf<String, DownloadStatus>())
+    private val trackStatusFlow = MutableSharedFlow<HashMap<String, DownloadStatus>>(1)
 
     private lateinit var updateUIReceiver: BroadcastReceiver
     private lateinit var queryReceiver: BroadcastReceiver
@@ -80,7 +78,7 @@ class MainActivity : ComponentActivity() {
                 override val database = this@MainActivity.database
                 override val fetchPlatformQueryResult = this@MainActivity.fetcher
                 override val directories: Dir = this@MainActivity.dir
-                override val downloadProgressReport: StateFlow<HashMap<String, DownloadStatus>> = downloadFlow
+                override val downloadProgressReport: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
             }
         )
 
@@ -108,9 +106,9 @@ class MainActivity : ComponentActivity() {
             addAction(Status.QUEUED.name)
             addAction(Status.FAILED.name)
             addAction(Status.DOWNLOADING.name)
+            addAction(Status.COMPLETED.name)
             addAction("Progress")
             addAction("Converting")
-            addAction("track_download_completed")
         }
         updateUIReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -119,18 +117,20 @@ class MainActivity : ComponentActivity() {
                     val trackDetails = intent.getParcelableExtra<TrackDetails?>("track")
                     trackDetails?.let { track ->
                         lifecycleScope.launch {
-                            val latestMap = downloadFlow.value.apply {
+                            val latestMap = trackStatusFlow.replayCache.getOrElse(0
+                            ) { hashMapOf() }.apply {
                                 this[track.title] = when (intent.action) {
                                     Status.QUEUED.name -> DownloadStatus.Queued
                                     Status.FAILED.name -> DownloadStatus.Failed
                                     Status.DOWNLOADING.name -> DownloadStatus.Downloading()
                                     "Progress" ->  DownloadStatus.Downloading(intent.getIntExtra("progress", 0))
                                     "Converting" -> DownloadStatus.Converting
-                                    "track_download_completed" -> DownloadStatus.Downloaded
+                                    Status.COMPLETED.name -> DownloadStatus.Downloaded
                                     else -> DownloadStatus.NotDownloaded
                                 }
                             }
-                            downloadFlow.emit(latestMap)
+                            trackStatusFlow.emit(latestMap)
+                            Log.i("Track Update",track.title + track.downloaded.toString())
                         }
                     }
                 }
@@ -146,7 +146,7 @@ class MainActivity : ComponentActivity() {
                     trackList?.let { list ->
                         Log.i("Service Response", "${list.size} Tracks Active")
                         lifecycleScope.launch {
-                            downloadFlow.emit(list)
+                            trackStatusFlow.emit(list)
                         }
                     }
                 }

@@ -13,3 +13,5 @@ expect suspend fun downloadTracks(
     getYTIDBestMatch:suspend (String,TrackDetails)->String?,
     saveFileWithMetaData:suspend (mp3ByteArray:ByteArray, trackDetails: TrackDetails) -> Unit
 )
+
+expect fun queryActiveTracks()

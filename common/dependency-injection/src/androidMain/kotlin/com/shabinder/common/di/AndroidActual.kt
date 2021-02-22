@@ -41,6 +41,13 @@ actual fun giveDonation(){
     //TODO
 }
 
+actual fun queryActiveTracks() {
+    val serviceIntent = Intent(appContext, ForegroundService::class.java).apply {
+        action = "query"
+    }
+    ContextCompat.startForegroundService(appContext, serviceIntent)
+}
+
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,
     getYTIDBestMatch:suspend (String,TrackDetails)->String?,

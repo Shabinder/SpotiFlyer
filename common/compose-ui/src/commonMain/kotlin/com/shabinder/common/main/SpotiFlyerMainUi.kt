@@ -53,7 +53,7 @@ fun SpotiFlyerMainContent(component: SpotiFlyerMain){
         when(model.selectedCategory){
             HomeCategory.About -> AboutColumn()
             HomeCategory.History -> HistoryColumn(
-                model.records,
+                model.records.sortedByDescending { it.id },
                 component::loadImage,
                 component::onLinkSearch
             )

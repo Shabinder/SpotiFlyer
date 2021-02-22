@@ -42,5 +42,9 @@ internal class SpotiFlyerListImpl(
         listOutput.callback(SpotiFlyerList.Output.Finished)
     }
 
+    override fun onRefreshTracksStatuses() {
+        store.accept(Intent.RefreshTracksStatuses)
+    }
+
     override suspend fun loadImage(url: String): ImageBitmap? = dir.loadImage(url)
 }

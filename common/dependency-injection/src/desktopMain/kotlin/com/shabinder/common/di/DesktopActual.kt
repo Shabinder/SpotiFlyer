@@ -22,7 +22,9 @@ actual fun giveDonation(){
     //TODO
 }
 
-val DownloadProgressFlow: MutableStateFlow<HashMap<String,DownloadStatus>> = MutableStateFlow(hashMapOf())
+actual fun queryActiveTracks(){}
+
+val DownloadProgressFlow: MutableSharedFlow<HashMap<String,DownloadStatus>> = MutableSharedFlow(1)
 
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,
@@ -36,7 +38,8 @@ actual suspend fun downloadTracks(
             val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
             val videoId = getYTIDBestMatch(searchQuery,it)
             if (videoId.isNullOrBlank()) {
-                DownloadProgressFlow.emit(DownloadProgressFlow.value.apply { set(it.title,DownloadStatus.Failed) })
+                DownloadProgressFlow.emit(DownloadProgressFlow.replayCache.getOrElse(0
+                ) { hashMapOf() }.apply { set(it.title,DownloadStatus.Failed) })
             } else {//Found Youtube Video ID
                 downloadTrack(videoId, it,saveFileWithMetaData)
             }
@@ -59,14 +62,17 @@ suspend fun downloadTrack(
             downloadFile(url).collect {
                 when(it){
                     is DownloadResult.Error -> {
-                        DownloadProgressFlow.emit(DownloadProgressFlow.value.apply { set(trackDetails.title,DownloadStatus.Failed) })
+                        DownloadProgressFlow.emit(DownloadProgressFlow.replayCache.getOrElse(0
+                        ) { hashMapOf() }.apply { set(trackDetails.title,DownloadStatus.Failed) })
                     }
                     is DownloadResult.Progress -> {
-                        DownloadProgressFlow.emit(DownloadProgressFlow.value.apply { set(trackDetails.title,DownloadStatus.Downloading(it.progress)) })
+                        DownloadProgressFlow.emit(DownloadProgressFlow.replayCache.getOrElse(0
+                        ) { hashMapOf() }.apply { set(trackDetails.title,DownloadStatus.Downloading(it.progress)) })
                     }
                     is DownloadResult.Success -> {//Todo clear map
                         saveFileWithMetaData(it.byteArray,trackDetails)
-                        DownloadProgressFlow.emit(DownloadProgressFlow.value.apply { set(trackDetails.title,DownloadStatus.Downloaded) })
+                        DownloadProgressFlow.emit(DownloadProgressFlow.replayCache.getOrElse(0
+                        ) { hashMapOf() }.apply { set(trackDetails.title,DownloadStatus.Downloaded) })
                     }
                 }
             }
