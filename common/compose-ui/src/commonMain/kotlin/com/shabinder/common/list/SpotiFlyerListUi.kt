@@ -69,6 +69,10 @@ fun TrackCard(
     downloadTrack:()->Unit,
     loadImage:suspend (String)-> ImageBitmap?
 ) {
+    /*val status = remember { mutableStateOf(track.downloaded.name()) }
+    LaunchedEffect(track.downloaded.name()){
+        status.value = track.downloaded.name()
+    }*/
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
         ImageLoad(
             {loadImage(track.albumArtURL)},

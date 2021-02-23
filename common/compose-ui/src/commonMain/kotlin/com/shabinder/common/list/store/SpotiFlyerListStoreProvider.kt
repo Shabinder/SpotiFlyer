@@ -1,7 +1,5 @@
 package com.shabinder.common.list.store
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.arkivanov.mvikotlin.core.store.*
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.shabinder.common.database.getLogger
@@ -16,9 +14,7 @@ import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.ui.showPopUpMessage
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import org.koin.ext.scope
 
 internal class SpotiFlyerListStoreProvider(
     private val dir: Dir,
@@ -70,16 +66,15 @@ internal class SpotiFlyerListStoreProvider(
                     else downloadTracks(finalList,fetchQuery.youtubeMusic::getYTIDBestMatch,dir::saveFileWithMetadata)
 
                     val list = intent.trackList.map {
-                        if (it.downloaded == DownloadStatus.NotDownloaded) {
-                            it.downloaded = DownloadStatus.Queued
-                        }
+                        if (it.downloaded == DownloadStatus.NotDownloaded)
+                            return@map it.copy(downloaded = DownloadStatus.Queued)
                         it
                     }
                     dispatch(Result.UpdateTrackList(list.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0){ hashMapOf()})))
                 }
                 is Intent.StartDownload -> {
                     downloadTracks(listOf(intent.track),fetchQuery.youtubeMusic::getYTIDBestMatch,dir::saveFileWithMetadata)
-                    dispatch(Result.UpdateTrackItem(intent.track.apply { downloaded = DownloadStatus.Queued }))
+                    dispatch(Result.UpdateTrackItem(intent.track.copy(downloaded = DownloadStatus.Queued)))
                 }
                 is Intent.RefreshTracksStatuses -> queryActiveTracks()
             }
@@ -108,7 +103,7 @@ internal class SpotiFlyerListStoreProvider(
         for(newTrack in map){
             titleList.indexOf(newTrack.key).let { position ->
                 if(position != -1){
-                    updatedList.getOrNull(position)?.apply { downloaded = newTrack.value }?.also { updatedTrack ->
+                    updatedList.getOrNull(position)?.copy(downloaded = newTrack.value)?.also { updatedTrack ->
                         updatedList[position] = updatedTrack
                         logger.d("$position) ${updatedTrack.downloaded} - ${updatedTrack.title}","List Store Track Update")
                     }

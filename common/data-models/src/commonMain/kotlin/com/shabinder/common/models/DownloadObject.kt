@@ -35,10 +35,9 @@ data class TrackDetails(
     var albumArtPath: String,
     var albumArtURL: String,
     var source: Source,
-    var downloaded: DownloadStatus = DownloadStatus.NotDownloaded,
-    var progress: Int = 2,//2 for visual progress bar hint
+    val downloaded: DownloadStatus = DownloadStatus.NotDownloaded,
     var outputFilePath: String,
-    var videoID:String? = null
+    var videoID:String? = null,
 ):Parcelable
 
 
