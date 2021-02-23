@@ -18,6 +18,7 @@ import com.shabinder.common.ui.showPopUpMessage
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import org.koin.ext.scope
 
 internal class SpotiFlyerListStoreProvider(
     private val dir: Dir,
@@ -37,16 +38,15 @@ internal class SpotiFlyerListStoreProvider(
         ) {}
 
     private sealed class Result {
-        data class ResultFetched(val result: PlatformQueryResult,val trackList: SnapshotStateList<TrackDetails>) : Result()
-        data class UpdateTrackList(val list:SnapshotStateList<TrackDetails>): Result()
+        data class ResultFetched(val result: PlatformQueryResult,val trackList: List<TrackDetails>) : Result()
+        data class UpdateTrackList(val list:List<TrackDetails>): Result()
         data class UpdateTrackItem(val item:TrackDetails): Result()
     }
 
-    private inner class ExecutorImpl : SuspendExecutor<Intent, Unit, State, Result, Nothing>() {
+    private inner class ExecutorImpl: SuspendExecutor<Intent, Unit, State, Result, Nothing>() {
 
         override suspend fun executeAction(action: Unit, getState: () -> State) {
             executeIntent(Intent.SearchLink(link),getState)
-            executeIntent(Intent.RefreshTracksStatuses,getState)
 
             downloadProgressFlow.collectLatest { map ->
                 logger.d(map.size.toString(),"ListStore: flow Updated")
@@ -59,7 +59,8 @@ internal class SpotiFlyerListStoreProvider(
             when (intent) {
                 is Intent.SearchLink -> fetchQuery.query(link)?.let{ result ->
                     result.trackList = result.trackList.toMutableList()
-                    dispatch((Result.ResultFetched(result,result.trackList.toMutableList().updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0){ hashMapOf()}))))
+                    dispatch((Result.ResultFetched(result,result.trackList.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0){ hashMapOf()}))))
+                    executeIntent(Intent.RefreshTracksStatuses,getState)
                 }
 
                 is Intent.StartDownloadAll -> {
@@ -74,7 +75,7 @@ internal class SpotiFlyerListStoreProvider(
                         }
                         it
                     }
-                    dispatch(Result.UpdateTrackList(list.toMutableList().updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0){ hashMapOf()})))
+                    dispatch(Result.UpdateTrackList(list.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0){ hashMapOf()})))
                 }
                 is Intent.StartDownload -> {
                     downloadTracks(listOf(intent.track),fetchQuery.youtubeMusic::getYTIDBestMatch,dir::saveFileWithMetadata)
@@ -95,23 +96,25 @@ internal class SpotiFlyerListStoreProvider(
         private fun State.updateTrackItem(item: TrackDetails):State{
             val position = this.trackList.map { it.title }.indexOf(item.title)
             if(position != -1){
-                return copy(trackList = trackList.apply { set(position,item) })
+                return copy(trackList = trackList.toMutableList().apply { set(position,item) })
             }
             return this
         }
     }
-    private fun MutableList<TrackDetails>.updateTracksStatuses(map:HashMap<String,DownloadStatus>):SnapshotStateList<TrackDetails>{
+    private fun List<TrackDetails>.updateTracksStatuses(map:HashMap<String,DownloadStatus>):List<TrackDetails>{
         val titleList = this.map { it.title }
-        val newStateList = mutableStateListOf<TrackDetails>()
+        val updatedList = mutableListOf<TrackDetails>().also { it.addAll(this) }
+
         for(newTrack in map){
             titleList.indexOf(newTrack.key).let { position ->
-                this.getOrNull(position)?.apply { downloaded = newTrack.value }?.also { updatedTrack ->
-                    this[position] = updatedTrack
-                    logger.d(updatedTrack.toString(),"List Store Track Update")
+                if(position != -1){
+                    updatedList.getOrNull(position)?.apply { downloaded = newTrack.value }?.also { updatedTrack ->
+                        updatedList[position] = updatedTrack
+                        logger.d("$position) ${updatedTrack.downloaded} - ${updatedTrack.title}","List Store Track Update")
+                    }
                 }
             }
         }
-        newStateList.addAll(this)
-        return newStateList
+        return updatedList
     }
 }

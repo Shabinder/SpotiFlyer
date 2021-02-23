@@ -37,7 +37,7 @@ fun SpotiFlyerListContent(
     val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = modifier.fillMaxSize()) {
-        //TODO Null Handling
+        //TODO Better Null Handling
         val result = model.queryResult!!
 
         LazyColumn(

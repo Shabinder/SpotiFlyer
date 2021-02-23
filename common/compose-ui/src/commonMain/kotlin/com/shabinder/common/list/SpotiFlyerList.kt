@@ -63,7 +63,7 @@ interface SpotiFlyerList {
             "Loading","", emptyList(),
             Source.Spotify),
         val link:String = "",
-        val trackList:SnapshotStateList<TrackDetails> = mutableStateListOf()
+        val trackList:List<TrackDetails> = emptyList()
     )
 }
 
