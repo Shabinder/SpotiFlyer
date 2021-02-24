@@ -35,6 +35,7 @@ data class TrackDetails(
     var albumArtPath: String,
     var albumArtURL: String,
     var source: Source,
+    val progress: Int = 2,
     val downloaded: DownloadStatus = DownloadStatus.NotDownloaded,
     var outputFilePath: String,
     var videoID:String? = null,

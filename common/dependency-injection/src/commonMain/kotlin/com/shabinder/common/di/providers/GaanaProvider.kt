@@ -220,7 +220,7 @@ class GaanaProvider(
             downloaded = it.downloaded ?: DownloadStatus.NotDownloaded,
             source = Source.Gaana,
             albumArtURL = it.artworkLink,
-            outputFilePath = dir.finalOutputDir(it.track_title,type, subFolder,dir.defaultDir(),".m4a")
+            outputFilePath = dir.finalOutputDir(it.track_title,type, subFolder,dir.defaultDir()/*,".m4a"*/)
         )
     }
 }

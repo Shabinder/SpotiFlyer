@@ -178,11 +178,17 @@ class ForegroundService : Service(),CoroutineScope{
     private fun downloadTrack(videoID:String, track: TrackDetails){
         launch {
             try {
-                val audioData = ytDownloader.getVideo(videoID).getData()
+                /*val audioData = ytDownloader.getVideo(videoID).getData()
 
                 audioData?.let {
                     val url: String = it.url()
                     logger.d("DHelper Link Found") { url }
+                }*/
+                val url = fetcher.youtubeMp3.getMp3DownloadLink(videoID)
+                if (url == null){
+                    sendTrackBroadcast(Status.FAILED.name,track)
+                    allTracksStatus[track.title] = DownloadStatus.Failed
+                } else{
                     val request= Request(url, track.outputFilePath).apply{
                         priority = Priority.NORMAL
                         networkType = NetworkType.ALL
@@ -260,6 +266,7 @@ class ForegroundService : Service(),CoroutineScope{
                     addToNotification("Processing ${it.title}")
                     job.invokeOnCompletion { _ ->
                         converted++
+                        allTracksStatus[it.title] = DownloadStatus.Downloaded
                         sendTrackBroadcast(Status.COMPLETED.name,it)
                         removeFromNotification("Processing ${it.title}")
                     }

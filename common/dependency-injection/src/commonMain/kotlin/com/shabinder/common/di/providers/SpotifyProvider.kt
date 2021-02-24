@@ -271,7 +271,7 @@ class SpotifyProvider(
             downloaded = it.downloaded,
             source = Source.Spotify,
             albumArtURL = it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString(),
-            outputFilePath = dir.finalOutputDir(it.name.toString(),type, subFolder,dir.defaultDir(),".m4a")
+            outputFilePath = dir.finalOutputDir(it.name.toString(),type, subFolder,dir.defaultDir()/*,".m4a"*/)
         )
     }
 }

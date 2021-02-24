@@ -117,7 +117,7 @@ object Ktor {
 }
 
 object Extras {
-    const val youtubeDownloader = "com.github.sealedtx:java-youtube-downloader:2.5.0"
+    const val youtubeDownloader = "com.github.sealedtx:java-youtube-downloader:2.5.1"
     const val fuzzyWuzzy = "me.xdrop:fuzzywuzzy:1.3.1"
     const val mp3agic = "com.mpatric:mp3agic:0.9.1"
     const val kermit = "co.touchlab:kermit:${Versions.kermit}"

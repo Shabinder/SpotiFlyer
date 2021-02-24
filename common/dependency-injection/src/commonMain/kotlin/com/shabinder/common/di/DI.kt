@@ -5,6 +5,7 @@ import com.shabinder.common.database.createDatabase
 import com.shabinder.common.database.getLogger
 import com.shabinder.common.di.providers.GaanaProvider
 import com.shabinder.common.di.providers.SpotifyProvider
+import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
 import io.ktor.client.*
 import io.ktor.client.features.json.*
@@ -33,7 +34,8 @@ fun commonModule(enableNetworkLogs: Boolean) = module {
     single { SpotifyProvider(get(),get(),get(),get()) }
     single { GaanaProvider(get(),get(),get(),get()) }
     single { YoutubeProvider(get(),get(),get(),get()) }
-    single { FetchPlatformQueryResult(get(),get(),get(),get(),get()) }
+    single { YoutubeMp3(get(),get(),get(),get()) }
+    single { FetchPlatformQueryResult(get(),get(),get(),get(),get(),get()) }
     single { createHttpClient(enableNetworkLogs = enableNetworkLogs) }
 }
 

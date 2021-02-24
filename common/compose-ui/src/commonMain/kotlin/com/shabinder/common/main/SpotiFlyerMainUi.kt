@@ -298,7 +298,7 @@ fun HistoryColumn(
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         content = {
-            items(list) {
+            items(list.distinctBy { it.coverUrl }) {
                 DownloadRecordItem(
                     item = it,
                     loadImage,

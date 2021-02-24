@@ -103,9 +103,9 @@ internal class SpotiFlyerListStoreProvider(
         for(newTrack in map){
             titleList.indexOf(newTrack.key).let { position ->
                 if(position != -1){
-                    updatedList.getOrNull(position)?.copy(downloaded = newTrack.value)?.also { updatedTrack ->
+                    updatedList.getOrNull(position)?.copy(downloaded = newTrack.value,progress = (newTrack.value as? DownloadStatus.Downloading)?.progress ?: updatedList[position].progress )?.also { updatedTrack ->
                         updatedList[position] = updatedTrack
-                        logger.d("$position) ${updatedTrack.downloaded} - ${updatedTrack.title}","List Store Track Update")
+                        //logger.d("$position) ${updatedTrack.downloaded} - ${updatedTrack.title}","List Store Track Update")
                     }
                 }
             }

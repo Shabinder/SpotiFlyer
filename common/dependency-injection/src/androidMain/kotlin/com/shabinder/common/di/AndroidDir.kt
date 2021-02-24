@@ -8,8 +8,6 @@ import android.os.Environment
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
-import com.arthenica.mobileffmpeg.Config
-import com.arthenica.mobileffmpeg.FFmpeg
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.database.appContext
@@ -78,33 +76,53 @@ actual class Dir actual constructor(
         mp3ByteArray: ByteArray,
         trackDetails: TrackDetails
     ) {
-        val m4aFile = File(trackDetails.outputFilePath)
+        val songFile = File(trackDetails.outputFilePath)
         /*
         * Check , if Fetch was Used, File is saved Already, else write byteArray we Received
         * */
-        if(!m4aFile.exists()) m4aFile.writeBytes(mp3ByteArray)
+        //if(!m4aFile.exists()) m4aFile.writeBytes(mp3ByteArray)
 
-        FFmpeg.executeAsync(
-            "-i ${m4aFile.absolutePath} -y -b:a 160k -acodec libmp3lame -vn ${m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"}"
-        ){ _, returnCode ->
-            when (returnCode) {
-                Config.RETURN_CODE_SUCCESS  -> {
-                    //FFMPEG task Completed
-                    logger.d{ "Async command execution completed successfully." }
-                    scope.launch {
-                        Mp3File(File(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"))
-                            .removeAllTags()
-                            .setId3v1Tags(trackDetails)
-                            .setId3v2TagsAndSaveFile(trackDetails)
-                        addToLibrary(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3")
+        when(trackDetails.outputFilePath.substringAfterLast('.')){
+            ".mp3" -> {
+                Mp3File(File(songFile.absolutePath))
+                    .removeAllTags()
+                    .setId3v1Tags(trackDetails)
+                    .setId3v2TagsAndSaveFile(trackDetails)
+                addToLibrary(songFile.absolutePath)
+            }
+            ".m4a" -> {
+                /*FFmpeg.executeAsync(
+                    "-i ${m4aFile.absolutePath} -y -b:a 160k -acodec libmp3lame -vn ${m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"}"
+                ){ _, returnCode ->
+                    when (returnCode) {
+                        Config.RETURN_CODE_SUCCESS  -> {
+                            //FFMPEG task Completed
+                            logger.d{ "Async command execution completed successfully." }
+                            scope.launch {
+                                Mp3File(File(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"))
+                                    .removeAllTags()
+                                    .setId3v1Tags(trackDetails)
+                                    .setId3v2TagsAndSaveFile(trackDetails)
+                                addToLibrary(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3")
+                            }
+                        }
+                        Config.RETURN_CODE_CANCEL -> {
+                            logger.d{"Async command execution cancelled by user."}
+                        }
+                        else -> {
+                            logger.d { "Async command execution failed with rc=$returnCode" }
+                        }
                     }
-                }
-                Config.RETURN_CODE_CANCEL -> {
-                    logger.d{"Async command execution cancelled by user."}
-                }
-                else -> {
-                    logger.d { "Async command execution failed with rc=$returnCode" }
-                }
+                }*/
+            }
+            else -> {
+                try{
+                    Mp3File(File(songFile.absolutePath))
+                        .removeAllTags()
+                        .setId3v1Tags(trackDetails)
+                        .setId3v2TagsAndSaveFile(trackDetails)
+                    addToLibrary(songFile.absolutePath)
+                }catch (e:Exception){e.printStackTrace()}
             }
         }
     }

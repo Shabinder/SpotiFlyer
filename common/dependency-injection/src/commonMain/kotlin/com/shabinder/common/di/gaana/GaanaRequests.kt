@@ -12,10 +12,10 @@ interface GaanaRequests {
     val httpClient:HttpClient
 
     /*
-        * Api Request:  http://api.gaana.com/?type=playlist&subtype=playlist_detail&seokey=gaana-dj-hindi-top-50-1&token=b2e6d7fbc136547a940516e9b77e5990&format=JSON
-        *
-        * subtype : ["most_popular_playlist" , "playlist_home_featured" ,"playlist_detail" ,"user_playlist" ,"topCharts"]
-        **/
+    * Api Request:  http://api.gaana.com/?type=playlist&subtype=playlist_detail&seokey=gaana-dj-hindi-top-50-1&token=b2e6d7fbc136547a940516e9b77e5990&format=JSON
+    *
+    * subtype : ["most_popular_playlist" , "playlist_home_featured" ,"playlist_detail" ,"user_playlist" ,"topCharts"]
+    **/
     suspend fun getGaanaPlaylist(
         type: String = "playlist",
         subtype: String = "playlist_detail",

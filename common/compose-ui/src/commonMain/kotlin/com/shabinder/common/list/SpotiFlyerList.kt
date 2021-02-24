@@ -58,10 +58,7 @@ interface SpotiFlyerList {
         object Finished : Output()
     }
     data class State(
-        val queryResult: PlatformQueryResult? = PlatformQueryResult(
-            "","",
-            "Loading","", emptyList(),
-            Source.Spotify),
+        val queryResult: PlatformQueryResult? = null,
         val link:String = "",
         val trackList:List<TrackDetails> = emptyList()
     )

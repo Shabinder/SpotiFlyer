@@ -34,7 +34,7 @@ kotlin {
                 implementation(Ktor.clientAndroid)
                 implementation(Extras.Android.fetch)
                 implementation(Koin.android)
-                api(files("$rootDir/libs/mobile-ffmpeg.aar"))
+                //api(files("$rootDir/libs/mobile-ffmpeg.aar"))
             }
         }
         desktopMain {

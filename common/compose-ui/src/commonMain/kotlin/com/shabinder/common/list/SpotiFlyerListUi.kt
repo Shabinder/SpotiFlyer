@@ -21,11 +21,6 @@ import com.shabinder.common.ui.*
 import com.shabinder.common.ui.SpotiFlyerTypography
 import com.shabinder.common.ui.colorAccent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun SpotiFlyerListContent(
@@ -38,28 +33,35 @@ fun SpotiFlyerListContent(
 
     Box(modifier = modifier.fillMaxSize()) {
         //TODO Better Null Handling
-        val result = model.queryResult!!
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            content = {
-                item {
-                    CoverImage(result.title, result.coverUrl, coroutineScope,component::loadImage)
-                }
-                itemsIndexed(model.trackList) { index, item ->
-                    TrackCard(
-                        track = item,
-                        downloadTrack = { component.onDownloadClicked(item) },
-                        loadImage = component::loadImage
-                    )
-                }
-            },
-            modifier = Modifier.fillMaxSize(),
-        )
-        DownloadAllButton(
-            onClick = {component.onDownloadAllClicked(result.trackList)},
-            modifier = Modifier.padding(bottom = 24.dp).align(Alignment.BottomCenter)
-        )
+        val result = model.queryResult
+        if(result == null){
+            Column(Modifier.fillMaxSize(),verticalArrangement = Arrangement.Center,horizontalAlignment = Alignment.CenterHorizontally) {
+                CircularProgressIndicator()
+                Spacer(modifier.padding(8.dp))
+                Text("Loading..",style = appNameStyle,color = colorPrimary)
+            }
+        }else{
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                content = {
+                    item {
+                        CoverImage(result.title, result.coverUrl, coroutineScope,component::loadImage)
+                    }
+                    itemsIndexed(model.trackList) { index, item ->
+                        TrackCard(
+                            track = item,
+                            downloadTrack = { component.onDownloadClicked(item) },
+                            loadImage = component::loadImage
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxSize(),
+            )
+            DownloadAllButton(
+                onClick = {component.onDownloadAllClicked(model.trackList)},
+                modifier = Modifier.padding(bottom = 24.dp).align(Alignment.BottomCenter)
+            )
+        }
     }
 }
 

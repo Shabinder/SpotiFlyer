@@ -60,6 +60,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        /*lifecycleScope.launch {
+            val string = fetcher.youtubeMp3.getMp3DownloadLink("lVfVrqu1G0U")
+            Log.i("Mp3Test",string)
+        }*/
         initialise()
     }
 

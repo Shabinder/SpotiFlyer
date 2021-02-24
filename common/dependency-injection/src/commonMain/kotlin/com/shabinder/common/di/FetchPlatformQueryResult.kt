@@ -4,6 +4,7 @@ import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.di.providers.GaanaProvider
 import com.shabinder.common.di.providers.SpotifyProvider
+import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
 import com.shabinder.database.Database
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +15,7 @@ class FetchPlatformQueryResult(
     private val spotifyProvider: SpotifyProvider,
     val youtubeProvider: YoutubeProvider,
     val youtubeMusic: YoutubeMusic,
+    val youtubeMp3: YoutubeMp3,
     private val database: Database
 ) {
     private val db:DownloadRecordDatabaseQueries

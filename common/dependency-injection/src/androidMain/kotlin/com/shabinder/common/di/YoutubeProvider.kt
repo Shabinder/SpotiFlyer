@@ -125,7 +125,7 @@ actual class YoutubeProvider actual constructor(
                         else {
                             DownloadStatus.NotDownloaded
                         },
-                        outputFilePath = dir.finalOutputDir(it.title(), folderType, subFolder, dir.defaultDir(),".m4a"),
+                        outputFilePath = dir.finalOutputDir(it.title(), folderType, subFolder, dir.defaultDir()/*,".m4a"*/),
                         videoID = it.videoId()
                     )
                 }
@@ -195,7 +195,7 @@ actual class YoutubeProvider actual constructor(
                         else {
                             DownloadStatus.NotDownloaded
                         },
-                        outputFilePath = dir.finalOutputDir(name, folderType, subFolder, dir.defaultDir(),".m4a"),
+                        outputFilePath = dir.finalOutputDir(name, folderType, subFolder, dir.defaultDir()/*,".m4a"*/),
                         videoID = searchId
                     )
                 )
