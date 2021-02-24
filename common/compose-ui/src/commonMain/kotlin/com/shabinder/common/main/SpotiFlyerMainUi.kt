@@ -10,6 +10,7 @@ import androidx.compose.material.*
 import androidx.compose.material.Icon
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults.textFieldColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -130,10 +132,12 @@ fun SearchPanel(
                     BorderStroke(2.dp, Brush.horizontalGradient(listOf(colorPrimary, colorAccent))),
                     RoundedCornerShape(30.dp)
                 ),
-            backgroundColor = Color.Black,
             shape = RoundedCornerShape(size = 30.dp),
-            activeColor = transparent,
-            inactiveColor = transparent,
+            colors = textFieldColors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                backgroundColor = Color.Black
+            )
         )
         OutlinedButton(
             modifier = Modifier.padding(12.dp).wrapContentWidth(),
@@ -171,28 +175,28 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         imageVector = SpotifyLogo(),
                         "Open Spotify",
                         tint = Color.Unspecified,
-                        modifier = Modifier.clickable(
+                        modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
                             onClick = { openPlatform("com.spotify.music","http://open.spotify.com") })
                     )
                     Spacer(modifier = modifier.padding(start = 16.dp))
                     Icon(imageVector = GaanaLogo(),
                         "Open Gaana",
                         tint = Color.Unspecified,
-                        modifier = Modifier.clickable(
+                        modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
                             onClick = { openPlatform("com.gaana","http://gaana.com") })
                     )
                     Spacer(modifier = modifier.padding(start = 16.dp))
                     Icon(imageVector = YoutubeLogo(),
                         "Open Youtube",
                         tint = Color.Unspecified,
-                        modifier = Modifier.clickable(
+                        modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
                             onClick = { openPlatform("com.google.android.youtube","http://m.youtube.com") })
                     )
                     Spacer(modifier = modifier.padding(start = 12.dp))
                     Icon(imageVector = YoutubeMusicLogo(),
                         "Open Youtube Music",
                         tint = Color.Unspecified,
-                        modifier = Modifier.clickable(
+                        modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
                             onClick = { openPlatform("com.google.android.apps.youtube.music","https://music.youtube.com/") })
                     )
                 }
@@ -251,7 +255,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         .clickable(onClick = { giveDonation() }),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Rounded.MailOutline,"Support Developer")
+                    Icon(Icons.Rounded.CardGiftcard,"Support Developer")
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
                         Text(
@@ -296,7 +300,7 @@ fun HistoryColumn(
     onItemClicked: (String) -> Unit
 ) {
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         content = {
             items(list.distinctBy { it.coverUrl }) {
                 DownloadRecordItem(
@@ -318,9 +322,10 @@ fun DownloadRecordItem(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {
         ImageLoad(
-            { loadImage(item.coverUrl) },
+            item.coverUrl,
+            loadImage,
             "Album Art",
-            modifier = Modifier.height(75.dp).width(90.dp)
+            modifier = Modifier.height(70.dp).width(70.dp).clip(SpotiFlyerShapes.medium)
         )
         Column(modifier = Modifier.padding(horizontal = 8.dp).height(60.dp).weight(1f),verticalArrangement = Arrangement.SpaceEvenly) {
             Text(item.name,maxLines = 1,overflow = TextOverflow.Ellipsis,style = SpotiFlyerTypography.h6,color = colorAccent)

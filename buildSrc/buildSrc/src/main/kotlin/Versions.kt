@@ -1,7 +1,7 @@
 @file:Suppress("MayBeConstant", "SpellCheckingInspection")
 
 object Versions {
-    const val versionName = "2.2"
+    const val versionName = "2.2.0"
     const val kotlinVersion = "1.4.30"
 
     const val coroutinesVersion = "1.4.2"
@@ -67,7 +67,7 @@ object JetBrains {
 
     object Compose {
         // __LATEST_COMPOSE_RELEASE_VERSION__
-        const val VERSION = "0.3.0-build152"
+        const val VERSION = "0.3.0"
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
     }
 }
@@ -122,7 +122,7 @@ object Extras {
     const val mp3agic = "com.mpatric:mp3agic:0.9.1"
     const val kermit = "co.touchlab:kermit:${Versions.kermit}"
     object Android {
-        val razorpay = "com.razorpay:checkout:1.6.4"
+        val razorpay = "com.razorpay:checkout:1.6.5"
         val fetch = "androidx.tonyodev.fetch2:xfetch2:3.1.6"
         val appUpdator = "com.github.amitbd1508:AppUpdater:4.1.0"
     }

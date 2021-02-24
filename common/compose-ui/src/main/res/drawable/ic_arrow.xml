@@ -14,8 +14,8 @@
   ~  along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="36dp"
-    android:height="32dp" android:viewportWidth="512" android:viewportHeight="512">
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="40dp"
+    android:height="38dp" android:viewportWidth="512" android:viewportHeight="512">
     <path android:fillColor="#516AEC" android:pathData="m296,288 l60,-60c7.73,-7.73 17.86,-11.6 28,-11.6 10.055,0 20.101,3.806 27.806,11.407 15.612,15.402 15.207,41.18 -0.3,56.687l-134.293,134.293c-11.716,11.716 -30.711,11.716 -42.426,0l-134.787,-134.787c-7.73,-7.73 -11.6,-17.86 -11.6,-28 0,-10.055 3.806,-20.101 11.407,-27.806 15.402,-15.612 41.18,-15.207 56.687,0.3l59.506,59.506v-232c0,-22.091 17.909,-40 40,-40 22.091,0 40,17.909 40,40z"/>
     <path android:fillColor="#EC7EBA" android:pathData="m411.51,284.49 l-134.3,134.3c-11.71,11.71 -30.71,11.71 -42.42,0l-12.74,-12.74c10.69,4.06 23.23,1.77 31.84,-6.84l134.29,-134.29c12.51,-12.51 15.19,-31.7 7.57,-46.74 5.86,1.81 11.39,5.03 16.06,9.63 15.61,15.4 15.2,41.18 -0.3,56.68z"/>
     <path android:fillColor="#EC7EBA" android:pathData="m251.88,27.72c-3.46,-3.46 -7.55,-6.29 -12.08,-8.3 4.95,-2.2 10.43,-3.42 16.2,-3.42 11.04,0 21.04,4.48 28.28,11.72s11.72,17.24 11.72,28.28v232l-15.329,15.329c-6.3,6.3 -17.071,1.838 -17.071,-7.071v-240.258c0,-11.04 -4.48,-21.04 -11.72,-28.28z"/>

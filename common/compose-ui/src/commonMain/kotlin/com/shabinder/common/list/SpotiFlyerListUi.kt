@@ -42,7 +42,7 @@ fun SpotiFlyerListContent(
             }
         }else{
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
                 content = {
                     item {
                         CoverImage(result.title, result.coverUrl, coroutineScope,component::loadImage)
@@ -71,17 +71,14 @@ fun TrackCard(
     downloadTrack:()->Unit,
     loadImage:suspend (String)-> ImageBitmap?
 ) {
-    /*val status = remember { mutableStateOf(track.downloaded.name()) }
-    LaunchedEffect(track.downloaded.name()){
-        status.value = track.downloaded.name()
-    }*/
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
         ImageLoad(
-            {loadImage(track.albumArtURL)},
+            track.albumArtURL,
+            loadImage,
             "Album Art",
             modifier = Modifier
-                .width(75.dp)
-                .height(90.dp)
+                .width(70.dp)
+                .height(70.dp)
                 .clip(MaterialTheme.shapes.medium)
         )
         Column(modifier = Modifier.padding(horizontal = 8.dp).height(60.dp).weight(1f),verticalArrangement = Arrangement.SpaceEvenly) {
@@ -133,11 +130,13 @@ fun CoverImage(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ImageLoad(
-            { loadImage(coverURL) },
+            coverURL,
+            loadImage,
             "Cover Image",
             modifier = Modifier
-                .width(210.dp)
-                .height(230.dp)
+                .padding(12.dp)
+                .width(190.dp)
+                .height(210.dp)
                 .clip(MaterialTheme.shapes.medium)
         )
         Text(

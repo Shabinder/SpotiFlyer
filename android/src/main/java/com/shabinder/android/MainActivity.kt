@@ -25,9 +25,12 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.rootComponent
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import com.razorpay.Checkout
+import com.razorpay.PaymentResultListener
 import com.shabinder.android.utils.checkIfLatestVersion
 import com.shabinder.android.utils.disableDozeMode
 import com.shabinder.android.utils.requestStoragePermission
+import com.shabinder.common.database.activityContext
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.createDirectories
@@ -38,6 +41,7 @@ import com.shabinder.common.root.SpotiFlyerRootContent
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.ui.SpotiFlyerTheme
 import com.shabinder.common.ui.colorOffWhite
+import com.shabinder.common.ui.showPopUpMessage
 import com.shabinder.database.Database
 import com.tonyodev.fetch2.Status
 import kotlinx.coroutines.*
@@ -46,7 +50,7 @@ import org.koin.android.ext.android.inject
 
 const val disableDozeCode = 1223
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), PaymentResultListener {
 
     private val database: Database by inject()
     private val fetcher: FetchPlatformQueryResult by inject()
@@ -77,7 +81,6 @@ class MainActivity : ComponentActivity() {
                             insets
                         }
                     }
-
                     root = SpotiFlyerRootContent(rootComponent(::spotiFlyerRoot),statusBarHeight)
                 }
             }
@@ -90,6 +93,7 @@ class MainActivity : ComponentActivity() {
         requestStoragePermission()
         disableDozeMode(disableDozeCode)
         dir.createDirectories()
+        Checkout.preload(applicationContext)
     }
 
     private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
@@ -208,4 +212,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onPaymentError(errorCode: Int, response: String?) {
+        try{
+            showPopUpMessage("Payment Failed, Response:$response")
+        }catch (e: Exception){
+            Log.d("Razorpay Payment","Exception in onPaymentSuccess $response")
+        }
+    }
+
+    override fun onPaymentSuccess(razorpayPaymentId: String?) {
+        try{
+            showPopUpMessage("Payment Successful, ThankYou!")
+        }catch (e: Exception){
+            showPopUpMessage("Razorpay Payment, Error Occurred.")
+            Log.d("Razorpay Payment","Exception in onPaymentSuccess, ${e.message}")
+        }
+    }
+
+    init {
+        activityContext = this
+    }
 }

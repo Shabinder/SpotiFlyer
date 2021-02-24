@@ -9,18 +9,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import kotlinx.coroutines.withContext
 
 @Composable
-fun ImageLoad(loader: suspend () -> ImageBitmap?, desc: String = "Album Art", modifier:Modifier = Modifier, placeholder:ImageVector = PlaceHolderImage()) {
-    var pic by remember { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(loader){
+fun ImageLoad(link:String,loader:suspend (String) ->ImageBitmap?, desc: String = "Album Art", modifier:Modifier = Modifier, placeholder:ImageVector = PlaceHolderImage()) {
+    var pic by remember(link) { mutableStateOf<ImageBitmap?>(null) }
+    LaunchedEffect(link){
         withContext(dispatcherIO) {
-            pic = loader()
+            pic = loader(link)
         }
     }
     Crossfade(pic){
-        if(pic == null) Image(placeholder, desc, modifier) else Image(pic!!, desc, modifier)
+        if(it == null) Image(placeholder, desc, modifier,contentScale = ContentScale.Crop) else Image(it, desc, modifier,contentScale = ContentScale.Crop)
     }
 }
 

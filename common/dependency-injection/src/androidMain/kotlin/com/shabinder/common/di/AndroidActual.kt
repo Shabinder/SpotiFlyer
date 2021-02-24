@@ -1,5 +1,6 @@
 package com.shabinder.common.di
 
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -7,22 +8,25 @@ import androidx.core.content.ContextCompat
 import com.github.kiulian.downloader.model.YoutubeVideo
 import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
-import com.shabinder.common.database.appContext
+import com.razorpay.Checkout
+import com.shabinder.common.database.activityContext
 import com.shabinder.common.di.worker.ForegroundService
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.ui.R
+import org.json.JSONObject
 
 actual fun openPlatform(packageID:String, platformLink:String){
-    val manager: PackageManager = appContext.packageManager
+    val manager: PackageManager = activityContext.packageManager
     try {
         val intent = manager.getLaunchIntentForPackage(packageID)
             ?: throw PackageManager.NameNotFoundException()
         intent.addCategory(Intent.CATEGORY_LAUNCHER)
-        appContext.startActivity(intent)
+        activityContext.startActivity(intent)
     } catch (e: PackageManager.NameNotFoundException) {
         val uri: Uri =
             Uri.parse(platformLink)
         val intent = Intent(Intent.ACTION_VIEW, uri)
-        appContext.startActivity(intent)
+        activityContext.startActivity(intent)
     }
 }
 
@@ -34,18 +38,44 @@ actual fun shareApp(){
     }
 
     val shareIntent = Intent.createChooser(sendIntent, null)
-    appContext.startActivity(shareIntent)
+    activityContext.startActivity(shareIntent)
 }
 
-actual fun giveDonation(){
-    //TODO
-}
+actual fun giveDonation() = startPayment()
 
+private fun startPayment(mainActivity: Activity = activityContext as Activity) {
+    /*
+    *  You need to pass current activity in order to let Razorpay create CheckoutActivity
+    * */
+    val co = Checkout().apply {
+        setKeyID("rzp_live_3ZQeoFYOxjmXye")
+        setImage(R.drawable.ic_spotiflyer_logo)
+    }
+
+    try {
+        val preFill = JSONObject()
+
+        val options = JSONObject().apply {
+            put("name","SpotiFlyer")
+            put("description","Thanks For the Donation!")
+            //You can omit the image option to fetch the image from dashboard
+            //put("image","https://github.com/Shabinder/SpotiFlyer/raw/master/app/SpotifyDownload.png")
+            put("currency","INR")
+            put("amount","4900")
+            put("prefill",preFill)
+        }
+
+        co.open(mainActivity,options)
+    }catch (e: Exception){
+        //showPop("Error in payment: "+ e.message)
+        e.printStackTrace()
+    }
+}
 actual fun queryActiveTracks() {
-    val serviceIntent = Intent(appContext, ForegroundService::class.java).apply {
+    val serviceIntent = Intent(activityContext, ForegroundService::class.java).apply {
         action = "query"
     }
-    ContextCompat.startForegroundService(appContext, serviceIntent)
+    ContextCompat.startForegroundService(activityContext, serviceIntent)
 }
 
 actual suspend fun downloadTracks(
@@ -54,9 +84,9 @@ actual suspend fun downloadTracks(
     saveFileWithMetaData:suspend (mp3ByteArray:ByteArray, trackDetails: TrackDetails) -> Unit
 ){
     if(!list.isNullOrEmpty()){
-        val serviceIntent = Intent(appContext, ForegroundService::class.java)
+        val serviceIntent = Intent(activityContext, ForegroundService::class.java)
         serviceIntent.putParcelableArrayListExtra("object",ArrayList<TrackDetails>(list))
-        appContext.let { ContextCompat.startForegroundService(it, serviceIntent) }
+        activityContext.let { ContextCompat.startForegroundService(it, serviceIntent) }
     }
 }
 

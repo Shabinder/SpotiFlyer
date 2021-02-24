@@ -2,9 +2,11 @@
 
 package com.shabinder.common.ui
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.Font
@@ -77,3 +79,6 @@ actual fun YoutubeMusicLogo() = vectorResource(R.drawable.ic_youtube_music_logo)
 
 @Composable
 actual fun GithubLogo() = vectorResource(R.drawable.ic_github)
+
+@Composable
+fun vectorResource(@DrawableRes id: Int) =  ImageVector.Companion.vectorResource(id)

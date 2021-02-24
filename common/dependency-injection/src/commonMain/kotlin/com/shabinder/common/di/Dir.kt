@@ -49,7 +49,7 @@ suspend fun downloadFile(url: String): Flow<DownloadResult> {
     }
 }
 fun getNameURL(url: String): String {
-    return url.substring(url.lastIndexOf('/') + 1, url.length)
+    return url.substring(url.lastIndexOf('/',url.lastIndexOf('/')-1) + 1, url.length).replace('/','_')
 }
 /*
 * Call this function at startup!

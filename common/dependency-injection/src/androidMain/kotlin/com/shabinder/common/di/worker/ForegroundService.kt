@@ -32,6 +32,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import co.touchlab.kermit.Kermit
 import com.github.kiulian.downloader.YoutubeDownloader
+import com.github.kiulian.downloader.model.formats.Format
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.getData
@@ -178,35 +179,35 @@ class ForegroundService : Service(),CoroutineScope{
     private fun downloadTrack(videoID:String, track: TrackDetails){
         launch {
             try {
-                /*val audioData = ytDownloader.getVideo(videoID).getData()
-
-                audioData?.let {
-                    val url: String = it.url()
-                    logger.d("DHelper Link Found") { url }
-                }*/
                 val url = fetcher.youtubeMp3.getMp3DownloadLink(videoID)
                 if (url == null){
-                    sendTrackBroadcast(Status.FAILED.name,track)
-                    allTracksStatus[track.title] = DownloadStatus.Failed
-                } else{
-                    val request= Request(url, track.outputFilePath).apply{
-                        priority = Priority.NORMAL
-                        networkType = NetworkType.ALL
-                    }
-                    fetch.enqueue(request,
-                        { request1 ->
-                            requestMap[request1] = track
-                            logger.d(tag){"Enqueuing Download"}
-                        },
-                        { error ->
-                            logger.d(tag){"Enqueuing Error:${error.throwable.toString()}"}
-                        }
-                    )
-                }
-            }catch (e: java.lang.Exception){
+                    val audioData:Format = ytDownloader.getVideo(videoID).getData() ?: throw Exception("Java YT Dependency Error")
+                    val ytUrl: String = audioData.url()
+                    enqueueDownload(ytUrl,track)
+                } else enqueueDownload(url,track)
+            }catch (e: Exception){
                 logger.d("Service YT Error"){e.message.toString()}
+                sendTrackBroadcast(Status.FAILED.name,track)
+                allTracksStatus[track.title] = DownloadStatus.Failed
             }
         }
+    }
+
+
+    private fun enqueueDownload(url:String,track:TrackDetails){
+        val request= Request(url, track.outputFilePath).apply{
+            priority = Priority.NORMAL
+            networkType = NetworkType.ALL
+        }
+        fetch.enqueue(request,
+            { request1 ->
+                requestMap[request1] = track
+                logger.d(tag){"Enqueuing Download"}
+            },
+            { error ->
+                logger.d(tag){"Enqueuing Error:${error.throwable.toString()}"}
+            }
+        )
     }
 
     /**
