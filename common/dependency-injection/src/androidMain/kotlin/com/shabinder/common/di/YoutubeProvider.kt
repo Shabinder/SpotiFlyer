@@ -53,9 +53,11 @@ actual class YoutubeProvider actual constructor(
             // Given Link is of a Playlist
             logger.i{ link }
             val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&").substringBefore("?")
-            return getYTPlaylist(
-                playlistId
-            )
+            return withContext(Dispatchers.IO){
+                getYTPlaylist(
+                    playlistId
+                )
+            }
         }else{//Given Link is of a Video
             var searchId = "error"
             when{
@@ -70,9 +72,11 @@ actual class YoutubeProvider actual constructor(
                 }
             }
             return if(searchId != "error") {
-                getYTTrack(
-                    searchId
-                )
+                withContext(Dispatchers.IO){
+                    getYTTrack(
+                        searchId
+                    )
+                }
             }else{
                 logger.d{"Your Youtube Link is not of a Video!!"}
                 null

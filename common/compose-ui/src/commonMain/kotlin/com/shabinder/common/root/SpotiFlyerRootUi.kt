@@ -3,6 +3,7 @@ package com.shabinder.common.root
 import androidx.compose.animation.core.*
 import androidx.compose.animation.core.Spring.StiffnessLow
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -12,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
@@ -20,10 +22,12 @@ import com.shabinder.common.main.SpotiFlyerMainContent
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.ui.SpotiFlyerLogo
 import com.shabinder.common.ui.appNameStyle
+import com.shabinder.common.ui.colorPrimaryDark
 import com.shabinder.common.ui.splash.*
+import com.shabinder.common.utils.verticalGradientScrim
 
 @Composable
-fun SpotiFlyerRootContent(component: SpotiFlyerRoot):SpotiFlyerRoot {
+fun SpotiFlyerRootContent(component: SpotiFlyerRoot,statusBarHeight:Dp = 0.dp):SpotiFlyerRoot {
 
     val transitionState = remember { MutableTransitionState(SplashState.Shown) }
     val transition = updateTransition(transitionState)
@@ -52,6 +56,7 @@ fun SpotiFlyerRootContent(component: SpotiFlyerRoot):SpotiFlyerRoot {
         MainScreen(
             Modifier.alpha(contentAlpha),
             contentTopPadding,
+            statusBarHeight,
             component
         )
     }
@@ -59,17 +64,21 @@ fun SpotiFlyerRootContent(component: SpotiFlyerRoot):SpotiFlyerRoot {
 }
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier, topPadding: Dp = 0.dp,component: SpotiFlyerRoot) {
-    val appBarColor = MaterialTheme.colors.surface
+fun MainScreen(modifier: Modifier = Modifier, topPadding: Dp = 0.dp,statusBarHeight: Dp = 0.dp,component: SpotiFlyerRoot) {
+
+    val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.65f)
+
     Column(
         modifier = modifier.fillMaxSize()
-        /*.verticalGradientScrim(
-        color = sharedViewModel.gradientColor.copy(alpha = 0.38f),
-        color = appBarColor.copy(alpha = 0.38f),
+        .verticalGradientScrim(
+        color = colorPrimaryDark.copy(alpha = 0.38f),
         startYPercentage = 0.29f,
         endYPercentage = 0f,
-    )*/
+    )
     ) {
+        Spacer(Modifier.background(appBarColor).height(statusBarHeight).fillMaxWidth())
+        LocalViewConfiguration.current
+
         AppBar(
             backgroundColor = appBarColor,
             modifier = Modifier.fillMaxWidth()
@@ -107,14 +116,14 @@ fun AppBar(
                     style = appNameStyle
                 )
             }
-        },
+        },/*
         actions = {
                 IconButton(
-                    onClick = {  /*TODO: Open Preferences*/ }
+                    onClick = {  *//*TODO: Open Preferences*//* }
                 ) {
                     Icon(Icons.Filled.Settings,"Preferences", tint = Color.Gray)
                 }
-        },
+        },*/
         modifier = modifier,
         elevation = 0.dp
     )

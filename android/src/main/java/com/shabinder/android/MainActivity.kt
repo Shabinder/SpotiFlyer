@@ -12,6 +12,14 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.Surface
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.rootComponent
@@ -53,17 +61,27 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // This app draws behind the system bars, so we want to handle fitting system windows
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContent {
             SpotiFlyerTheme {
                 Surface(contentColor = colorOffWhite) {
-                    root = SpotiFlyerRootContent(rootComponent(::spotiFlyerRoot))
+
+                    var statusBarHeight by remember { mutableStateOf(27.dp) }
+                    val view = LocalView.current
+
+                    LaunchedEffect(view){
+                        view.setOnApplyWindowInsetsListener { _, insets ->
+                            statusBarHeight = insets.systemWindowInsetTop.dp
+                            insets
+                        }
+                    }
+
+                    root = SpotiFlyerRootContent(rootComponent(::spotiFlyerRoot),statusBarHeight)
                 }
             }
         }
-        /*lifecycleScope.launch {
-            val string = fetcher.youtubeMp3.getMp3DownloadLink("lVfVrqu1G0U")
-            Log.i("Mp3Test",string)
-        }*/
         initialise()
     }
 
