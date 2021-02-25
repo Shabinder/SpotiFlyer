@@ -1,20 +1,34 @@
 package com.shabinder.spotiflyer
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material.Surface
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.SdStorage
+import androidx.compose.material.icons.rounded.SystemSecurityUpdate
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.arkivanov.decompose.ComponentContext
@@ -24,17 +38,12 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.razorpay.Checkout
 import com.razorpay.PaymentResultListener
 import com.shabinder.common.database.activityContext
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.FetchPlatformQueryResult
-import com.shabinder.common.di.createDirectories
-import com.shabinder.common.di.showPopUpMessage
+import com.shabinder.common.di.*
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
-import com.shabinder.common.uikit.SpotiFlyerRootContent
-import com.shabinder.common.uikit.SpotiFlyerTheme
-import com.shabinder.common.uikit.colorOffWhite
+import com.shabinder.common.uikit.*
 import com.shabinder.database.Database
 import com.shabinder.spotiflyer.utils.checkIfLatestVersion
 import com.shabinder.spotiflyer.utils.disableDozeMode
@@ -55,7 +64,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
     private val callBacks: SpotiFlyerRootCallBacks
         get() = root.callBacks
     private val trackStatusFlow = MutableSharedFlow<HashMap<String, DownloadStatus>>(1)
-
+    private var permissionGranted = mutableStateOf(true)
     private lateinit var updateUIReceiver: BroadcastReceiver
     private lateinit var queryReceiver: BroadcastReceiver
 
@@ -69,14 +78,28 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                 Surface(contentColor = colorOffWhite) {
 
                     var statusBarHeight by remember { mutableStateOf(27.dp) }
+                    var askForPermission by remember { mutableStateOf(false) }
+                    permissionGranted = remember { mutableStateOf(true) }
                     val view = LocalView.current
 
                     LaunchedEffect(view){
+                        permissionGranted.value = (ContextCompat
+                            .checkSelfPermission(this@MainActivity,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                                &&
+                                ContextCompat.checkSelfPermission(this@MainActivity,
+                                    Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) == PackageManager.PERMISSION_GRANTED)
+
                         view.setOnApplyWindowInsetsListener { _, insets ->
                             statusBarHeight = insets.systemWindowInsetTop.dp
                             insets
                         }
+                        delay(2000)
+                        askForPermission = true
                     }
+
+                    if(askForPermission && !permissionGranted.value) permissionDialog()
+
                     root = SpotiFlyerRootContent(rememberRootComponent(::spotiFlyerRoot),statusBarHeight)
                 }
             }
@@ -86,8 +109,6 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 
     private fun initialise() {
         checkIfLatestVersion()
-        requestStoragePermission()
-        disableDozeMode(disableDozeCode)
         dir.createDirectories()
         Checkout.preload(applicationContext)
     }
@@ -116,6 +137,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                     pm.isIgnoringBatteryOptimizations(packageName)
                 if (isIgnoringBatteryOptimizations) {
                     // Ignoring battery optimization
+                    permissionGranted.value = true
                 } else {
                     disableDozeMode(disableDozeCode)//Again Ask For Permission!!
                 }
@@ -223,6 +245,67 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
             showPopUpMessage("Razorpay Payment, Error Occurred.")
             Log.d("Razorpay Payment","Exception in onPaymentSuccess, ${e.message}")
         }
+    }
+
+    @Composable
+    private fun permissionDialog(){
+        AlertDialog(
+            onDismissRequest = {},
+            buttons = {
+                TextButton({
+                    requestStoragePermission()
+                    disableDozeMode(disableDozeCode)
+                    permissionGranted.value = (ContextCompat
+                        .checkSelfPermission(this@MainActivity,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                            &&
+                            ContextCompat.checkSelfPermission(this@MainActivity,Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) == PackageManager.PERMISSION_GRANTED)
+                },Modifier.padding(bottom = 16.dp,start = 16.dp,end = 16.dp).fillMaxWidth().background(colorPrimary,shape = SpotiFlyerShapes.medium).padding(horizontal = 8.dp),
+                ){
+                    Text("Grant Permissions",color = Color.Black,fontSize = 18.sp,textAlign = TextAlign.Center)
+                }
+            },title = {Text("Required Permissions:",style = SpotiFlyerTypography.h5,textAlign = TextAlign.Center)},
+            backgroundColor = Color.DarkGray,
+            text = {
+                Column{
+                    Spacer(modifier = Modifier.padding(8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
+                    ) {
+                        Icon(Icons.Rounded.SdStorage,"Storage Permission.")
+                        Spacer(modifier = Modifier.padding(start = 16.dp))
+                        Column {
+                            Text(
+                                text = "Storage Permission.",
+                                style = SpotiFlyerTypography.h6.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                            Text(
+                                text = "To download your favourite songs to this device.",
+                                style = SpotiFlyerTypography.subtitle2,
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Rounded.SystemSecurityUpdate,"Allow Background Running")
+                        Spacer(modifier = Modifier.padding(start = 16.dp))
+                        Column {
+                            Text(
+                                text = "Background Running.",
+                                style = SpotiFlyerTypography.h6.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                            Text(
+                                text = "To download all songs in background without any System Interruptions",
+                                style = SpotiFlyerTypography.subtitle2,
+                            )
+                        }
+                    }
+                }
+            }
+
+        )
     }
 
     init {

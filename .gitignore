@@ -113,3 +113,7 @@
 /buildSrc/buildSrc/.gradle/
 /buildSrc/buildSrc/build/
 /desktop/build/
+/common/compose/build/
+/common/list/build/
+/common/main/build/
+/common/root/build/
