@@ -2,13 +2,11 @@ package com.shabinder.common.di
 
 import androidx.compose.ui.graphics.ImageBitmap
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.di.providers.YoutubeMusic
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.TrackDetails
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt

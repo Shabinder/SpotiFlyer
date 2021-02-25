@@ -29,7 +29,7 @@ class TokenSet : RatioAlgorithm() {
         results.add(ratio.apply(sortedInter, sorted2to1))
         results.add(ratio.apply(sorted1to2, sorted2to1))
 
-        return results.max()!!
+        return results.maxOrNull()!!
 
     }
 

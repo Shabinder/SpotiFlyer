@@ -4,15 +4,19 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.core.content.ContextCompat
 import com.github.kiulian.downloader.model.YoutubeVideo
 import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.razorpay.Checkout
+import com.shabinder.common.database.R
 import com.shabinder.common.database.activityContext
+import com.shabinder.common.database.appContext
 import com.shabinder.common.di.worker.ForegroundService
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.ui.R
+import kotlinx.coroutines.Dispatchers
 import org.json.JSONObject
 
 actual fun openPlatform(packageID:String, platformLink:String){
@@ -29,7 +33,20 @@ actual fun openPlatform(packageID:String, platformLink:String){
         activityContext.startActivity(intent)
     }
 }
+actual val dispatcherIO = Dispatchers.IO
 
+@Composable
+actual fun Toast(
+    text: String,
+    visibility: MutableState<Boolean>,
+    duration: ToastDuration
+){
+    //We Have Android's Implementation of Toast so its just Empty
+}
+
+actual fun showPopUpMessage(text: String){
+    android.widget.Toast.makeText(appContext,text, android.widget.Toast.LENGTH_SHORT).show()
+}
 actual fun shareApp(){
     val sendIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND

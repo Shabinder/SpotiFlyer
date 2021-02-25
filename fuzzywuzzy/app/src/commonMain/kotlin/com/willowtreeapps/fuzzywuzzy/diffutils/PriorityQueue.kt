@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.willowtreeapps.fuzzywuzzy.diffutils
 /*
  * Copyright (c) 2017 Kotlin Algorithm Club

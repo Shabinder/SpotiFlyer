@@ -3,7 +3,10 @@ enableFeaturePreview("GRADLE_METADATA")
 
 include(
     ":common:database",
-    ":common:compose-ui",
+    ":common:compose",
+    ":common:root",
+    ":common:main",
+    ":common:list",
     ":common:data-models",
     ":common:dependency-injection",
     ":fuzzywuzzy:app",

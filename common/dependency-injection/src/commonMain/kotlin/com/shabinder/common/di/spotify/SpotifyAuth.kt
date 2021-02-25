@@ -2,7 +2,6 @@ package com.shabinder.common.di.spotify
 
 import com.shabinder.common.di.kotlinxSerializer
 import com.shabinder.common.models.spotify.TokenData
-import com.shabinder.database.Database
 import io.ktor.client.*
 import io.ktor.client.features.auth.*
 import io.ktor.client.features.auth.providers.*
@@ -10,7 +9,6 @@ import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
-import kotlinx.datetime.Clock
 
 suspend fun authenticateSpotify(): TokenData {
     return spotifyAuthClient.post("https://accounts.spotify.com/api/token"){

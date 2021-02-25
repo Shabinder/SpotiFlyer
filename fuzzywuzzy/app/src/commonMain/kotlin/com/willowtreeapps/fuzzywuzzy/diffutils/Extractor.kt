@@ -78,7 +78,7 @@ class Extractor(private var cutoff: Int = 0) {
     fun extractOne(query: String, choices: Collection<String>, func: Applicable): ExtractedResult {
         val extracted = extractWithoutOrder(query, choices, func)
 
-        return extracted.max()!!
+        return extracted.maxOrNull()!!
     }
 
     /**
@@ -95,7 +95,7 @@ class Extractor(private var cutoff: Int = 0) {
 
         val extracted = extractWithoutOrder(query, choices, toStringFunction, func)
 
-        return extracted.max()!!
+        return extracted.maxOrNull()!!
 
     }
 

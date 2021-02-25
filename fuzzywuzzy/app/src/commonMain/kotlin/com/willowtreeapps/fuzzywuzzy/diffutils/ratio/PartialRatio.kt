@@ -60,7 +60,7 @@ class PartialRatio : Ratio {
 
         }
 
-        return round(100 * scores.max()!!).toInt()
+        return round(100 * scores.maxOrNull()!!).toInt()
 
     }
 

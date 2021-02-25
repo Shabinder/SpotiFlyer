@@ -33,12 +33,12 @@ import androidx.core.net.toUri
 import co.touchlab.kermit.Kermit
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.github.kiulian.downloader.model.formats.Format
+import com.shabinder.common.database.R.*
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.getData
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.ui.R.*
 import com.tonyodev.fetch2.*
 import com.tonyodev.fetch2core.DownloadBlock
 import kotlinx.coroutines.*

@@ -2,8 +2,8 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.database.TokenDBQueries
-import com.shabinder.common.models.spotify.TokenData
 import com.shabinder.common.di.spotify.authenticateSpotify
+import com.shabinder.common.models.spotify.TokenData
 import com.shabinder.database.Database
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

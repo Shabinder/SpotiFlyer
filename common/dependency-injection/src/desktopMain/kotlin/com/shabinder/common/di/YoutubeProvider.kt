@@ -18,10 +18,10 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import com.github.kiulian.downloader.YoutubeDownloader
+import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.database.Database
 import io.ktor.client.*

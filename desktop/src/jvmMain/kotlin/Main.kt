@@ -16,12 +16,11 @@ import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.initKoin
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRootContent
-import com.shabinder.common.ui.SpotiFlyerColors
-import com.shabinder.common.ui.SpotiFlyerShapes
-import com.shabinder.common.ui.SpotiFlyerTypography
-import com.shabinder.common.ui.colorOffWhite
+import com.shabinder.common.uikit.SpotiFlyerColors
+import com.shabinder.common.uikit.SpotiFlyerShapes
+import com.shabinder.common.uikit.SpotiFlyerTypography
+import com.shabinder.common.uikit.colorOffWhite
 import com.shabinder.database.Database
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 

@@ -21,7 +21,7 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common:database"))
                 implementation(project(":common:dependency-injection"))
-                implementation(project(":common:compose-ui"))
+                implementation(project(":common:compose"))
                 implementation(Decompose.decompose)
                 implementation(Decompose.extensionsCompose)
                 implementation(MVIKotlin.mvikotlin)

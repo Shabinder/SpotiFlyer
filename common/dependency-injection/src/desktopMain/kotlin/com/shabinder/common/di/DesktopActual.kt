@@ -7,8 +7,8 @@ import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 
 actual fun openPlatform(packageID:String, platformLink:String){
     //TODO

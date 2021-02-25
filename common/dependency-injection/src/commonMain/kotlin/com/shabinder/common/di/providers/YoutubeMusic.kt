@@ -1,7 +1,6 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
-import co.touchlab.kermit.Logger
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.YoutubeTrack
 import com.willowtreeapps.fuzzywuzzy.diffutils.FuzzySearch

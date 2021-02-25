@@ -16,7 +16,7 @@ repositories {
 android {
     compileSdkVersion(29)
     defaultConfig {
-        applicationId = "com.shabinder.android"
+        applicationId = "com.shabinder.spotiflyer"
         minSdkVersion(Versions.minSdkVersion)
         targetSdkVersion(Versions.targetSdkVersion)
         versionCode = Versions.versionCode
@@ -25,8 +25,8 @@ android {
 
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
-            //isShrinkResources = true
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -63,7 +63,8 @@ dependencies {
     implementation(Androidx.androidxActivity)
 
     implementation(project(":common:database"))
-    implementation(project(":common:compose-ui"))
+    implementation(project(":common:compose"))
+    implementation(project(":common:root"))
     implementation(project(":common:dependency-injection"))
     implementation(project(":common:data-models"))
 
@@ -82,12 +83,6 @@ dependencies {
         implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$it")
         implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$it")
     }
-
-    //Coil-Image Loading
-    Versions.coilVersion.let{
-        implementation("dev.chrisbanes.accompanist:accompanist-coil:$it")
-        implementation("dev.chrisbanes.accompanist:accompanist-insets:$it")
-    }
 */
 
     Extras.Android.apply {
@@ -103,7 +98,7 @@ dependencies {
     implementation(Decompose.extensionsCompose)
 
     //Test
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:4.13.2")
     androidTestImplementation(Androidx.junit)
     androidTestImplementation(Androidx.expresso)
 

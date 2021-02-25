@@ -21,10 +21,10 @@ import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.gaana.GaanaRequests
-import com.shabinder.common.models.gaana.GaanaTrack
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.gaana.GaanaTrack
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.database.Database
 import io.ktor.client.*
@@ -169,7 +169,7 @@ class GaanaProvider(
                     subFolder = link
                     coverUrl = gaanaPlaceholderImageUrl
                     val artistDetails =
-                        getGaanaArtistDetails(seokey = link).artist?.firstOrNull()
+                        getGaanaArtistDetails(seokey = link).artist.firstOrNull()
                             ?.also {
                                 title = it.name
                                 coverUrl = it.artworkLink ?: gaanaPlaceholderImageUrl
