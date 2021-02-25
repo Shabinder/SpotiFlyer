@@ -21,7 +21,7 @@ class TokenStore(
             db.add(token.access_token!!, token.expiry!! + Clock.System.now().epochSeconds)
     }
 
-    suspend fun getToken(): TokenData {
+    suspend fun getToken(): TokenData? {
         var token: TokenData? = db.select().executeAsOneOrNull()?.let {
             TokenData(it.accessToken,null,it.expiry)
         }
@@ -29,7 +29,7 @@ class TokenStore(
         if(Clock.System.now().epochSeconds > token?.expiry ?:0 || token == null){
             logger.d{"Requesting New Token"}
             token = authenticateSpotify()
-            GlobalScope.launch { token.access_token?.let { save(token) } }
+            GlobalScope.launch { token?.access_token?.let { save(token) } }
         }
         return token
     }

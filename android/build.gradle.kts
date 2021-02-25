@@ -4,6 +4,9 @@ plugins {
     id("com.android.application")
     kotlin("android")
     id("org.jetbrains.compose")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+    id("com.google.firebase.firebase-perf")
 }
 
 group = "com.shabinder"
@@ -75,6 +78,12 @@ dependencies {
     implementation(Decompose.decompose)
     implementation(Decompose.extensionsCompose)
 
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:26.5.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-perf-ktx")
+
 /*
     //Lifecycle
     Versions.androidLifecycle.let{
@@ -84,6 +93,7 @@ dependencies {
         implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$it")
     }
 */
+
 
     Extras.Android.apply {
         implementation(appUpdator)

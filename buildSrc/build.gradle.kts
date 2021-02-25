@@ -16,6 +16,9 @@ repositories {
 
 dependencies {
     implementation("com.android.tools.build:gradle:4.0.1")
+    implementation("com.google.gms:google-services:4.3.5")
+    implementation("com.google.firebase:perf-plugin:1.3.4")
+    implementation("com.google.firebase:firebase-crashlytics-gradle:2.5.0")
     implementation(JetBrains.Compose.gradlePlugin)
     implementation(JetBrains.Kotlin.gradlePlugin)
     implementation(JetBrains.Kotlin.serialization)

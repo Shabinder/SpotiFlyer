@@ -14,6 +14,7 @@ import io.ktor.client.features.logging.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
@@ -46,20 +47,18 @@ val kotlinxSerializer = KotlinxSerializer( Json {
 /*
 * Refactor This
 * */
-fun isInternetAvailable(): Boolean {
-    var result = false
-    val job = GlobalScope.launch {
+suspend fun isInternetAvailable(): Boolean {
+    return withContext(dispatcherIO) {
         try {
             ktorHttpClient.head<String>("http://google.com")
-            result = true
+            true
         } catch (e: Exception) {
             println(e.message)
-            result = false
+            false
         }
     }
-    while (job.isActive){}
-    return result
 }
+
 fun createHttpClient(enableNetworkLogs: Boolean = false,serializer: KotlinxSerializer = kotlinxSerializer) = HttpClient {
     install(JsonFeature) {
         this.serializer = serializer

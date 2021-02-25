@@ -45,9 +45,7 @@ import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.uikit.*
 import com.shabinder.database.Database
-import com.shabinder.spotiflyer.utils.checkIfLatestVersion
-import com.shabinder.spotiflyer.utils.disableDozeMode
-import com.shabinder.spotiflyer.utils.requestStoragePermission
+import com.shabinder.spotiflyer.utils.*
 import com.tonyodev.fetch2.Status
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -100,6 +98,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 
                     if(askForPermission && !permissionGranted.value) permissionDialog()
 
+                    NetworkDialog()
                     root = SpotiFlyerRootContent(rememberRootComponent(::spotiFlyerRoot),statusBarHeight)
                 }
             }

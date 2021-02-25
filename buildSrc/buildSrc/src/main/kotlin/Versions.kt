@@ -27,7 +27,7 @@ object Versions {
     //Android
     const val versionCode = 15
     const val minSdkVersion = 24
-    const val compileSdkVersion = 30
+    const val compileSdkVersion = 29
     const val targetSdkVersion = 29
     const val androidLifecycle = "2.3.0"
 }

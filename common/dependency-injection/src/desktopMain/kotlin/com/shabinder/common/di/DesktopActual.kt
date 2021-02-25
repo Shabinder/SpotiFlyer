@@ -1,5 +1,9 @@
 package com.shabinder.common.di
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.github.kiulian.downloader.model.YoutubeVideo
 import com.github.kiulian.downloader.model.formats.Format
@@ -21,6 +25,19 @@ actual fun shareApp(){
 actual fun giveDonation(){
     //TODO
 }
+
+
+@Composable
+actual fun AlertDialog(
+    onDismissRequest: () -> Unit,
+    buttons: @Composable () -> Unit,
+    modifier: Modifier,
+    title: (@Composable () -> Unit)?,
+    text: @Composable (() -> Unit)?,
+    shape: Shape,
+    backgroundColor: Color,
+    contentColor: Color,
+){}
 
 actual fun queryActiveTracks(){}
 

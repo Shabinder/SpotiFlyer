@@ -1,5 +1,6 @@
 package com.shabinder.common.di.spotify
 
+import com.shabinder.common.di.isInternetAvailable
 import com.shabinder.common.di.kotlinxSerializer
 import com.shabinder.common.models.spotify.TokenData
 import io.ktor.client.*
@@ -10,10 +11,10 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 
-suspend fun authenticateSpotify(): TokenData {
-    return spotifyAuthClient.post("https://accounts.spotify.com/api/token"){
+suspend fun authenticateSpotify(): TokenData? {
+    return if(isInternetAvailable()) spotifyAuthClient.post("https://accounts.spotify.com/api/token"){
         body = FormDataContent(Parameters.build { append("grant_type","client_credentials") })
-    }
+    } else null
 }
 
 private val spotifyAuthClient by lazy {

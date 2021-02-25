@@ -18,10 +18,7 @@ package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.database.DownloadRecordDatabaseQueries
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.TokenStore
-import com.shabinder.common.di.finalOutputDir
-import com.shabinder.common.di.kotlinxSerializer
+import com.shabinder.common.di.*
 import com.shabinder.common.di.spotify.SpotifyRequests
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
@@ -48,8 +45,17 @@ class SpotifyProvider(
 
     init {
         logger.d { "Creating Spotify Provider" }
-        GlobalScope.launch(Dispatchers.Default) {
-            val token = tokenStore.getToken()
+        GlobalScope.launch(Dispatchers.Default) {authenticateSpotify()}
+    }
+
+    override suspend fun authenticateSpotify(): HttpClient?{
+        val token = tokenStore.getToken()
+        return if(token == null) {
+            showPopUpMessage("Please Check your Network Connection")
+            null
+        }
+        else{
+            logger.d { "Spotify Provider Created with $token" }
             httpClient = HttpClient {
                 defaultRequest {
                     header("Authorization","Bearer ${token.access_token}")
@@ -58,7 +64,7 @@ class SpotifyProvider(
                     serializer = kotlinxSerializer
                 }
             }
-            logger.d { "Spotify Provider Created with $token" }
+            httpClient
         }
     }
 
@@ -68,6 +74,11 @@ class SpotifyProvider(
         get() = database.downloadRecordDatabaseQueries
 
     suspend fun query(fullLink: String): PlatformQueryResult?{
+
+        if(!this::httpClient.isInitialized){
+            authenticateSpotify()
+        }
+
         var spotifyLink =
             "https://" + fullLink.substringAfterLast("https://").substringBefore(" ").trim()
 
