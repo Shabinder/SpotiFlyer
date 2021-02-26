@@ -1,7 +1,6 @@
 package com.shabinder.spotiflyer.utils
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.AlertDialog
@@ -33,7 +32,9 @@ fun NetworkDialog(
         visible = true
     }
 
-    AnimatedVisibility(networkAvailability.value == false && visible){
+    AnimatedVisibility(
+        networkAvailability.value == false && visible
+    ) {
         AlertDialog(
             onDismissRequest = {},
             buttons = {

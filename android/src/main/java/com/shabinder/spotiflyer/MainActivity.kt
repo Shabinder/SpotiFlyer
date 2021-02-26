@@ -1,20 +1,17 @@
 package com.shabinder.spotiflyer
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -30,7 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.arkivanov.decompose.ComponentContext
@@ -105,6 +101,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
         checkIfLatestVersion()
         dir.createDirectories()
         Checkout.preload(applicationContext)
+        handleIntentFromExternalActivity()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -223,7 +220,13 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                     val filterLinkRegex = """http.+\w""".toRegex()
                     val string = it.replace("\n".toRegex(), " ")
                     val link = filterLinkRegex.find(string)?.value.toString()
-                    callBacks.searchLink(link)
+                    Log.i("Intent",link)
+                    lifecycleScope.launch {
+                        while(!this@MainActivity::root.isInitialized){
+                            delay(100)
+                        }
+                        if(isInternetAvailable)callBacks.searchLink(link)
+                    }
                 }
             }
         }
@@ -253,7 +256,9 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
             delay(2000)
             askForPermission = true
         }
-        AnimatedVisibility(askForPermission && !permissionGranted.value){
+        AnimatedVisibility(
+            askForPermission && !permissionGranted.value
+        ){
             AlertDialog(
                 onDismissRequest = {},
                 buttons = {
