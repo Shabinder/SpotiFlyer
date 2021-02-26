@@ -5,10 +5,12 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
+import androidx.core.content.ContextCompat
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
@@ -23,6 +25,17 @@ fun Activity.checkIfLatestVersion() {
         start()
     }
 }
+
+fun Activity.checkPermissions():Boolean{
+    return (ContextCompat
+        .checkSelfPermission(this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            &&
+            ContextCompat.checkSelfPermission(this,
+                Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) == PackageManager.PERMISSION_GRANTED)
+
+}
+
 @SuppressLint("BatteryLife", "ObsoleteSdkInt")
 fun Activity.disableDozeMode(requestCode:Int) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

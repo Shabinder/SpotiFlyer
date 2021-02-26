@@ -4,19 +4,13 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.core.content.ContextCompat
 import com.github.kiulian.downloader.model.YoutubeVideo
 import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.razorpay.Checkout
-import com.shabinder.common.database.R
 import com.shabinder.common.database.activityContext
 import com.shabinder.common.database.appContext
 import com.shabinder.common.di.worker.ForegroundService
@@ -48,6 +42,9 @@ actual fun Toast(
 ){
     //We Have Android's Implementation of Toast so its just Empty
 }
+
+actual val isInternetAvailable:Boolean
+    get() = internetAvailability.value ?: true
 
 actual fun showPopUpMessage(text: String){
     android.widget.Toast.makeText(appContext,text, android.widget.Toast.LENGTH_SHORT).show()

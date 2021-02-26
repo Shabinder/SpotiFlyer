@@ -13,6 +13,8 @@ expect fun showPopUpMessage(text: String)
 
 expect val dispatcherIO: CoroutineDispatcher
 
+expect val isInternetAvailable:Boolean
+
 expect suspend fun downloadTracks(
     list: List<TrackDetails>,
     getYTIDBestMatch:suspend (String,TrackDetails)->String?,

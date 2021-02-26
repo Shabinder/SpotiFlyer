@@ -44,20 +44,6 @@ val kotlinxSerializer = KotlinxSerializer( Json {
     isLenient = true
     ignoreUnknownKeys = true
 })
-/*
-* Refactor This
-* */
-suspend fun isInternetAvailable(): Boolean {
-    return withContext(dispatcherIO) {
-        try {
-            ktorHttpClient.head<String>("http://google.com")
-            true
-        } catch (e: Exception) {
-            println(e.message)
-            false
-        }
-    }
-}
 
 fun createHttpClient(enableNetworkLogs: Boolean = false,serializer: KotlinxSerializer = kotlinxSerializer) = HttpClient {
     install(JsonFeature) {

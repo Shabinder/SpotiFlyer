@@ -11,8 +11,12 @@ import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
+import io.ktor.client.request.*
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 actual fun openPlatform(packageID:String, platformLink:String){
     //TODO
@@ -26,20 +30,30 @@ actual fun giveDonation(){
     //TODO
 }
 
-
-@Composable
-actual fun AlertDialog(
-    onDismissRequest: () -> Unit,
-    buttons: @Composable () -> Unit,
-    modifier: Modifier,
-    title: (@Composable () -> Unit)?,
-    text: @Composable (() -> Unit)?,
-    shape: Shape,
-    backgroundColor: Color,
-    contentColor: Color,
-){}
-
 actual fun queryActiveTracks(){}
+
+/*
+* Refactor This
+* */
+private suspend fun isInternetAvailable(): Boolean {
+    return withContext(dispatcherIO) {
+        try {
+            ktorHttpClient.head<String>("http://google.com")
+            true
+        } catch (e: Exception) {
+            println(e.message)
+            false
+        }
+    }
+}
+
+actual val isInternetAvailable:Boolean
+    get(){
+        var result = false
+        val job = GlobalScope.launch { result = isInternetAvailable() }
+        while(job.isActive){}
+        return result
+    }
 
 val DownloadProgressFlow: MutableSharedFlow<HashMap<String,DownloadStatus>> = MutableSharedFlow(1)
 

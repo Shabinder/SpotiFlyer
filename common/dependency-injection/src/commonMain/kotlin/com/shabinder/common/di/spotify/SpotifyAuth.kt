@@ -12,7 +12,7 @@ import io.ktor.client.request.forms.*
 import io.ktor.http.*
 
 suspend fun authenticateSpotify(): TokenData? {
-    return if(isInternetAvailable()) spotifyAuthClient.post("https://accounts.spotify.com/api/token"){
+    return if(isInternetAvailable) spotifyAuthClient.post("https://accounts.spotify.com/api/token"){
         body = FormDataContent(Parameters.build { append("grant_type","client_credentials") })
     } else null
 }

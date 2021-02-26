@@ -3,6 +3,8 @@ package com.shabinder.common.main.integration
 import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.extensions.coroutines.states
+import com.shabinder.common.di.isInternetAvailable
+import com.shabinder.common.di.showPopUpMessage
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.*
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
@@ -26,7 +28,8 @@ internal class SpotiFlyerMainImpl(
     override val models: Flow<State> = store.states
 
     override fun onLinkSearch(link: String) {
-        mainOutput.callback(Output.Search(link = link))
+        if(isInternetAvailable) mainOutput.callback(Output.Search(link = link))
+        else showPopUpMessage("Check Network Connection Please")
     }
 
     override fun onInputLinkChanged(link: String) {

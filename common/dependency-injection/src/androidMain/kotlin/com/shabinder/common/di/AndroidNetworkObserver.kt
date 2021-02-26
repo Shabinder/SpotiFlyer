@@ -22,11 +22,11 @@ import javax.net.SocketFactory
 
 const val TAG = "C-Manager"
 
-val isInternetAvailable by lazy { ConnectionLiveData(appContext) }
+val internetAvailability by lazy { ConnectionLiveData(appContext) }
 
 @Composable
 fun isInternetAvailableState(): State<Boolean?>{
-   return isInternetAvailable.observeAsState()
+   return internetAvailability.observeAsState()
 }
 
 /**
