@@ -7,36 +7,36 @@ plugins {
 kotlin {
     jvm("desktop")
     android()
-    // Remove After upgrading dependency
-    /*configurations.all {
-        resolutionStrategy.eachDependency {
-            if (requested.group.contains("org.jetbrains.compose")) {
-                useVersion(JetBrains.Compose.VERSION)
-            }
-            if (requested.group.contains("androidx.compose")) {
-                useVersion(Versions.compose)
-            }
-        }
-    }*/
+    js {
+        browser()
+        nodejs()
+    }
     sourceSets {
         named("commonMain") {
             dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
             }
         }
 
         named("androidMain") {
             dependencies {
-                api("androidx.appcompat:appcompat:1.2.0")
-                api(Androidx.core)
+                implementation("androidx.appcompat:appcompat:1.2.0")
+                implementation(Androidx.core)
             }
         }
 
         named("desktopMain") {
             dependencies {
-                api(compose.desktop.common)
+                implementation(compose.desktop.common)
+            }
+        }
+        named("jsMain") {
+            dependencies {
+                implementation("org.jetbrains:kotlin-react:17.0.1-pre.148-kotlin-1.4.30")
+                implementation("org.jetbrains:kotlin-styled:1.0.0-pre.115-kotlin-1.4.10")
+                implementation("org.jetbrains:kotlin-react-dom:17.0.1-pre.148-kotlin-1.4.30")
             }
         }
     }

@@ -12,7 +12,6 @@ kotlin {
             dependencies {
                 implementation(compose.materialIconsExtended)
                 implementation(project(":common:dependency-injection"))
-                //implementation("com.alialbaali.kamel:kamel-image:0.1.0")
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
                 implementation(project(":common:list"))

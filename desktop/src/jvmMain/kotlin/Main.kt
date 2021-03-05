@@ -6,7 +6,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.extensions.compose.jetbrains.rootComponent
+import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
 import com.arkivanov.mvikotlin.core.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.core.lifecycle.resume
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
@@ -15,11 +15,7 @@ import com.shabinder.common.di.DownloadProgressFlow
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.initKoin
 import com.shabinder.common.root.SpotiFlyerRoot
-import com.shabinder.common.root.SpotiFlyerRootContent
-import com.shabinder.common.uikit.SpotiFlyerColors
-import com.shabinder.common.uikit.SpotiFlyerShapes
-import com.shabinder.common.uikit.SpotiFlyerTypography
-import com.shabinder.common.uikit.colorOffWhite
+import com.shabinder.common.uikit.*
 import com.shabinder.database.Database
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -42,13 +38,7 @@ fun main(){
                 typography = SpotiFlyerTypography,
                 shapes = SpotiFlyerShapes
             ) {
-                val callBacks = SpotiFlyerRootContent(rootComponent(factory = ::spotiFlyerRoot)).callBacks
-                val scope = rememberCoroutineScope()
-                scope.launch {
-                    DownloadProgressFlow.collect {
-
-                    }
-                }
+                val callBacks = SpotiFlyerRootContent(rememberRootComponent(factory = ::spotiFlyerRoot)).callBacks
             }
         }
     }

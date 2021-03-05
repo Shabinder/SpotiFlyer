@@ -2,7 +2,7 @@
 
 object Versions {
     const val versionName = "2.2.0"
-    const val kotlinVersion = "1.4.30"
+    const val kotlinVersion = "1.4.31"
 
     const val coroutinesVersion = "1.4.2"
     //const val compose = "1.0.0-alpha12"
@@ -67,7 +67,7 @@ object JetBrains {
 
     object Compose {
         // __LATEST_COMPOSE_RELEASE_VERSION__
-        const val VERSION = "0.4.0-build168"
+        const val VERSION = "0.3.2"
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
     }
 }

@@ -15,7 +15,7 @@ kotlin {
                 implementation(project(":common:database"))
                 implementation(project(":fuzzywuzzy:app"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
                 implementation(Ktor.clientCore)
                 implementation(Ktor.clientCio)
@@ -43,7 +43,6 @@ kotlin {
         }
         desktopMain {
             dependencies{
-                implementation("com.github.kokorin.jaffree:jaffree:0.9.10")
                 implementation(Ktor.clientApache)
                 implementation(Ktor.slf4j)
             }

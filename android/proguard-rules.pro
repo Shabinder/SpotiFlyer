@@ -32,6 +32,7 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 -keep class com.shabinder.** { *; }
+-keep class com.mpatric.** { *; }
 -keep,includedescriptorclasses class com.shabinder.**$$serializer { *; } # <-- change package name to your app's
 -keepclassmembers class com.shabinder.** { # <-- change package name to your app's
     *** Companion;

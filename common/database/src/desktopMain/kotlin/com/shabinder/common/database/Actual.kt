@@ -6,7 +6,8 @@ import com.shabinder.database.Database
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import java.io.File
 
-actual fun createDatabase(): Database {
+@Suppress("RedundantNullableReturnType")
+actual fun createDatabase(): Database? {
     val databasePath = File(System.getProperty("java.io.tmpdir"), "Database.db")
     val driver = JdbcSqliteDriver(url = "jdbc:sqlite:${databasePath.absolutePath}")
         .also { Database.Schema.create(it) }

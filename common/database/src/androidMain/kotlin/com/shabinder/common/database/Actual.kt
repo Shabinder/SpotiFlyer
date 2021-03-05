@@ -15,7 +15,8 @@ lateinit var appContext: Context
 @SuppressLint("StaticFieldLeak")
 lateinit var activityContext: Context
 
-actual fun createDatabase(): Database {
+@Suppress("RedundantNullableReturnType")
+actual fun createDatabase(): Database? {
     val driver = AndroidSqliteDriver(Database.Schema, appContext, "Database.db")
     return Database(driver)
 }

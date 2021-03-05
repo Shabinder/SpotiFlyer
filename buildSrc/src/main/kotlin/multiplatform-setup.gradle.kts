@@ -7,7 +7,10 @@ kotlin {
     jvm("desktop")
     android()
     //ios()
-
+    js {
+        browser()
+        nodejs()
+    }
     sourceSets {
         named("commonTest") {
             dependencies {
@@ -24,6 +27,11 @@ kotlin {
         named("desktopTest") {
             dependencies {
                 implementation(JetBrains.Kotlin.testJunit)
+            }
+        }
+        named("jsTest") {
+            dependencies {
+
             }
         }
     }
