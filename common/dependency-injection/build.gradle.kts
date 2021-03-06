@@ -1,7 +1,7 @@
 import org.jetbrains.compose.compose
 
 plugins {
-    id("multiplatform-compose-setup")
+    id("multiplatform-setup")
     id("android-setup")
     kotlin("plugin.serialization")
 }
@@ -11,8 +11,8 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(compose.materialIconsExtended)
-                implementation(project(":common:data-models"))
-                implementation(project(":common:database"))
+                api(project(":common:data-models"))
+                api(project(":common:database"))
                 implementation(project(":fuzzywuzzy:app"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
@@ -45,6 +45,11 @@ kotlin {
             dependencies{
                 implementation(Ktor.clientApache)
                 implementation(Ktor.slf4j)
+            }
+        }
+        jsMain {
+            dependencies {
+                implementation(project(":common:data-models"))
             }
         }
     }

@@ -5,6 +5,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.di.Picture
 import com.shabinder.common.list.integration.SpotiFlyerListImpl
 import com.shabinder.common.models.Consumer
 import com.shabinder.common.models.DownloadStatus
@@ -35,7 +36,7 @@ interface SpotiFlyerList {
     /*
     * Load Image from cache/Internet and cache it
     * */
-    suspend fun loadImage(url:String): ImageBitmap?
+    suspend fun loadImage(url:String): Picture
 
     /*
     * Sync Tracks Statuses

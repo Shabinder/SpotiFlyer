@@ -136,9 +136,9 @@ actual class Dir actual constructor(
             listOf(path).toTypedArray(), null,null)
     }
 
-    actual suspend fun loadImage(url: String): ImageBitmap? {
+    actual suspend fun loadImage(url: String): Picture {
         val cachePath = imageCacheDir() + getNameURL(url)
-        return (loadCachedImage(cachePath) ?: freshImage(url))?.asImageBitmap()
+        return Picture(image = (loadCachedImage(cachePath) ?: freshImage(url))?.asImageBitmap())
     }
 
     private fun loadCachedImage(cachePath: String): Bitmap? {

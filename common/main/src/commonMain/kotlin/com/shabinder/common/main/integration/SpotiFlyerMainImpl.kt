@@ -3,6 +3,7 @@ package com.shabinder.common.main.integration
 import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.extensions.coroutines.states
+import com.shabinder.common.di.Picture
 import com.shabinder.common.di.isInternetAvailable
 import com.shabinder.common.di.showPopUpMessage
 import com.shabinder.common.main.SpotiFlyerMain
@@ -40,5 +41,5 @@ internal class SpotiFlyerMainImpl(
         store.accept(Intent.SelectCategory(category))
     }
 
-    override suspend fun loadImage(url: String): ImageBitmap? = dir.loadImage(url)
+    override suspend fun loadImage(url: String): Picture = dir.loadImage(url)
 }

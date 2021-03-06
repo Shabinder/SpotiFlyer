@@ -1,5 +1,5 @@
 plugins {
-    id("multiplatform-setup")
+    id("multiplatform-setup-test")
     id("android-setup")
     id("com.squareup.sqldelight")
 }

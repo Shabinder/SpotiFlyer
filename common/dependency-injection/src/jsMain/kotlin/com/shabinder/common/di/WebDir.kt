@@ -2,9 +2,6 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.models.TrackDetails
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.w3c.dom.ImageBitmap
 
 actual class Dir actual constructor(private val logger: Kermit) {
@@ -43,8 +40,8 @@ actual class Dir actual constructor(private val logger: Kermit) {
 
     actual fun addToLibrary(path:String){}
 
-    actual suspend fun loadImage(url: String): ImageBitmap? {
-        return null
+    actual suspend fun loadImage(url: String): Picture {
+        return Picture(url)
     }
 
     private fun loadCachedImage(cachePath: String): ImageBitmap? {

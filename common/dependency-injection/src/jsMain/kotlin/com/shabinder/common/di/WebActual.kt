@@ -46,11 +46,11 @@ actual val isInternetAvailable:Boolean
         return result
     }
 
-val DownloadProgressFlow: MutableSharedFlow<HashMap<String,DownloadStatus>> = MutableSharedFlow(1)
+val DownloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = MutableSharedFlow(1)
 
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,
-    getYTIDBestMatch:suspend (String,TrackDetails)->String?,
+    getYTIDBestMatch:suspend (String, TrackDetails)->String?,
     saveFileWithMetaData:suspend (mp3ByteArray:ByteArray, trackDetails: TrackDetails) -> Unit
 ){
     list.forEach {

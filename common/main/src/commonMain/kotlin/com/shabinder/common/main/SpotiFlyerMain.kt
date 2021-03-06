@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.di.Dir
+import com.shabinder.common.di.Picture
 import com.shabinder.common.main.integration.SpotiFlyerMainImpl
 import com.shabinder.common.models.Consumer
 import com.shabinder.common.models.DownloadRecord
@@ -33,7 +34,7 @@ interface SpotiFlyerMain {
     /*
     * Load Image from cache/Internet and cache it
     * */
-    suspend fun loadImage(url:String): ImageBitmap?
+    suspend fun loadImage(url:String): Picture
 
     interface Dependencies {
         val mainOutput: Consumer<Output>

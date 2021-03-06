@@ -3,6 +3,7 @@ package com.shabinder.common.list.integration
 import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.extensions.coroutines.states
+import com.shabinder.common.di.Picture
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.list.SpotiFlyerList.Dependencies
 import com.shabinder.common.list.SpotiFlyerList.State
@@ -46,5 +47,5 @@ internal class SpotiFlyerListImpl(
         store.accept(Intent.RefreshTracksStatuses)
     }
 
-    override suspend fun loadImage(url: String): ImageBitmap? = dir.loadImage(url)
+    override suspend fun loadImage(url: String): Picture = dir.loadImage(url)
 }

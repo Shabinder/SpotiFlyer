@@ -18,6 +18,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 import javax.imageio.ImageIO
 
+
+
+
 actual class Dir actual constructor(private val logger: Kermit) {
 
     init {
@@ -79,11 +82,12 @@ actual class Dir actual constructor(private val logger: Kermit) {
             .setId3v2TagsAndSaveFile(trackDetails)
     }
     actual fun addToLibrary(path:String){}
-    actual suspend fun loadImage(url: String): ImageBitmap? {
+
+    actual suspend fun loadImage(url: String): Picture {
         val cachePath = imageCacheDir() + getNameURL(url)
         var picture: ImageBitmap? = loadCachedImage(cachePath)
         if (picture == null) picture = freshImage(url)
-        return picture
+        return Picture(image = picture)
     }
 
     private fun loadCachedImage(cachePath: String): ImageBitmap? {
