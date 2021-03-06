@@ -1,6 +1,5 @@
 package com.shabinder.common.list
 
-import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.di.Dir

@@ -1,0 +1,99 @@
+@font-face {
+    font-family: pristine;
+    src: url("pristine_script.ttf");
+}
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-family: Lora,Helvetica Neue,Helvetica,Arial,sans-serif;
+    position: relative;
+    color: #fff;
+    caret-color: crimson;
+    background-color: black;
+    /*background-image: linear-gradient(180deg,rgba(221,0,221,0.50),rgba(221,0,221,0.32),rgba(221,0,221,0.16),rgba(221,0,221,0.08),rgba(221,0,221,0.04),rgba(0,0,0,0));*/
+    background-image: url("header.png");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+#appName{
+    font-family: pristine, cursive;
+}
+.headingTitle{
+    text-align: center;
+    margin: 10px;
+    font-family: 'RocknRoll One', sans-serif;
+}
+.glow-button:hover {
+    color: rgba(255, 255, 255, 1);
+    box-shadow: 0 5px 15px rgb(105, 44, 143);
+}
+.button {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.8);
+    //background: rgb(145, 92, 182);
+    padding: 15px 40px;
+    border-radius: 4px;
+    font-weight: normal;
+    text-transform: uppercase;
+    transition: all 0.2s ease-in-out;
+}
+.searchBox {;
+    background: #2f3640;
+    height: 42px;
+    border-radius: 40px;
+    padding: 10px;
+    align-self: center;
+    margin: 24px;
+}
+
+.searchBox:hover > .searchInput {
+    width: 30vw;
+    padding: 0 6px;
+}
+
+.searchBox:hover .search-icon {
+    filter: none;
+}
+
+.searchBox:hover > .searchButton {
+    background: white;
+    color : #2f3640;
+}
+
+.search-icon {
+    filter: invert(100%);
+}
+
+.searchButton {
+    color: white;
+    float: right;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #2f3640;
+    display: flex;
+    outline: none;
+    justify-content: center;
+    align-items: center;
+    transition: 0.4s;
+}
+.searchInput {
+    border:none;
+    background: none;
+    outline:none;
+    float:left;
+    padding: 0;
+    color: white;
+    font-size: 16px;
+    transition: 0.4s;
+    line-height: 40px;
+    width: 0px;
+}
+
+@media screen and (max-width: 620px) {
+    .searchBox:hover > .searchInput {
+        width: 150px;
+        padding: 0 6px;
+    }
+}

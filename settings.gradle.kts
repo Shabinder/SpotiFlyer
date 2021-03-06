@@ -11,5 +11,6 @@ include(
     ":common:dependency-injection",
     ":fuzzywuzzy:app",
     ":android",
-    ":desktop"
+    ":desktop",
+    ":web-app"
 )
