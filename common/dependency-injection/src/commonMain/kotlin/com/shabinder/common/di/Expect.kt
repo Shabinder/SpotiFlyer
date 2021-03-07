@@ -9,8 +9,6 @@ expect fun shareApp()
 
 expect fun giveDonation()
 
-expect fun showPopUpMessage(text: String)
-
 expect val dispatcherIO: CoroutineDispatcher
 
 expect val isInternetAvailable:Boolean

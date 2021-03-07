@@ -7,59 +7,54 @@ import org.w3c.dom.HTMLInputElement
 import react.*
 import styled.*
 
-data class SearchbarState(var link:String):RState
-
 external interface SearchbarProps : RProps {
     var link: String
+    var search:(String)->Unit
 }
 
-fun RBuilder.searchBar(attrs:SearchbarProps.() -> Unit): ReactElement {
-    return child(Searchbar::class){
-        this.attrs(attrs)
+@Suppress("FunctionName")
+fun RBuilder.SearchBar(handler:SearchbarProps.() -> Unit) = child(searchbar){
+    attrs {
+        handler()
     }
 }
 
-class Searchbar(props: SearchbarProps): RComponent<SearchbarProps,SearchbarState>(props) {
-    init {
-        state = SearchbarState(props.link)
-    }
 
-    override fun RBuilder.render() {
-        styledDiv{
+
+val searchbar = functionalComponent<SearchbarProps>("SearchBar"){ props ->
+    val (link,setLink) = useState(props.link)
+
+    styledDiv{
+        css {
+            classes = mutableListOf("searchBox")
+        }
+        styledInput(type = InputType.url){
+            attrs {
+                placeholder = "Search"
+                onChangeFunction = {
+                    val target = it.target as HTMLInputElement
+                    setLink(target.value)
+                }
+                value = link
+            }
             css {
-                classes = mutableListOf("searchBox")
+                classes = mutableListOf("searchInput")
             }
-            styledInput(type = InputType.url){
-                attrs {
-                    placeholder = "Search"
-                    onChangeFunction = {
-                        val target = it.target as HTMLInputElement
-                        setState{
-                            link = target.value
-                        }
-                    }
-                    value = state.link
-                }
-                css {
-                    classes = mutableListOf("searchInput")
+        }
+        styledButton {
+            attrs {
+                onClickFunction = {
+                    props.search(link)
                 }
             }
-            styledButton {
-                attrs {
-                    onClickFunction = {
-
-                    }
-                }
+            css {
+                classes = mutableListOf("searchButton")
+            }
+            styledImg(src = "search.svg") {
                 css {
-                    classes = mutableListOf("searchButton")
-                }
-                styledImg(src = "search.svg") {
-                    css {
-                        classes = mutableListOf("search-icon")
-                    }
+                    classes = mutableListOf("search-icon")
                 }
             }
         }
     }
-
 }

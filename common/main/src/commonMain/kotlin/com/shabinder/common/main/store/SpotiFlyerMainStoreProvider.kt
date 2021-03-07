@@ -22,7 +22,8 @@ import kotlinx.coroutines.flow.map
 
 internal class SpotiFlyerMainStoreProvider(
     private val storeFactory: StoreFactory,
-    database: Database
+    private val showPopUpMessage: (String)->Unit,
+    private val database: Database?
 ) {
 
     fun provide(): SpotiFlyerMainStore =
@@ -34,12 +35,12 @@ internal class SpotiFlyerMainStoreProvider(
             reducer = ReducerImpl
         ) {}
 
-    val updates: Flow<List<DownloadRecord>> =
-        database.downloadRecordDatabaseQueries
-            .selectAll()
-            .asFlow()
-            .mapToList(Dispatchers.Default)
-            .map {
+    val updates: Flow<List<DownloadRecord>>? =
+        database?.downloadRecordDatabaseQueries
+            ?.selectAll()
+            ?.asFlow()
+            ?.mapToList(Dispatchers.Default)
+            ?.map {
                 it.map { record ->
                     record.run{
                         DownloadRecord(id, type, name, link, coverUrl, totalFiles)
@@ -56,7 +57,7 @@ internal class SpotiFlyerMainStoreProvider(
 
     private inner class ExecutorImpl : SuspendExecutor<Intent, Unit, State, Result, Nothing>() {
         override suspend fun executeAction(action: Unit, getState: () -> State) {
-            updates.collect {
+            updates?.collect {
                 dispatch(Result.ItemsLoaded(it))
             }
         }

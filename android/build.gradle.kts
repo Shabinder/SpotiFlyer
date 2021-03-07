@@ -72,7 +72,7 @@ dependencies {
     implementation(project(":common:data-models"))
 
     implementation(Koin.android)
-    implementation(Koin.androidViewModel)
+    implementation(Koin.compose)
 
     //DECOMPOSE
     implementation(Decompose.decompose)

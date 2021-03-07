@@ -34,21 +34,9 @@ actual fun openPlatform(packageID:String, platformLink:String){
 }
 actual val dispatcherIO = Dispatchers.IO
 
-@Composable
-actual fun Toast(
-    text: String,
-    visibility: MutableState<Boolean>,
-    duration: ToastDuration
-){
-    //We Have Android's Implementation of Toast so its just Empty
-}
-
 actual val isInternetAvailable:Boolean
     get() = internetAvailability.value ?: true
 
-actual fun showPopUpMessage(text: String){
-    android.widget.Toast.makeText(appContext,text, android.widget.Toast.LENGTH_SHORT).show()
-}
 actual fun shareApp(){
     val sendIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND

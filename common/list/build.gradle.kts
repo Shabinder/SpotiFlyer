@@ -15,7 +15,6 @@ kotlin {
                 implementation(MVIKotlin.coroutines)
                 implementation(MVIKotlin.mvikotlin)
                 implementation(Decompose.decompose)
-                implementation(Decompose.extensionsCompose)
             }
         }
     }

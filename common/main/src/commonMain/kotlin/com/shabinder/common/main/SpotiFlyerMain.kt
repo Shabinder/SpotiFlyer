@@ -1,6 +1,5 @@
 package com.shabinder.common.main
 
-import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.di.Dir
@@ -39,8 +38,9 @@ interface SpotiFlyerMain {
     interface Dependencies {
         val mainOutput: Consumer<Output>
         val storeFactory: StoreFactory
-        val database: Database
+        val database: Database?
         val dir: Dir
+        val showPopUpMessage:(String)->Unit
     }
     sealed class Output {
         data class Search(val link: String) : Output()

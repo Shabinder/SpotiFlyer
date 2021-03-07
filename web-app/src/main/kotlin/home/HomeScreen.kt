@@ -1,24 +1,22 @@
 package home
 
+import com.shabinder.common.main.SpotiFlyerMain
+import extras.RenderableComponent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.css.*
 import react.*
 import styled.css
 import styled.styledDiv
 
+class HomeScreen(
+    props: Props<SpotiFlyerMain>,
+    override val stateFlow: Flow<State> = props.model.models.map { State(it) }
+) : RenderableComponent<SpotiFlyerMain, HomeScreen.State>(
+    props,
+    initialState = State(data = SpotiFlyerMain.State())
+) {
 
-data class HomeScreenState(var link:String): RState
-
-external interface HomeScreenProps : RProps {
-    var link: String
-}
-
-fun RBuilder.homeScreen(attrs:HomeScreenProps.() -> Unit): ReactElement {
-    return child(HomeScreen::class){
-        this.attrs(attrs)
-    }
-}
-
-class HomeScreen(props:HomeScreenProps):RComponent<HomeScreenProps,HomeScreenState>(props) {
     override fun RBuilder.render() {
         styledDiv{
             css {
@@ -28,24 +26,34 @@ class HomeScreen(props:HomeScreenProps):RComponent<HomeScreenProps,HomeScreenSta
                 justifyContent = JustifyContent.center
                 alignItems = Align.center
             }
-            message {}
-            searchBar {
-                link = props.link
+
+            Message {
+                text = "Your Gateway to Nirvana, for FREE!"
             }
-            iconList {
-                iconsAndPlatforms = iconList
+
+            SearchBar {
+                link = state.data.link
+                search = model::onLinkSearch
+            }
+
+            IconList {
+                iconsAndPlatforms = platformIconList
                 isBadge = false
             }
         }
-        iconList{
+        IconList {
             iconsAndPlatforms = badges
             isBadge = true
         }
     }
+
+    class State(
+        var data: SpotiFlyerMain.State
+    ):RState
 }
 
 
-private val iconList = mapOf(
+private val platformIconList = mapOf(
     "spotify.svg" to "https://open.spotify.com/",
     "gaana.svg" to "https://www.gaana.com/",
     "youtube.svg" to "https://www.youtube.com/",

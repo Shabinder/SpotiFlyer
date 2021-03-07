@@ -1,6 +1,5 @@
 package com.shabinder.common.list.integration
 
-import androidx.compose.ui.graphics.ImageBitmap
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.extensions.coroutines.states
 import com.shabinder.common.di.Picture
@@ -24,8 +23,9 @@ internal class SpotiFlyerListImpl(
                 dir = this.dir,
                 storeFactory = storeFactory,
                 fetchQuery = fetchQuery,
+                downloadProgressFlow = downloadProgressFlow,
                 link = link,
-                downloadProgressFlow = downloadProgressFlow
+                showPopUpMessage = showPopUpMessage
             ).provide()
         }
 

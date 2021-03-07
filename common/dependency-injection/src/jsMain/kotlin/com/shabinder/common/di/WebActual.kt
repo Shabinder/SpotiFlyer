@@ -19,7 +19,6 @@ actual fun giveDonation(){
 }
 
 actual fun queryActiveTracks(){}
-actual fun showPopUpMessage(text:String){}
 
 actual val dispatcherIO: CoroutineDispatcher = Dispatchers.Default
 
@@ -40,6 +39,7 @@ private suspend fun isInternetAvailable(): Boolean {
 
 actual val isInternetAvailable:Boolean
     get(){
+        return true
         var result = false
         val job = GlobalScope.launch { result = isInternetAvailable() }
         while(job.isActive){}
@@ -52,11 +52,11 @@ actual suspend fun downloadTracks(
     list: List<TrackDetails>,
     getYTIDBestMatch:suspend (String, TrackDetails)->String?,
     saveFileWithMetaData:suspend (mp3ByteArray:ByteArray, trackDetails: TrackDetails) -> Unit
-){
+){/*
     list.forEach {
         if (!it.videoID.isNullOrBlank()) {//Video ID already known!
         } else {
 
         }
-    }
+    }*/
 }

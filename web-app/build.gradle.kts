@@ -14,6 +14,16 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-js"))
+    implementation(Decompose.decompose)
+    implementation(Koin.core)
+    implementation(MVIKotlin.mvikotlin)
+    implementation(MVIKotlin.mvikotlinMain)
+    implementation(project(":common:root"))
+    implementation(project(":common:main"))
+    implementation(project(":common:list"))
+    implementation(project(":common:database"))
+    implementation(project(":common:data-models"))
+    implementation(project(":common:dependency-injection"))
     implementation("org.jetbrains:kotlin-react:17.0.1-pre.148-kotlin-1.4.30")
     implementation("org.jetbrains:kotlin-react-dom:17.0.1-pre.148-kotlin-1.4.30")
     implementation("org.jetbrains:kotlin-styled:1.0.0-pre.115-kotlin-1.4.10")

@@ -48,6 +48,7 @@ import com.tonyodev.fetch2.Status
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.android.ext.android.inject
+import com.shabinder.common.uikit.showPopUpMessage as uikitShowPopUpMessage
 
 const val disableDozeCode = 1223
 
@@ -117,6 +118,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                 override val database = this@MainActivity.database
                 override val fetchPlatformQueryResult = this@MainActivity.fetcher
                 override val directories: Dir = this@MainActivity.dir
+                override val showPopUpMessage: (String) -> Unit = ::uikitShowPopUpMessage
                 override val downloadProgressReport: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
             }
         )
@@ -234,7 +236,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 
     override fun onPaymentError(errorCode: Int, response: String?) {
         try{
-            showPopUpMessage("Payment Failed, Response:$response")
+            uikitShowPopUpMessage("Payment Failed, Response:$response")
         }catch (e: Exception){
             Log.d("Razorpay Payment","Exception in onPaymentSuccess $response")
         }
@@ -242,9 +244,9 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 
     override fun onPaymentSuccess(razorpayPaymentId: String?) {
         try{
-            showPopUpMessage("Payment Successful, ThankYou!")
+            uikitShowPopUpMessage("Payment Successful, ThankYou!")
         }catch (e: Exception){
-            showPopUpMessage("Razorpay Payment, Error Occurred.")
+            uikitShowPopUpMessage("Razorpay Payment, Error Occurred.")
             Log.d("Razorpay Payment","Exception in onPaymentSuccess, ${e.message}")
         }
     }

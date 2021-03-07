@@ -1,5 +1,5 @@
 plugins {
-    id("multiplatform-compose-setup")
+    id("multiplatform-setup")
     id("android-setup")
     id("kotlin-parcelize")
     kotlin("plugin.serialization")
@@ -10,7 +10,7 @@ kotlin {
         commonMain {
             dependencies {
                 api("dev.icerock.moko:parcelize:0.6.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
             }
         }
     }

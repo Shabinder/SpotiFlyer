@@ -17,8 +17,7 @@ import com.shabinder.common.di.initKoin
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.uikit.*
 import com.shabinder.database.Database
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import com.shabinder.common.uikit.showPopUpMessage as uikitShowPopUpMessage
 
 private val koin = initKoin(enableNetworkLogs = true).koin
 
@@ -49,9 +48,10 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
         componentContext = componentContext,
         dependencies = object : SpotiFlyerRoot.Dependencies {
             override val storeFactory = DefaultStoreFactory
-            override val database: Database = koin.get()
+            override val database: Database? = koin.get()
             override val fetchPlatformQueryResult: FetchPlatformQueryResult = koin.get()
             override val directories: Dir = koin.get()
+            override val showPopUpMessage: (String) -> Unit = ::uikitShowPopUpMessage
             override val downloadProgressReport = DownloadProgressFlow
         }
     )

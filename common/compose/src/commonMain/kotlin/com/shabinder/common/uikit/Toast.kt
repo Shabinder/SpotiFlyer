@@ -1,4 +1,4 @@
-package com.shabinder.common.di
+package com.shabinder.common.uikit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 enum class ToastDuration(val value: Int) {
     Short(1000), Long(3000)
 }
+
+expect fun showPopUpMessage(text: String)
 
 @Composable
 expect fun Toast(

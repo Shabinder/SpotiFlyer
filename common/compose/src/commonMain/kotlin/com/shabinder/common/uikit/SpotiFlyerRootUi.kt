@@ -85,7 +85,6 @@ fun MainScreen(modifier: Modifier = Modifier, topPadding: Dp = 0.dp,statusBarHei
         Spacer(Modifier.padding(top = topPadding))
         Children(
             routerState = component.routerState,
-            //TODO animation = crossfade()
         ) { child, _ ->
             when (child) {
                 is Child.Main -> SpotiFlyerMainContent(component = child.component)

@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import com.shabinder.common.database.R
+import com.shabinder.common.database.appContext
 import com.shabinder.common.di.Picture
 import com.shabinder.common.di.dispatcherIO
 import kotlinx.coroutines.withContext
@@ -103,3 +104,15 @@ actual fun GithubLogo() = vectorResource(R.drawable.ic_github)
 
 @Composable
 fun vectorResource(@DrawableRes id: Int) =  ImageVector.Companion.vectorResource(id)
+
+@Composable
+actual fun Toast(
+    text: String,
+    visibility: MutableState<Boolean>,
+    duration: ToastDuration
+){
+    //We Have Android's Implementation of Toast so its just Empty
+}
+actual fun showPopUpMessage(text: String){
+    android.widget.Toast.makeText(appContext,text, android.widget.Toast.LENGTH_SHORT).show()
+}

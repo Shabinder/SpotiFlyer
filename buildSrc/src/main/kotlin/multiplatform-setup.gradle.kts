@@ -2,9 +2,11 @@ import gradle.kotlin.dsl.accessors._2e23d8fadf0ed92ae13e19db3d83f86d.compose
 import gradle.kotlin.dsl.accessors._2e23d8fadf0ed92ae13e19db3d83f86d.kotlin
 import gradle.kotlin.dsl.accessors._2e23d8fadf0ed92ae13e19db3d83f86d.sourceSets
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.compose.compose
 
 plugins {
-    id("com.android.library")
+//    id("com.android.library")
+    id("android-setup")
     id("kotlin-multiplatform")
     id("org.jetbrains.compose")
 }
@@ -19,9 +21,7 @@ kotlin {
     sourceSets {
         named("commonMain") {
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
             }
         }
 
@@ -29,12 +29,22 @@ kotlin {
             dependencies {
                 implementation("androidx.appcompat:appcompat:1.2.0")
                 implementation(Androidx.core)
+                implementation(compose.runtime)
+                implementation(compose.material)
+                implementation(compose.foundation)
+                implementation(compose.materialIconsExtended)
+                implementation(Decompose.extensionsCompose)
             }
         }
 
         named("desktopMain") {
             dependencies {
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
                 implementation(compose.desktop.common)
+                implementation(compose.materialIconsExtended)
+                implementation(Decompose.extensionsCompose)
             }
         }
         named("jsMain") {

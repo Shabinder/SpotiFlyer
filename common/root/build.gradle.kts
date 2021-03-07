@@ -10,7 +10,6 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(compose.materialIconsExtended)
                 implementation(project(":common:dependency-injection"))
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
@@ -20,7 +19,6 @@ kotlin {
                 implementation(MVIKotlin.coroutines)
                 implementation(MVIKotlin.mvikotlin)
                 implementation(Decompose.decompose)
-                implementation(Decompose.extensionsCompose)
             }
         }
     }

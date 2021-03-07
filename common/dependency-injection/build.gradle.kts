@@ -10,15 +10,14 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(compose.materialIconsExtended)
-                api(project(":common:data-models"))
-                api(project(":common:database"))
+                implementation(project(":common:data-models"))
+                implementation(project(":common:database"))
                 implementation(project(":fuzzywuzzy:app"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
                 implementation(Ktor.clientCore)
-                implementation(Ktor.clientCio)
+                //implementation(Ktor.clientCio)
                 implementation(Ktor.clientSerialization)
                 implementation(Ktor.clientLogging)
                 implementation(Ktor.clientJson)
@@ -34,6 +33,7 @@ kotlin {
         }
         androidMain {
             dependencies{
+                implementation(compose.materialIconsExtended)
                 implementation(Ktor.clientAndroid)
                 implementation(Extras.Android.fetch)
                 implementation(Koin.android)
@@ -43,12 +43,14 @@ kotlin {
         }
         desktopMain {
             dependencies{
+                implementation(compose.materialIconsExtended)
                 implementation(Ktor.clientApache)
                 implementation(Ktor.slf4j)
             }
         }
         jsMain {
             dependencies {
+                implementation(Ktor.clientJs)
                 implementation(project(":common:data-models"))
             }
         }

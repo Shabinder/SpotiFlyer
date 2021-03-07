@@ -17,6 +17,7 @@ internal class SpotiFlyerListStoreProvider(
     private val storeFactory: StoreFactory,
     private val fetchQuery: FetchPlatformQueryResult,
     private val link: String,
+    private val showPopUpMessage: (String) -> Unit,
     private val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>
 ) {
     val logger = getLogger()

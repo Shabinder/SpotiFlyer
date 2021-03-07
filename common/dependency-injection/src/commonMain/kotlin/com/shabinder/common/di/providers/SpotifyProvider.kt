@@ -51,7 +51,7 @@ class SpotifyProvider(
     override suspend fun authenticateSpotify(): HttpClient?{
         val token = tokenStore.getToken()
         return if(token == null) {
-            showPopUpMessage("Please Check your Network Connection")
+            logger.d{ "Please Check your Network Connection" }
             null
         }
         else{

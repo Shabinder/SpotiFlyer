@@ -9,13 +9,13 @@ object Versions {
 
     const val coilVersion = "0.4.1"
     //DI
-    const val koin = "3.0.0-alpha-4"
+    const val koin = "3.0.1-beta-1"
 
     //Logger
     const val kermit = "0.1.8"
 
     //Internet
-    const val ktor = "1.5.1"
+    const val ktor = "1.5.2"
 
     const val kotlinxSerialization = "1.1.0-RC"
     //Database
@@ -32,10 +32,10 @@ object Versions {
     const val androidLifecycle = "2.3.0"
 }
 object Koin {
-    val core = "org.koin:koin-core:${Versions.koin}"
-    val test = "org.koin:koin-test:${Versions.koin}"
-    val android = "org.koin:koin-android:${Versions.koin}"
-    val androidViewModel = "org.koin:koin-androidx-viewmodel:${Versions.koin}"
+    val core = "io.insert-koin:koin-core:${Versions.koin}"
+    val test = "io.insert-koin:koin-test:${Versions.koin}"
+    val android = "io.insert-koin:koin-android:${Versions.koin}"
+    val compose = "io.insert-koin:koin-androidx-compose:${Versions.koin}"
 }
 object Androidx{
     const val androidxActivity = "androidx.activity:activity-compose:1.3.0-alpha02"

@@ -14,7 +14,8 @@ final pathSeparator = System.properties["path.separator"]
 
 kotlin {
     jvm()
-    /*js() {
+    js() {
+        browser()
         [compileKotlinJs, compileTestKotlinJs].each { configuration ->
             configuration.kotlinOptions {
                 moduleKind = 'umd'
@@ -22,7 +23,7 @@ kotlin {
                 metaInfo = true
             }
         }
-    }*/
+    }
 
 /*
     wasm32("wasm")
@@ -63,7 +64,7 @@ kotlin {
                 implementation 'junit:junit:4.12'
             }
         }
-        /*jsMain {
+        jsMain {
             kotlin.srcDir('src/jsMain/kotlin')
             dependencies {
                 implementation kotlin("stdlib-js")
@@ -77,7 +78,7 @@ kotlin {
                 kotlinOptions.moduleKind = "umd"
             }
         }
-        jsTest {
+        /*jsTest {
             dependencies {
                 implementation kotlin("test-js")
                 implementation kotlin("stdlib-js")

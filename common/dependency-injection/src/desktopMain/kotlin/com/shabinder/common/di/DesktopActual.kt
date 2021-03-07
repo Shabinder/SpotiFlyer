@@ -12,6 +12,7 @@ import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import io.ktor.client.request.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
@@ -21,6 +22,8 @@ import kotlinx.coroutines.withContext
 actual fun openPlatform(packageID:String, platformLink:String){
     //TODO
 }
+
+actual val dispatcherIO = Dispatchers.IO
 
 actual fun shareApp(){
     //TODO
