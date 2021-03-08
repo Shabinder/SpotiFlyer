@@ -34,9 +34,9 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
     private val root = SpotiFlyerRoot(ctx,
         object : SpotiFlyerRoot.Dependencies{
             override val storeFactory: StoreFactory = DefaultStoreFactory
-            override val database: Database? = null
             override val fetchPlatformQueryResult = dependencies.fetchPlatformQueryResult
             override val directories = dependencies.directories
+            override val database: Database? = directories.db
             override val showPopUpMessage: (String) -> Unit = {}//TODO
             override val downloadProgressReport: MutableSharedFlow<HashMap<String, DownloadStatus>>
                 = MutableSharedFlow(1)

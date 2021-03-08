@@ -16,10 +16,10 @@ class FetchPlatformQueryResult(
     val youtubeProvider: YoutubeProvider,
     val youtubeMusic: YoutubeMusic,
     val youtubeMp3: YoutubeMp3,
-    private val database: Database
+    private val dir: Dir
 ) {
-    private val db:DownloadRecordDatabaseQueries
-        get() = database.downloadRecordDatabaseQueries
+    private val db:DownloadRecordDatabaseQueries?
+        get() = dir.db?.downloadRecordDatabaseQueries
 
     suspend fun query(link:String): PlatformQueryResult?{
         val result = when{
@@ -41,7 +41,7 @@ class FetchPlatformQueryResult(
         }
         result?.run {
             withContext(Dispatchers.Default){
-                db.add(
+                db?.add(
                     folderType, title, link, coverUrl, trackList.size.toLong()
                 )
             }

@@ -8,7 +8,6 @@ import io.ktor.client.*
 
 class YoutubeMp3(
     override val httpClient: HttpClient,
-    private val database: Database,
     private val logger: Kermit,
     private val dir: Dir,
 ):Yt1sMp3 {

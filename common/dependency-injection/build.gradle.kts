@@ -17,7 +17,6 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
                 implementation(Ktor.clientCore)
-                //implementation(Ktor.clientCio)
                 implementation(Ktor.clientSerialization)
                 implementation(Ktor.clientLogging)
                 implementation(Ktor.clientJson)

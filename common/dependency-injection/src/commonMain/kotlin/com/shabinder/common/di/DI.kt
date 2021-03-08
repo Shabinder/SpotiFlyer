@@ -23,17 +23,16 @@ fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclarat
     }
 
 fun commonModule(enableNetworkLogs: Boolean) = module {
-    single { Dir(get()) }
-    single { createDatabase() }
+    single { createHttpClient(enableNetworkLogs = enableNetworkLogs) }
+    single { Dir(get(),createDatabase()) }
     single { Kermit(getLogger()) }
     single { TokenStore(get(),get()) }
     single { YoutubeMusic(get(),get()) }
-    single { SpotifyProvider(get(),get(),get(),get()) }
-    single { GaanaProvider(get(),get(),get(),get()) }
-    single { YoutubeProvider(get(),get(),get(),get()) }
-    single { YoutubeMp3(get(),get(),get(),get()) }
+    single { SpotifyProvider(get(),get(),get()) }
+    single { GaanaProvider(get(),get(),get()) }
+    single { YoutubeProvider(get(),get(),get()) }
+    single { YoutubeMp3(get(),get(),get()) }
     single { FetchPlatformQueryResult(get(),get(),get(),get(),get(),get()) }
-    single { createHttpClient(enableNetworkLogs = enableNetworkLogs) }
 }
 
 val kotlinxSerializer = KotlinxSerializer( Json {

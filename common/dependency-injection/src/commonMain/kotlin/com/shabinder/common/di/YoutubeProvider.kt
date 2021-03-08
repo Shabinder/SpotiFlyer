@@ -7,7 +7,6 @@ import io.ktor.client.*
 
 expect class YoutubeProvider(
     httpClient: HttpClient,
-    database: Database,
     logger: Kermit,
     dir: Dir
 ) {

@@ -1,8 +1,10 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
+import com.shabinder.common.database.createDatabase
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.database.Database
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -11,8 +13,10 @@ import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt
 
 expect class Dir(
-    logger: Kermit
+    logger: Kermit,
+    database: Database? = createDatabase()
 ) {
+    val db :Database?
     fun isPresent(path:String):Boolean
     fun fileSeparator(): String
     fun defaultDir(): String

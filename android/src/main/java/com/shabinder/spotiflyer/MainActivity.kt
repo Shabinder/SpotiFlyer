@@ -55,7 +55,6 @@ const val disableDozeCode = 1223
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity(), PaymentResultListener {
 
-    private val database: Database by inject()
     private val fetcher: FetchPlatformQueryResult by inject()
     private val dir: Dir by inject()
     private lateinit var root: SpotiFlyerRoot
@@ -115,7 +114,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
             componentContext,
             dependencies = object : SpotiFlyerRoot.Dependencies{
                 override val storeFactory = LoggingStoreFactory(DefaultStoreFactory)
-                override val database = this@MainActivity.database
+                override val database = this@MainActivity.dir.db
                 override val fetchPlatformQueryResult = this@MainActivity.fetcher
                 override val directories: Dir = this@MainActivity.dir
                 override val showPopUpMessage: (String) -> Unit = ::uikitShowPopUpMessage

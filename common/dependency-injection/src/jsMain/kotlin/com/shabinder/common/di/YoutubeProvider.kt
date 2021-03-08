@@ -7,7 +7,6 @@ import io.ktor.client.*
 
 actual class YoutubeProvider actual constructor(
     httpClient: HttpClient,
-    database: Database,
     logger: Kermit,
     dir: Dir
 ) {

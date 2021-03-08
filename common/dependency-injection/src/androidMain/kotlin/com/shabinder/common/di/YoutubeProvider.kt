@@ -18,19 +18,16 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import com.github.kiulian.downloader.YoutubeDownloader
-import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.spotify.Source
-import com.shabinder.database.Database
 import io.ktor.client.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 actual class YoutubeProvider actual constructor(
     private val httpClient: HttpClient,
-    private val database: Database,
     private val logger: Kermit,
     private val dir: Dir,
 ){
@@ -43,9 +40,6 @@ actual class YoutubeProvider actual constructor(
     private val sampleDomain1 = "music.youtube.com"
     private val sampleDomain2 = "youtube.com"
     private val sampleDomain3 = "youtu.be"
-
-    private val db: DownloadRecordDatabaseQueries
-        get() = database.downloadRecordDatabaseQueries
 
     actual suspend fun query(fullLink: String): PlatformQueryResult?{
         val link = fullLink.removePrefix("https://").removePrefix("http://")
@@ -133,22 +127,6 @@ actual class YoutubeProvider actual constructor(
                         videoID = it.videoId()
                     )
                 }
-
-                withContext(Dispatchers.IO) {
-                    db.add(
-                        type = "PlayList",
-                        name = if (name.length > 17) {
-                            "${name.subSequence(0, 16)}..."
-                        } else {
-                            name
-                        },
-                        link = "https://www.youtube.com/playlist?list=$searchId",
-                        coverUrl = "https://i.ytimg.com/vi/${
-                            videos.firstOrNull()?.videoId()
-                        }/hqdefault.jpg",
-                        totalFiles = videos.size.toLong(),
-                    )
-                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 logger.d{"An Error Occurred While Processing!"}
@@ -204,20 +182,6 @@ actual class YoutubeProvider actual constructor(
                     )
                 )
                 title = name
-
-                withContext(Dispatchers.IO) {
-                    db.add(
-                            type = "Track",
-                            name = if (name.length > 17) {
-                                "${name.subSequence(0, 16)}..."
-                            } else {
-                                name
-                            },
-                            link = "https://www.youtube.com/watch?v=$searchId",
-                            coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
-                            totalFiles = 1,
-                    )
-                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 logger.e{"An Error Occurred While Processing!,$searchId"}

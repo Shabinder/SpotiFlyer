@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.database.Database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -21,7 +22,10 @@ import javax.imageio.ImageIO
 
 
 
-actual class Dir actual constructor(private val logger: Kermit) {
+actual class Dir actual constructor(
+    private val logger: Kermit,
+    private val database: Database?,
+    ) {
 
     init {
         createDirectories()
@@ -120,6 +124,9 @@ actual class Dir actual constructor(private val logger: Kermit) {
             null
         }
     }
+
+    actual val db: Database?
+        get() = database
 }
 fun BufferedImage.toImageBitmap() = Image.makeFromEncoded(
     toByteArray(this)

@@ -17,7 +17,6 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.gaana.GaanaRequests
@@ -26,21 +25,15 @@ import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.gaana.GaanaTrack
 import com.shabinder.common.models.spotify.Source
-import com.shabinder.database.Database
 import io.ktor.client.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class GaanaProvider(
     override val httpClient: HttpClient,
-    private val database: Database,
     private val logger: Kermit,
     private val dir: Dir,
 ): GaanaRequests {
 
     private val gaanaPlaceholderImageUrl = "https://a10.gaanacdn.com/images/social/gaana_social.jpg"
-    private val db: DownloadRecordDatabaseQueries
-        get() = database.downloadRecordDatabaseQueries
 
     suspend fun query(fullLink: String): PlatformQueryResult?{
         //Link Schema: https://gaana.com/type/link
@@ -90,15 +83,6 @@ class GaanaProvider(
                         trackList = listOf(it).toTrackDetailsList(folderType, subFolder)
                         title = it.track_title
                         coverUrl = it.artworkLink
-                        withContext(Dispatchers.Default) {
-                            db.add(
-                                type = "Track",
-                                name = title,
-                                link = "https://gaana.com/$type/$link",
-                                coverUrl = coverUrl,
-                                totalFiles = 1,
-                            )
-                        }
                     }
                 }
                 "album" -> {
@@ -121,15 +105,6 @@ class GaanaProvider(
                         trackList = it.tracks.toTrackDetailsList(folderType, subFolder)
                         title = link
                         coverUrl = it.custom_artworks.size_480p
-                        withContext(Dispatchers.Default) {
-                            db.add(
-                                type = "Album",
-                                name = title,
-                                link = "https://gaana.com/$type/$link",
-                                coverUrl = coverUrl,
-                                totalFiles = trackList.size.toLong(),
-                            )
-                        }
                     }
                 }
                 "playlist" -> {
@@ -153,15 +128,6 @@ class GaanaProvider(
                         title = link
                         //coverUrl.value = "TODO"
                         coverUrl = gaanaPlaceholderImageUrl
-                        withContext(Dispatchers.Default) {
-                            db.add(
-                                type = "Playlist",
-                                name = title,
-                                link = "https://gaana.com/$type/$link",
-                                coverUrl = coverUrl,
-                                totalFiles = it.tracks.size.toLong(),
-                            )
-                        }
                     }
                 }
                 "artist" -> {
@@ -189,15 +155,6 @@ class GaanaProvider(
                             }
                         }
                         trackList = it.tracks?.toTrackDetailsList(folderType, subFolder) ?: emptyList()
-                        withContext(Dispatchers.Default) {
-                            db.add(
-                                type = "Artist",
-                                name = artistDetails?.name ?: link,
-                                link = "https://gaana.com/$type/$link",
-                                coverUrl = coverUrl,
-                                totalFiles = trackList.size.toLong(),
-                            )
-                        }
                     }
                 }
                 else -> {//TODO Handle Error}

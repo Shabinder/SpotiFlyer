@@ -11,6 +11,7 @@ import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.common.database.appContext
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.database.Database
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -23,7 +24,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 actual class Dir actual constructor(
-    private val logger: Kermit
+    private val logger: Kermit,
+    private val database: Database?
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -170,4 +172,6 @@ actual class Dir actual constructor(
             null
         }
     }
+
+    actual val db: Database? = database
 }

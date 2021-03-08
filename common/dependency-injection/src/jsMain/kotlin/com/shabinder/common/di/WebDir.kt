@@ -2,9 +2,13 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.database.Database
 import org.w3c.dom.ImageBitmap
 
-actual class Dir actual constructor(private val logger: Kermit) {
+actual class Dir actual constructor(
+    private val logger: Kermit,
+    private val database: Database?,
+) {
 
     /*init {
         createDirectories()
@@ -51,4 +55,7 @@ actual class Dir actual constructor(private val logger: Kermit) {
     private suspend fun freshImage(url:String): ImageBitmap?{
         return null
     }
+
+    actual val db: Database?
+        get() = database
 }

@@ -20,7 +20,6 @@ fun main() {
     }
 }
 
-
 object AppDependencies : KoinComponent {
     val logger: Kermit
     val directories: Dir

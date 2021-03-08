@@ -48,9 +48,9 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
         componentContext = componentContext,
         dependencies = object : SpotiFlyerRoot.Dependencies {
             override val storeFactory = DefaultStoreFactory
-            override val database: Database? = koin.get()
             override val fetchPlatformQueryResult: FetchPlatformQueryResult = koin.get()
             override val directories: Dir = koin.get()
+            override val database: Database? = directories.db
             override val showPopUpMessage: (String) -> Unit = ::uikitShowPopUpMessage
             override val downloadProgressReport = DownloadProgressFlow
         }

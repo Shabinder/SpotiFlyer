@@ -17,7 +17,6 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.di.*
 import com.shabinder.common.di.spotify.SpotifyRequests
 import com.shabinder.common.models.PlatformQueryResult
@@ -26,7 +25,6 @@ import com.shabinder.common.models.spotify.Album
 import com.shabinder.common.models.spotify.Image
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.models.spotify.Track
-import com.shabinder.database.Database
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
@@ -34,18 +32,16 @@ import io.ktor.client.request.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SpotifyProvider(
     private val tokenStore: TokenStore,
-    private val database: Database,
     private val logger: Kermit,
     private val dir: Dir,
 ) : SpotifyRequests {
 
     init {
         logger.d { "Creating Spotify Provider" }
-        GlobalScope.launch(Dispatchers.Default) {authenticateSpotify()}
+        //GlobalScope.launch(Dispatchers.Default) {authenticateSpotify()}
     }
 
     override suspend fun authenticateSpotify(): HttpClient?{
@@ -69,9 +65,6 @@ class SpotifyProvider(
     }
 
     override lateinit var httpClient: HttpClient
-
-    private val db:DownloadRecordDatabaseQueries
-        get() = database.downloadRecordDatabaseQueries
 
     suspend fun query(fullLink: String): PlatformQueryResult?{
 
@@ -139,15 +132,6 @@ class SpotifyProvider(
                         title = it.name.toString()
                         coverUrl = (it.album?.images?.elementAtOrNull(1)?.url
                             ?: it.album?.images?.elementAtOrNull(0)?.url).toString()
-                        withContext(Dispatchers.Default) {
-                            db.add(
-                                    type = "Track",
-                                    name = title,
-                                    link = "https://open.spotify.com/$type/$link",
-                                    coverUrl = coverUrl,
-                                    totalFiles = 1,
-                            )
-                        }
                     }
                 }
 
@@ -184,15 +168,6 @@ class SpotifyProvider(
                             title = albumObject.name.toString()
                             coverUrl = (albumObject.images?.elementAtOrNull(1)?.url
                                 ?: albumObject.images?.elementAtOrNull(0)?.url).toString()
-                            withContext(Dispatchers.Default) {
-                                db.add(
-                                    type = "Album",
-                                    name = title,
-                                    link = "https://open.spotify.com/$type/$link",
-                                    coverUrl = coverUrl,
-                                    totalFiles = trackList.size.toLong(),
-                                )
-                            }
                         }
                     }
                 }
@@ -235,15 +210,6 @@ class SpotifyProvider(
                     title = playlistObject.name.toString()
                     coverUrl = playlistObject.images?.elementAtOrNull(1)?.url
                         ?: playlistObject.images?.firstOrNull()?.url.toString()
-                    withContext(Dispatchers.Default) {
-                        db.add(
-                            type = "Playlist",
-                            name = title,
-                            link = "https://open.spotify.com/$type/$link",
-                            coverUrl = coverUrl,
-                            totalFiles = tempTrackList.size.toLong(),
-                        )
-                    }
                 }
                 "episode" -> {//TODO
                 }
