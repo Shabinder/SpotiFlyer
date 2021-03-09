@@ -4,6 +4,7 @@ import com.arkivanov.decompose.lifecycle.LifecycleRegistry
 import com.arkivanov.decompose.lifecycle.destroy
 import com.arkivanov.decompose.lifecycle.resume
 import com.arkivanov.mvikotlin.core.store.StoreFactory
+import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.root.SpotiFlyerRoot
@@ -33,7 +34,7 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
 
     private val root = SpotiFlyerRoot(ctx,
         object : SpotiFlyerRoot.Dependencies{
-            override val storeFactory: StoreFactory = DefaultStoreFactory
+            override val storeFactory: StoreFactory = LoggingStoreFactory(DefaultStoreFactory)
             override val fetchPlatformQueryResult = dependencies.fetchPlatformQueryResult
             override val directories = dependencies.directories
             override val database: Database? = directories.db

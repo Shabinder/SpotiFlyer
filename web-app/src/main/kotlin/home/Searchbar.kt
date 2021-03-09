@@ -10,6 +10,7 @@ import styled.*
 external interface SearchbarProps : RProps {
     var link: String
     var search:(String)->Unit
+    var onLinkChange:(String)->Unit
 }
 
 @Suppress("FunctionName")
@@ -22,8 +23,6 @@ fun RBuilder.SearchBar(handler:SearchbarProps.() -> Unit) = child(searchbar){
 
 
 val searchbar = functionalComponent<SearchbarProps>("SearchBar"){ props ->
-    val (link,setLink) = useState(props.link)
-
     styledDiv{
         css {
             classes = mutableListOf("searchBox")
@@ -33,9 +32,10 @@ val searchbar = functionalComponent<SearchbarProps>("SearchBar"){ props ->
                 placeholder = "Search"
                 onChangeFunction = {
                     val target = it.target as HTMLInputElement
-                    setLink(target.value)
+                    props.onLinkChange(target.value)
+                    println(target.value)
                 }
-                value = link
+                value = props.link
             }
             css {
                 classes = mutableListOf("searchInput")
@@ -44,7 +44,7 @@ val searchbar = functionalComponent<SearchbarProps>("SearchBar"){ props ->
         styledButton {
             attrs {
                 onClickFunction = {
-                    props.search(link)
+                    props.search(props.link)
                 }
             }
             css {

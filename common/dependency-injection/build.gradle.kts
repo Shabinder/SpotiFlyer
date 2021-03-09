@@ -13,7 +13,6 @@ kotlin {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
                 implementation(project(":fuzzywuzzy:app"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
                 implementation(Ktor.clientCore)
@@ -26,17 +25,17 @@ kotlin {
                 api(Koin.test)
 
                 api(Extras.kermit)
-                api(Extras.youtubeDownloader)
-                api(Extras.mp3agic)
             }
         }
         androidMain {
             dependencies{
                 implementation(compose.materialIconsExtended)
+                implementation(Koin.android)
                 implementation(Ktor.clientAndroid)
                 implementation(Extras.Android.fetch)
-                implementation(Koin.android)
                 implementation(Extras.Android.razorpay)
+                api(Extras.youtubeDownloader)
+                api(Extras.mp3agic)
                 //api(files("$rootDir/libs/mobile-ffmpeg.aar"))
             }
         }
@@ -45,6 +44,8 @@ kotlin {
                 implementation(compose.materialIconsExtended)
                 implementation(Ktor.clientApache)
                 implementation(Ktor.slf4j)
+                api(Extras.youtubeDownloader)
+                api(Extras.mp3agic)
             }
         }
         jsMain {

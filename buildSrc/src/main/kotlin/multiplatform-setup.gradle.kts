@@ -21,7 +21,7 @@ kotlin {
     sourceSets {
         named("commonMain") {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
+
             }
         }
 
@@ -33,6 +33,7 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.foundation)
                 implementation(compose.materialIconsExtended)
+                implementation(Decompose.decompose)
                 implementation(Decompose.extensionsCompose)
             }
         }
@@ -44,6 +45,7 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.desktop.common)
                 implementation(compose.materialIconsExtended)
+                implementation(Decompose.decompose)
                 implementation(Decompose.extensionsCompose)
             }
         }

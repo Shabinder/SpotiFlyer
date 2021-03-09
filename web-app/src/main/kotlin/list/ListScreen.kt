@@ -13,8 +13,9 @@ import styled.styledDiv
 
 class ListScreen(
     props: Props<SpotiFlyerList>,
-    override val stateFlow: Flow<State> = props.model.models.map { State(it) }
 ) : RenderableComponent<SpotiFlyerList, ListScreen.State>(props,initialState = State(SpotiFlyerList.State())) {
+
+    override val stateFlow: Flow<State> = model.models.map { State(it) }
 
     override fun RBuilder.render() {
         styledDiv {

@@ -1,9 +1,14 @@
 package home
 
 import com.shabinder.common.main.SpotiFlyerMain
+import com.shabinder.common.main.SpotiFlyerMain.State
 import extras.RenderableComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.css.*
 import react.*
 import styled.css
@@ -11,13 +16,26 @@ import styled.styledDiv
 
 class HomeScreen(
     props: Props<SpotiFlyerMain>,
-    override val stateFlow: Flow<State> = props.model.models.map { State(it) }
-) : RenderableComponent<SpotiFlyerMain, HomeScreen.State>(
+) : RenderableComponent<SpotiFlyerMain, State>(
     props,
-    initialState = State(data = SpotiFlyerMain.State())
+    initialState = State()
 ) {
 
+    override val stateFlow: Flow<SpotiFlyerMain.State> = model.models
+
+    override fun componentDidMount() {
+        if(!scope.isActive)
+            scope = CoroutineScope(Dispatchers.Default)
+        scope.launch {
+            stateFlow.collect {
+                println("Updating State = $it")
+                setState { data = it }
+            }
+        }
+    }
+
     override fun RBuilder.render() {
+        println("Rendering New State = \"${state.data}\" ")
         styledDiv{
             css {
                 display = Display.flex
@@ -32,8 +50,10 @@ class HomeScreen(
             }
 
             SearchBar {
+                println("Search Props ${state.data.link}")
                 link = state.data.link
                 search = model::onLinkSearch
+                onLinkChange = model::onInputLinkChanged
             }
 
             IconList {
@@ -46,10 +66,6 @@ class HomeScreen(
             isBadge = true
         }
     }
-
-    class State(
-        var data: SpotiFlyerMain.State
-    ):RState
 }
 
 

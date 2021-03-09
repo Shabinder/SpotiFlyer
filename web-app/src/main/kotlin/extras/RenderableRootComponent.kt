@@ -3,12 +3,7 @@ package extras
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.ValueObserver
 import extras.RenderableRootComponent.Props
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import react.RComponent
 import react.RProps
 import react.RState
@@ -24,15 +19,16 @@ abstract class RenderableRootComponent<
 
     protected val model: T get() = props.model
     private val subscriptions = ArrayList<Subscription<*>>()
-    protected lateinit var scope: CoroutineScope
+    protected var scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
 
     init {
-        state = initialState
+        this.state = initialState
     }
 
     override fun componentDidMount() {
         subscriptions.forEach { subscribe(it) }
-        scope = CoroutineScope(Dispatchers.Default)
+        if(!scope.isActive)
+            scope = CoroutineScope(Dispatchers.Default)
     }
 
     private fun <T : Any> subscribe(subscription: Subscription<T>) {
