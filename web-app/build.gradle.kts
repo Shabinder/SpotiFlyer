@@ -16,6 +16,7 @@ dependencies {
     implementation(kotlin("stdlib-js"))
     implementation(Decompose.decompose)
     implementation(Koin.core)
+    implementation(Ktor.clientJs)
     implementation(MVIKotlin.mvikotlin)
     implementation(MVIKotlin.coroutines)
     implementation(MVIKotlin.mvikotlinMain)
@@ -33,7 +34,8 @@ dependencies {
 }
 
 kotlin {
-    js {
+    js() {
+        //useCommonJs()
         browser {
             webpackTask {
                 cssSupport.enabled = true

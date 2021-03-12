@@ -13,7 +13,7 @@ interface SpotifyRequests {
 
     val httpClient:HttpClient
 
-    suspend fun authenticateSpotify():HttpClient?
+    suspend fun authenticateSpotifyClient(override:Boolean = false):HttpClient?
 
     suspend fun getPlaylist(playlistID: String): Playlist {
         return httpClient.get("$BASE_URL/playlists/$playlistID")

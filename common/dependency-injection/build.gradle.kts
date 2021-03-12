@@ -50,8 +50,11 @@ kotlin {
         }
         jsMain {
             dependencies {
-                implementation(Ktor.clientJs)
                 implementation(project(":common:data-models"))
+                implementation(Ktor.clientJs)
+                implementation(npm("browser-id3-writer","4.4.0"))
+                implementation(npm("file-saver","2.0.4"))
+                //implementation(npm("@types/file-saver","2.0.1",generateExternals = true))
             }
         }
     }

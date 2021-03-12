@@ -19,6 +19,7 @@ package com.shabinder.common.di.providers
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.*
 import com.shabinder.common.di.spotify.SpotifyRequests
+import com.shabinder.common.di.spotify.authenticateSpotify
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.spotify.Album
@@ -41,11 +42,13 @@ class SpotifyProvider(
 
     init {
         logger.d { "Creating Spotify Provider" }
-        //GlobalScope.launch(Dispatchers.Default) {authenticateSpotify()}
+        GlobalScope.launch(Dispatchers.Default) {
+            authenticateSpotifyClient()
+        }
     }
 
-    override suspend fun authenticateSpotify(): HttpClient?{
-        val token = tokenStore.getToken()
+    override suspend fun authenticateSpotifyClient(override:Boolean): HttpClient?{
+        val token = if(override) authenticateSpotify() else tokenStore.getToken()
         return if(token == null) {
             logger.d{ "Please Check your Network Connection" }
             null
@@ -69,7 +72,7 @@ class SpotifyProvider(
     suspend fun query(fullLink: String): PlatformQueryResult?{
 
         if(!this::httpClient.isInitialized){
-            authenticateSpotify()
+            authenticateSpotifyClient()
         }
 
         var spotifyLink =

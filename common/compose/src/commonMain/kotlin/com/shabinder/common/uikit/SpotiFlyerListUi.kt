@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.shabinder.common.di.Picture
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
@@ -67,7 +68,7 @@ fun SpotiFlyerListContent(
 fun TrackCard(
     track: TrackDetails,
     downloadTrack:()->Unit,
-    loadImage:suspend (String)-> ImageBitmap?
+    loadImage:suspend (String)-> Picture
 ) {
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
         ImageLoad(
@@ -120,7 +121,7 @@ fun CoverImage(
     title: String,
     coverURL: String,
     scope: CoroutineScope,
-    loadImage: suspend (String) -> ImageBitmap?,
+    loadImage: suspend (String) -> Picture,
     modifier: Modifier = Modifier,
 ) {
     Column(

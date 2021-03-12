@@ -249,8 +249,7 @@ class YoutubeMusic constructor(
         return httpClient.post("https://music.youtube.com/youtubei/v1/search?alt=json&key=$apiKey"){
             contentType(ContentType.Application.Json)
             headers{
-                //append("Content-Type"," application/json")
-                append("Referer"," https://music.youtube.com/search")
+                append("referer","https://music.youtube.com/search")
             }
             body = buildJsonObject {
                 putJsonObject("context"){

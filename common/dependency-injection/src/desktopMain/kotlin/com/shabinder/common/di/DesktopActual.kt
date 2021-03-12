@@ -1,9 +1,5 @@
 package com.shabinder.common.di
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import com.github.kiulian.downloader.YoutubeDownloader
 import com.github.kiulian.downloader.model.YoutubeVideo
 import com.github.kiulian.downloader.model.formats.Format
@@ -62,20 +58,20 @@ val DownloadProgressFlow: MutableSharedFlow<HashMap<String,DownloadStatus>> = Mu
 
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,
-    getYTIDBestMatch:suspend (String,TrackDetails)->String?,
-    saveFileWithMetaData:suspend (mp3ByteArray:ByteArray, trackDetails: TrackDetails) -> Unit
+    fetcher: FetchPlatformQueryResult,
+    dir: Dir
 ){
     list.forEach {
         if (!it.videoID.isNullOrBlank()) {//Video ID already known!
-            downloadTrack(it.videoID!!, it,saveFileWithMetaData)
+            downloadTrack(it.videoID!!, it,dir::saveFileWithMetadata)
         } else {
             val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
-            val videoId = getYTIDBestMatch(searchQuery,it)
+            val videoId = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery,it)
             if (videoId.isNullOrBlank()) {
                 DownloadProgressFlow.emit(DownloadProgressFlow.replayCache.getOrElse(0
                 ) { hashMapOf() }.apply { set(it.title,DownloadStatus.Failed) })
             } else {//Found Youtube Video ID
-                downloadTrack(videoId, it,saveFileWithMetaData)
+                downloadTrack(videoId, it,dir::saveFileWithMetadata)
             }
         }
     }

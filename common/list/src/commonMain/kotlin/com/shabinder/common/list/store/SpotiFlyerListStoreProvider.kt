@@ -60,7 +60,7 @@ internal class SpotiFlyerListStoreProvider(
                     val finalList =
                         intent.trackList.filter { it.downloaded == DownloadStatus.NotDownloaded }
                     if (finalList.isNullOrEmpty())  showPopUpMessage("All Songs are Processed")
-                    else downloadTracks(finalList,fetchQuery.youtubeMusic::getYTIDBestMatch,dir::saveFileWithMetadata)
+                    else downloadTracks(finalList,fetchQuery,dir)
 
                     val list = intent.trackList.map {
                         if (it.downloaded == DownloadStatus.NotDownloaded)
@@ -70,7 +70,7 @@ internal class SpotiFlyerListStoreProvider(
                     dispatch(Result.UpdateTrackList(list.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0){ hashMapOf()})))
                 }
                 is Intent.StartDownload -> {
-                    downloadTracks(listOf(intent.track),fetchQuery.youtubeMusic::getYTIDBestMatch,dir::saveFileWithMetadata)
+                    downloadTracks(listOf(intent.track),fetchQuery,dir)
                     dispatch(Result.UpdateTrackItem(intent.track.copy(downloaded = DownloadStatus.Queued)))
                 }
                 is Intent.RefreshTracksStatuses -> queryActiveTracks()

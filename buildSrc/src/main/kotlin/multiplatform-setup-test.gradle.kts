@@ -7,9 +7,10 @@ kotlin {
     jvm("desktop")
     android()
     //ios()
-    js {
+    js() {
         browser()
-        nodejs()
+        //nodejs()
+        binaries.executable()
     }
     sourceSets {
         named("commonTest") {

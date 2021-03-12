@@ -15,8 +15,8 @@ expect val isInternetAvailable:Boolean
 
 expect suspend fun downloadTracks(
     list: List<TrackDetails>,
-    getYTIDBestMatch:suspend (String,TrackDetails)->String?,
-    saveFileWithMetaData:suspend (mp3ByteArray:ByteArray, trackDetails: TrackDetails) -> Unit
+    fetcher: FetchPlatformQueryResult,
+    dir: Dir
 )
 
 expect fun queryActiveTracks()

@@ -33,7 +33,6 @@ val searchbar = functionalComponent<SearchbarProps>("SearchBar"){ props ->
                 onChangeFunction = {
                     val target = it.target as HTMLInputElement
                     props.onLinkChange(target.value)
-                    println(target.value)
                 }
                 value = props.link
             }

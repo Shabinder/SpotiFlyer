@@ -5,15 +5,16 @@ import com.shabinder.common.di.initKoin
 import react.dom.render
 import kotlinx.browser.document
 import kotlinx.browser.window
-import navbar.navBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 
 fun main() {
     window.onload = {
         render(document.getElementById("root")) {
-            navBar {}
-            app {
+            App {
                 dependencies = AppDependencies
             }
         }
@@ -21,6 +22,7 @@ fun main() {
 }
 
 object AppDependencies : KoinComponent {
+    val appScope = CoroutineScope(Dispatchers.Default)
     val logger: Kermit
     val directories: Dir
     val fetchPlatformQueryResult: FetchPlatformQueryResult
@@ -29,5 +31,8 @@ object AppDependencies : KoinComponent {
         directories = get()
         logger = get()
         fetchPlatformQueryResult = get()
+        appScope.launch {
+            //fetchPlatformQueryResult.spotifyProvider.authenticateSpotifyClient(true)
+        }
     }
 }

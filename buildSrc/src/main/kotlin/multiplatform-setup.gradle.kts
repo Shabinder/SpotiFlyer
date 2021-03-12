@@ -14,9 +14,10 @@ plugins {
 kotlin {
     jvm("desktop")
     android()
-    js {
+    js() {
         browser()
-        nodejs()
+        //nodejs()
+        binaries.executable()
     }
     sourceSets {
         named("commonMain") {

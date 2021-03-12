@@ -4,15 +4,12 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.core.content.ContextCompat
 import com.github.kiulian.downloader.model.YoutubeVideo
 import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.razorpay.Checkout
 import com.shabinder.common.database.activityContext
-import com.shabinder.common.database.appContext
 import com.shabinder.common.di.worker.ForegroundService
 import com.shabinder.common.models.TrackDetails
 import kotlinx.coroutines.Dispatchers
@@ -87,8 +84,8 @@ actual fun queryActiveTracks() {
 
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,
-    getYTIDBestMatch:suspend (String,TrackDetails)->String?,
-    saveFileWithMetaData:suspend (mp3ByteArray:ByteArray, trackDetails: TrackDetails) -> Unit
+    fetcher: FetchPlatformQueryResult,
+    dir: Dir
 ){
     if(!list.isNullOrEmpty()){
         val serviceIntent = Intent(activityContext, ForegroundService::class.java)

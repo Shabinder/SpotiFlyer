@@ -28,10 +28,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.shabinder.common.di.Picture
 import com.shabinder.common.di.giveDonation
 import com.shabinder.common.di.openPlatform
 import com.shabinder.common.di.shareApp
-import com.shabinder.common.di.showPopUpMessage
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
 import com.shabinder.common.models.DownloadRecord
@@ -303,7 +303,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
 @Composable
 fun HistoryColumn(
     list: List<DownloadRecord>,
-    loadImage:suspend (String)-> ImageBitmap?,
+    loadImage:suspend (String)-> Picture,
     onItemClicked: (String) -> Unit
 ) {
     Crossfade(list){
@@ -335,7 +335,7 @@ fun HistoryColumn(
 @Composable
 fun DownloadRecordItem(
     item: DownloadRecord,
-    loadImage:suspend (String)-> ImageBitmap?,
+    loadImage:suspend (String)-> Picture,
     onItemClicked:(String)->Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {

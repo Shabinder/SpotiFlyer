@@ -18,7 +18,8 @@ external interface AppProps : RProps {
     var dependencies: AppDependencies
 }
 
-fun RBuilder.app(attrs: AppProps.() -> Unit): ReactElement {
+@Suppress("FunctionName")
+fun RBuilder.App(attrs: AppProps.() -> Unit): ReactElement {
     return child(App::class){
         this.attrs(attrs)
     }

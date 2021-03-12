@@ -3,12 +3,7 @@ package home
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.State
 import extras.RenderableComponent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import kotlinx.css.*
 import react.*
 import styled.css
@@ -22,17 +17,6 @@ class HomeScreen(
 ) {
 
     override val stateFlow: Flow<SpotiFlyerMain.State> = model.models
-
-    override fun componentDidMount() {
-        if(!scope.isActive)
-            scope = CoroutineScope(Dispatchers.Default)
-        scope.launch {
-            stateFlow.collect {
-                println("Updating State = $it")
-                setState { data = it }
-            }
-        }
-    }
 
     override fun RBuilder.render() {
         println("Rendering New State = \"${state.data}\" ")
@@ -50,7 +34,6 @@ class HomeScreen(
             }
 
             SearchBar {
-                println("Search Props ${state.data.link}")
                 link = state.data.link
                 search = model::onLinkSearch
                 onLinkChange = model::onInputLinkChanged

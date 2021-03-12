@@ -2,9 +2,7 @@ package list
 
 import kotlinx.css.*
 import kotlinx.html.id
-import react.RProps
-import react.rFunction
-import react.useState
+import react.*
 import styled.css
 import styled.styledDiv
 import styled.styledH1
@@ -16,19 +14,25 @@ external interface CoverImageProps : RProps {
     var coverName: String
 }
 
-val CoverImage = rFunction<CoverImageProps>("CoverImage"){ props ->
-    val (coverURL,setCoverURL) = useState(props.coverImageURL)
-    val (coverName,setCoverName) = useState(props.coverName)
+@Suppress("FunctionName")
+fun RBuilder.CoverImage(handler: CoverImageProps.() -> Unit): ReactElement {
+    return child(coverImage){
+        attrs {
+            handler()
+        }
+    }
+}
 
+private val coverImage = functionalComponent<CoverImageProps>("CoverImage"){ props ->
     styledDiv {
-        styledImg(src=coverURL){
+        styledImg(src= props.coverImageURL){
             css {
-                height = 300.px
-                width = 300.px
+                height = 220.px
+                width = 220.px
             }
         }
         styledH1 {
-            +coverName
+            +props.coverName
             css {
                 textAlign = TextAlign.center
             }
@@ -40,6 +44,7 @@ val CoverImage = rFunction<CoverImageProps>("CoverImage"){ props ->
             display = Display.flex
             alignItems = Align.center
             flexDirection = FlexDirection.column
+            marginTop = 12.px
         }
     }
 }
