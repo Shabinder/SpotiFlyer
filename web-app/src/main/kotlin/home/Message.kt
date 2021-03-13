@@ -25,7 +25,7 @@ private val message = functionalComponent<MessageProps>("Message") { props->
             + props.text
             css {
                 classes = mutableListOf("headingTitle")
-                fontSize = 3.2.rem
+                fontSize = 2.6.em
             }
         }
     }

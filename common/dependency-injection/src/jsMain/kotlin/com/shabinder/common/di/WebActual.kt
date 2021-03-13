@@ -7,7 +7,6 @@ import io.ktor.client.request.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
-import org.khronos.webgl.ArrayBuffer
 
 actual fun openPlatform(packageID:String, platformLink:String){
     //TODO
@@ -43,13 +42,14 @@ private suspend fun isInternetAvailable(): Boolean {
 actual val isInternetAvailable:Boolean
     get(){
         return true
-        var result = false
+        /*var result = false
         val job = GlobalScope.launch { result = isInternetAvailable() }
         while(job.isActive){}
-        return result
+        return result*/
     }
 
 val DownloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = MutableSharedFlow(1)
+val allTracksStatus: HashMap<String, DownloadStatus> = hashMapOf()
 
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,
@@ -58,35 +58,48 @@ actual suspend fun downloadTracks(
 ){
     withContext(Dispatchers.Default){
         list.forEach {
+            allTracksStatus[it.title] = DownloadStatus.Queued
             if (!it.videoID.isNullOrBlank()) {//Video ID already known!
                 downloadTrack(it.videoID!!, it, fetcher, dir)
             } else {
                 val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
                 val videoID = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery,it)
                 if (videoID.isNullOrBlank()) {
+                    allTracksStatus[it.title] = DownloadStatus.Failed
+                    DownloadProgressFlow.emit(allTracksStatus)
                 } else {//Found Youtube Video ID
                     downloadTrack(videoID, it, fetcher, dir)
                 }
             }
         }
+        DownloadProgressFlow.emit(allTracksStatus)
     }
 }
 
 suspend fun downloadTrack(videoID: String, track: TrackDetails, fetcher:FetchPlatformQueryResult,dir:Dir) {
     val url = fetcher.youtubeMp3.getMp3DownloadLink(videoID)
     if(url == null){
-        // TODO Handle
+        allTracksStatus[track.title] = DownloadStatus.Failed
+        DownloadProgressFlow.emit(allTracksStatus)
         println("No URL to Download")
     }else {
         downloadFile(url).collect {
             when(it){
                 is DownloadResult.Success -> {
                     println("Download Completed")
+                    allTracksStatus[track.title] = DownloadStatus.Downloaded
                    dir.saveFileWithMetadata(it.byteArray, track)
                 }
-                is DownloadResult.Error -> println("Download Error: ${track.title}")
-                is DownloadResult.Progress -> println("Download Progress: ${it.progress}  : ${track.title}")
+                is DownloadResult.Error -> {
+                    allTracksStatus[track.title] = DownloadStatus.Failed
+                    println("Download Error: ${track.title}")
+                }
+                is DownloadResult.Progress -> {
+                    allTracksStatus[track.title] = DownloadStatus.Downloading(it.progress)
+                    println("Download Progress: ${it.progress}  : ${track.title}")
+                }
             }
+            DownloadProgressFlow.emit(allTracksStatus)
         }
     }
 }

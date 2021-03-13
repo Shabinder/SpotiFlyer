@@ -24,11 +24,11 @@ fun RBuilder.IconList(handler:IconListProps.() -> Unit): ReactElement {
 private val iconList = functionalComponent<IconListProps>("IconList") { props ->
     styledDiv {
         css {
-            +Styles.makeRow
             margin(18.px)
             if(props.isBadge) {
-                alignItems = Align.end
+                classes = mutableListOf("info-banners")
             }
+            + Styles.makeRow
         }
         for((icon,platformLink) in props.iconsAndPlatforms){
             styledA(href = platformLink){

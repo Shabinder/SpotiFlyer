@@ -74,7 +74,7 @@ actual class Dir actual constructor(
     private suspend fun writeTagsAndSave(writer:ID3Writer, albumArt:Object?, trackDetails: TrackDetails){
         writer.apply {
             setFrame("TIT2", trackDetails.title)
-            setFrame("TPE1", trackDetails.artists)
+            setFrame("TPE1", trackDetails.artists.toTypedArray())
             setFrame("TALB", trackDetails.albumName?:"")
             try{trackDetails.year?.substring(0,4)?.toInt()?.let { setFrame("TYER", it) }} catch(e:Exception){}
             setFrame("TPE2", trackDetails.artists.joinToString(","))

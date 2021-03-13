@@ -6,8 +6,8 @@
 	<stop  offset="0" style="stop-color:#80D8FF"/>
 	<stop  offset="0.16" style="stop-color:#88D1FF"/>
 	<stop  offset="0.413" style="stop-color:#9FBEFE"/>
-	<stop  offset="0.725" style="stop-color:#C4A0FD"/>
-	<stop  offset="1" style="stop-color:#EA80FC"/>
+	<stop  offset="0.725" style="stop-color:#FC5C7D"/>
+	<stop  offset="1" style="stop-color:#FC5C7D"/>
 </linearGradient>
 <path style="fill:url(#SVGID_1_);" d="M462.622,512H49.378C22.151,512,0,489.85,0,462.623v-118.49c0-11.046,8.954-20,20-20
 	s20,8.954,20,20v118.49c0,5.171,4.207,9.377,9.378,9.377h413.244c5.171,0,9.378-4.207,9.378-9.377v-118.49c0-11.046,8.954-20,20-20

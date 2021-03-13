@@ -6,11 +6,10 @@ import com.arkivanov.decompose.lifecycle.resume
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
-import com.shabinder.common.models.DownloadStatus
+import com.shabinder.common.di.DownloadProgressFlow
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.database.Database
 import extras.renderableChild
-import kotlinx.coroutines.flow.MutableSharedFlow
 import react.*
 import root.RootR
 
@@ -40,8 +39,7 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
             override val directories = dependencies.directories
             override val database: Database? = directories.db
             override val showPopUpMessage: (String) -> Unit = {}//TODO
-            override val downloadProgressReport: MutableSharedFlow<HashMap<String, DownloadStatus>>
-                = MutableSharedFlow(1)
+            override val downloadProgressReport = DownloadProgressFlow
 
         }
     )
