@@ -26,7 +26,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.0
         with:
           repository-name: Shabinder/SpotiFlyer
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: build/distributions # The folder the action should deploy.
+          FOLDER: web-app/build/distributions # The folder the action should deploy.
           CLEAN: true # Automatically remove deleted files from the deploy branch
