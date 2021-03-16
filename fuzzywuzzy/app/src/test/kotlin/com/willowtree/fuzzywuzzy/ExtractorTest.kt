@@ -1,4 +1,4 @@
-package com.willowtreeapps.fuzzywuzzy
+package kotlin.com.willowtree.fuzzywuzzy
 
 import com.willowtreeapps.fuzzywuzzy.diffutils.Extractor
 import com.willowtreeapps.fuzzywuzzy.diffutils.algorithms.WeightedRatio
