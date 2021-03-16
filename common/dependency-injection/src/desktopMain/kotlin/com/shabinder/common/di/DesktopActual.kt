@@ -4,6 +4,7 @@ import com.github.kiulian.downloader.YoutubeDownloader
 import com.github.kiulian.downloader.model.YoutubeVideo
 import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
+import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
@@ -18,6 +19,7 @@ import kotlinx.coroutines.withContext
 actual fun openPlatform(packageID:String, platformLink:String){
     //TODO
 }
+actual val currentPlatform: AllPlatforms = AllPlatforms.Jvm
 
 actual val dispatcherIO = Dispatchers.IO
 

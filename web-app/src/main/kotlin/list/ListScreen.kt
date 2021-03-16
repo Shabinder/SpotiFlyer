@@ -35,7 +35,11 @@ class ListScreen(
                 }
 
                 DownloadAllButton {
-                    isActive = state.data.trackList.isNotEmpty()
+                    isActive = state.data.trackList.size > 1
+                    downloadAll = {
+                        model.onDownloadAllClicked(state.data.trackList)
+                    }
+                    link = state.data.link
                 }
 
                 styledDiv{

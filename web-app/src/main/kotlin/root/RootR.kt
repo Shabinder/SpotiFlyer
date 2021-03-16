@@ -6,7 +6,6 @@ import com.shabinder.common.root.SpotiFlyerRoot.*
 import extras.RenderableRootComponent
 import extras.renderableChild
 import home.HomeScreen
-import kotlinx.coroutines.launch
 import list.ListScreen
 import navbar.NavBar
 import react.RBuilder
@@ -19,9 +18,12 @@ class RootR(props: Props<SpotiFlyerRoot>) : RenderableRootComponent<SpotiFlyerRo
     private val component: Child
         get() = model.routerState.value.activeChild.component
 
+    private val callBacks get() = model.callBacks
+
     override fun RBuilder.render() {
         NavBar {
             isBackVisible = (component is Child.List)
+            popBackToHomeScreen = callBacks::popBackToHomeScreen
         }
         when(component){
             is Child.Main -> renderableChild(HomeScreen::class, (component as Child.Main).component)
@@ -33,7 +35,7 @@ class RootR(props: Props<SpotiFlyerRoot>) : RenderableRootComponent<SpotiFlyerRo
         model.routerState.bindToState { routerState = it }
     }
     class State(
-        var routerState: RouterState<*, Child>,
+        var routerState: RouterState<*, Child>
     ) : RState
 
 }

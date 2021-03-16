@@ -16,6 +16,10 @@ html {
     background-image: url("header-dark.jpg");
     font-family: Lora,Helvetica Neue,Helvetica,Arial,sans-serif;
 }
+a:link, a:visited {
+    color: white;
+    text-decoration: none;
+}
 body, html {
     width: 100%;
     height: 100%;
@@ -238,4 +242,57 @@ body, html {
           -webkit-transform: scale3D(0, 0, 1);
           transform: scale3D(0, 0, 1);
       }
+}
+
+/*Extension Switch*/
+.cmn-toggle {
+    position: absolute;
+    margin-left: -9999px;
+    visibility: hidden;
+}
+
+.cmn-toggle + label {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+}
+
+input.cmn-toggle-round-flat + label {
+    /* width = 2*height or 2*border-radius */
+    padding: 2px;
+    width: 40px;
+    height: 20px;
+    border: 3px solid #dddddd;
+    border-radius: 60px;
+    transition: border-color 0.3s;
+}
+
+input.cmn-toggle-round-flat + label:before,
+input.cmn-toggle-round-flat + label:after {
+    display: block;
+    position: absolute;
+    content: "";
+}
+
+input.cmn-toggle-round-flat + label:after {
+    /* width = 2*border-radius */
+    top: 4px;
+    left: 4px;
+    bottom: 4px;
+    width: 16px;
+    background-color: #dddddd;
+    border-radius: 52px;
+    transition: margin 0.3s, background 0.3s;
+}
+
+input.cmn-toggle-round-flat:checked + label {
+    border-color: #8ce196;
+}
+
+input.cmn-toggle-round-flat:checked + label:after {
+    /* margin-left = border-radius from 'input.cmn-toggle-round-flat + label' */
+    margin-left: 20px;
+    background-color: #8ce196;
 }

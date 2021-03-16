@@ -1,7 +1,6 @@
 package list
 
-import kotlinx.css.px
-import kotlinx.css.width
+import kotlinx.css.*
 import react.*
 import styled.css
 import styled.styledDiv
@@ -31,8 +30,11 @@ private val circularProgressBar = functionalComponent<CircularProgressBarProps>(
             styledDiv{ css { classes = mutableListOf("value-bar") } }
         }
         css{
+            display = Display.flex
+            justifyContent = JustifyContent.center
             classes = mutableListOf("progress-circle","p${props.progress}").apply { if(props.progress>50) add("over50") }
             width = 50.px
+            marginBottom = 65.px
         }
     }
 }

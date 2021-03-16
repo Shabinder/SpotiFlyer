@@ -1,5 +1,6 @@
 package com.shabinder.common.di
 
+import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
@@ -7,6 +8,8 @@ import io.ktor.client.request.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
+
+actual val currentPlatform:AllPlatforms = AllPlatforms.Js
 
 actual fun openPlatform(packageID:String, platformLink:String){
     //TODO
@@ -87,7 +90,6 @@ suspend fun downloadTrack(videoID: String, track: TrackDetails, fetcher:FetchPla
             when(it){
                 is DownloadResult.Success -> {
                     println("Download Completed")
-                    allTracksStatus[track.title] = DownloadStatus.Downloaded
                    dir.saveFileWithMetadata(it.byteArray, track)
                 }
                 is DownloadResult.Error -> {

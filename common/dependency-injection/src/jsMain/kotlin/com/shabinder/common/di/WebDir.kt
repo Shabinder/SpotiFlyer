@@ -1,7 +1,9 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
+import com.shabinder.common.di.gaana.corsApi
 import com.shabinder.common.models.DownloadResult
+import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
 import kotlinext.js.Object
@@ -50,7 +52,7 @@ actual class Dir actual constructor(
             trackDetails: TrackDetails
     ) {
         val writer = ID3Writer(mp3ByteArray.toArrayBuffer())
-        val albumArt = downloadFile(trackDetails.albumArtURL)
+        val albumArt = downloadFile(corsApi+trackDetails.albumArtURL)
         albumArt.collect {
             when(it){
                 is DownloadResult.Success -> {
@@ -83,7 +85,9 @@ actual class Dir actual constructor(
             albumArt?.let { setFrame("APIC", it) }
         }
         writer.addTag()
+        allTracksStatus[trackDetails.title] = DownloadStatus.Downloaded
         saveAs(writer.getBlob(), "${removeIllegalChars(trackDetails.title)}.mp3")
+        DownloadProgressFlow.emit(allTracksStatus)
     }
 
     actual fun addToLibrary(path:String){}

@@ -1,7 +1,5 @@
 .progress-circle {
    margin: 20px;
-   position: relative; /* so that children can be absolutely positioned */
-   line-height: 5em;
 }
 
 .progress-circle:after{
@@ -14,6 +12,7 @@
     height: 4.3em;
     background-color: white;
     content: " ";
+    margin-top: 0.35em;
 }
 /* Text inside the control */
 .progress-circle span {

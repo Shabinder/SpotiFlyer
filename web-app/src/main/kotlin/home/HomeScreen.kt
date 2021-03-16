@@ -1,7 +1,9 @@
 package home
 
+import com.shabinder.common.di.currentPlatform
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.State
+import com.shabinder.common.models.AllPlatforms
 import extras.RenderableComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.css.*
@@ -19,7 +21,6 @@ class HomeScreen(
     override val stateFlow: Flow<SpotiFlyerMain.State> = model.models
 
     override fun RBuilder.render() {
-        println("Rendering New State = \"${state.data}\" ")
         styledDiv{
             css {
                 display = Display.flex

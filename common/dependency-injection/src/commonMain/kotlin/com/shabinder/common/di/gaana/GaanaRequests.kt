@@ -1,11 +1,19 @@
 package com.shabinder.common.di.gaana
 
+import com.shabinder.common.di.currentPlatform
+import com.shabinder.common.models.AllPlatforms
+import com.shabinder.common.models.corsProxy
 import com.shabinder.common.models.gaana.*
 import io.ktor.client.*
 import io.ktor.client.request.*
 
+val corsApi get() = if(currentPlatform is AllPlatforms.Js){
+    corsProxy.url
+} //  "https://spotiflyer-cors.azurewebsites.net/" //"https://spotiflyer-cors.herokuapp.com/"//"https://cors.bridged.cc/"
+else ""
+
 private const val TOKEN = "b2e6d7fbc136547a940516e9b77e5990"
-private const val BASE_URL = "https://api.gaana.com/"
+private val BASE_URL get() = "${corsApi}https://api.gaana.com"
 
 interface GaanaRequests {
 
@@ -76,6 +84,7 @@ interface GaanaRequests {
             "$BASE_URL/?type=$type&subtype=$subtype&seokey=$seokey&token=$TOKEN&format=$format"
         )
     }
+
     /*
     * Api Request:  http://api.gaana.com/?type=artist&subtype=artist_track_listing&seokey=neha-kakkar&limit=50&token=b2e6d7fbc136547a940516e9b77e5990&format=JSON
     *

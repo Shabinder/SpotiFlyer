@@ -42,6 +42,7 @@ interface SpotiFlyerMain {
         val dir: Dir
         val showPopUpMessage:(String)->Unit
     }
+
     sealed class Output {
         data class Search(val link: String) : Output()
     }

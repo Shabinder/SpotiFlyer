@@ -22,9 +22,12 @@ fun RBuilder.TrackItem(handler: TrackItemProps.() -> Unit): ReactElement {
 }
 
 private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props ->
+    val (downloadStatus,setDownloadStatus) = useState(props.details.downloaded)
     val details = props.details
+    useEffect(listOf(props.details)){
+        setDownloadStatus(props.details.downloaded)
+    }
     styledDiv {
-
         styledImg(src = details.albumArtURL) {
             css {
                 height = 90.px
@@ -89,20 +92,23 @@ private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props
                         whiteSpace = WhiteSpace.nowrap
                         overflow = Overflow.hidden
                     }
-                    + details.durationSec.toString()
+                    + "${details.durationSec/60} min, ${details.durationSec%60} sec"
                 }
             }
         }
-        when(details.downloaded){
+        when(downloadStatus){
             is DownloadStatus.NotDownloaded ->{
                 DownloadButton {
-                    onClick = { props.downloadTrack(details) }
-                    status = details.downloaded
+                    onClick = {
+                        setDownloadStatus(DownloadStatus.Queued)
+                        props.downloadTrack(details)
+                    }
+                    status = downloadStatus
                 }
             }
             is DownloadStatus.Downloading -> {
                 CircularProgressBar {
-                    progress = (details.downloaded as DownloadStatus.Downloading).progress
+                    progress = downloadStatus.progress
                 }
             }
             DownloadStatus.Queued -> {
@@ -111,7 +117,7 @@ private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props
             DownloadStatus.Downloaded -> {
                 DownloadButton {
                     onClick = {}
-                    status = details.downloaded
+                    status = downloadStatus
                 }
             }
             DownloadStatus.Converting -> {
@@ -120,7 +126,7 @@ private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props
             DownloadStatus.Failed -> {
                 DownloadButton {
                     onClick = {}
-                    status = details.downloaded
+                    status = downloadStatus
                 }
             }
         }
@@ -128,7 +134,7 @@ private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props
         css {
             alignItems = Align.center
             display =Display.flex
-            flexGrow = 1.0
+            paddingRight = 16.px
         }
     }
 }

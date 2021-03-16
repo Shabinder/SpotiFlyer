@@ -1,5 +1,6 @@
 package com.shabinder.common.di.spotify
 
+import com.shabinder.common.di.gaana.corsApi
 import com.shabinder.common.models.spotify.Album
 import com.shabinder.common.models.spotify.PagingObjectPlaylistTrack
 import com.shabinder.common.models.spotify.Playlist
@@ -7,7 +8,7 @@ import com.shabinder.common.models.spotify.Track
 import io.ktor.client.*
 import io.ktor.client.request.*
 
-private const val BASE_URL = "https://api.spotify.com/v1"
+private val BASE_URL get() = "${corsApi}https://api.spotify.com/v1"
 
 interface SpotifyRequests {
 
