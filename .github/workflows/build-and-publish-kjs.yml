@@ -26,6 +26,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.0
         with:
           repository-name: Shabinder/SpotiFlyer
+          token:  adea5c27d4c7ee42dc4010cb8adef92538f6e52d
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
           FOLDER: web-app/build/distributions # The folder the action should deploy.
