@@ -25,18 +25,6 @@ fun RBuilder.IconList(handler:IconListProps.() -> Unit): ReactElement {
 
 private val iconList = functionalComponent<IconListProps>("IconList") { props ->
 
-    useEffect {
-        val form = document.getElementById("razorpay-form")!!
-        repeat(form.childNodes.length){
-            form.childNodes.item(it)?.let { it1 -> form.removeChild(it1) }
-        }
-        form.appendElement("script"){
-            this.setAttribute("src","https://checkout.razorpay.com/v1/payment-button.js")
-            this.setAttribute("async", true.toString())
-            this.setAttribute("data-payment_button_id", "pl_GnKuuDBdBu0ank")
-        }
-    }
-
     styledDiv {
         css {
             margin(18.px)

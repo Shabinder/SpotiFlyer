@@ -1,5 +1,6 @@
 package list
 
+import kotlinx.css.marginRight
 import kotlinx.css.px
 import kotlinx.css.width
 import react.*
@@ -24,6 +25,7 @@ private val loadingSpinner = functionalComponent<RProps>("Loading-Spinner") {
         css{
             classes = mutableListOf("lds-ring")
             width = 50.px
+            marginRight = 8.px
         }
     }
 }

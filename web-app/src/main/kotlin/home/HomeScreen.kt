@@ -5,8 +5,10 @@ import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.State
 import com.shabinder.common.models.AllPlatforms
 import extras.RenderableComponent
+import kotlinx.browser.document
 import kotlinx.coroutines.flow.Flow
 import kotlinx.css.*
+import kotlinx.dom.appendElement
 import react.*
 import styled.css
 import styled.styledDiv
@@ -17,6 +19,19 @@ class HomeScreen(
     props,
     initialState = State()
 ) {
+    override fun componentDidMount() {
+        super.componentDidMount()
+        val form = document.getElementById("razorpay-form")!!
+        repeat(form.childNodes.length){
+            form.childNodes.item(0)?.let { it1 -> form.removeChild(it1) }
+            form.childNodes.item(it)?.let { it1 -> form.removeChild(it1) }
+        }
+        form.appendElement("script"){
+            this.setAttribute("src","https://checkout.razorpay.com/v1/payment-button.js")
+            this.setAttribute("async", true.toString())
+            this.setAttribute("data-payment_button_id", "pl_GnKuuDBdBu0ank")
+        }
+    }
 
     override val stateFlow: Flow<SpotiFlyerMain.State> = model.models
 
@@ -56,8 +71,8 @@ class HomeScreen(
 private val platformIconList = mapOf(
     "spotify.svg" to "https://open.spotify.com/",
     "gaana.svg" to "https://www.gaana.com/",
-    "youtube.svg" to "https://www.youtube.com/",
-    "youtube_music.svg" to "https://music.youtube.com/"
+    //"youtube.svg" to "https://www.youtube.com/",
+    //"youtube_music.svg" to "https://music.youtube.com/"
 )
 private val badges = mapOf(
     "https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=SpotiFlyer&logo=android&style=for-the-badge"
