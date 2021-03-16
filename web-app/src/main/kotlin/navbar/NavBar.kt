@@ -47,7 +47,7 @@ private val navBar = functionalComponent<NavBarProps>("NavBar") { props ->
                 }
             }
         }
-        styledA(href = "TODO Website Link") {
+        styledA(href = "https://shabinder.github.io/SpotiFlyer/",target="_blank") {
             css {
                 display = Display.flex
                 alignItems = Align.center

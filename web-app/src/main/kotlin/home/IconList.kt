@@ -31,7 +31,7 @@ private val iconList = functionalComponent<IconListProps>("IconList") { props ->
             + Styles.makeRow
         }
         for((icon,platformLink) in props.iconsAndPlatforms){
-            styledA(href = platformLink){
+            styledA(href = platformLink,target="_blank"){
                 styledImg {
                     attrs {
                         src = icon
