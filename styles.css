@@ -28,14 +28,19 @@ body, html {
     font-weight: 100;
     text-shadow: 0.3px 0.5px #ffffff;
 }
+
 .headingTitle{
     text-align: center;
     margin: 10px;
     font-family: 'RocknRoll One', sans-serif;
 }
-.glow-button:hover {
+.glow-button, .PaymentButton  {
+    transition: all .2s ease-in-out;
+}
+.glow-button:hover, .PaymentButton:hover {
     color: rgba(255, 255, 255, 1);
     box-shadow: 0 5px 15px rgb(105, 44, 143);
+    transform: scale(1.1);
 }
 
 /*Loading Spinner*/
@@ -295,7 +300,7 @@ input.cmn-toggle-round-flat:checked + label:after {
         flex-direction: column;
     }
     .searchInput {
-        width: 35vw;
+        width: 60vw;
         padding: 0 6px;
     }
     .search-icon {
