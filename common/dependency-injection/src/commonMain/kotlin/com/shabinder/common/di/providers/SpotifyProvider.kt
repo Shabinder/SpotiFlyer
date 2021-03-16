@@ -20,6 +20,7 @@ import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.*
 import com.shabinder.common.di.spotify.SpotifyRequests
 import com.shabinder.common.di.spotify.authenticateSpotify
+import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.spotify.Album
@@ -43,7 +44,9 @@ class SpotifyProvider(
     init {
         logger.d { "Creating Spotify Provider" }
         GlobalScope.launch(Dispatchers.Default) {
-            authenticateSpotifyClient()
+            if(currentPlatform is AllPlatforms.Js){
+                authenticateSpotifyClient(override = true)
+            }else authenticateSpotifyClient()
         }
     }
 
