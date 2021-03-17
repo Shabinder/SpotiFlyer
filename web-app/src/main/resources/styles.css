@@ -299,8 +299,12 @@ input.cmn-toggle-round-flat:checked + label:after {
     .info-banners {
         flex-direction: column;
     }
-    .searchInput {
+    .searchBox:hover > .searchInput {
         width: 60vw;
+        padding: 0 6px;
+    }
+    .searchInput {
+        width: 55vw;
         padding: 0 6px;
     }
     .search-icon {
