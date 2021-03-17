@@ -1,9 +1,9 @@
 package list
 
+import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import kotlinx.css.*
 import kotlinx.html.id
-import kotlinx.html.js.onClickFunction
 import react.*
 import styled.*
 
@@ -22,9 +22,12 @@ fun RBuilder.TrackItem(handler: TrackItemProps.() -> Unit): ReactElement {
 }
 
 private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props ->
+    val (downloadStatus,setDownloadStatus) = useState(props.details.downloaded)
     val details = props.details
+    useEffect(listOf(props.details)){
+        setDownloadStatus(props.details.downloaded)
+    }
     styledDiv {
-
         styledImg(src = details.albumArtURL) {
             css {
                 height = 90.px
@@ -36,72 +39,102 @@ private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props
             attrs {
                 id = "text-details"
             }
-            styledDiv {
+            css {
+                flexGrow = 1.0
+                minWidth = 0.px
+                display = Display.flex
+                flexDirection = FlexDirection.column
+                margin(8.px)
+            }
+            styledDiv{
+                css {
+                    height = 40.px
+                    alignItems = Align.center
+                    display = Display.flex
+                }
                 styledH3 {
                     + details.title
                     css {
                         padding(8.px)
+                        fontSize = 1.3.em
+                        textOverflow = TextOverflow.ellipsis
+                        whiteSpace = WhiteSpace.nowrap
+                        overflow = Overflow.hidden
                     }
-                }
-                css {
-                    height = 40.px
-                    display =Display.flex
-                    alignItems = Align.center
                 }
             }
             styledDiv {
+                css {
+                    height = 40.px
+                    alignItems = Align.center
+                    display = Display.flex
+                }
                 styledH4 {
                     + details.artists.joinToString(",")
                     css {
                         flexGrow = 1.0
                         padding(8.px)
+                        minWidth = 4.em
+                        fontSize = 1.1.em
+                        textOverflow = TextOverflow.ellipsis
+                        whiteSpace = WhiteSpace.nowrap
+                        overflow = Overflow.hidden
                     }
                 }
                 styledH4 {
-                    + "${details.durationSec} sec"
                     css {
+                        textAlign = TextAlign.end
                         flexGrow = 1.0
                         padding(8.px)
-                        textAlign = TextAlign.right
+                        minWidth = 4.em
+                        fontSize = 1.1.em
+                        textOverflow = TextOverflow.ellipsis
+                        whiteSpace = WhiteSpace.nowrap
+                        overflow = Overflow.hidden
                     }
+                    + "${details.durationSec/60} min, ${details.durationSec%60} sec"
                 }
-                css {
-                    height = 40.px
-                    display =Display.flex
-                    alignItems = Align.center
-                }
-            }
-            css {
-                display = Display.flex
-                flexGrow = 1.0
-                flexDirection = FlexDirection.column
-                margin(8.px)
             }
         }
-        styledDiv {
-            styledImg(src = "download-gradient.svg") {
-                attrs {
-                    onClickFunction = {
+        when(downloadStatus){
+            is DownloadStatus.NotDownloaded ->{
+                DownloadButton {
+                    onClick = {
+                        setDownloadStatus(DownloadStatus.Queued)
                         props.downloadTrack(details)
                     }
-                }
-                css {
-                    margin(8.px)
+                    status = downloadStatus
                 }
             }
-            css {
-                classes = mutableListOf("glow-button")
-                borderRadius = 100.px
-                width = 65.px
+            is DownloadStatus.Downloading -> {
+                CircularProgressBar {
+                    progress = downloadStatus.progress
+                }
+            }
+            DownloadStatus.Queued -> {
+                LoadingSpinner {}
+            }
+            DownloadStatus.Downloaded -> {
+                DownloadButton {
+                    onClick = {}
+                    status = downloadStatus
+                }
+            }
+            DownloadStatus.Converting -> {
+                LoadingSpinner {}
+            }
+            DownloadStatus.Failed -> {
+                DownloadButton {
+                    onClick = {}
+                    status = downloadStatus
+                }
             }
         }
 
         css {
             alignItems = Align.center
             display =Display.flex
-            flexDirection = FlexDirection.row
-            flexGrow = 1.0
-            color = Color.white
+            paddingRight = 16.px
         }
     }
 }

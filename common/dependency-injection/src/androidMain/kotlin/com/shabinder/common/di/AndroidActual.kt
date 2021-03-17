@@ -11,6 +11,7 @@ import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.razorpay.Checkout
 import com.shabinder.common.database.activityContext
 import com.shabinder.common.di.worker.ForegroundService
+import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.TrackDetails
 import kotlinx.coroutines.Dispatchers
 import org.json.JSONObject
@@ -30,6 +31,7 @@ actual fun openPlatform(packageID:String, platformLink:String){
     }
 }
 actual val dispatcherIO = Dispatchers.IO
+actual val currentPlatform: AllPlatforms = AllPlatforms.Jvm
 
 actual val isInternetAvailable:Boolean
     get() = internetAvailability.value ?: true

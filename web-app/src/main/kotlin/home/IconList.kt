@@ -1,11 +1,13 @@
 package home
 
+import kotlinx.browser.document
 import kotlinx.css.*
+import kotlinx.dom.appendElement
+import kotlinx.dom.createElement
+import kotlinx.html.SCRIPT
+import kotlinx.html.id
 import react.*
-import styled.css
-import styled.styledA
-import styled.styledDiv
-import styled.styledImg
+import styled.*
 
 external interface IconListProps : RProps {
     var iconsAndPlatforms: Map<String,String>
@@ -22,16 +24,26 @@ fun RBuilder.IconList(handler:IconListProps.() -> Unit): ReactElement {
 }
 
 private val iconList = functionalComponent<IconListProps>("IconList") { props ->
+
     styledDiv {
         css {
-            +Styles.makeRow
             margin(18.px)
             if(props.isBadge) {
-                alignItems = Align.end
+                classes = mutableListOf("info-banners")
             }
+            + Styles.makeRow
         }
+        val firstElem = props.iconsAndPlatforms.keys.elementAt(1)
         for((icon,platformLink) in props.iconsAndPlatforms){
-            styledA(href = platformLink){
+            if(icon == firstElem && props.isBadge){
+                //<form><script src="https://checkout.razorpay.com/v1/payment-button.js" data-payment_button_id="pl_GnKuuDBdBu0ank" async> </script> </form>
+                styledForm {
+                    attrs{
+                        id = "razorpay-form"
+                    }
+                }
+            }
+            styledA(href = platformLink,target="_blank"){
                 styledImg {
                     attrs {
                         src = icon

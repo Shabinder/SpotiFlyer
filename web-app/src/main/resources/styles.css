@@ -2,9 +2,14 @@
     font-family: pristine;
     src: url("pristine_script.ttf");
 }
+
 html {
     background-image: url("header-dark.jpg");
     font-family: Lora,Helvetica Neue,Helvetica,Arial,sans-serif;
+}
+a:link, a:visited {
+    color: white;
+    text-decoration: none;
 }
 body, html {
     width: 100%;
@@ -20,16 +25,59 @@ body, html {
 }
 #appName{
     font-family: pristine, cursive;
+    font-weight: 100;
+    text-shadow: 0.3px 0.5px #ffffff;
 }
+
 .headingTitle{
     text-align: center;
     margin: 10px;
     font-family: 'RocknRoll One', sans-serif;
 }
-.glow-button:hover {
+.glow-button, .PaymentButton  {
+    transition: all .2s ease-in-out;
+}
+.glow-button:hover, .PaymentButton:hover {
     color: rgba(255, 255, 255, 1);
     box-shadow: 0 5px 15px rgb(105, 44, 143);
+    transform: scale(1.1);
 }
+
+/*Loading Spinner*/
+.lds-ring {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+.lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 3.5em;
+    height: 3.5em;
+    border: 8px solid #fff;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #fff transparent transparent transparent;
+}
+.lds-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+}
+.lds-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+}
+.lds-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+}
+@keyframes lds-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 .button {
     text-decoration: none;
     color: rgba(255, 255, 255, 0.8);
@@ -50,7 +98,7 @@ body, html {
 }
 
 .searchBox:hover > .searchInput {
-    width: 30vw;
+    width: 35vw;
     padding: 0 6px;
 }
 
@@ -92,6 +140,8 @@ body, html {
     line-height: 40px;
     width: 0px;
 }
+
+/*Download All Button*/
 #download-all-text {
     color: black;
     display: none;
@@ -191,9 +241,73 @@ body, html {
           transform: scale3D(0, 0, 1);
       }
 }
-@media screen and (max-width: 620px) {
-    .searchBox:hover > .searchInput {
-        width: 150px;
+
+/*Extension Switch*/
+.cmn-toggle {
+    position: absolute;
+    margin-left: -9999px;
+    visibility: hidden;
+}
+
+.cmn-toggle + label {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+}
+
+input.cmn-toggle-round-flat + label {
+    /* width = 2*height or 2*border-radius */
+    padding: 2px;
+    width: 40px;
+    height: 20px;
+    border: 3px solid #dddddd;
+    border-radius: 60px;
+    transition: border-color 0.3s;
+}
+
+input.cmn-toggle-round-flat + label:before,
+input.cmn-toggle-round-flat + label:after {
+    display: block;
+    position: absolute;
+    content: "";
+}
+
+input.cmn-toggle-round-flat + label:after {
+    /* width = 2*border-radius */
+    top: 4px;
+    left: 4px;
+    bottom: 4px;
+    width: 16px;
+    background-color: #dddddd;
+    border-radius: 52px;
+    transition: margin 0.3s, background 0.3s;
+}
+
+input.cmn-toggle-round-flat:checked + label {
+    border-color: #8ce196;
+}
+
+input.cmn-toggle-round-flat:checked + label:after {
+    /* margin-left = border-radius from 'input.cmn-toggle-round-flat + label' */
+    margin-left: 20px;
+    background-color: #8ce196;
+}
+@media screen and (max-width: 600px) {
+    /* CSS HERE ONLY ON PHONE */
+    .info-banners {
+        flex-direction: column;
+    }
+    .searchInput {
+        width: 60vw;
         padding: 0 6px;
+    }
+    .search-icon {
+        filter: none;
+    }
+    .searchButton {
+        background: white;
+        color : #2f3640;
     }
 }

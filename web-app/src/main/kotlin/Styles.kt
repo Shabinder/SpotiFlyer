@@ -10,7 +10,6 @@ val colorOffWhite = Color("#E7E7E7")
 object Styles: StyleSheet("Searchbar", isStatic = true) {
     val makeRow by css {
         display = Display.flex
-        flexDirection = FlexDirection.row
         alignItems = Align.center
         alignContent = Align.center
         justifyContent = JustifyContent.center

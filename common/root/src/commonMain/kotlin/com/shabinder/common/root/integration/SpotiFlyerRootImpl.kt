@@ -29,6 +29,11 @@ internal class SpotiFlyerRootImpl(
 
     override val callBacks = object : SpotiFlyerRootCallBacks{
         override fun searchLink(link: String) = onMainOutput(SpotiFlyerMain.Output.Search(link))
+        override fun popBackToHomeScreen() {
+            router.popWhile {
+                it !is Configuration.Main
+            }
+        }
     }
 
     private fun createChild(configuration: Configuration, componentContext: ComponentContext): Child =

@@ -9,6 +9,7 @@ import kotlinx.html.id
 import react.RBuilder
 import styled.css
 import styled.styledDiv
+import styled.styledSection
 
 class ListScreen(
     props: Props<SpotiFlyerList>,
@@ -20,9 +21,9 @@ class ListScreen(
 
         val result = state.data.queryResult
 
-        styledDiv {
+        styledSection {
             attrs {
-                id = "list-screen-div"
+                id = "list-screen"
             }
 
             if(result == null){
@@ -34,13 +35,25 @@ class ListScreen(
                 }
 
                 DownloadAllButton {
-                    isActive = state.data.trackList.isNotEmpty()
+                    isActive = state.data.trackList.size > 1
+                    downloadAll = {
+                        model.onDownloadAllClicked(state.data.trackList)
+                    }
+                    link = state.data.link
                 }
 
-                state.data.trackList.forEachIndexed{ index, trackDetails ->
-                    TrackItem {
-                        details = trackDetails
-                        downloadTrack = model::onDownloadClicked
+                styledDiv{
+                    css {
+                        display =Display.flex
+                        flexGrow = 1.0
+                        flexDirection = FlexDirection.column
+                        color = Color.white
+                    }
+                    state.data.trackList.forEachIndexed{ index, trackDetails ->
+                        TrackItem {
+                            details = trackDetails
+                            downloadTrack = model::onDownloadClicked
+                        }
                     }
                 }
             }
@@ -48,10 +61,9 @@ class ListScreen(
             css {
                 classes = mutableListOf("list-screen")
                 display = Display.flex
+                padding(8.px)
                 flexDirection = FlexDirection.column
                 flexGrow = 1.0
-                justifyContent = JustifyContent.center
-                alignItems = Align.stretch
             }
         }
     }

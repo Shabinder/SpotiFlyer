@@ -1,5 +1,6 @@
 package com.shabinder.common.di
 
+import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.TrackDetails
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -12,6 +13,8 @@ expect fun giveDonation()
 expect val dispatcherIO: CoroutineDispatcher
 
 expect val isInternetAvailable:Boolean
+
+expect val currentPlatform: AllPlatforms
 
 expect suspend fun downloadTracks(
     list: List<TrackDetails>,
