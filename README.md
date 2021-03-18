@@ -6,7 +6,7 @@
 <a href="https://github.com/Shabinder/SpotiFlyer"><img src="https://github.com/Shabinder/SpotiFlyer/blob/Compose/art/SpotiFlyer.svg" align="left" height="80" width="80" ></a>
 
 # SpotiFlyer
-- **Kotlin Multiplatform** Music Downloader ,supports **Spotify, Youtube, 
+- **Kotlin Multiplatform** Music Downloader ,supports **Spotify, Youtube, Gaana**.
 
 Supports- Playlist, Albums, Tracks. _(If You know Any Source for Episodes/Podcasts create an Issue sharing It.)_
 
@@ -44,7 +44,7 @@ Or to save a click, [this link](https://github.com/Shabinder/SpotiFlyer/releases
 
 [![APK Download](https://img.shields.io/github/downloads/Shabinder/SpotiFlyer/total?style=for-the-badge&logo=android&color=17B2E7)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.2.0/SpotiFlyer-v2.2.0.apk)
 
-###Running desktop application
+### Running desktop application
 ```./gradlew :desktop:run```
 
 
