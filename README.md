@@ -60,11 +60,13 @@ Have any questions, doubts or want to present your opinions, views? You're alway
  - Support for Podcasts/Episodes and Shows.
  - Preference Screen.
  - Another Source for Music in addition to youtube.
- - IOS(Swift UI)(I can't afford MacBook for Dev. as of now, However Pull Requests are Open.)
+ - IOS(Swift UI)(I can't afford MacBook for Dev. as of now, however **pull requests are welcome!**)
  
 ### Note
 The availability of YouTube Music in your country is important for this app to work since we use YouTube Music to filter out our search results.
 To check if YouTube Music is available in your country, visit [YouTube Music](https://music.youtube.com).
+
+I am hosting a **server for WEB APP on my own personal device** , so expect some downtimes, If you have a **server** available and would like to share , open an issue or ping me wherever you can get a hold of me.
 
 License
 ![GPL-License](https://img.shields.io/github/license/Shabinder/SpotiFlyer?style=flat-square)
