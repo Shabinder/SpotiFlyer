@@ -4,6 +4,7 @@ import com.github.kiulian.downloader.YoutubeDownloader
 import com.github.kiulian.downloader.model.YoutubeVideo
 import com.github.kiulian.downloader.model.formats.Format
 import com.github.kiulian.downloader.model.quality.AudioQuality
+import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
@@ -58,22 +59,27 @@ actual val isInternetAvailable:Boolean
 
 val DownloadProgressFlow: MutableSharedFlow<HashMap<String,DownloadStatus>> = MutableSharedFlow(1)
 
+//Scope Allowing 4 Parallel Downloads
+val DownloadScope = ParallelExecutor(Dispatchers.IO)
+
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,
     fetcher: FetchPlatformQueryResult,
     dir: Dir
 ){
     list.forEach {
-        if (!it.videoID.isNullOrBlank()) {//Video ID already known!
-            downloadTrack(it.videoID!!, it,dir::saveFileWithMetadata)
-        } else {
-            val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
-            val videoId = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery,it)
-            if (videoId.isNullOrBlank()) {
-                DownloadProgressFlow.emit(DownloadProgressFlow.replayCache.getOrElse(0
-                ) { hashMapOf() }.apply { set(it.title,DownloadStatus.Failed) })
-            } else {//Found Youtube Video ID
-                downloadTrack(videoId, it,dir::saveFileWithMetadata)
+        DownloadScope.execute { // Send Download to Pool.
+            if (!it.videoID.isNullOrBlank()) {//Video ID already known!
+                downloadTrack(it.videoID!!, it,dir::saveFileWithMetadata)
+            } else {
+                val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
+                val videoId = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery,it)
+                if (videoId.isNullOrBlank()) {
+                    DownloadProgressFlow.emit(DownloadProgressFlow.replayCache.getOrElse(0
+                    ) { hashMapOf() }.apply { set(it.title,DownloadStatus.Failed) })
+                } else {//Found Youtube Video ID
+                    downloadTrack(videoId, it,dir::saveFileWithMetadata)
+                }
             }
         }
     }

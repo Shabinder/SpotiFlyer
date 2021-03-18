@@ -16,8 +16,8 @@ class YoutubeMp3(
     private val dir: Dir,
 ):Yt1sMp3 {
     suspend fun getMp3DownloadLink(videoID:String):String? = getLinkFromYt1sMp3(videoID)?.let{
-        println("Is Self Hosted"+(corsProxy is CorsProxy.SelfHostedCorsProxy))
-        if (currentPlatform is AllPlatforms.Js && corsProxy !is CorsProxy.PublicProxyWithExtension) "https://kind-grasshopper-73.telebit.io/cors/$it"
+        if (currentPlatform is AllPlatforms.Js/* && corsProxy !is CorsProxy.PublicProxyWithExtension*/)
+            "https://kind-grasshopper-73.telebit.io/cors/$it"
         else it
     }
 }

@@ -43,25 +43,10 @@ kotlin {
                 implementation kotlin("stdlib-common")
             }
         }
-        commonTest {
-            kotlin.srcDir('src/test')
-            dependencies {
-                implementation kotlin("test-common")
-                implementation kotlin("test-annotations-common")
-            }
-        }
-
         jvmMain {
             kotlin.srcDir('src/jvmMain/kotlin')
             dependencies {
                 implementation kotlin("stdlib")
-            }
-        }
-        jvmTest {
-            dependencies {
-                implementation kotlin("test")
-                implementation kotlin("test-junit")
-                implementation 'junit:junit:4.12'
             }
         }
         jsMain {
@@ -78,12 +63,28 @@ kotlin {
                 kotlinOptions.moduleKind = "umd"
             }
         }
-        /*jsTest {
+        /*
+        commonTest {
+            kotlin.srcDir('src/test')
+            dependencies {
+                implementation kotlin("test-common")
+                implementation kotlin("test-annotations-common")
+            }
+        }
+        jsTest {
             dependencies {
                 implementation kotlin("test-js")
                 implementation kotlin("stdlib-js")
             }
-        }*/
+        }
+        jvmTest {
+            dependencies {
+                implementation kotlin("test")
+                implementation kotlin("test-junit")
+                implementation 'junit:junit:4.13.2'
+            }
+        }
+        */
         /*nativeMain {
             kotlin.srcDir('src/nativeMain/kotlin')
         }*/

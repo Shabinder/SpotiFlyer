@@ -12,7 +12,7 @@ expect fun ImageLoad(
     loader:suspend (String) ->Picture,
     desc: String = "Album Art",
     modifier:Modifier = Modifier,
-    placeholder:ImageVector = PlaceHolderImage()
+    //placeholder:ImageVector = PlaceHolderImage()
 )
 
 @Composable

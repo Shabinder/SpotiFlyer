@@ -1,4 +1,4 @@
-package com.shabinder.common.di
+package com.shabinder.common.di.utils
 
 
 

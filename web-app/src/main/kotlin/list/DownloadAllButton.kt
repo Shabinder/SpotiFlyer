@@ -48,7 +48,7 @@ private val downloadAllButton = functionalComponent<DownloadAllButtonProps>("Dow
             styledDiv {
                 attrs {
                     onClickFunction = {
-                        //props.downloadAll()
+                        props.downloadAll()
                         setClicked(true)
                     }
                 }

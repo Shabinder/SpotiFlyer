@@ -169,7 +169,7 @@ class YoutubeMusic constructor(
                 }
             }
         }
-        //logger.d(youtubeTracks.joinToString(" abc \n"),tag)
+        //logger.d {youtubeTracks.joinToString("\n")}
         return youtubeTracks
     }
 
@@ -222,7 +222,7 @@ class YoutubeMusic constructor(
             }
 
             if(artistMatchNumber == 0) {
-                //log("YT Api Removing", result.toString())
+                //logger.d{ "YT Api Removing:   $result" }
                 continue
             }
 

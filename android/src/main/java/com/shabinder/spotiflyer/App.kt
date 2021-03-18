@@ -22,7 +22,7 @@ import com.shabinder.common.di.initKoin
 import com.shabinder.spotiflyer.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
 
 class App: Application(), KoinComponent {
     override fun onCreate() {

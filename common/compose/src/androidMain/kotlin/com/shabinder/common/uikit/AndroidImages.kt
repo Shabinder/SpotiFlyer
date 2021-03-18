@@ -22,7 +22,13 @@ import com.shabinder.common.di.dispatcherIO
 import kotlinx.coroutines.withContext
 
 @Composable
-actual fun ImageLoad(link:String, loader:suspend (String) -> Picture, desc: String, modifier:Modifier, placeholder: ImageVector) {
+actual fun ImageLoad(
+    link:String,
+    loader:suspend (String) -> Picture,
+    desc: String,
+    modifier:Modifier,
+    //placeholder: ImageVector
+) {
     var pic by remember(link) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(link){
         withContext(dispatcherIO) {
@@ -31,7 +37,7 @@ actual fun ImageLoad(link:String, loader:suspend (String) -> Picture, desc: Stri
     }
 
     Crossfade(pic){
-        if(it == null) Image(placeholder, desc, modifier,contentScale = ContentScale.Crop) else Image(it, desc, modifier,contentScale = ContentScale.Crop)
+        if(it == null) Image(PlaceHolderImage(), desc, modifier,contentScale = ContentScale.Crop) else Image(it, desc, modifier,contentScale = ContentScale.Crop)
     }
 }
 

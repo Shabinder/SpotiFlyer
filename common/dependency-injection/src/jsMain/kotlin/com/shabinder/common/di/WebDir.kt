@@ -2,18 +2,14 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.gaana.corsApi
+import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
 import kotlinext.js.Object
-import kotlinext.js.asJsObject
 import kotlinext.js.js
-import kotlinext.js.jsObject
 import kotlinx.coroutines.flow.collect
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import org.khronos.webgl.ArrayBuffer
 import org.w3c.dom.ImageBitmap
 import org.khronos.webgl.Int8Array
@@ -56,7 +52,7 @@ actual class Dir actual constructor(
         albumArt.collect {
             when(it){
                 is DownloadResult.Success -> {
-                    println("Album Art Downloaded Success")
+                    logger.d{"Album Art Downloaded Success"}
                     val albumArtObj = js {
                         this["type"] = 3
                         this["data"] = it.byteArray.toArrayBuffer()
@@ -65,10 +61,10 @@ actual class Dir actual constructor(
                     writeTagsAndSave(writer, albumArtObj as Object,trackDetails)
                 }
                 is DownloadResult.Error -> {
-                    println("Album Art Downloading Error")
+                    logger.d{"Album Art Downloading Error"}
                     writeTagsAndSave(writer,null,trackDetails)
                 }
-                is DownloadResult.Progress -> println("Album Art Downloading: ${it.progress}")
+                is DownloadResult.Progress -> logger.d{"Album Art Downloading: ${it.progress}"}
             }
         }
     }
@@ -86,8 +82,8 @@ actual class Dir actual constructor(
         }
         writer.addTag()
         allTracksStatus[trackDetails.title] = DownloadStatus.Downloaded
-        saveAs(writer.getBlob(), "${removeIllegalChars(trackDetails.title)}.mp3")
         DownloadProgressFlow.emit(allTracksStatus)
+        saveAs(writer.getBlob(), "${removeIllegalChars(trackDetails.title)}.mp3")
     }
 
     actual fun addToLibrary(path:String){}

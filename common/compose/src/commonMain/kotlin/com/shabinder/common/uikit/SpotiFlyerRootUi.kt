@@ -25,6 +25,8 @@ import com.shabinder.common.uikit.splash.Splash
 import com.shabinder.common.uikit.splash.SplashState
 import com.shabinder.common.uikit.utils.verticalGradientScrim
 
+private var isSplashShown = SplashState.Shown
+
 @Composable
 fun SpotiFlyerRootContent(component: SpotiFlyerRoot, statusBarHeight:Dp = 0.dp): SpotiFlyerRoot {
 
@@ -34,23 +36,26 @@ fun SpotiFlyerRootContent(component: SpotiFlyerRoot, statusBarHeight:Dp = 0.dp):
     val splashAlpha by transition.animateFloat(
         transitionSpec = { tween(durationMillis = 100) }
     ) {
-        if (it == SplashState.Shown) 1f else 0f
+        if (it == SplashState.Shown && isSplashShown == SplashState.Shown) 1f else 0f
     }
     val contentAlpha by transition.animateFloat(
         transitionSpec = { tween(durationMillis = 300) }
     ) {
-        if (it == SplashState.Shown) 0f else 1f
+        if (it == SplashState.Shown && isSplashShown == SplashState.Shown) 0f else 1f
     }
     val contentTopPadding by transition.animateDp(
         transitionSpec = { spring(stiffness = StiffnessLow) }
     ) {
-        if (it == SplashState.Shown) 100.dp else 0.dp
+        if (it == SplashState.Shown  && isSplashShown == SplashState.Shown) 100.dp else 0.dp
     }
 
     Box{
         Splash(
             modifier = Modifier.alpha(splashAlpha),
-            onTimeout = { transitionState.targetState = SplashState.Completed }
+            onTimeout = {
+                transitionState.targetState = SplashState.Completed
+                isSplashShown = SplashState.Completed
+            }
         )
         MainScreen(
             Modifier.alpha(contentAlpha),

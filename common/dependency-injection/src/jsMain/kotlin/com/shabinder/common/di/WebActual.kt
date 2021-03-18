@@ -52,6 +52,8 @@ actual val isInternetAvailable:Boolean
     }
 
 val DownloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = MutableSharedFlow(1)
+//Error:https://github.com/Kotlin/kotlinx.atomicfu/issues/182
+//val DownloadScope = ParallelExecutor(Dispatchers.Default) //Download Pool of 4 parallel
 val allTracksStatus: HashMap<String, DownloadStatus> = hashMapOf()
 
 actual suspend fun downloadTracks(
@@ -59,14 +61,15 @@ actual suspend fun downloadTracks(
     fetcher: FetchPlatformQueryResult,
     dir: Dir
 ){
-    withContext(Dispatchers.Default){
-        list.forEach {
+    list.forEach {
+        withContext(Dispatchers.Default) {
             allTracksStatus[it.title] = DownloadStatus.Queued
             if (!it.videoID.isNullOrBlank()) {//Video ID already known!
                 downloadTrack(it.videoID!!, it, fetcher, dir)
             } else {
                 val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
                 val videoID = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery,it)
+                println(videoID+" : "+it.title)
                 if (videoID.isNullOrBlank()) {
                     allTracksStatus[it.title] = DownloadStatus.Failed
                     DownloadProgressFlow.emit(allTracksStatus)
@@ -74,8 +77,8 @@ actual suspend fun downloadTracks(
                     downloadTrack(videoID, it, fetcher, dir)
                 }
             }
+            DownloadProgressFlow.emit(allTracksStatus)
         }
-        DownloadProgressFlow.emit(allTracksStatus)
     }
 }
 

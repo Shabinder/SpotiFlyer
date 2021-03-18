@@ -106,29 +106,31 @@ private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props
                     status = downloadStatus
                 }
             }
-            is DownloadStatus.Downloading -> {
+            //TODO Fix Progress Indicator
+            /*is DownloadStatus.Downloading -> {
                 CircularProgressBar {
                     progress = downloadStatus.progress
                 }
             }
-            DownloadStatus.Queued -> {
+            is DownloadStatus.Converting -> {
                 LoadingSpinner {}
             }
-            DownloadStatus.Downloaded -> {
+            is DownloadStatus.Queued -> {
+                LoadingSpinner {}
+            }*/
+            is DownloadStatus.Downloaded -> {
                 DownloadButton {
                     onClick = {}
                     status = downloadStatus
                 }
             }
-            DownloadStatus.Converting -> {
-                LoadingSpinner {}
-            }
-            DownloadStatus.Failed -> {
+            is DownloadStatus.Failed -> {
                 DownloadButton {
                     onClick = {}
                     status = downloadStatus
                 }
             }
+            else -> LoadingSpinner { }
         }
 
         css {

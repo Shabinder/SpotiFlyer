@@ -21,6 +21,7 @@ import com.shabinder.common.uikit.showPopUpMessage as uikitShowPopUpMessage
 
 private val koin = initKoin(enableNetworkLogs = true).koin
 
+
 fun main(){
 
     val lifecycle = LifecycleRegistry()
