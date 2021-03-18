@@ -30,7 +30,6 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
-
 /*def addDependency(Upload task, String groupId, String artifactId, String version, String type) {
     task.repositories.withType(org.gradle.api.artifacts.maven.MavenDeployer) { mavenDeployer ->
         task.doFirst {
