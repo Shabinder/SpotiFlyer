@@ -22,10 +22,10 @@ import org.w3c.files.Blob
 @JsModule("browser-id3-writer")
 @JsNonModule
 external class ID3Writer(a: ArrayBuffer) {
-    fun setFrame(frameName:String,frameValue:Any):ID3Writer
+    fun setFrame(frameName: String, frameValue: Any): ID3Writer
     fun removeTag()
-    fun addTag():ArrayBuffer
-    fun getBlob():Blob
-    fun getURL():String
+    fun addTag(): ArrayBuffer
+    fun getBlob(): Blob
+    fun getURL(): String
     fun revokeURL()
 }

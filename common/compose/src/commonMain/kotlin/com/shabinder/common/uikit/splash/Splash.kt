@@ -17,7 +17,13 @@
 package com.shabinder.common.uikit.splash
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +35,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shabinder.common.uikit.*
+import com.shabinder.common.uikit.HeartIcon
+import com.shabinder.common.uikit.SpotiFlyerLogo
+import com.shabinder.common.uikit.SpotiFlyerTypography
+import com.shabinder.common.uikit.colorAccent
+import com.shabinder.common.uikit.colorPrimary
 import kotlinx.coroutines.delay
 
 private const val SplashWaitTime: Long = 2000
@@ -45,7 +55,7 @@ fun Splash(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
             delay(SplashWaitTime)
             currentOnTimeout()
         }
-        Image(imageVector = SpotiFlyerLogo(),"SpotiFlyer Logo")
+        Image(imageVector = SpotiFlyerLogo(), "SpotiFlyer Logo")
         MadeInIndia(Modifier.align(Alignment.BottomCenter))
     }
 }
@@ -53,7 +63,7 @@ fun Splash(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
 @Composable
 fun MadeInIndia(
     modifier: Modifier = Modifier
-){
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.padding(8.dp)
@@ -68,7 +78,7 @@ fun MadeInIndia(
                 fontSize = 22.sp
             )
             Spacer(modifier = Modifier.padding(start = 4.dp))
-            Icon(HeartIcon(),"Love",tint = Color.Unspecified)
+            Icon(HeartIcon(), "Love", tint = Color.Unspecified)
             Spacer(modifier = Modifier.padding(start = 4.dp))
             Text(
                 text = " in India",

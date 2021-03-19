@@ -16,7 +16,6 @@
 
 plugins {
     `kotlin-dsl`
-    //`kotlin-dsl-precompiled-script-plugins`
 }
 
 group = "com.shabinder"
@@ -28,6 +27,7 @@ repositories {
     mavenCentral()
     google()
     maven(url = "https://jitpack.io")
+    maven(url = "https://plugins.gradle.org/m2/")
     maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")
     maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
@@ -37,6 +37,7 @@ dependencies {
     implementation("com.google.gms:google-services:4.3.5")
     implementation("com.google.firebase:perf-plugin:1.3.5")
     implementation("com.google.firebase:firebase-crashlytics-gradle:2.5.1")
+    implementation("org.jlleitschuh.gradle:ktlint-gradle:${Versions.ktLint}")
     implementation(JetBrains.Compose.gradlePlugin)
     implementation(JetBrains.Kotlin.gradlePlugin)
     implementation(JetBrains.Kotlin.serialization)

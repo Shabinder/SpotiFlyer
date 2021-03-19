@@ -27,4 +27,5 @@ data class UserPublic(
     var id: String? = null,
     var images: List<Image?>? = null,
     var type: String? = null,
-    var uri: String? = null)
+    var uri: String? = null
+)

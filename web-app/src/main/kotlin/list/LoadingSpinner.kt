@@ -19,7 +19,11 @@ package list
 import kotlinx.css.marginRight
 import kotlinx.css.px
 import kotlinx.css.width
-import react.*
+import react.RBuilder
+import react.RProps
+import react.ReactElement
+import react.child
+import react.functionalComponent
 import styled.css
 import styled.styledDiv
 

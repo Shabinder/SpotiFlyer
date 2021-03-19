@@ -14,9 +14,27 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import kotlinx.css.*
+import kotlinx.css.Align
+import kotlinx.css.BorderStyle
+import kotlinx.css.Color
+import kotlinx.css.Display
+import kotlinx.css.JustifyContent
+import kotlinx.css.alignContent
+import kotlinx.css.alignItems
+import kotlinx.css.backgroundColor
+import kotlinx.css.borderBottomColor
+import kotlinx.css.borderBottomStyle
+import kotlinx.css.borderColor
+import kotlinx.css.borderRadius
+import kotlinx.css.borderRightColor
+import kotlinx.css.borderWidth
+import kotlinx.css.color
+import kotlinx.css.display
+import kotlinx.css.justifyContent
+import kotlinx.css.margin
+import kotlinx.css.padding
+import kotlinx.css.px
 import styled.StyleSheet
-
 
 val colorPrimary = Color("#FC5C7D")
 val colorPrimaryDark = Color("#CE1CFF")

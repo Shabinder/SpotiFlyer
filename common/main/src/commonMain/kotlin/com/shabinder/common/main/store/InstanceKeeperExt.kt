@@ -24,9 +24,9 @@ fun <T : Store<*, *, *>> InstanceKeeper.getStore(key: Any, factory: () -> T): T 
     getOrCreate(key) { StoreHolder(factory()) }
         .store
 
-inline fun <reified T
+inline fun <reified T :
 
-: Store<*, *, *>> InstanceKeeper.getStore(noinline factory: () -> T): T =
+        Store<*, *, *>> InstanceKeeper.getStore(noinline factory: () -> T): T =
     getStore(T::class, factory)
 
 private class StoreHolder<T : Store<*, *, *>>(

@@ -17,26 +17,54 @@
 package com.shabinder.common.uikit
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Tab
+import androidx.compose.material.TabPosition
+import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults.textFieldColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.CardGiftcard
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Flag
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -53,7 +81,7 @@ import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
 import com.shabinder.common.models.DownloadRecord
 
 @Composable
-fun SpotiFlyerMainContent(component: SpotiFlyerMain){
+fun SpotiFlyerMainContent(component: SpotiFlyerMain) {
     val model by component.models.collectAsState(SpotiFlyerMain.State())
 
     Column {
@@ -69,7 +97,7 @@ fun SpotiFlyerMainContent(component: SpotiFlyerMain){
             component::selectCategory
         )
 
-        when(model.selectedCategory){
+        when (model.selectedCategory) {
             HomeCategory.About -> AboutColumn()
             HomeCategory.History -> HistoryColumn(
                 model.records.sortedByDescending { it.id },
@@ -87,7 +115,7 @@ fun HomeTabBar(
     selectCategory: (HomeCategory) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val selectedIndex =categories.indexOfFirst { it == selectedCategory }
+    val selectedIndex = categories.indexOfFirst { it == selectedCategory }
     val indicator = @Composable { tabPositions: List<TabPosition> ->
         HomeCategoryTabIndicator(
             Modifier.tabIndicatorOffset(tabPositions[selectedIndex])
@@ -99,57 +127,62 @@ fun HomeTabBar(
         indicator = indicator,
         modifier = modifier,
     ) {
-            categories.forEachIndexed { index, category ->
-                Tab(
-                    selected = index == selectedIndex,
-                    onClick = { selectCategory(category) },
-                    text = {
-                        Text(
-                            text = when (category) {
-                                HomeCategory.About -> "About"
-                                HomeCategory.History -> "History"
-                            },
-                            style = MaterialTheme.typography.body2
-                        )
-                    },
-                    icon = {
-                        when (category) {
-                            HomeCategory.About -> Icon(Icons.Outlined.Info,"Info Tab")
-                            HomeCategory.History -> Icon(Icons.Outlined.History,"History Tab")
-                        }
+        categories.forEachIndexed { index, category ->
+            Tab(
+                selected = index == selectedIndex,
+                onClick = { selectCategory(category) },
+                text = {
+                    Text(
+                        text = when (category) {
+                            HomeCategory.About -> "About"
+                            HomeCategory.History -> "History"
+                        },
+                        style = MaterialTheme.typography.body2
+                    )
+                },
+                icon = {
+                    when (category) {
+                        HomeCategory.About -> Icon(Icons.Outlined.Info, "Info Tab")
+                        HomeCategory.History -> Icon(Icons.Outlined.History, "History Tab")
                     }
-                )
-            }
+                }
+            )
         }
+    }
 }
 
 @Composable
 fun SearchPanel(
-    link:String,
-    updateLink:(String) -> Unit,
-    onSearch:(String) -> Unit,
+    link: String,
+    updateLink: (String) -> Unit,
+    onSearch: (String) -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.padding(top = 16.dp)
-    ){
+    ) {
         TextField(
             value = link,
-            onValueChange = updateLink ,
+            onValueChange = updateLink,
             leadingIcon = {
-                Icon(Icons.Rounded.Edit,"Link Text Box",tint = Color.LightGray)
+                Icon(Icons.Rounded.Edit, "Link Text Box", tint = Color.LightGray)
             },
-            label = { Text(text = "Paste Link Here...",color = Color.LightGray) },
+            label = { Text(text = "Paste Link Here...", color = Color.LightGray) },
             singleLine = true,
-            textStyle = TextStyle.Default.merge(TextStyle(fontSize = 18.sp,color = Color.White)),
+            textStyle = TextStyle.Default.merge(TextStyle(fontSize = 18.sp, color = Color.White)),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
             modifier = modifier.padding(12.dp).fillMaxWidth()
                 .border(
-                    BorderStroke(2.dp, Brush.horizontalGradient(listOf(
-                        colorPrimary,
-                        colorAccent
-                    ))),
+                    BorderStroke(
+                        2.dp,
+                        Brush.horizontalGradient(
+                            listOf(
+                                colorPrimary,
+                                colorAccent
+                            )
+                        )
+                    ),
                     RoundedCornerShape(30.dp)
                 ),
             shape = RoundedCornerShape(size = 30.dp),
@@ -162,29 +195,34 @@ fun SearchPanel(
         OutlinedButton(
             modifier = Modifier.padding(12.dp).wrapContentWidth(),
             onClick = {
-                if(link.isBlank()) showPopUpMessage("Enter A Link!")
-                else{
-                    //TODO if(!isOnline(ctx)) showPopUpMessage("Check Your Internet Connection") else
+                if (link.isBlank()) showPopUpMessage("Enter A Link!")
+                else {
+                    // TODO if(!isOnline(ctx)) showPopUpMessage("Check Your Internet Connection") else
                     onSearch(link)
                 }
             },
-            border = BorderStroke(1.dp, Brush.horizontalGradient(listOf(
-                colorPrimary,
-                colorAccent
-            )))
-        ){
-            Text(text = "Search",style = SpotiFlyerTypography.h6,modifier = Modifier.padding(4.dp))
+            border = BorderStroke(
+                1.dp,
+                Brush.horizontalGradient(
+                    listOf(
+                        colorPrimary,
+                        colorAccent
+                    )
+                )
+            )
+        ) {
+            Text(text = "Search", style = SpotiFlyerTypography.h6, modifier = Modifier.padding(4.dp))
         }
     }
 }
 
 @Composable
 fun AboutColumn(modifier: Modifier = Modifier) {
-    //TODO Make Scrollable
+    // TODO Make Scrollable
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         Card(
             modifier = modifier.fillMaxWidth(),
-            border = BorderStroke(1.dp,Color.Gray)
+            border = BorderStroke(1.dp, Color.Gray)
         ) {
             Column(modifier.padding(12.dp)) {
                 Text(
@@ -193,34 +231,41 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                     color = colorAccent
                 )
                 Spacer(modifier = Modifier.padding(top = 12.dp))
-                Row(horizontalArrangement = Arrangement.Center,modifier = modifier.fillMaxWidth()) {
+                Row(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
                     Icon(
                         imageVector = SpotifyLogo(),
                         "Open Spotify",
                         tint = Color.Unspecified,
                         modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                            onClick = { openPlatform("com.spotify.music","http://open.spotify.com") })
+                            onClick = { openPlatform("com.spotify.music", "http://open.spotify.com") }
+                        )
                     )
                     Spacer(modifier = modifier.padding(start = 16.dp))
-                    Icon(imageVector = GaanaLogo(),
+                    Icon(
+                        imageVector = GaanaLogo(),
                         "Open Gaana",
                         tint = Color.Unspecified,
                         modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                            onClick = { openPlatform("com.gaana","http://gaana.com") })
+                            onClick = { openPlatform("com.gaana", "http://gaana.com") }
+                        )
                     )
                     Spacer(modifier = modifier.padding(start = 16.dp))
-                    Icon(imageVector = YoutubeLogo(),
+                    Icon(
+                        imageVector = YoutubeLogo(),
                         "Open Youtube",
                         tint = Color.Unspecified,
                         modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                            onClick = { openPlatform("com.google.android.youtube","http://m.youtube.com") })
+                            onClick = { openPlatform("com.google.android.youtube", "http://m.youtube.com") }
+                        )
                     )
                     Spacer(modifier = modifier.padding(start = 12.dp))
-                    Icon(imageVector = YoutubeMusicLogo(),
+                    Icon(
+                        imageVector = YoutubeMusicLogo(),
                         "Open Youtube Music",
                         tint = Color.Unspecified,
                         modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                            onClick = { openPlatform("com.google.android.apps.youtube.music","https://music.youtube.com/") })
+                            onClick = { openPlatform("com.google.android.apps.youtube.music", "https://music.youtube.com/") }
+                        )
                     )
                 }
             }
@@ -228,7 +273,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.padding(top = 8.dp))
         Card(
             modifier = modifier.fillMaxWidth(),
-            border = BorderStroke(1.dp,Color.Gray)//Gray
+            border = BorderStroke(1.dp, Color.Gray) // Gray
         ) {
             Column(modifier.padding(12.dp)) {
                 Text(
@@ -237,12 +282,14 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                     color = colorAccent
                 )
                 Spacer(modifier = Modifier.padding(top = 6.dp))
-                Row(verticalAlignment = Alignment.CenterVertically,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth().clickable(
-                        onClick = { openPlatform("","http://github.com/Shabinder/SpotiFlyer") })
+                        onClick = { openPlatform("", "http://github.com/Shabinder/SpotiFlyer") }
+                    )
                         .padding(vertical = 6.dp)
                 ) {
-                    Icon(imageVector = GithubLogo(),"Open Project Repo",tint = Color(0xFFCCCCCC))
+                    Icon(imageVector = GithubLogo(), "Open Project Repo", tint = Color(0xFFCCCCCC))
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
                         Text(
@@ -257,10 +304,10 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                 }
                 Row(
                     modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        .clickable(onClick = { openPlatform("","http://github.com/Shabinder/SpotiFlyer") }),
+                        .clickable(onClick = { openPlatform("", "http://github.com/Shabinder/SpotiFlyer") }),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Rounded.Flag,"Help Translate",Modifier.size(32.dp))
+                    Icon(Icons.Rounded.Flag, "Help Translate", Modifier.size(32.dp))
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
                         Text(
@@ -278,7 +325,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         .clickable(onClick = { giveDonation() }),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Rounded.CardGiftcard,"Support Developer")
+                    Icon(Icons.Rounded.CardGiftcard, "Support Developer")
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
                         Text(
@@ -293,12 +340,14 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                 }
                 Row(
                     modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        .clickable(onClick = {
-                            shareApp()
-                        }),
+                        .clickable(
+                            onClick = {
+                                shareApp()
+                            }
+                        ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Rounded.Share,"Share SpotiFlyer App")
+                    Icon(Icons.Rounded.Share, "Share SpotiFlyer App")
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
                         Text(
@@ -319,22 +368,23 @@ fun AboutColumn(modifier: Modifier = Modifier) {
 @Composable
 fun HistoryColumn(
     list: List<DownloadRecord>,
-    loadImage:suspend (String)-> Picture,
+    loadImage: suspend (String) -> Picture,
     onItemClicked: (String) -> Unit
 ) {
-    Crossfade(list){
-        if(it.isEmpty()){
-            Column(Modifier.padding(bottom = 32.dp).fillMaxSize(),verticalArrangement = Arrangement.Center,horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Outlined.Info,"No History Available Yet",modifier = Modifier.size(80.dp),
+    Crossfade(list) {
+        if (it.isEmpty()) {
+            Column(Modifier.padding(bottom = 32.dp).fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    Icons.Outlined.Info, "No History Available Yet", modifier = Modifier.size(80.dp),
                     colorOffWhite
                 )
-                Text("No History Available",style = SpotiFlyerTypography.h4.copy(fontWeight = FontWeight.Light),textAlign = TextAlign.Center)
+                Text("No History Available", style = SpotiFlyerTypography.h4.copy(fontWeight = FontWeight.Light), textAlign = TextAlign.Center)
             }
-        }else{
+        } else {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 content = {
-                    items(it.distinctBy {record -> record.coverUrl }) { record ->
+                    items(it.distinctBy { record -> record.coverUrl }) { record ->
                         DownloadRecordItem(
                             item = record,
                             loadImage,
@@ -351,38 +401,39 @@ fun HistoryColumn(
 @Composable
 fun DownloadRecordItem(
     item: DownloadRecord,
-    loadImage:suspend (String)-> Picture,
-    onItemClicked:(String)->Unit
+    loadImage: suspend (String) -> Picture,
+    onItemClicked: (String) -> Unit
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {
         ImageLoad(
             item.coverUrl,
             loadImage,
             "Album Art",
             modifier = Modifier.height(70.dp).width(70.dp).clip(SpotiFlyerShapes.medium)
         )
-        Column(modifier = Modifier.padding(horizontal = 8.dp).height(60.dp).weight(1f),verticalArrangement = Arrangement.SpaceEvenly) {
-            Text(item.name,maxLines = 1,overflow = TextOverflow.Ellipsis,style = SpotiFlyerTypography.h6,color = colorAccent)
+        Column(modifier = Modifier.padding(horizontal = 8.dp).height(60.dp).weight(1f), verticalArrangement = Arrangement.SpaceEvenly) {
+            Text(item.name, maxLines = 1, overflow = TextOverflow.Ellipsis, style = SpotiFlyerTypography.h6, color = colorAccent)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Bottom,
                 modifier = Modifier.padding(horizontal = 8.dp).fillMaxSize()
-            ){
-                Text(item.type,fontSize = 13.sp,color = colorOffWhite)
-                Text("Tracks: ${item.totalFiles}",fontSize = 13.sp,color = colorOffWhite)
+            ) {
+                Text(item.type, fontSize = 13.sp, color = colorOffWhite)
+                Text("Tracks: ${item.totalFiles}", fontSize = 13.sp, color = colorOffWhite)
             }
         }
         Image(
             imageVector = ShareImage(),
             "Research",
-            modifier = Modifier.clickable(onClick = {
-                //if(!isOnline(ctx)) showDialog("Check Your Internet Connection") else
-                onItemClicked(item.link)
-            })
+            modifier = Modifier.clickable(
+                onClick = {
+                    // if(!isOnline(ctx)) showDialog("Check Your Internet Connection") else
+                    onItemClicked(item.link)
+                }
+            )
         )
     }
 }
-
 
 @Composable
 fun HomeCategoryTabIndicator(

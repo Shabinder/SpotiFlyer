@@ -19,7 +19,7 @@ package com.shabinder.common.models.gaana
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Genre (
-	val genre_id : Int,
-	val name : String
+data class Genre(
+    val genre_id: Int,
+    val name: String
 )

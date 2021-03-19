@@ -78,7 +78,7 @@ actual fun Toast(
                         isShown = false
                         visibility.value = false
                     }
-                    onDispose {  }
+                    onDispose { }
                 }
             }
         }

@@ -19,10 +19,10 @@ package com.shabinder.common.models.gaana
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GaanaAlbum (
-    val tracks : List<GaanaTrack>,
-    val count : Int,
-    val custom_artworks : CustomArtworks,
-    val release_year : Int,
-    val favorite_count : Int,
+data class GaanaAlbum(
+    val tracks: List<GaanaTrack>,
+    val count: Int,
+    val custom_artworks: CustomArtworks,
+    val release_year: Int,
+    val favorite_count: Int,
 )

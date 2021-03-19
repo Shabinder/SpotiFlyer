@@ -16,7 +16,12 @@
 
 package com.shabinder.common.root.integration
 
-import com.arkivanov.decompose.*
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.RouterState
+import com.arkivanov.decompose.pop
+import com.arkivanov.decompose.popWhile
+import com.arkivanov.decompose.push
+import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
 import com.arkivanov.decompose.value.Value
@@ -43,7 +48,7 @@ internal class SpotiFlyerRootImpl(
 
     override val routerState: Value<RouterState<*, Child>> = router.state
 
-    override val callBacks = object : SpotiFlyerRootCallBacks{
+    override val callBacks = object : SpotiFlyerRootCallBacks {
         override fun searchLink(link: String) = onMainOutput(SpotiFlyerMain.Output.Search(link))
         override fun popBackToHomeScreen() {
             router.popWhile {
@@ -74,7 +79,7 @@ internal class SpotiFlyerRootImpl(
                 override val fetchQuery = fetchPlatformQueryResult
                 override val dir: Dir = directories
                 override val link: String = link
-                override val listOutput : Consumer<SpotiFlyerList.Output> = Consumer(::onListOutput)
+                override val listOutput: Consumer<SpotiFlyerList.Output> = Consumer(::onListOutput)
                 override val downloadProgressFlow = downloadProgressReport
             }
         )

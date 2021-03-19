@@ -47,7 +47,7 @@ interface SpotiFlyerRoot {
         val database: Database?
         val fetchPlatformQueryResult: FetchPlatformQueryResult
         val directories: Dir
-        val showPopUpMessage:(String)->Unit
+        val showPopUpMessage: (String) -> Unit
         val downloadProgressReport: MutableSharedFlow<HashMap<String, DownloadStatus>>
     }
 }

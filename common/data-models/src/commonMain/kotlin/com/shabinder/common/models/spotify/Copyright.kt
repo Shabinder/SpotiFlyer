@@ -21,4 +21,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Copyright(
     var text: String? = null,
-    var type: String? = null)
+    var type: String? = null
+)

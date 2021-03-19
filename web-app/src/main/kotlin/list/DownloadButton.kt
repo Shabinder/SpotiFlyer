@@ -17,9 +17,17 @@
 package list
 
 import com.shabinder.common.models.DownloadStatus
-import kotlinx.css.*
+import kotlinx.css.borderRadius
+import kotlinx.css.em
+import kotlinx.css.margin
+import kotlinx.css.px
+import kotlinx.css.width
 import kotlinx.html.js.onClickFunction
-import react.*
+import react.RBuilder
+import react.RProps
+import react.ReactElement
+import react.child
+import react.functionalComponent
 import styled.css
 import styled.styledDiv
 import styled.styledImg

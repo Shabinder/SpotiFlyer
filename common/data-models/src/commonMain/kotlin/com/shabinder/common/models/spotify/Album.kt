@@ -30,11 +30,12 @@ data class Album(
     var href: String? = null,
     var id: String? = null,
     var images: List<Image?>? = null,
-    var label :String? = null,
+    var label: String? = null,
     var name: String? = null,
     var popularity: Int? = null,
     var release_date: String? = null,
     var release_date_precision: String? = null,
     var tracks: PagingObjectTrack? = null,
     var type: String? = null,
-    var uri: String? = null)
+    var uri: String? = null
+)

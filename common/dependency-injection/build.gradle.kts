@@ -44,7 +44,7 @@ kotlin {
             }
         }
         androidMain {
-            dependencies{
+            dependencies {
                 implementation(compose.materialIconsExtended)
                 implementation(Koin.android)
                 implementation(Ktor.clientAndroid)
@@ -52,11 +52,11 @@ kotlin {
                 implementation(Extras.Android.razorpay)
                 api(Extras.youtubeDownloader)
                 api(Extras.mp3agic)
-                //api(files("$rootDir/libs/mobile-ffmpeg.aar"))
+                // api(files("$rootDir/libs/mobile-ffmpeg.aar"))
             }
         }
         desktopMain {
-            dependencies{
+            dependencies {
                 implementation(compose.materialIconsExtended)
                 implementation(Ktor.clientApache)
                 implementation(Ktor.slf4j)
@@ -68,9 +68,9 @@ kotlin {
             dependencies {
                 implementation(project(":common:data-models"))
                 implementation(Ktor.clientJs)
-                implementation(npm("browser-id3-writer","4.4.0"))
-                implementation(npm("file-saver","2.0.4"))
-                //implementation(npm("@types/file-saver","2.0.1",generateExternals = true))
+                implementation(npm("browser-id3-writer", "4.4.0"))
+                implementation(npm("file-saver", "2.0.4"))
+                // implementation(npm("@types/file-saver","2.0.1",generateExternals = true))
             }
         }
     }

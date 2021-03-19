@@ -21,26 +21,29 @@ object Versions {
     const val kotlinVersion = "1.4.31"
 
     const val coroutinesVersion = "1.4.2"
-    //const val compose = "1.0.0-alpha12"
 
     const val coilVersion = "0.4.1"
-    //DI
+
+    // Code Formatting
+    const val ktLint = "10.0.0"
+    
+    // DI
     const val koin = "3.0.1-beta-1"
 
-    //Logger
+    // Logger
     const val kermit = "0.1.8"
 
-    //Internet
+    // Internet
     const val ktor = "1.5.2"
 
     const val kotlinxSerialization = "1.1.0-RC"
-    //Database
+    // Database
     const val sqlDelight = "1.4.4"
 
     const val sqliteJdbcDriver = "3.30.1"
     const val slf4j = "1.7.30"
 
-    //Android
+    // Android
     const val versionCode = 15
     const val minSdkVersion = 24
     const val compileSdkVersion = 29
@@ -53,7 +56,7 @@ object Koin {
     val android = "io.insert-koin:koin-android:${Versions.koin}"
     val compose = "io.insert-koin:koin-androidx-compose:${Versions.koin}"
 }
-object Androidx{
+object Androidx {
     const val androidxActivity = "androidx.activity:activity-compose:1.3.0-alpha02"
     const val core = "androidx.core:core-ktx:1.3.2"
     const val palette = "androidx.palette:palette-ktx:1.0.0"

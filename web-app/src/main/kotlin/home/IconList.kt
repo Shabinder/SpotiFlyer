@@ -16,14 +16,23 @@
 
 package home
 
-import kotlinx.browser.document
-import kotlinx.css.*
-import kotlinx.dom.appendElement
-import kotlinx.dom.createElement
-import kotlinx.html.SCRIPT
+import Styles
+import kotlinx.css.borderRadius
+import kotlinx.css.height
+import kotlinx.css.margin
+import kotlinx.css.px
+import kotlinx.css.width
 import kotlinx.html.id
-import react.*
-import styled.*
+import react.RBuilder
+import react.RProps
+import react.ReactElement
+import react.child
+import react.functionalComponent
+import styled.css
+import styled.styledA
+import styled.styledDiv
+import styled.styledForm
+import styled.styledImg
 
 external interface IconListProps : RProps {
     var iconsAndPlatforms: Map<String,String>

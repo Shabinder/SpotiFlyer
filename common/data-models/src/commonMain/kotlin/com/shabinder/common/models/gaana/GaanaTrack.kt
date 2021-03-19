@@ -21,22 +21,22 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GaanaTrack (
-    val tags : List<Tags?>? = null,
-    val seokey : String,
-    val albumseokey : String? = null,
-    val track_title : String,
-    val album_title : String? = null,
-    val language : String? = null,
+data class GaanaTrack(
+    val tags: List<Tags?>? = null,
+    val seokey: String,
+    val albumseokey: String? = null,
+    val track_title: String,
+    val album_title: String? = null,
+    val language: String? = null,
     val duration: Int,
-    @SerialName("artwork_large") val artworkLink : String,
-    val artist : List<Artist?> = emptyList(),
-    @SerialName("gener") val genre : List<Genre?>? = null,
-    val lyrics_url : String? = null,
-    val youtube_id : String? = null,
-    val total_favourite_count : Int? = null,
-    val release_date : String? = null,
-    val play_ct : String? = null,
-    val secondary_language : String? = null,
+    @SerialName("artwork_large") val artworkLink: String,
+    val artist: List<Artist?> = emptyList(),
+    @SerialName("gener") val genre: List<Genre?>? = null,
+    val lyrics_url: String? = null,
+    val youtube_id: String? = null,
+    val total_favourite_count: Int? = null,
+    val release_date: String? = null,
+    val play_ct: String? = null,
+    val secondary_language: String? = null,
     var downloaded: DownloadStatus? = DownloadStatus.NotDownloaded
 )

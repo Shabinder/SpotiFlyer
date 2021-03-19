@@ -25,25 +25,25 @@ import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.gaana.GaanaTrack
 import com.shabinder.common.models.spotify.Source
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 
 class GaanaProvider(
     override val httpClient: HttpClient,
     private val logger: Kermit,
     private val dir: Dir,
-): GaanaRequests {
+) : GaanaRequests {
 
     private val gaanaPlaceholderImageUrl = "https://a10.gaanacdn.com/images/social/gaana_social.jpg"
 
-    suspend fun query(fullLink: String): PlatformQueryResult?{
-        //Link Schema: https://gaana.com/type/link
+    suspend fun query(fullLink: String): PlatformQueryResult? {
+        // Link Schema: https://gaana.com/type/link
         val gaanaLink = fullLink.substringAfter("gaana.com/")
 
         val link = gaanaLink.substringAfterLast('/', "error")
         val type = gaanaLink.substringBeforeLast('/', "error").substringAfterLast('/')
 
-        //Error
-        if (type == "Error" || link == "Error"){
+        // Error
+        if (type == "Error" || link == "Error") {
             return null
         }
         return gaanaSearch(
@@ -53,8 +53,8 @@ class GaanaProvider(
     }
 
     private suspend fun gaanaSearch(
-        type:String,
-        link:String,
+        type: String,
+        link: String,
     ): PlatformQueryResult {
         val result = PlatformQueryResult(
             folderType = "",
@@ -64,22 +64,14 @@ class GaanaProvider(
             trackList = listOf(),
             Source.Gaana
         )
+        logger.i { "GAANA SEARCH: $type - $link" }
         with(result) {
             when (type) {
                 "song" -> {
                     getGaanaSong(seokey = link).tracks.firstOrNull()?.also {
                         folderType = "Tracks"
                         subFolder = ""
-                        if (dir.isPresent(
-                                dir.finalOutputDir(
-                                    it.track_title,
-                                    folderType,
-                                    subFolder,
-                                    dir.defaultDir()
-                                )
-                            )) {//Download Already Present!!
-                            it.downloaded = DownloadStatus.Downloaded
-                        }
+                        it.updateStatusIfPresent(folderType, subFolder)
                         trackList = listOf(it).toTrackDetailsList(folderType, subFolder)
                         title = it.track_title
                         coverUrl = it.artworkLink
@@ -90,17 +82,7 @@ class GaanaProvider(
                         folderType = "Albums"
                         subFolder = link
                         it.tracks.forEach { track ->
-                            if (dir.isPresent(
-                                    dir.finalOutputDir(
-                                        track.track_title,
-                                        folderType,
-                                        subFolder,
-                                        dir.defaultDir()
-                                    )
-                                )
-                            ) {//Download Already Present!!
-                                track.downloaded = DownloadStatus.Downloaded
-                            }
+                            track.updateStatusIfPresent(folderType, subFolder)
                         }
                         trackList = it.tracks.toTrackDetailsList(folderType, subFolder)
                         title = link
@@ -112,21 +94,11 @@ class GaanaProvider(
                         folderType = "Playlists"
                         subFolder = link
                         it.tracks.forEach { track ->
-                            if (dir.isPresent(
-                                    dir.finalOutputDir(
-                                        track.track_title,
-                                        folderType,
-                                        subFolder,
-                                        dir.defaultDir()
-                                    )
-                                )
-                            ) {//Download Already Present!!
-                                track.downloaded = DownloadStatus.Downloaded
-                            }
+                            track.updateStatusIfPresent(folderType, subFolder)
                         }
                         trackList = it.tracks.toTrackDetailsList(folderType, subFolder)
                         title = link
-                        //coverUrl.value = "TODO"
+                        // coverUrl.value = "TODO"
                         coverUrl = gaanaPlaceholderImageUrl
                     }
                 }
@@ -134,37 +106,27 @@ class GaanaProvider(
                     folderType = "Artist"
                     subFolder = link
                     coverUrl = gaanaPlaceholderImageUrl
-                    val artistDetails =
-                        getGaanaArtistDetails(seokey = link).artist.firstOrNull()
-                            ?.also {
-                                title = it.name
-                                coverUrl = it.artworkLink ?: gaanaPlaceholderImageUrl
-                            }
+                    getGaanaArtistDetails(seokey = link).artist.firstOrNull()
+                        ?.also {
+                            title = it.name
+                            coverUrl = it.artworkLink ?: gaanaPlaceholderImageUrl
+                        }
                     getGaanaArtistTracks(seokey = link).also {
                         it.tracks?.forEach { track ->
-                            if (dir.isPresent(
-                                    dir.finalOutputDir(
-                                        track.track_title,
-                                        folderType,
-                                        subFolder,
-                                        dir.defaultDir()
-                                    )
-                                )
-                            ) {//Download Already Present!!
-                                track.downloaded = DownloadStatus.Downloaded
-                            }
+                            track.updateStatusIfPresent(folderType, subFolder)
                         }
                         trackList = it.tracks?.toTrackDetailsList(folderType, subFolder) ?: emptyList()
                     }
                 }
-                else -> {//TODO Handle Error}
+                else -> {
+                    // TODO Handle Error
                 }
             }
             return result
         }
     }
 
-    private fun List<GaanaTrack>.toTrackDetailsList(type:String, subFolder:String) = this.map {
+    private fun List<GaanaTrack>.toTrackDetailsList(type: String, subFolder: String) = this.map {
         TrackDetails(
             title = it.track_title,
             artists = it.artist.map { artist -> artist?.name.toString() },
@@ -172,12 +134,25 @@ class GaanaProvider(
             albumArtPath = dir.imageCacheDir() + (it.artworkLink.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg",
             albumName = it.album_title,
             year = it.release_date,
-            comment = "Genres:${it.genre?.map { genre -> genre?.name }?.reduceOrNull { acc, s -> acc + s  }}",
+            comment = "Genres:${it.genre?.map { genre -> genre?.name }?.reduceOrNull { acc, s -> acc + s }}",
             trackUrl = it.lyrics_url,
             downloaded = it.downloaded ?: DownloadStatus.NotDownloaded,
             source = Source.Gaana,
             albumArtURL = it.artworkLink,
-            outputFilePath = dir.finalOutputDir(it.track_title,type, subFolder,dir.defaultDir()/*,".m4a"*/)
+            outputFilePath = dir.finalOutputDir(it.track_title, type, subFolder, dir.defaultDir()/*,".m4a"*/)
         )
+    }
+    private fun GaanaTrack.updateStatusIfPresent(folderType: String, subFolder: String) {
+        if (dir.isPresent(
+                dir.finalOutputDir(
+                        track_title,
+                        folderType,
+                        subFolder,
+                        dir.defaultDir()
+                    )
+            )
+        ) { // Download Already Present!!
+            downloaded = DownloadStatus.Downloaded
+        }
     }
 }

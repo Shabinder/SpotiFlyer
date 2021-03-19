@@ -16,11 +16,24 @@
 
 package com.shabinder.common.uikit
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Spring.StiffnessLow
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -45,7 +58,7 @@ import com.shabinder.common.uikit.utils.verticalGradientScrim
 private var isSplashShown = SplashState.Shown
 
 @Composable
-fun SpotiFlyerRootContent(component: SpotiFlyerRoot, statusBarHeight:Dp = 0.dp): SpotiFlyerRoot {
+fun SpotiFlyerRootContent(component: SpotiFlyerRoot, statusBarHeight: Dp = 0.dp): SpotiFlyerRoot {
 
     val transitionState = remember { MutableTransitionState(SplashState.Shown) }
     val transition = updateTransition(transitionState)
@@ -63,10 +76,10 @@ fun SpotiFlyerRootContent(component: SpotiFlyerRoot, statusBarHeight:Dp = 0.dp):
     val contentTopPadding by transition.animateDp(
         transitionSpec = { spring(stiffness = StiffnessLow) }
     ) {
-        if (it == SplashState.Shown  && isSplashShown == SplashState.Shown) 100.dp else 0.dp
+        if (it == SplashState.Shown && isSplashShown == SplashState.Shown) 100.dp else 0.dp
     }
 
-    Box{
+    Box {
         Splash(
             modifier = Modifier.alpha(splashAlpha),
             onTimeout = {
@@ -85,17 +98,17 @@ fun SpotiFlyerRootContent(component: SpotiFlyerRoot, statusBarHeight:Dp = 0.dp):
 }
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier, topPadding: Dp = 0.dp,statusBarHeight: Dp = 0.dp,component: SpotiFlyerRoot) {
+fun MainScreen(modifier: Modifier = Modifier, topPadding: Dp = 0.dp, statusBarHeight: Dp = 0.dp, component: SpotiFlyerRoot) {
 
     val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.65f)
 
     Column(
         modifier = modifier.fillMaxSize()
-        .verticalGradientScrim(
-        color = colorPrimaryDark.copy(alpha = 0.38f),
-        startYPercentage = 0.29f,
-        endYPercentage = 0f,
-    )
+            .verticalGradientScrim(
+                color = colorPrimaryDark.copy(alpha = 0.38f),
+                startYPercentage = 0.29f,
+                endYPercentage = 0f,
+            )
     ) {
         Spacer(Modifier.background(appBarColor).height(statusBarHeight).fillMaxWidth())
         LocalViewConfiguration.current
@@ -136,7 +149,7 @@ fun AppBar(
                     style = appNameStyle
                 )
             }
-        },/*
+        }, /*
         actions = {
                 IconButton(
                     onClick = {  *//*TODO: Open Preferences*//* }

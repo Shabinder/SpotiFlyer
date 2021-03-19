@@ -16,6 +16,7 @@
 
 plugins {
     id("com.android.library")
+    id("ktlint-setup")
 }
 
 android {
@@ -43,5 +44,4 @@ android {
             res.srcDirs("src/androidMain/res")
         }
     }
-
 }

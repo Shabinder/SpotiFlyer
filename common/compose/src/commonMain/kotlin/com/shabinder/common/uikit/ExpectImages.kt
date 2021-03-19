@@ -17,52 +17,52 @@
 @file:Suppress("FunctionName")
 package com.shabinder.common.uikit
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.shabinder.common.di.Picture
 
 @Composable
 expect fun ImageLoad(
-    link:String,
-    loader:suspend (String) ->Picture,
+    link: String,
+    loader: suspend (String) -> Picture,
     desc: String = "Album Art",
-    modifier:Modifier = Modifier,
-    //placeholder:ImageVector = PlaceHolderImage()
+    modifier: Modifier = Modifier,
+    // placeholder:ImageVector = PlaceHolderImage()
 )
 
 @Composable
 expect fun DownloadImageTick()
 
 @Composable
-expect fun DownloadAllImage():ImageVector
+expect fun DownloadAllImage(): ImageVector
 
 @Composable
-expect fun ShareImage():ImageVector
+expect fun ShareImage(): ImageVector
 
 @Composable
-expect fun PlaceHolderImage():ImageVector
+expect fun PlaceHolderImage(): ImageVector
 
 @Composable
-expect fun SpotiFlyerLogo():ImageVector
+expect fun SpotiFlyerLogo(): ImageVector
 
 @Composable
-expect fun SpotifyLogo():ImageVector
+expect fun SpotifyLogo(): ImageVector
 
 @Composable
-expect fun YoutubeLogo():ImageVector
+expect fun YoutubeLogo(): ImageVector
 
 @Composable
-expect fun GaanaLogo():ImageVector
+expect fun GaanaLogo(): ImageVector
 
 @Composable
-expect fun YoutubeMusicLogo():ImageVector
+expect fun YoutubeMusicLogo(): ImageVector
 
 @Composable
-expect fun GithubLogo():ImageVector
+expect fun GithubLogo(): ImageVector
 
 @Composable
-expect fun HeartIcon():ImageVector
+expect fun HeartIcon(): ImageVector
 
 @Composable
 expect fun DownloadImageError()

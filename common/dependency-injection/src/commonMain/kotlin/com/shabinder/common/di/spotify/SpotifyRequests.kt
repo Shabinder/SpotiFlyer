@@ -21,16 +21,16 @@ import com.shabinder.common.models.spotify.Album
 import com.shabinder.common.models.spotify.PagingObjectPlaylistTrack
 import com.shabinder.common.models.spotify.Playlist
 import com.shabinder.common.models.spotify.Track
-import io.ktor.client.*
-import io.ktor.client.request.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
 
 private val BASE_URL get() = "${corsApi}https://api.spotify.com/v1"
 
 interface SpotifyRequests {
 
-    val httpClient:HttpClient
+    val httpClient: HttpClient
 
-    suspend fun authenticateSpotifyClient(override:Boolean = false):HttpClient?
+    suspend fun authenticateSpotifyClient(override: Boolean = false): HttpClient?
 
     suspend fun getPlaylist(playlistID: String): Playlist {
         return httpClient.get("$BASE_URL/playlists/$playlistID")
@@ -48,7 +48,7 @@ interface SpotifyRequests {
         return httpClient.get("$BASE_URL/tracks/$id")
     }
 
-    suspend fun getEpisode(id: String?) : Track {
+    suspend fun getEpisode(id: String?): Track {
         return httpClient.get("$BASE_URL/episodes/$id")
     }
 
@@ -60,7 +60,7 @@ interface SpotifyRequests {
         return httpClient.get("$BASE_URL/albums/$id")
     }
 
-    suspend fun getResponse(url:String):String{
+    suspend fun getResponse(url: String): String {
         return httpClient.get(url)
     }
 }

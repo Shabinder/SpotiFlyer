@@ -16,6 +16,8 @@
 
 plugins {
     `kotlin-dsl`
+    id("org.jlleitschuh.gradle.ktlint")
+    id("org.jlleitschuh.gradle.ktlint-idea")
 }
 
 allprojects {
@@ -27,7 +29,7 @@ allprojects {
         maven(url = "https://dl.bintray.com/ekito/koin")
         maven(url = "https://kotlin.bintray.com/kotlinx/")
         maven(url = "https://dl.bintray.com/icerockdev/moko")
-        //maven(url = "https://kotlin.bintray.com/kotlin-js-wrappers/")
+        // maven(url = "https://kotlin.bintray.com/kotlin-js-wrappers/")
         maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")
         maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }

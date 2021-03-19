@@ -58,7 +58,6 @@ import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.uikit.*
-import com.shabinder.database.Database
 import com.shabinder.spotiflyer.utils.*
 import com.tonyodev.fetch2.Status
 import kotlinx.coroutines.*

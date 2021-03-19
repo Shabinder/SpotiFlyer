@@ -20,6 +20,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GaanaArtistDetails(
-    val artist : List<Artist>,
-    val count : Int,
+    val artist: List<Artist>,
+    val count: Int,
 )

@@ -18,7 +18,7 @@ package root
 
 import com.arkivanov.decompose.RouterState
 import com.shabinder.common.root.SpotiFlyerRoot
-import com.shabinder.common.root.SpotiFlyerRoot.*
+import com.shabinder.common.root.SpotiFlyerRoot.Child
 import extras.RenderableRootComponent
 import extras.renderableChild
 import home.HomeScreen

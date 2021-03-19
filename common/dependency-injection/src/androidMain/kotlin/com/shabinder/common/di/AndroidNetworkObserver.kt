@@ -24,7 +24,6 @@ import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
 import android.net.NetworkRequest
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.lifecycle.LiveData
 import com.shabinder.common.database.appContext
@@ -41,8 +40,8 @@ const val TAG = "C-Manager"
 val internetAvailability by lazy { ConnectionLiveData(appContext) }
 
 @Composable
-fun isInternetAvailableState(): State<Boolean?>{
-   return internetAvailability.observeAsState()
+fun isInternetAvailableState(): State<Boolean?> {
+    return internetAvailability.observeAsState()
 }
 
 /**
@@ -83,17 +82,17 @@ class ConnectionLiveData(context: Context = appContext) : LiveData<Boolean>() {
           Source: https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onAvailable(android.net.Network)
          */
         override fun onAvailable(network: Network) {
-            Log.d(TAG, "onAvailable: ${network}")
+            Log.d(TAG, "onAvailable: $network")
             val networkCapabilities = cm.getNetworkCapabilities(network)
             val hasInternetCapability = networkCapabilities?.hasCapability(NET_CAPABILITY_INTERNET)
-            Log.d(TAG, "onAvailable: ${network}, $hasInternetCapability")
+            Log.d(TAG, "onAvailable: $network, $hasInternetCapability")
             if (hasInternetCapability == true) {
                 // check if this network actually has internet
                 CoroutineScope(Dispatchers.IO).launch {
                     val hasInternet = DoesNetworkHaveInternet.execute(network.socketFactory)
-                    if(hasInternet){
-                        withContext(Dispatchers.Main){
-                            Log.d(TAG, "onAvailable: adding network. ${network}")
+                    if (hasInternet) {
+                        withContext(Dispatchers.Main) {
+                            Log.d(TAG, "onAvailable: adding network. $network")
                             validNetworks.add(network)
                             checkValidNetworks()
                         }
@@ -107,11 +106,10 @@ class ConnectionLiveData(context: Context = appContext) : LiveData<Boolean>() {
           Source: https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onLost(android.net.Network)
          */
         override fun onLost(network: Network) {
-            Log.d(TAG, "onLost: ${network}")
+            Log.d(TAG, "onLost: $network")
             validNetworks.remove(network)
             checkValidNetworks()
         }
-
     }
 
     /**
@@ -122,14 +120,14 @@ class ConnectionLiveData(context: Context = appContext) : LiveData<Boolean>() {
 
         // Make sure to execute this on a background thread.
         fun execute(socketFactory: SocketFactory): Boolean {
-            return try{
+            return try {
                 Log.d(TAG, "PINGING google.")
                 val socket = socketFactory.createSocket() ?: throw IOException("Socket is null.")
                 socket.connect(InetSocketAddress("8.8.8.8", 53), 1500)
                 socket.close()
                 Log.d(TAG, "PING success.")
                 true
-            }catch (e: IOException){
+            } catch (e: IOException) {
                 Log.e(TAG, "No internet connection. $e")
                 false
             }

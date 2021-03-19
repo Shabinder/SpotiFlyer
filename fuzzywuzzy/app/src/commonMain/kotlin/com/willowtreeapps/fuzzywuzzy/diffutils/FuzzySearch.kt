@@ -28,6 +28,7 @@ import com.willowtreeapps.fuzzywuzzy.diffutils.ratio.SimpleRatio
 /**
  * FuzzySearch facade class
  */
+@Suppress("unused")
 object FuzzySearch {
 
     /**

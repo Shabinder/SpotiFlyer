@@ -18,8 +18,7 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.models.PlatformQueryResult
-import com.shabinder.database.Database
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 
 actual class YoutubeProvider actual constructor(
     httpClient: HttpClient,

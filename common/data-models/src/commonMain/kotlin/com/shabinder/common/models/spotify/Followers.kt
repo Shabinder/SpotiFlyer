@@ -21,4 +21,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Followers(
     var href: String? = null,
-    var total: Int? = null)
+    var total: Int? = null
+)

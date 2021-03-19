@@ -40,4 +40,3 @@ data class Track(
     var popularity: Int? = null,
     var downloaded: DownloadStatus = DownloadStatus.NotDownloaded
 )
-

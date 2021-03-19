@@ -26,7 +26,11 @@ import com.shabinder.common.di.DownloadProgressFlow
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.database.Database
 import extras.renderableChild
-import react.*
+import react.RBuilder
+import react.RComponent
+import react.RProps
+import react.RState
+import react.ReactElement
 import root.RootR
 
 external interface AppProps : RProps {
@@ -45,8 +49,6 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
     private val lifecycle = LifecycleRegistry()
     private val ctx = DefaultComponentContext(lifecycle = lifecycle)
     private val dependencies = props.dependencies
-    private val logger:Kermit
-        get() = dependencies.logger
 
     private val root = SpotiFlyerRoot(ctx,
         object : SpotiFlyerRoot.Dependencies{

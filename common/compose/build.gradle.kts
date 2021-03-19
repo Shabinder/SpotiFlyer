@@ -33,7 +33,7 @@ kotlin {
                 implementation(project(":common:database"))
                 implementation(project(":common:data-models"))
                 implementation(project(":common:dependency-injection"))
-                //DECOMPOSE
+                // DECOMPOSE
                 implementation(Decompose.decompose)
                 implementation(Decompose.extensionsCompose)
             }

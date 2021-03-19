@@ -22,33 +22,32 @@ import com.shabinder.common.di.providers.SpotifyProvider
 import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
 import com.shabinder.common.models.PlatformQueryResult
-import com.shabinder.database.Database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class FetchPlatformQueryResult(
     private val gaanaProvider: GaanaProvider,
-    val spotifyProvider: SpotifyProvider,
+    private val spotifyProvider: SpotifyProvider,
     val youtubeProvider: YoutubeProvider,
     val youtubeMusic: YoutubeMusic,
     val youtubeMp3: YoutubeMp3,
     private val dir: Dir
 ) {
-    private val db:DownloadRecordDatabaseQueries?
+    private val db: DownloadRecordDatabaseQueries?
         get() = dir.db?.downloadRecordDatabaseQueries
 
-    suspend fun query(link:String): PlatformQueryResult?{
-        val result = when{
-            //SPOTIFY
-            link.contains("spotify",true) ->
+    suspend fun query(link: String): PlatformQueryResult? {
+        val result = when {
+            // SPOTIFY
+            link.contains("spotify", true) ->
                 spotifyProvider.query(link)
 
-            //YOUTUBE
-            link.contains("youtube.com",true) || link.contains("youtu.be",true) ->
+            // YOUTUBE
+            link.contains("youtube.com", true) || link.contains("youtu.be", true) ->
                 youtubeProvider.query(link)
 
-            //GAANA
-            link.contains("gaana",true) ->
+            // GAANA
+            link.contains("gaana", true) ->
                 gaanaProvider.query(link)
 
             else -> {
@@ -56,7 +55,7 @@ class FetchPlatformQueryResult(
             }
         }
         result?.run {
-            withContext(Dispatchers.Default){
+            withContext(Dispatchers.Default) {
                 db?.add(
                     folderType, title, link, coverUrl, trackList.size.toLong()
                 )

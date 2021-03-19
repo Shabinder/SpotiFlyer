@@ -36,12 +36,12 @@ interface SpotiFlyerList {
     /*
     * Download All Tracks(after filtering already Downloaded)
     * */
-    fun onDownloadAllClicked(trackList:List<TrackDetails>)
+    fun onDownloadAllClicked(trackList: List<TrackDetails>)
 
     /*
     * Download All Tracks(after filtering already Downloaded)
     * */
-    fun onDownloadClicked(track:TrackDetails)
+    fun onDownloadClicked(track: TrackDetails)
 
     /*
     * To Pop and return back to Main Screen
@@ -51,7 +51,7 @@ interface SpotiFlyerList {
     /*
     * Load Image from cache/Internet and cache it
     * */
-    suspend fun loadImage(url:String): Picture
+    suspend fun loadImage(url: String): Picture
 
     /*
     * Sync Tracks Statuses
@@ -64,7 +64,7 @@ interface SpotiFlyerList {
         val dir: Dir
         val link: String
         val listOutput: Consumer<Output>
-        val showPopUpMessage:(String)->Unit
+        val showPopUpMessage: (String) -> Unit
         val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>
     }
     sealed class Output {
@@ -72,8 +72,8 @@ interface SpotiFlyerList {
     }
     data class State(
         val queryResult: PlatformQueryResult? = null,
-        val link:String = "",
-        val trackList:List<TrackDetails> = emptyList()
+        val link: String = "",
+        val trackList: List<TrackDetails> = emptyList()
     )
 }
 

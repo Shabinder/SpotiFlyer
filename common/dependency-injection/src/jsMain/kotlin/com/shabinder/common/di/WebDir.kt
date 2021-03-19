@@ -27,8 +27,8 @@ import kotlinext.js.Object
 import kotlinext.js.js
 import kotlinx.coroutines.flow.collect
 import org.khronos.webgl.ArrayBuffer
-import org.w3c.dom.ImageBitmap
 import org.khronos.webgl.Int8Array
+import org.w3c.dom.ImageBitmap
 
 actual class Dir actual constructor(
     private val logger: Kermit,
@@ -45,52 +45,52 @@ actual class Dir actual constructor(
     actual fun fileSeparator(): String = "/"
 
     actual fun imageCacheDir(): String = "TODO" +
-            fileSeparator() + "SpotiFlyer/.images" + fileSeparator()
+        fileSeparator() + "SpotiFlyer/.images" + fileSeparator()
 
     actual fun defaultDir(): String = "TODO" + fileSeparator() +
-            "SpotiFlyer" + fileSeparator()
+        "SpotiFlyer" + fileSeparator()
 
     actual fun isPresent(path: String): Boolean = false
 
-    actual fun createDirectory(dirPath:String){}
+    actual fun createDirectory(dirPath: String) {}
 
     actual suspend fun clearCache() {}
 
-    actual suspend fun cacheImage(image: Any,path:String) {}
+    actual suspend fun cacheImage(image: Any, path: String) {}
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    actual suspend  fun saveFileWithMetadata(
-            mp3ByteArray: ByteArray,
-            trackDetails: TrackDetails
+    actual suspend fun saveFileWithMetadata(
+        mp3ByteArray: ByteArray,
+        trackDetails: TrackDetails
     ) {
         val writer = ID3Writer(mp3ByteArray.toArrayBuffer())
-        val albumArt = downloadFile(corsApi+trackDetails.albumArtURL)
+        val albumArt = downloadFile(corsApi + trackDetails.albumArtURL)
         albumArt.collect {
-            when(it){
+            when (it) {
                 is DownloadResult.Success -> {
-                    logger.d{"Album Art Downloaded Success"}
+                    logger.d { "Album Art Downloaded Success" }
                     val albumArtObj = js {
                         this["type"] = 3
                         this["data"] = it.byteArray.toArrayBuffer()
                         this["description"] = "Cover Art"
                     }
-                    writeTagsAndSave(writer, albumArtObj as Object,trackDetails)
+                    writeTagsAndSave(writer, albumArtObj as Object, trackDetails)
                 }
                 is DownloadResult.Error -> {
-                    logger.d{"Album Art Downloading Error"}
-                    writeTagsAndSave(writer,null,trackDetails)
+                    logger.d { "Album Art Downloading Error" }
+                    writeTagsAndSave(writer, null, trackDetails)
                 }
-                is DownloadResult.Progress -> logger.d{"Album Art Downloading: ${it.progress}"}
+                is DownloadResult.Progress -> logger.d { "Album Art Downloading: ${it.progress}" }
             }
         }
     }
 
-    private suspend fun writeTagsAndSave(writer:ID3Writer, albumArt:Object?, trackDetails: TrackDetails){
+    private suspend fun writeTagsAndSave(writer: ID3Writer, albumArt: Object?, trackDetails: TrackDetails) {
         writer.apply {
             setFrame("TIT2", trackDetails.title)
             setFrame("TPE1", trackDetails.artists.toTypedArray())
-            setFrame("TALB", trackDetails.albumName?:"")
-            try{trackDetails.year?.substring(0,4)?.toInt()?.let { setFrame("TYER", it) }} catch(e:Exception){}
+            setFrame("TALB", trackDetails.albumName ?: "")
+            try { trackDetails.year?.substring(0, 4)?.toInt()?.let { setFrame("TYER", it) } } catch (e: Exception) {}
             setFrame("TPE2", trackDetails.artists.joinToString(","))
             setFrame("WOAS", trackDetails.source.toString())
             setFrame("TLEN", trackDetails.durationSec)
@@ -102,7 +102,7 @@ actual class Dir actual constructor(
         saveAs(writer.getBlob(), "${removeIllegalChars(trackDetails.title)}.mp3")
     }
 
-    actual fun addToLibrary(path:String){}
+    actual fun addToLibrary(path: String) {}
 
     actual suspend fun loadImage(url: String): Picture {
         return Picture(url)
@@ -110,12 +110,12 @@ actual class Dir actual constructor(
 
     private fun loadCachedImage(cachePath: String): ImageBitmap? = null
 
-    private suspend fun freshImage(url:String): ImageBitmap? = null
+    private suspend fun freshImage(url: String): ImageBitmap? = null
 
     actual val db: Database?
         get() = database
 }
 
-fun ByteArray.toArrayBuffer():ArrayBuffer{
+fun ByteArray.toArrayBuffer(): ArrayBuffer {
     return this.unsafeCast<Int8Array>().buffer
 }

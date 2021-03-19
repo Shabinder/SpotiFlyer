@@ -20,5 +20,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GaanaSong(
-    val tracks : List<GaanaTrack>
+    val tracks: List<GaanaTrack>
 )

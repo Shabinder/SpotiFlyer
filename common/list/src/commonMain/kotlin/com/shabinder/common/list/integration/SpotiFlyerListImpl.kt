@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.Flow
 internal class SpotiFlyerListImpl(
     componentContext: ComponentContext,
     dependencies: Dependencies
-): SpotiFlyerList,ComponentContext by componentContext, Dependencies by dependencies {
+) : SpotiFlyerList, ComponentContext by componentContext, Dependencies by dependencies {
 
     private val store =
         instanceKeeper.getStore {
@@ -51,11 +51,11 @@ internal class SpotiFlyerListImpl(
         store.accept(Intent.StartDownloadAll(trackList))
     }
 
-    override fun onDownloadClicked(track:TrackDetails) {
+    override fun onDownloadClicked(track: TrackDetails) {
         store.accept(Intent.StartDownload(track))
     }
 
-    override fun onBackPressed(){
+    override fun onBackPressed() {
         listOutput.callback(SpotiFlyerList.Output.Finished)
     }
 

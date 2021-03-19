@@ -17,7 +17,11 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.di.*
+import com.shabinder.common.di.Dir
+import com.shabinder.common.di.TokenStore
+import com.shabinder.common.di.currentPlatform
+import com.shabinder.common.di.finalOutputDir
+import com.shabinder.common.di.kotlinxSerializer
 import com.shabinder.common.di.spotify.SpotifyRequests
 import com.shabinder.common.di.spotify.authenticateSpotify
 import com.shabinder.common.models.AllPlatforms
@@ -27,10 +31,10 @@ import com.shabinder.common.models.spotify.Album
 import com.shabinder.common.models.spotify.Image
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.models.spotify.Track
-import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.request.*
+import io.ktor.client.HttpClient
+import io.ktor.client.features.defaultRequest
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.request.header
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -44,23 +48,22 @@ class SpotifyProvider(
     init {
         logger.d { "Creating Spotify Provider" }
         GlobalScope.launch(Dispatchers.Default) {
-            if(currentPlatform is AllPlatforms.Js){
+            if (currentPlatform is AllPlatforms.Js) {
                 authenticateSpotifyClient(override = true)
-            }else authenticateSpotifyClient()
+            } else authenticateSpotifyClient()
         }
     }
 
-    override suspend fun authenticateSpotifyClient(override:Boolean): HttpClient?{
-        val token = if(override) authenticateSpotify() else tokenStore.getToken()
-        return if(token == null) {
-            logger.d{ "Please Check your Network Connection" }
+    override suspend fun authenticateSpotifyClient(override: Boolean): HttpClient? {
+        val token = if (override) authenticateSpotify() else tokenStore.getToken()
+        return if (token == null) {
+            logger.d { "Please Check your Network Connection" }
             null
-        }
-        else{
+        } else {
             logger.d { "Spotify Provider Created with $token" }
             httpClient = HttpClient {
                 defaultRequest {
-                    header("Authorization","Bearer ${token.access_token}")
+                    header("Authorization", "Bearer ${token.access_token}")
                 }
                 install(JsonFeature) {
                     serializer = kotlinxSerializer
@@ -72,9 +75,9 @@ class SpotifyProvider(
 
     override lateinit var httpClient: HttpClient
 
-    suspend fun query(fullLink: String): PlatformQueryResult?{
+    suspend fun query(fullLink: String): PlatformQueryResult? {
 
-        if(!this::httpClient.isInitialized){
+        if (!this::httpClient.isInitialized) {
             authenticateSpotifyClient()
         }
 
@@ -82,20 +85,19 @@ class SpotifyProvider(
             "https://" + fullLink.substringAfterLast("https://").substringBefore(" ").trim()
 
         if (!spotifyLink.contains("open.spotify")) {
-            //Very Rare instance
+            // Very Rare instance
             spotifyLink = resolveLink(spotifyLink)
         }
 
         val link = spotifyLink.substringAfterLast('/', "Error").substringBefore('?')
         val type = spotifyLink.substringBeforeLast('/', "Error").substringAfterLast('/')
 
-
         if (type == "Error" || link == "Error") {
             return null
         }
 
         if (type == "episode" || type == "show") {
-            //TODO Implementation
+            // TODO Implementation
             return null
         }
 
@@ -106,7 +108,7 @@ class SpotifyProvider(
     }
 
     private suspend fun spotifySearch(
-        type:String,
+        type: String,
         link: String
     ): PlatformQueryResult {
         val result = PlatformQueryResult(
@@ -123,21 +125,13 @@ class SpotifyProvider(
                     getTrack(link).also {
                         folderType = "Tracks"
                         subFolder = ""
-                        if (dir.isPresent(
-                                dir.finalOutputDir(
-                                    it.name.toString(),
-                                    folderType,
-                                    subFolder,
-                                    dir.defaultDir()
-                                )
-                            )
-                        ) {//Download Already Present!!
-                            it.downloaded = com.shabinder.common.models.DownloadStatus.Downloaded
-                        }
+                        it.updateStatusIfPresent(folderType, subFolder)
                         trackList = listOf(it).toTrackDetailsList(folderType, subFolder)
                         title = it.name.toString()
-                        coverUrl = (it.album?.images?.elementAtOrNull(1)?.url
-                            ?: it.album?.images?.elementAtOrNull(0)?.url).toString()
+                        coverUrl = (
+                            it.album?.images?.elementAtOrNull(1)?.url
+                                ?: it.album?.images?.elementAtOrNull(0)?.url
+                            ).toString()
                     }
                 }
 
@@ -146,17 +140,7 @@ class SpotifyProvider(
                     folderType = "Albums"
                     subFolder = albumObject.name.toString()
                     albumObject.tracks?.items?.forEach {
-                        if (dir.isPresent(
-                                dir.finalOutputDir(
-                                    it.name.toString(),
-                                    folderType,
-                                    subFolder,
-                                    dir.defaultDir()
-                                )
-                            )
-                        ) {//Download Already Present!!
-                            it.downloaded = com.shabinder.common.models.DownloadStatus.Downloaded
-                        }
+                        it.updateStatusIfPresent(folderType, subFolder)
                         it.album = Album(
                             images = listOf(
                                 Image(
@@ -168,12 +152,14 @@ class SpotifyProvider(
                     }
                     albumObject.tracks?.items?.toTrackDetailsList(folderType, subFolder).let {
                         if (it.isNullOrEmpty()) {
-                            //TODO Handle Error
+                            // TODO Handle Error
                         } else {
                             trackList = it
                             title = albumObject.name.toString()
-                            coverUrl = (albumObject.images?.elementAtOrNull(1)?.url
-                                ?: albumObject.images?.elementAtOrNull(0)?.url).toString()
+                            coverUrl = (
+                                albumObject.images?.elementAtOrNull(1)?.url
+                                    ?: albumObject.images?.elementAtOrNull(0)?.url
+                                ).toString()
                         }
                     }
                 }
@@ -183,27 +169,17 @@ class SpotifyProvider(
                     folderType = "Playlists"
                     subFolder = playlistObject.name.toString()
                     val tempTrackList = mutableListOf<Track>()
-                    //log("Tracks Fetched", playlistObject.tracks?.items?.size.toString())
+                    // log("Tracks Fetched", playlistObject.tracks?.items?.size.toString())
                     playlistObject.tracks?.items?.forEach {
                         it.track?.let { it1 ->
-                            if (dir.isPresent(
-                                    dir.finalOutputDir(
-                                        it1.name.toString(),
-                                        folderType,
-                                        subFolder,
-                                        dir.defaultDir()
-                                    )
-                                )
-                            ) {//Download Already Present!!
-                                it1.downloaded = com.shabinder.common.models.DownloadStatus.Downloaded
-                            }
+                            it1.updateStatusIfPresent(folderType, subFolder)
                             tempTrackList.add(it1)
                         }
                     }
                     var moreTracksAvailable = !playlistObject.tracks?.next.isNullOrBlank()
 
                     while (moreTracksAvailable) {
-                        //Check For More Tracks If available
+                        // Check For More Tracks If available
                         val moreTracks =
                             getPlaylistTracks(link, offset = tempTrackList.size)
                         moreTracks.items?.forEach {
@@ -211,18 +187,18 @@ class SpotifyProvider(
                         }
                         moreTracksAvailable = !moreTracks.next.isNullOrBlank()
                     }
-                    //log("Total Tracks Fetched", tempTrackList.size.toString())
+                    // log("Total Tracks Fetched", tempTrackList.size.toString())
                     trackList = tempTrackList.toTrackDetailsList(folderType, subFolder)
                     title = playlistObject.name.toString()
                     coverUrl = playlistObject.images?.elementAtOrNull(1)?.url
                         ?: playlistObject.images?.firstOrNull()?.url.toString()
                 }
-                "episode" -> {//TODO
+                "episode" -> { // TODO
                 }
-                "show" -> {//TODO
+                "show" -> { // TODO
                 }
                 else -> {
-                    //TODO Handle Error
+                    // TODO Handle Error
                 }
             }
         }
@@ -234,18 +210,18 @@ class SpotifyProvider(
     * Fetching Standard Link: https://open.spotify.com/playlist/37i9dQZF1DX9RwfGbeGQwP?si=iWz7B1tETiunDntnDo3lSQ&amp;_branch_match_id=862039436205270630
     * */
     private suspend fun resolveLink(
-        url:String
-    ):String {
+        url: String
+    ): String {
         val response = getResponse(url)
         val regex = """https://open\.spotify\.com.+\w""".toRegex()
         return regex.find(response)?.value.toString()
     }
 
-    private fun List<Track>.toTrackDetailsList(type:String, subFolder:String) = this.map {
+    private fun List<Track>.toTrackDetailsList(type: String, subFolder: String) = this.map {
         TrackDetails(
             title = it.name.toString(),
             artists = it.artists?.map { artist -> artist?.name.toString() } ?: listOf(),
-            durationSec = (it.duration_ms/1000).toInt(),
+            durationSec = (it.duration_ms / 1000).toInt(),
             albumArtPath = dir.imageCacheDir() + (it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg",
             albumName = it.album?.name,
             year = it.album?.release_date,
@@ -254,7 +230,20 @@ class SpotifyProvider(
             downloaded = it.downloaded,
             source = Source.Spotify,
             albumArtURL = it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString(),
-            outputFilePath = dir.finalOutputDir(it.name.toString(),type, subFolder,dir.defaultDir()/*,".m4a"*/)
+            outputFilePath = dir.finalOutputDir(it.name.toString(), type, subFolder, dir.defaultDir()/*,".m4a"*/)
         )
+    }
+    private fun Track.updateStatusIfPresent(folderType: String, subFolder: String) {
+        if (dir.isPresent(
+                dir.finalOutputDir(
+                        name.toString(),
+                        folderType,
+                        subFolder,
+                        dir.defaultDir()
+                    )
+            )
+        ) { // Download Already Present!!
+            downloaded = com.shabinder.common.models.DownloadStatus.Downloaded
+        }
     }
 }

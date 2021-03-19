@@ -16,8 +16,6 @@
 
 package com.shabinder.common.models.wynk
 
-
-
 // Use Kotlinx JSON Parsing as in YT Music
 data class ShortURLWynk(
     val actualTotal: Int,
@@ -33,15 +31,15 @@ data class ShortURLWynk(
     val isFollowable: Boolean,
     val isHt: Boolean,
     val itemIds: List<String>,
-    val itemTypes: List<String>, //Songs , etc
+    val itemTypes: List<String>, // Songs , etc
     val items: List<ItemWynk>,
     val lang: String,
-    val largeImage: String, //Cover Image Alternate
+    val largeImage: String, // Cover Image Alternate
     val lastUpdated: Long,
     val offset: Int,
     val owner: String,
     val playIcon: Boolean,
-    val playlistImage: String, //Cover Image
+    val playlistImage: String, // Cover Image
     val redesignFeaturedImage: String,
     val shortUrl: String,
     val singers: List<SingerWynk>,

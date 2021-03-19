@@ -21,12 +21,19 @@ package com.shabinder.common.di.utils
 // implementation("org.jetbrains.kotlinx:atomicfu:0.14.4")
 // Gist: https://gist.github.com/fluidsonic/ba32de21c156bbe8424c8d5fc20dcd8e
 
-import io.ktor.utils.io.core.*
+import io.ktor.utils.io.core.Closeable
 import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.*
-import kotlinx.coroutines.selects.*
-import kotlin.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 
 class ParallelExecutor(
     parentContext: CoroutineContext,
@@ -38,11 +45,9 @@ class ParallelExecutor(
     private val killQueue = Channel<Unit>(Channel.UNLIMITED)
     private val operationQueue = Channel<Operation<*>>(Channel.RENDEZVOUS)
 
-
     init {
         startOrStopProcessors(expectedCount = concurrentOperationLimit.value, actualCount = 0)
     }
-
 
     override fun close() {
         if (!isClosed.compareAndSet(expect = false, update = true))
@@ -55,7 +60,6 @@ class ParallelExecutor(
         coroutineContext.cancel(cause)
     }
 
-
     private fun CoroutineScope.launchProcessor() = launch {
         while (true) {
             val operation = select<Operation<*>?> {
@@ -67,7 +71,6 @@ class ParallelExecutor(
         }
     }
 
-
     suspend fun <Result> execute(block: suspend () -> Result): Result =
         withContext(coroutineContext) {
             val operation = Operation(block)
@@ -76,7 +79,6 @@ class ParallelExecutor(
             operation.result.await()
         }
 
-
     // TODO This launches all coroutines in advance even if they're never needed. Find a lazy way to do this.
     fun setConcurrentOperationLimit(limit: Int) {
         require(limit >= 1) { "'limit' must be greater than zero: $limit" }
@@ -84,7 +86,6 @@ class ParallelExecutor(
 
         startOrStopProcessors(expectedCount = limit, actualCount = concurrentOperationLimit.getAndSet(limit))
     }
-
 
     private fun startOrStopProcessors(expectedCount: Int, actualCount: Int) {
         if (expectedCount == actualCount)
@@ -105,7 +106,6 @@ class ParallelExecutor(
             repeat(-change) { killQueue.offer(Unit) }
     }
 
-
     private class Operation<Result>(
         private val block: suspend () -> Result,
     ) {
@@ -114,12 +114,10 @@ class ParallelExecutor(
 
         val result: Deferred<Result> get() = _result
 
-
         suspend fun execute() {
             try {
                 _result.complete(block())
-            }
-            catch (e: Throwable) {
+            } catch (e: Throwable) {
                 _result.completeExceptionally(e)
             }
         }

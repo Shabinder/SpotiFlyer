@@ -20,7 +20,15 @@ import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.list.SpotiFlyerList.State
 import extras.RenderableComponent
 import kotlinx.coroutines.flow.Flow
-import kotlinx.css.*
+import kotlinx.css.Color
+import kotlinx.css.Display
+import kotlinx.css.FlexDirection
+import kotlinx.css.color
+import kotlinx.css.display
+import kotlinx.css.flexDirection
+import kotlinx.css.flexGrow
+import kotlinx.css.padding
+import kotlinx.css.px
 import kotlinx.html.id
 import react.RBuilder
 import styled.css
@@ -65,7 +73,7 @@ class ListScreen(
                         flexDirection = FlexDirection.column
                         color = Color.white
                     }
-                    state.data.trackList.forEachIndexed{ index, trackDetails ->
+                    state.data.trackList.forEachIndexed{ _, trackDetails ->
                         TrackItem {
                             details = trackDetails
                             downloadTrack = model::onDownloadClicked

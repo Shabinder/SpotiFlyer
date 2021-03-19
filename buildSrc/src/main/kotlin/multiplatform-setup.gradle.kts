@@ -14,17 +14,11 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import gradle.kotlin.dsl.accessors._2e23d8fadf0ed92ae13e19db3d83f86d.compose
-import gradle.kotlin.dsl.accessors._2e23d8fadf0ed92ae13e19db3d83f86d.kotlin
-import gradle.kotlin.dsl.accessors._2e23d8fadf0ed92ae13e19db3d83f86d.sourceSets
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.compose.compose
-
 plugins {
-//    id("com.android.library")
     id("android-setup")
     id("kotlin-multiplatform")
     id("org.jetbrains.compose")
+    id("ktlint-setup")
 }
 
 kotlin {
@@ -32,14 +26,12 @@ kotlin {
     android()
     js() {
         browser()
-        //nodejs()
+        // nodejs()
         binaries.executable()
     }
     sourceSets {
         named("commonMain") {
-            dependencies {
-
-            }
+            dependencies {}
         }
 
         named("androidMain") {

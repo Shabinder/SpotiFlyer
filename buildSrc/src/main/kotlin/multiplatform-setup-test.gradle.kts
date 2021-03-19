@@ -17,15 +17,16 @@
 plugins {
     id("com.android.library")
     id("kotlin-multiplatform")
+    id("ktlint-setup")
 }
 
 kotlin {
     jvm("desktop")
     android()
-    //ios()
+    // ios()
     js() {
         browser()
-        //nodejs()
+        // nodejs()
         binaries.executable()
     }
     sourceSets {
@@ -47,9 +48,7 @@ kotlin {
             }
         }
         named("jsTest") {
-            dependencies {
-
-            }
+            dependencies {}
         }
     }
 

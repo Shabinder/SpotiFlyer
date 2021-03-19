@@ -14,8 +14,6 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.jetbrains.compose.compose
-
 plugins {
     id("multiplatform-setup")
     id("android-setup")

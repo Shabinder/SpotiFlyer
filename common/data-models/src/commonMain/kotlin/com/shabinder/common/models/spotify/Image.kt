@@ -22,4 +22,5 @@ import kotlinx.serialization.Serializable
 data class Image(
     var width: Int? = null,
     var height: Int? = null,
-    var url: String? = null)
+    var url: String? = null
+)

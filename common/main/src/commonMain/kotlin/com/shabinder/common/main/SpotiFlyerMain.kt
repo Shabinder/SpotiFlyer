@@ -49,14 +49,14 @@ interface SpotiFlyerMain {
     /*
     * Load Image from cache/Internet and cache it
     * */
-    suspend fun loadImage(url:String): Picture
+    suspend fun loadImage(url: String): Picture
 
     interface Dependencies {
         val mainOutput: Consumer<Output>
         val storeFactory: StoreFactory
         val database: Database?
         val dir: Dir
-        val showPopUpMessage:(String)->Unit
+        val showPopUpMessage: (String) -> Unit
     }
 
     sealed class Output {

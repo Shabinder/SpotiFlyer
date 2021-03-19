@@ -20,26 +20,28 @@ import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import io.ktor.client.request.*
-import kotlinx.coroutines.*
+import io.ktor.client.request.head
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.withContext
 
-actual val currentPlatform:AllPlatforms = AllPlatforms.Js
+actual val currentPlatform: AllPlatforms = AllPlatforms.Js
 
-actual fun openPlatform(packageID:String, platformLink:String){
-    //TODO
+actual fun openPlatform(packageID: String, platformLink: String) {
+    // TODO
 }
 
-actual fun shareApp(){
-    //TODO
+actual fun shareApp() {
+    // TODO
 }
 
-actual fun giveDonation(){
-    //TODO
+actual fun giveDonation() {
+    // TODO
 }
 
-actual fun queryActiveTracks(){}
+actual fun queryActiveTracks() {}
 
 actual val dispatcherIO: CoroutineDispatcher = Dispatchers.Default
 
@@ -58,8 +60,8 @@ private suspend fun isInternetAvailable(): Boolean {
     }
 }
 
-actual val isInternetAvailable:Boolean
-    get(){
+actual val isInternetAvailable: Boolean
+    get() {
         return true
         /*var result = false
         val job = GlobalScope.launch { result = isInternetAvailable() }
@@ -68,28 +70,28 @@ actual val isInternetAvailable:Boolean
     }
 
 val DownloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = MutableSharedFlow(1)
-//Error:https://github.com/Kotlin/kotlinx.atomicfu/issues/182
-//val DownloadScope = ParallelExecutor(Dispatchers.Default) //Download Pool of 4 parallel
+// Error:https://github.com/Kotlin/kotlinx.atomicfu/issues/182
+// val DownloadScope = ParallelExecutor(Dispatchers.Default) //Download Pool of 4 parallel
 val allTracksStatus: HashMap<String, DownloadStatus> = hashMapOf()
 
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,
     fetcher: FetchPlatformQueryResult,
     dir: Dir
-){
+) {
     list.forEach {
-        withContext(Dispatchers.Default) {
+        withContext(dispatcherIO) {
             allTracksStatus[it.title] = DownloadStatus.Queued
-            if (!it.videoID.isNullOrBlank()) {//Video ID already known!
+            if (!it.videoID.isNullOrBlank()) { // Video ID already known!
                 downloadTrack(it.videoID!!, it, fetcher, dir)
             } else {
                 val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
-                val videoID = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery,it)
-                println(videoID+" : "+it.title)
+                val videoID = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery, it)
+                println(videoID + " : " + it.title)
                 if (videoID.isNullOrBlank()) {
                     allTracksStatus[it.title] = DownloadStatus.Failed
                     DownloadProgressFlow.emit(allTracksStatus)
-                } else {//Found Youtube Video ID
+                } else { // Found Youtube Video ID
                     downloadTrack(videoID, it, fetcher, dir)
                 }
             }
@@ -98,18 +100,18 @@ actual suspend fun downloadTracks(
     }
 }
 
-suspend fun downloadTrack(videoID: String, track: TrackDetails, fetcher:FetchPlatformQueryResult,dir:Dir) {
+suspend fun downloadTrack(videoID: String, track: TrackDetails, fetcher: FetchPlatformQueryResult, dir: Dir) {
     val url = fetcher.youtubeMp3.getMp3DownloadLink(videoID)
-    if(url == null){
+    if (url == null) {
         allTracksStatus[track.title] = DownloadStatus.Failed
         DownloadProgressFlow.emit(allTracksStatus)
         println("No URL to Download")
-    }else {
+    } else {
         downloadFile(url).collect {
-            when(it){
+            when (it) {
                 is DownloadResult.Success -> {
                     println("Download Completed")
-                   dir.saveFileWithMetadata(it.byteArray, track)
+                    dir.saveFileWithMetadata(it.byteArray, track)
                 }
                 is DownloadResult.Error -> {
                     allTracksStatus[track.title] = DownloadStatus.Failed

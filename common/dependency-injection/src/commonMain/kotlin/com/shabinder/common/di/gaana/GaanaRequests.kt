@@ -19,11 +19,15 @@ package com.shabinder.common.di.gaana
 import com.shabinder.common.di.currentPlatform
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.corsProxy
-import com.shabinder.common.models.gaana.*
-import io.ktor.client.*
-import io.ktor.client.request.*
+import com.shabinder.common.models.gaana.GaanaAlbum
+import com.shabinder.common.models.gaana.GaanaArtistDetails
+import com.shabinder.common.models.gaana.GaanaArtistTracks
+import com.shabinder.common.models.gaana.GaanaPlaylist
+import com.shabinder.common.models.gaana.GaanaSong
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
 
-val corsApi get() = if(currentPlatform is AllPlatforms.Js){
+val corsApi get() = if (currentPlatform is AllPlatforms.Js) {
     corsProxy.url
 } //  "https://spotiflyer-cors.azurewebsites.net/" //"https://spotiflyer-cors.herokuapp.com/"//"https://cors.bridged.cc/"
 else ""
@@ -33,7 +37,7 @@ private val BASE_URL get() = "${corsApi}https://api.gaana.com"
 
 interface GaanaRequests {
 
-    val httpClient:HttpClient
+    val httpClient: HttpClient
 
     /*
     * Api Request:  http://api.gaana.com/?type=playlist&subtype=playlist_detail&seokey=gaana-dj-hindi-top-50-1&token=b2e6d7fbc136547a940516e9b77e5990&format=JSON

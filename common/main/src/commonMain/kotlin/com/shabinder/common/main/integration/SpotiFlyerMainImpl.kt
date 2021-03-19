@@ -21,7 +21,10 @@ import com.arkivanov.mvikotlin.extensions.coroutines.states
 import com.shabinder.common.di.Picture
 import com.shabinder.common.di.isInternetAvailable
 import com.shabinder.common.main.SpotiFlyerMain
-import com.shabinder.common.main.SpotiFlyerMain.*
+import com.shabinder.common.main.SpotiFlyerMain.Dependencies
+import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
+import com.shabinder.common.main.SpotiFlyerMain.Output
+import com.shabinder.common.main.SpotiFlyerMain.State
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
 import com.shabinder.common.main.store.SpotiFlyerMainStoreProvider
 import com.shabinder.common.main.store.getStore
@@ -30,7 +33,7 @@ import kotlinx.coroutines.flow.Flow
 internal class SpotiFlyerMainImpl(
     componentContext: ComponentContext,
     dependencies: Dependencies
-): SpotiFlyerMain,ComponentContext by componentContext, Dependencies by dependencies {
+) : SpotiFlyerMain, ComponentContext by componentContext, Dependencies by dependencies {
 
     private val store =
         instanceKeeper.getStore {
@@ -44,7 +47,7 @@ internal class SpotiFlyerMainImpl(
     override val models: Flow<State> = store.states
 
     override fun onLinkSearch(link: String) {
-        if(isInternetAvailable) mainOutput.callback(Output.Search(link = link))
+        if (isInternetAvailable) mainOutput.callback(Output.Search(link = link))
         else showPopUpMessage("Check Network Connection Please")
     }
 

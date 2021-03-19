@@ -16,8 +16,6 @@
 
 package com.shabinder.common.di.utils
 
-
-
 /**
  * Removing Illegal Chars from File Name
  * **/

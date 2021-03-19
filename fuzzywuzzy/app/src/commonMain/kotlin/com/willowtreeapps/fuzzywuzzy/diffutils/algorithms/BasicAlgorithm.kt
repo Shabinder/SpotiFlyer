@@ -19,7 +19,6 @@ package com.willowtreeapps.fuzzywuzzy.diffutils.algorithms
 import com.willowtreeapps.fuzzywuzzy.ToStringFunction
 import com.willowtreeapps.fuzzywuzzy.diffutils.Applicable
 
-
 abstract class BasicAlgorithm : Applicable {
 
     var stringFunction: ToStringFunction<String>? = null

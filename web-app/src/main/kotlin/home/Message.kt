@@ -16,8 +16,13 @@
 
 package home
 
-import kotlinx.css.*
-import react.*
+import kotlinx.css.em
+import kotlinx.css.fontSize
+import react.RBuilder
+import react.RProps
+import react.ReactElement
+import react.child
+import react.functionalComponent
 import styled.css
 import styled.styledDiv
 import styled.styledH1

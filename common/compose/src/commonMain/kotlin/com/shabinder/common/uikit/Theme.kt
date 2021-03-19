@@ -20,11 +20,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 
 @Composable
-fun SpotiFlyerTheme(content: @Composable() () -> Unit) {
+fun SpotiFlyerTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-            colors = SpotiFlyerColors,
-            typography = SpotiFlyerTypography,
-            shapes = SpotiFlyerShapes,
-            content = content
+        colors = SpotiFlyerColors,
+        typography = SpotiFlyerTypography,
+        shapes = SpotiFlyerShapes,
+        content = content
     )
 }

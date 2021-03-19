@@ -21,7 +21,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TokenData(
-    var access_token:String?,
-    var token_type:String?,
-    @SerialName("expires_in") var expiry:Long?
+    var access_token: String?,
+    var token_type: String?,
+    @SerialName("expires_in") var expiry: Long?
 )

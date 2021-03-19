@@ -16,8 +16,18 @@
 
 package list
 
-import kotlinx.css.*
-import react.*
+import kotlinx.css.Display
+import kotlinx.css.JustifyContent
+import kotlinx.css.display
+import kotlinx.css.justifyContent
+import kotlinx.css.marginBottom
+import kotlinx.css.px
+import kotlinx.css.width
+import react.RBuilder
+import react.RProps
+import react.ReactElement
+import react.child
+import react.functionalComponent
 import styled.css
 import styled.styledDiv
 import styled.styledSpan

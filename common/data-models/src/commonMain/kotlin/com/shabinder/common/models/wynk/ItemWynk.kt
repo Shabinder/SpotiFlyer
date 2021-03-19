@@ -27,7 +27,7 @@ data class ItemWynk(
     val cues: List<String>,
     val downloadPrice: String,
     val downloadUrl: String,
-    val duration: Int, //in Seconds
+    val duration: Int, // in Seconds
     val exclusive: Boolean,
     val formats: List<String>,
     val htData: List<HtDataWynk>,
@@ -42,11 +42,11 @@ data class ItemWynk(
     val rentUrl: String,
     val serverEtag: String,
     val shortUrl: String,
-    val smallImage: String, //Cover Image after Replacing 120x120 with 720x720
+    val smallImage: String, // Cover Image after Replacing 120x120 with 720x720
     val subtitle: String, // String : `ArtistName - TrackName`
-    val subtitleId: String, //ARTIST NAME,artist-id , etc //USE SUBTITLE INSTEAD
+    val subtitleId: String, // ARTIST NAME,artist-id , etc //USE SUBTITLE INSTEAD
     val subtitleType: String, // ARTIST etc
     val title: String,
-    val type: String, //Song ,etc
+    val type: String, // Song ,etc
     val videoPresent: Boolean
 )

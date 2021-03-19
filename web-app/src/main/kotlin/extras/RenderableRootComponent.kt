@@ -19,7 +19,10 @@ package extras
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.ValueObserver
 import extras.RenderableRootComponent.Props
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
 import react.RComponent
 import react.RProps
 import react.RState

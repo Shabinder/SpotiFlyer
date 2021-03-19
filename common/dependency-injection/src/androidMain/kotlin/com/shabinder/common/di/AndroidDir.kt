@@ -21,7 +21,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaScannerConnection
 import android.os.Environment
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
@@ -55,33 +54,28 @@ actual class Dir actual constructor(
     @Suppress("DEPRECATION")
     actual fun defaultDir(): String =
         Environment.getExternalStorageDirectory().toString() + File.separator +
-                Environment.DIRECTORY_MUSIC + File.separator +
-                "SpotiFlyer"+ File.separator
+            Environment.DIRECTORY_MUSIC + File.separator +
+            "SpotiFlyer" + File.separator
 
     actual fun isPresent(path: String): Boolean = File(path).exists()
 
     actual fun createDirectory(dirPath: String) {
         val yourAppDir = File(dirPath)
 
-        if(!yourAppDir.exists() && !yourAppDir.isDirectory)
-        { // create empty directory
-            if (yourAppDir.mkdirs())
-            {logger.i{"$dirPath created"}}
-            else
-            {
-                logger.e{"Unable to create Dir: $dirPath!"}
+        if (!yourAppDir.exists() && !yourAppDir.isDirectory) { // create empty directory
+            if (yourAppDir.mkdirs()) { logger.i { "$dirPath created" } } else {
+                logger.e { "Unable to create Dir: $dirPath!" }
             }
-        }
-        else {
+        } else {
             logger.i { "$dirPath already exists" }
         }
     }
 
-    actual suspend fun clearCache(){
+    actual suspend fun clearCache() {
         File(imageCacheDir()).deleteRecursively()
     }
 
-    actual suspend fun cacheImage(image: Any,path:String) {
+    actual suspend fun cacheImage(image: Any, path: String) {
         try {
             FileOutputStream(path).use { out ->
                 (image as? Bitmap)?.compress(Bitmap.CompressFormat.JPEG, 100, out)
@@ -100,9 +94,9 @@ actual class Dir actual constructor(
         /*
         * Check , if Fetch was Used, File is saved Already, else write byteArray we Received
         * */
-        //if(!m4aFile.exists()) m4aFile.writeBytes(mp3ByteArray)
+        // if(!m4aFile.exists()) m4aFile.writeBytes(mp3ByteArray)
 
-        when(trackDetails.outputFilePath.substringAfterLast('.')){
+        when (trackDetails.outputFilePath.substringAfterLast('.')) {
             ".mp3" -> {
                 Mp3File(File(songFile.absolutePath))
                     .removeAllTags()
@@ -136,22 +130,23 @@ actual class Dir actual constructor(
                 }*/
             }
             else -> {
-                try{
+                try {
                     Mp3File(File(songFile.absolutePath))
                         .removeAllTags()
                         .setId3v1Tags(trackDetails)
                         .setId3v2TagsAndSaveFile(trackDetails)
                     addToLibrary(songFile.absolutePath)
-                }catch (e:Exception){e.printStackTrace()}
+                } catch (e: Exception) { e.printStackTrace() }
             }
         }
     }
 
-    actual fun addToLibrary(path:String) {
-        logger.d{"Scanning File"}
+    actual fun addToLibrary(path: String) {
+        logger.d { "Scanning File" }
         MediaScannerConnection.scanFile(
             appContext,
-            listOf(path).toTypedArray(), null,null)
+            listOf(path).toTypedArray(), null, null
+        )
     }
 
     actual suspend fun loadImage(url: String): Picture {
@@ -167,7 +162,7 @@ actual class Dir actual constructor(
             null
         }
     }
-    private suspend fun freshImage(url:String): Bitmap?{
+    private suspend fun freshImage(url: String): Bitmap? {
         return try {
             val source = URL(url)
             val connection: HttpURLConnection = source.openConnection() as HttpURLConnection
@@ -179,7 +174,7 @@ actual class Dir actual constructor(
 
             if (result != null) {
                 GlobalScope.launch(Dispatchers.IO) {
-                    cacheImage(result,imageCacheDir() + getNameURL(url))
+                    cacheImage(result, imageCacheDir() + getNameURL(url))
                 }
                 result
             } else null

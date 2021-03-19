@@ -26,4 +26,5 @@ data class PagingObjectTrack(
     var next: String? = null,
     var offset: Int = 0,
     var previous: String? = null,
-    var total: Int = 0)
+    var total: Int = 0
+)

@@ -24,4 +24,5 @@ data class LinkedTrack(
     var href: String? = null,
     var id: String? = null,
     var type: String? = null,
-    var uri: String? = null)
+    var uri: String? = null
+)

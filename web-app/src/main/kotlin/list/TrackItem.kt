@@ -18,10 +18,43 @@ package list
 
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import kotlinx.css.*
+import kotlinx.css.Align
+import kotlinx.css.Display
+import kotlinx.css.FlexDirection
+import kotlinx.css.Overflow
+import kotlinx.css.TextAlign
+import kotlinx.css.TextOverflow
+import kotlinx.css.WhiteSpace
+import kotlinx.css.alignItems
+import kotlinx.css.display
+import kotlinx.css.em
+import kotlinx.css.flexDirection
+import kotlinx.css.flexGrow
+import kotlinx.css.fontSize
+import kotlinx.css.height
+import kotlinx.css.margin
+import kotlinx.css.minWidth
+import kotlinx.css.overflow
+import kotlinx.css.padding
+import kotlinx.css.paddingRight
+import kotlinx.css.px
+import kotlinx.css.textAlign
+import kotlinx.css.textOverflow
+import kotlinx.css.whiteSpace
+import kotlinx.css.width
 import kotlinx.html.id
-import react.*
-import styled.*
+import react.RBuilder
+import react.RProps
+import react.ReactElement
+import react.child
+import react.functionalComponent
+import react.useEffect
+import react.useState
+import styled.css
+import styled.styledDiv
+import styled.styledH3
+import styled.styledH4
+import styled.styledImg
 
 external interface TrackItemProps : RProps {
     var details:TrackDetails

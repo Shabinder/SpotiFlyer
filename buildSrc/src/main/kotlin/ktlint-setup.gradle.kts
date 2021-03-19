@@ -14,9 +14,31 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.common.di
+plugins {
+    id("org.jlleitschuh.gradle.ktlint")
+    id("org.jlleitschuh.gradle.ktlint-idea")
+}
 
-sealed class NetworkResponse<out T> {
-    data class Success<T>(val value:T):NetworkResponse<T>()
-    data class Error(val message:String):NetworkResponse<Nothing>()
+subprojects {
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    apply(plugin = "org.jlleitschuh.gradle.ktlint-idea")
+    repositories {
+        // Required to download KtLint
+        mavenCentral()
+    }
+    ktlint {
+        android.set(true)
+        outputToConsole.set(true)
+        ignoreFailures.set(true)
+        coloredOutput.set(true)
+        verbose.set(true)
+        filter {
+            exclude("**/generated/**")
+            exclude("**/build/**")
+        }
+    }
+    // Optionally configure plugin
+    /*configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        debug.set(true)
+    }*/
 }

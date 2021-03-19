@@ -16,7 +16,6 @@
 
 package com.willowtreeapps.fuzzywuzzy
 
-
 /**
  * Transforms an item of type T to a String.
  *

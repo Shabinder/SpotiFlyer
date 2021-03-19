@@ -20,9 +20,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Artist (
-	val popularity : Int,
-	val seokey : String,
-	val name : String,
-	@SerialName("artwork_175x175")var artworkLink :String? = null
+data class Artist(
+    val popularity: Int,
+    val seokey: String,
+    val name: String,
+    @SerialName("artwork_175x175")var artworkLink: String? = null
 )

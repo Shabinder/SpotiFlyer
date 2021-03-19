@@ -22,9 +22,10 @@ import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpStatement
+import io.ktor.http.contentLength
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt
@@ -33,17 +34,17 @@ expect class Dir(
     logger: Kermit,
     database: Database? = createDatabase()
 ) {
-    val db :Database?
-    fun isPresent(path:String):Boolean
+    val db: Database?
+    fun isPresent(path: String): Boolean
     fun fileSeparator(): String
     fun defaultDir(): String
     fun imageCacheDir(): String
-    fun createDirectory(dirPath:String)
-    suspend fun cacheImage(image: Any,path: String) // in Android = ImageBitmap, Desktop = BufferedImage
-    suspend fun loadImage(url:String): Picture
+    fun createDirectory(dirPath: String)
+    suspend fun cacheImage(image: Any, path: String) // in Android = ImageBitmap, Desktop = BufferedImage
+    suspend fun loadImage(url: String): Picture
     suspend fun clearCache()
     suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, trackDetails: TrackDetails)
-    fun addToLibrary(path:String)
+    fun addToLibrary(path: String)
 }
 
 suspend fun downloadFile(url: String): Flow<DownloadResult> {
@@ -67,7 +68,7 @@ suspend fun downloadFile(url: String): Flow<DownloadResult> {
     }
 }
 fun getNameURL(url: String): String {
-    return url.substring(url.lastIndexOf('/',url.lastIndexOf('/')-1) + 1, url.length).replace('/','_')
+    return url.substring(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1, url.length).replace('/', '_')
 }
 /*
 * Call this function at startup!
@@ -80,7 +81,7 @@ fun Dir.createDirectories() {
     createDirectory(defaultDir() + "Playlists/")
     createDirectory(defaultDir() + "YT_Downloads/")
 }
-fun Dir.finalOutputDir(itemName:String, type:String, subFolder:String, defaultDir:String, extension:String = ".mp3" ): String =
+fun Dir.finalOutputDir(itemName: String, type: String, subFolder: String, defaultDir: String, extension: String = ".mp3"): String =
     defaultDir + removeIllegalChars(type) + this.fileSeparator() +
-            if(subFolder.isEmpty())"" else { removeIllegalChars(subFolder) + this.fileSeparator()} +
-            removeIllegalChars(itemName) + extension
+        if (subFolder.isEmpty())"" else { removeIllegalChars(subFolder) + this.fileSeparator() } +
+        removeIllegalChars(itemName) + extension

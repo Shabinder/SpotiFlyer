@@ -19,17 +19,17 @@ package com.shabinder.common.di.spotify
 import com.shabinder.common.di.isInternetAvailable
 import com.shabinder.common.di.kotlinxSerializer
 import com.shabinder.common.models.spotify.TokenData
-import io.ktor.client.*
-import io.ktor.client.features.auth.*
-import io.ktor.client.features.auth.providers.*
-import io.ktor.client.features.json.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.features.auth.Auth
+import io.ktor.client.features.auth.providers.basic
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.request.forms.FormDataContent
+import io.ktor.client.request.post
+import io.ktor.http.Parameters
 
 suspend fun authenticateSpotify(): TokenData? {
-    return if(isInternetAvailable) spotifyAuthClient.post("https://accounts.spotify.com/api/token"){
-        body = FormDataContent(Parameters.build { append("grant_type","client_credentials") })
+    return if (isInternetAvailable) spotifyAuthClient.post("https://accounts.spotify.com/api/token") {
+        body = FormDataContent(Parameters.build { append("grant_type", "client_credentials") })
     } else null
 }
 

@@ -17,16 +17,30 @@
 package com.shabinder.common.uikit
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -35,7 +49,6 @@ import com.shabinder.common.di.Picture
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun SpotiFlyerListContent(
@@ -44,23 +57,21 @@ fun SpotiFlyerListContent(
 ) {
     val model by component.models.collectAsState(SpotiFlyerList.State())
 
-    val coroutineScope = rememberCoroutineScope()
-
     Box(modifier = modifier.fillMaxSize()) {
-        //TODO Better Null Handling
+        // TODO Better Null Handling
         val result = model.queryResult
-        if(result == null){
-            Column(Modifier.fillMaxSize(),verticalArrangement = Arrangement.Center,horizontalAlignment = Alignment.CenterHorizontally) {
+        if (result == null) {
+            Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier.padding(8.dp))
-                Text("Loading..",style = appNameStyle,color = colorPrimary)
+                Text("Loading..", style = appNameStyle, color = colorPrimary)
             }
-        }else{
+        } else {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 content = {
                     item {
-                        CoverImage(result.title, result.coverUrl, coroutineScope,component::loadImage)
+                        CoverImage(result.title, result.coverUrl, component::loadImage)
                     }
                     itemsIndexed(model.trackList) { index, item ->
                         TrackCard(
@@ -73,7 +84,7 @@ fun SpotiFlyerListContent(
                 modifier = Modifier.fillMaxSize(),
             )
             DownloadAllButton(
-                onClick = {component.onDownloadAllClicked(model.trackList)},
+                onClick = { component.onDownloadAllClicked(model.trackList) },
                 modifier = Modifier.padding(bottom = 24.dp).align(Alignment.BottomCenter)
             )
         }
@@ -83,10 +94,10 @@ fun SpotiFlyerListContent(
 @Composable
 fun TrackCard(
     track: TrackDetails,
-    downloadTrack:()->Unit,
-    loadImage:suspend (String)-> Picture
+    downloadTrack: () -> Unit,
+    loadImage: suspend (String) -> Picture
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically,modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
         ImageLoad(
             track.albumArtURL,
             loadImage,
@@ -96,18 +107,18 @@ fun TrackCard(
                 .height(70.dp)
                 .clip(MaterialTheme.shapes.medium)
         )
-        Column(modifier = Modifier.padding(horizontal = 8.dp).height(60.dp).weight(1f),verticalArrangement = Arrangement.SpaceEvenly) {
-            Text(track.title,maxLines = 1,overflow = TextOverflow.Ellipsis,style = SpotiFlyerTypography.h6,color = colorAccent)
+        Column(modifier = Modifier.padding(horizontal = 8.dp).height(60.dp).weight(1f), verticalArrangement = Arrangement.SpaceEvenly) {
+            Text(track.title, maxLines = 1, overflow = TextOverflow.Ellipsis, style = SpotiFlyerTypography.h6, color = colorAccent)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Bottom,
                 modifier = Modifier.padding(horizontal = 8.dp).fillMaxSize()
-            ){
-                Text("${track.artists.firstOrNull()}...",fontSize = 12.sp,maxLines = 1)
-                Text("${track.durationSec/60} min, ${track.durationSec%60} sec",fontSize = 12.sp,maxLines = 1,overflow = TextOverflow.Ellipsis)
+            ) {
+                Text("${track.artists.firstOrNull()}...", fontSize = 12.sp, maxLines = 1)
+                Text("${track.durationSec / 60} min, ${track.durationSec % 60} sec", fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
-        when(track.downloaded){
+        when (track.downloaded) {
             is DownloadStatus.Downloaded -> {
                 DownloadImageTick()
             }
@@ -118,15 +129,19 @@ fun TrackCard(
                 DownloadImageError()
             }
             is DownloadStatus.Downloading -> {
-                CircularProgressIndicator(progress = (track.downloaded as DownloadStatus.Downloading).progress.toFloat()/100f)
+                CircularProgressIndicator(progress = (track.downloaded as DownloadStatus.Downloading).progress.toFloat() / 100f)
             }
             is DownloadStatus.Converting -> {
-                CircularProgressIndicator(progress = 100f,color = colorAccent)
+                CircularProgressIndicator(progress = 100f, color = colorAccent)
             }
             is DownloadStatus.NotDownloaded -> {
-                DownloadImageArrow(Modifier.clickable(onClick = {
-                    downloadTrack()
-                }))
+                DownloadImageArrow(
+                    Modifier.clickable(
+                        onClick = {
+                            downloadTrack()
+                        }
+                    )
+                )
             }
         }
     }
@@ -136,7 +151,6 @@ fun TrackCard(
 fun CoverImage(
     title: String,
     coverURL: String,
-    scope: CoroutineScope,
     loadImage: suspend (String) -> Picture,
     modifier: Modifier = Modifier,
 ) {
@@ -160,7 +174,6 @@ fun CoverImage(
             maxLines = 2,
             textAlign = TextAlign.Center,
             overflow = TextOverflow.Ellipsis,
-            //color = colorAccent,
         )
     }
     /*scope.launch {
@@ -173,7 +186,7 @@ fun DownloadAllButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     ExtendedFloatingActionButton(
         text = { Text("Download All") },
         onClick = onClick,
-        icon = { Icon(imageVector = DownloadAllImage(),"Download All Button",tint = Color(0xFF000000)) },
+        icon = { Icon(imageVector = DownloadAllImage(), "Download All Button", tint = Color(0xFF000000)) },
         backgroundColor = colorAccent,
         modifier = modifier
     )

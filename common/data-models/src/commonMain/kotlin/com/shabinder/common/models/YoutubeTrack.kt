@@ -21,8 +21,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class YoutubeTrack(
     var name: String? = null,
-    var type: String? = null,           // Song / Video
+    var type: String? = null, // Song / Video
     var artist: String? = null,
-    var duration:String? = null,
+    var duration: String? = null,
     var videoId: String? = null
 )

@@ -38,18 +38,20 @@ import kotlinx.coroutines.flow.map
 
 internal class SpotiFlyerMainStoreProvider(
     private val storeFactory: StoreFactory,
-    private val showPopUpMessage: (String)->Unit,
+    private val showPopUpMessage: (String) -> Unit,
     private val database: Database?
 ) {
 
     fun provide(): SpotiFlyerMainStore =
-        object : SpotiFlyerMainStore, Store<Intent, State, Nothing> by storeFactory.create(
-            name = "SpotiFlyerHomeStore",
-            initialState = State(),
-            bootstrapper = SimpleBootstrapper(Unit),
-            executorFactory = ::ExecutorImpl,
-            reducer = ReducerImpl
-        ) {}
+        object :
+            SpotiFlyerMainStore,
+            Store<Intent, State, Nothing> by storeFactory.create(
+                name = "SpotiFlyerHomeStore",
+                initialState = State(),
+                bootstrapper = SimpleBootstrapper(Unit),
+                executorFactory = ::ExecutorImpl,
+                reducer = ReducerImpl
+            ) {}
 
     val updates: Flow<List<DownloadRecord>>? =
         database?.downloadRecordDatabaseQueries
@@ -58,12 +60,11 @@ internal class SpotiFlyerMainStoreProvider(
             ?.mapToList(Dispatchers.Default)
             ?.map {
                 it.map { record ->
-                    record.run{
+                    record.run {
                         DownloadRecord(id, type, name, link, coverUrl, totalFiles)
                     }
                 }
             }
-
 
     private sealed class Result {
         data class ItemsLoaded(val items: List<DownloadRecord>) : Result()
@@ -91,10 +92,10 @@ internal class SpotiFlyerMainStoreProvider(
 
     private object ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
-             when (result) {
+            when (result) {
                 is Result.ItemsLoaded -> copy(records = result.items)
                 is Result.LinkChanged -> copy(link = result.link)
                 is Result.CategoryChanged -> copy(selectedCategory = result.category)
-             }
+            }
     }
 }

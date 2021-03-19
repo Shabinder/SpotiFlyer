@@ -16,16 +16,22 @@
 
 package home
 
-import com.shabinder.common.di.currentPlatform
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.State
-import com.shabinder.common.models.AllPlatforms
 import extras.RenderableComponent
 import kotlinx.browser.document
 import kotlinx.coroutines.flow.Flow
-import kotlinx.css.*
+import kotlinx.css.Align
+import kotlinx.css.Display
+import kotlinx.css.FlexDirection
+import kotlinx.css.JustifyContent
+import kotlinx.css.alignItems
+import kotlinx.css.display
+import kotlinx.css.flexDirection
+import kotlinx.css.flexGrow
+import kotlinx.css.justifyContent
 import kotlinx.dom.appendElement
-import react.*
+import react.RBuilder
 import styled.css
 import styled.styledDiv
 

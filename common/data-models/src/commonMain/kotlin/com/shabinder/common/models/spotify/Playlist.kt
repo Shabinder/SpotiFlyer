@@ -34,4 +34,5 @@ data class Playlist(
     var snapshot_id: String? = null,
     var tracks: PagingObjectPlaylistTrack? = null,
     var type: String? = null,
-    var uri: String? = null)
+    var uri: String? = null
+)

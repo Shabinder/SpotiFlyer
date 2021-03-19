@@ -22,9 +22,15 @@ import kotlinx.html.js.onChangeFunction
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.js.onKeyDownFunction
 import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.Window
-import react.*
-import styled.*
+import react.RBuilder
+import react.RProps
+import react.child
+import react.functionalComponent
+import styled.css
+import styled.styledButton
+import styled.styledDiv
+import styled.styledImg
+import styled.styledInput
 
 external interface SearchbarProps : RProps {
     var link: String

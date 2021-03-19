@@ -18,7 +18,10 @@ package com.willowtreeapps.fuzzywuzzy.diffutils
 
 import com.willowtreeapps.fuzzywuzzy.diffutils.structs.EditOp
 import com.willowtreeapps.fuzzywuzzy.diffutils.structs.EditType
-import com.willowtreeapps.fuzzywuzzy.diffutils.structs.EditType.*
+import com.willowtreeapps.fuzzywuzzy.diffutils.structs.EditType.DELETE
+import com.willowtreeapps.fuzzywuzzy.diffutils.structs.EditType.INSERT
+import com.willowtreeapps.fuzzywuzzy.diffutils.structs.EditType.KEEP
+import com.willowtreeapps.fuzzywuzzy.diffutils.structs.EditType.REPLACE
 import com.willowtreeapps.fuzzywuzzy.diffutils.structs.MatchingBlock
 import com.willowtreeapps.fuzzywuzzy.diffutils.structs.OpCode
 
@@ -39,18 +42,12 @@ object DiffUtils {
         var len2Copy = len2
 
         var len1o = 0
-        val len2o: Int
         var i = 0
-
-        val matrix: IntArray
-
-        val c1 = s1
-        val c2 = s2
 
         var p1 = 0
         var p2 = 0
 
-        while (len1Copy > 0 && len2Copy > 0 && c1[p1] == c2[p2]) {
+        while (len1Copy > 0 && len2Copy > 0 && s1[p1] == s2[p2]) {
             len1Copy--
             len2Copy--
 
@@ -60,10 +57,10 @@ object DiffUtils {
             len1o++
         }
 
-        len2o = len1o
+        val len2o: Int = len1o
 
         /* strip common suffix */
-        while (len1Copy > 0 && len2Copy > 0 && c1[p1 + len1Copy - 1] == c2[p2 + len2Copy - 1]) {
+        while (len1Copy > 0 && len2Copy > 0 && s1[p1 + len1Copy - 1] == s2[p2 + len2Copy - 1]) {
             len1Copy--
             len2Copy--
         }
@@ -71,7 +68,7 @@ object DiffUtils {
         len1Copy++
         len2Copy++
 
-        matrix = IntArray(len2Copy * len1Copy)
+        val matrix: IntArray = IntArray(len2Copy * len1Copy)
 
         while (i < len2Copy) {
             matrix[i] = i
@@ -90,7 +87,7 @@ object DiffUtils {
             var ptrC = i * len2Copy
             val ptrEnd = ptrC + len2Copy - 1
 
-            val char1 = c1[p1 + i - 1]
+            val char1 = s1[p1 + i - 1]
             var ptrChar2 = p2
 
             var x = i
@@ -99,7 +96,7 @@ object DiffUtils {
 
             while (ptrC <= ptrEnd) {
 
-                var c3 = matrix[ptrPrev++] + if (char1 != c2[ptrChar2++]) 1 else 0
+                var c3 = matrix[ptrPrev++] + if (char1 != s2[ptrChar2++]) 1 else 0
                 x++
 
                 if (x > c3) {
@@ -113,14 +110,12 @@ object DiffUtils {
                 }
 
                 matrix[ptrC++] = x
-
             }
             i++
-
         }
 
 
-        return editOpsFromCostMatrix(len1Copy, c1, p1, len1o, len2Copy, c2, p2, len2o, matrix)
+        return editOpsFromCostMatrix(len1Copy, s1, p1, len1o, len2Copy, s2, p2, len2o, matrix)
     }
 
 
@@ -134,11 +129,9 @@ object DiffUtils {
 
         var ptr: Int = len1 * len2 - 1
 
-        val ops: Array<EditOp?>
-
         var dir = 0
 
-        ops = arrayOfNulls(pos)
+        val ops: Array<EditOp?> = arrayOfNulls(pos)
 
         while (i > 0 || j > 0) {
 
@@ -246,10 +239,9 @@ object DiffUtils {
         val n = ops.size
 
         var noOfMB = 0
-        var i: Int
         var o = 0
 
-        i = n
+        var i: Int = n
         while (i-- != 0) {
 
             if (ops[o].type === KEEP) {
@@ -324,7 +316,6 @@ object DiffUtils {
         val n = ops.size
 
         var numberOfMatchingBlocks = 0
-        var i: Int
         var spos: Int
         var dpos: Int
 
@@ -335,7 +326,7 @@ object DiffUtils {
 
         var type: EditType
 
-        i = n
+        var i: Int = n
         while (i != 0) {
 
 

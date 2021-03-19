@@ -23,7 +23,7 @@ import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.spotify.Source
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -31,7 +31,7 @@ actual class YoutubeProvider actual constructor(
     private val httpClient: HttpClient,
     private val logger: Kermit,
     private val dir: Dir,
-){
+) {
     val ytDownloader: YoutubeDownloader = YoutubeDownloader()
     /*
     * YT Album Art Schema
@@ -42,38 +42,38 @@ actual class YoutubeProvider actual constructor(
     private val sampleDomain2 = "youtube.com"
     private val sampleDomain3 = "youtu.be"
 
-    actual suspend fun query(fullLink: String): PlatformQueryResult?{
+    actual suspend fun query(fullLink: String): PlatformQueryResult? {
         val link = fullLink.removePrefix("https://").removePrefix("http://")
-        if(link.contains("playlist",true) || link.contains("list",true)){
+        if (link.contains("playlist", true) || link.contains("list", true)) {
             // Given Link is of a Playlist
-            logger.i{ link }
+            logger.i { link }
             val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&").substringBefore("?")
-            return withContext(Dispatchers.IO){
+            return withContext(Dispatchers.IO) {
                 getYTPlaylist(
                     playlistId
                 )
             }
-        }else{//Given Link is of a Video
+        } else { // Given Link is of a Video
             var searchId = "error"
-            when{
-                link.contains(sampleDomain1,true) -> {//Youtube Music
-                    searchId = link.substringAfterLast("/","error").substringBefore("&").substringAfterLast("=")
+            when {
+                link.contains(sampleDomain1, true) -> { // Youtube Music
+                    searchId = link.substringAfterLast("/", "error").substringBefore("&").substringAfterLast("=")
                 }
-                link.contains(sampleDomain2,true) -> {//Standard Youtube Link
-                    searchId =  link.substringAfterLast("=","error").substringBefore("&")
+                link.contains(sampleDomain2, true) -> { // Standard Youtube Link
+                    searchId = link.substringAfterLast("=", "error").substringBefore("&")
                 }
-                link.contains(sampleDomain3,true) -> {//Shortened Youtube Link
-                    searchId = link.substringAfterLast("/","error").substringBefore("&")
+                link.contains(sampleDomain3, true) -> { // Shortened Youtube Link
+                    searchId = link.substringAfterLast("/", "error").substringBefore("&")
                 }
             }
-            return if(searchId != "error") {
-                withContext(Dispatchers.IO){
+            return if (searchId != "error") {
+                withContext(Dispatchers.IO) {
                     getYTTrack(
                         searchId
                     )
                 }
-            }else{
-                logger.d{"Your Youtube Link is not of a Video!!"}
+            } else {
+                logger.d { "Your Youtube Link is not of a Video!!" }
                 null
             }
         }
@@ -81,7 +81,7 @@ actual class YoutubeProvider actual constructor(
 
     private suspend fun getYTPlaylist(
         searchId: String
-    ): PlatformQueryResult?{
+    ): PlatformQueryResult? {
         val result = PlatformQueryResult(
             folderType = "",
             subFolder = "",
@@ -99,7 +99,7 @@ actual class YoutubeProvider actual constructor(
                 val videos = playlist.videos()
 
                 coverUrl = "https://i.ytimg.com/vi/${
-                    videos.firstOrNull()?.videoId()
+                videos.firstOrNull()?.videoId()
                 }/hqdefault.jpg"
                 title = name
 
@@ -113,11 +113,11 @@ actual class YoutubeProvider actual constructor(
                         albumArtURL = "https://i.ytimg.com/vi/${it.videoId()}/hqdefault.jpg",
                         downloaded = if (dir.isPresent(
                                 dir.finalOutputDir(
-                                    itemName = it.title(),
-                                    type = folderType,
-                                    subFolder = subFolder,
-                                    dir.defaultDir()
-                                )
+                                        itemName = it.title(),
+                                        type = folderType,
+                                        subFolder = subFolder,
+                                        dir.defaultDir()
+                                    )
                             )
                         )
                             DownloadStatus.Downloaded
@@ -130,16 +130,16 @@ actual class YoutubeProvider actual constructor(
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                logger.d{"An Error Occurred While Processing!"}
+                logger.d { "An Error Occurred While Processing!" }
             }
         }
-        return if(result.title.isNotBlank()) result
+        return if (result.title.isNotBlank()) result
         else null
     }
 
     @Suppress("DefaultLocale")
     private suspend fun getYTTrack(
-        searchId:String,
+        searchId: String,
     ): PlatformQueryResult? {
         val result = PlatformQueryResult(
             folderType = "",
@@ -148,15 +148,15 @@ actual class YoutubeProvider actual constructor(
             coverUrl = "",
             trackList = listOf(),
             Source.YouTube
-        ).apply{
+        ).apply {
             try {
-                logger.i{searchId}
+                logger.i { searchId }
                 val video = ytDownloader.getVideo(searchId)
                 coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
                 val detail = video?.details()
                 val name = detail?.title()?.replace(detail.author()!!.toUpperCase(), "", true)
                     ?: detail?.title() ?: ""
-                //logger.i{ detail.toString() }
+                // logger.i{ detail.toString() }
                 trackList = listOf(
                     TrackDetails(
                         title = name,
@@ -167,11 +167,11 @@ actual class YoutubeProvider actual constructor(
                         albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
                         downloaded = if (dir.isPresent(
                                 dir.finalOutputDir(
-                                    itemName = name,
-                                    type = folderType,
-                                    subFolder = subFolder,
-                                    defaultDir = dir.defaultDir()
-                                )
+                                        itemName = name,
+                                        type = folderType,
+                                        subFolder = subFolder,
+                                        defaultDir = dir.defaultDir()
+                                    )
                             )
                         )
                             DownloadStatus.Downloaded
@@ -185,10 +185,10 @@ actual class YoutubeProvider actual constructor(
                 title = name
             } catch (e: Exception) {
                 e.printStackTrace()
-                logger.e{"An Error Occurred While Processing!,$searchId"}
+                logger.e { "An Error Occurred While Processing!,$searchId" }
             }
         }
-        return if(result.title.isNotBlank()) result
+        return if (result.title.isNotBlank()) result
         else null
     }
 }

@@ -21,21 +21,32 @@ import com.shabinder.common.di.gaana.corsApi
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.YoutubeTrack
 import com.willowtreeapps.fuzzywuzzy.diffutils.FuzzySearch
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import kotlinx.serialization.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.headers
+import io.ktor.client.request.post
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonObject
 import kotlin.math.absoluteValue
 
 private const val apiKey = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30"
 
 class YoutubeMusic constructor(
     private val logger: Kermit,
-    private val httpClient:HttpClient,
+    private val httpClient: HttpClient,
 ) {
     private val tag = "YT Music"
 
-    suspend fun getYTIDBestMatch(query: String,trackDetails: TrackDetails):String?{
+    suspend fun getYTIDBestMatch(query: String, trackDetails: TrackDetails): String? {
         return sortByBestMatch(
             getYTTracks(query),
             trackName = trackDetails.title,
@@ -43,7 +54,7 @@ class YoutubeMusic constructor(
             trackDurationSec = trackDetails.durationSec
         ).keys.firstOrNull()
     }
-    private suspend fun getYTTracks(query: String):List<YoutubeTrack>{
+    private suspend fun getYTTracks(query: String): List<YoutubeTrack> {
         val youtubeTracks = mutableListOf<YoutubeTrack>()
 
         val responseObj = Json.parseToJsonElement(getYoutubeMusicResponse(query))
@@ -54,33 +65,35 @@ class YoutubeMusic constructor(
 
         val resultBlocks = mutableListOf<JsonArray>()
         if (contentBlocks != null) {
-            for (cBlock in contentBlocks){
+            for (cBlock in contentBlocks) {
                 /**
                  *Ignore user-suggestion
                  *The 'itemSectionRenderer' field is for user notices (stuff like - 'showing
                  *results for xyz, search for abc instead') we have no use for them, the for
                  *loop below if throw a keyError if we don't ignore them
                  */
-                if(cBlock.jsonObject.containsKey("itemSectionRenderer")){
+                if (cBlock.jsonObject.containsKey("itemSectionRenderer")) {
                     continue
                 }
 
-                for(contents in cBlock.jsonObject["musicShelfRenderer"]?.jsonObject?.get("contents")?.jsonArray
-                    ?: listOf()){
+                for (
+                    contents in cBlock.jsonObject["musicShelfRenderer"]?.jsonObject?.get("contents")?.jsonArray
+                        ?: listOf()
+                ) {
                     /**
                      *  apparently content Blocks without an 'overlay' field don't have linkBlocks
                      *  I have no clue what they are and why there even exist
                      *
-                    if(!contents.containsKey("overlay")){
-                    println(contents)
-                    continue
-                    TODO check and correct
-                    }*/
+                     if(!contents.containsKey("overlay")){
+                     println(contents)
+                     continue
+                     TODO check and correct
+                     }*/
 
                     val result = contents.jsonObject["musicResponsiveListItemRenderer"]
                         ?.jsonObject?.get("flexColumns")?.jsonArray
 
-                    //Add the linkBlock
+                    // Add the linkBlock
                     val linkBlock = contents.jsonObject["musicResponsiveListItemRenderer"]
                         ?.jsonObject?.get("overlay")
                         ?.jsonObject?.get("musicItemThumbnailOverlayRenderer")
@@ -122,7 +135,7 @@ class YoutubeMusic constructor(
             ! we do so only if their Type is 'Song' or 'Video
             */
 
-            for(result in resultBlocks){
+            for (result in resultBlocks) {
 
                 // Blindly gather available details
                 val availableDetails = mutableListOf<String>()
@@ -137,33 +150,33 @@ class YoutubeMusic constructor(
                 ! other constituents of a result block will lead to errors, hence the 'in
                 ! result[:-1] ,i.e., skip last element in array '
                 */
-                for(detailArray in result.subList(0,result.size-1)){
-                    for(detail in detailArray.jsonArray){
-                        if(detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]?.jsonObject?.size?:0 < 2) continue
+                for (detailArray in result.subList(0, result.size - 1)) {
+                    for (detail in detailArray.jsonArray) {
+                        if (detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]?.jsonObject?.size ?: 0 < 2) continue
 
                         // if not a dummy, collect All Variables
                         val details = detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]
                             ?.jsonObject?.get("text")
                             ?.jsonObject?.get("runs")?.jsonArray ?: listOf()
 
-                        for (d in details){
+                        for (d in details) {
                             d.jsonObject["text"]?.jsonPrimitive?.contentOrNull?.let {
-                                if(it != " • "){
+                                if (it != " • ") {
                                     availableDetails.add(it)
                                 }
                             }
                         }
                     }
                 }
-                //logger.d("YT Music details"){availableDetails.toString()}
+                // logger.d("YT Music details"){availableDetails.toString()}
                 /*
                 ! Filter Out non-Song/Video results and incomplete results here itself
                 ! From what we know about detail order, note that [1] - indicate result type
                 */
-                if ( availableDetails.size == 5 && availableDetails[1] in listOf("Song","Video") ){
+                if (availableDetails.size == 5 && availableDetails[1] in listOf("Song", "Video")) {
 
                     // skip if result is in hours instead of minutes (no song is that long)
-                    if(availableDetails[4].split(':').size != 2) continue
+                    if (availableDetails[4].split(':').size != 2) continue
 
                     /*
                     ! grab Video ID
@@ -173,7 +186,7 @@ class YoutubeMusic constructor(
                     ! reference the dict keys by index
                     */
 
-                    val videoId:String? = result.last().jsonObject["watchEndpoint"]?.jsonObject?.get("videoId")?.jsonPrimitive?.content
+                    val videoId: String? = result.last().jsonObject["watchEndpoint"]?.jsonObject?.get("videoId")?.jsonPrimitive?.content
                     val ytTrack = YoutubeTrack(
                         name = availableDetails[0],
                         type = availableDetails[1],
@@ -185,64 +198,63 @@ class YoutubeMusic constructor(
                 }
             }
         }
-        //logger.d {youtubeTracks.joinToString("\n")}
+        // logger.d {youtubeTracks.joinToString("\n")}
         return youtubeTracks
     }
 
     private fun sortByBestMatch(
-        ytTracks:List<YoutubeTrack>,
-        trackName:String,
-        trackArtists:List<String>,
-        trackDurationSec:Int,
-    ):Map<String,Int>{
+        ytTracks: List<YoutubeTrack>,
+        trackName: String,
+        trackArtists: List<String>,
+        trackDurationSec: Int,
+    ): Map<String, Int> {
         /*
         * "linksWithMatchValue" is map with Youtube VideoID and its rating/match with 100 as Max Value
         **/
-        val linksWithMatchValue = mutableMapOf<String,Int>()
+        val linksWithMatchValue = mutableMapOf<String, Int>()
 
-        for (result in ytTracks){
+        for (result in ytTracks) {
 
             // LoweCasing Name to match Properly
             // most song results on youtube go by $artist - $songName or artist1/artist2
             var hasCommonWord = false
 
-            val resultName = result.name?.toLowerCase()?.replace("-"," ")?.replace("/"," ") ?: ""
+            val resultName = result.name?.toLowerCase()?.replace("-", " ")?.replace("/", " ") ?: ""
             val trackNameWords = trackName.toLowerCase().split(" ")
 
-            for (nameWord in trackNameWords){
-                if (nameWord.isNotBlank() && FuzzySearch.partialRatio(nameWord,resultName) > 85) hasCommonWord = true
+            for (nameWord in trackNameWords) {
+                if (nameWord.isNotBlank() && FuzzySearch.partialRatio(nameWord, resultName) > 85) hasCommonWord = true
             }
 
             // Skip this Result if No Word is Common in Name
             if (!hasCommonWord) {
-                //log("YT Api Removing", result.toString())
+                // log("YT Api Removing", result.toString())
                 continue
             }
-
 
             // Find artist match
             // Will Be Using Fuzzy Search Because YT Spelling might be mucked up
             // match  = (no of artist names in result) / (no. of artist names on spotify) * 100
             var artistMatchNumber = 0
 
-            if(result.type == "Song"){
-                for (artist in trackArtists){
-                    if(FuzzySearch.ratio(artist.toLowerCase(),result.artist?.toLowerCase() ?: "") > 85)
+            if (result.type == "Song") {
+                for (artist in trackArtists) {
+                    if (FuzzySearch.ratio(artist.toLowerCase(), result.artist?.toLowerCase() ?: "") > 85)
                         artistMatchNumber++
                 }
-            }else{//i.e. is a Video
+            } else { // i.e. is a Video
                 for (artist in trackArtists) {
-                    if(FuzzySearch.partialRatio(artist.toLowerCase(),result.name?.toLowerCase() ?: "") > 85)
+                    if (FuzzySearch.partialRatio(artist.toLowerCase(), result.name?.toLowerCase() ?: "") > 85)
                         artistMatchNumber++
                 }
             }
 
-            if(artistMatchNumber == 0) {
-                //logger.d{ "YT Api Removing:   $result" }
+            if (artistMatchNumber == 0) {
+                // logger.d{ "YT Api Removing:   $result" }
                 continue
             }
 
-            val artistMatch = (artistMatchNumber / trackArtists.size ) * 100
+            val artistMatch = (artistMatchNumber / trackArtists.size) * 100
 
             // Duration Match
             /*! time match = 100 - (delta(duration)**2 / original duration * 100)
@@ -250,32 +262,34 @@ class YoutubeMusic constructor(
             ! seconds, we need to amplify the delta if it is to have any meaningful impact
             ! wen we calculate the avg match value*/
             val difference = result.duration?.split(":")?.get(0)?.toInt()?.times(60)
-                ?.plus(result.duration?.split(":")?.get(1)?.toInt()?:0)
+                ?.plus(result.duration?.split(":")?.get(1)?.toInt() ?: 0)
                 ?.minus(trackDurationSec)?.absoluteValue ?: 0
-            val nonMatchValue :Float= ((difference*difference).toFloat()/trackDurationSec.toFloat())
-            val durationMatch = 100 - (nonMatchValue*100)
+            val nonMatchValue: Float = ((difference * difference).toFloat() / trackDurationSec.toFloat())
+            val durationMatch = 100 - (nonMatchValue * 100)
 
-            val avgMatch = (artistMatch + durationMatch)/2
+            val avgMatch = (artistMatch + durationMatch) / 2
             linksWithMatchValue[result.videoId.toString()] = avgMatch.toInt()
         }
-        //logger.d("YT Api Result"){"$trackName - $linksWithMatchValue"}
-        return linksWithMatchValue.toList().sortedByDescending { it.second }.toMap()
+        // logger.d("YT Api Result"){"$trackName - $linksWithMatchValue"}
+        return linksWithMatchValue.toList().sortedByDescending { it.second }.toMap().also {
+            logger.d(tag) { "Match Found for $trackName - ${!it.isNullOrEmpty()}" }
+        }
     }
 
-    private suspend fun getYoutubeMusicResponse(query: String):String{
-        return httpClient.post("${corsApi}https://music.youtube.com/youtubei/v1/search?alt=json&key=$apiKey"){
+    private suspend fun getYoutubeMusicResponse(query: String): String {
+        return httpClient.post("${corsApi}https://music.youtube.com/youtubei/v1/search?alt=json&key=$apiKey") {
             contentType(ContentType.Application.Json)
-            headers{
-                append("referer","https://music.youtube.com/search")
+            headers {
+                append("referer", "https://music.youtube.com/search")
             }
             body = buildJsonObject {
-                putJsonObject("context"){
-                    putJsonObject("client"){
-                        put("clientName" ,"WEB_REMIX")
-                        put("clientVersion" ,"0.1")
+                putJsonObject("context") {
+                    putJsonObject("client") {
+                        put("clientName", "WEB_REMIX")
+                        put("clientVersion", "0.1")
                     }
                 }
-                put("query",query)
+                put("query", query)
             }
         }
     }

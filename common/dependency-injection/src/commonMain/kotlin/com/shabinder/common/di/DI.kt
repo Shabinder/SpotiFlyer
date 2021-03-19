@@ -23,10 +23,13 @@ import com.shabinder.common.di.providers.GaanaProvider
 import com.shabinder.common.di.providers.SpotifyProvider
 import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
-import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.logging.*
+import io.ktor.client.HttpClient
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.features.json.serializer.KotlinxSerializer
+import io.ktor.client.features.logging.DEFAULT
+import io.ktor.client.features.logging.LogLevel
+import io.ktor.client.features.logging.Logger
+import io.ktor.client.features.logging.Logging
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
@@ -40,23 +43,25 @@ fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclarat
 
 fun commonModule(enableNetworkLogs: Boolean) = module {
     single { createHttpClient(enableNetworkLogs = enableNetworkLogs) }
-    single { Dir(get(),createDatabase()) }
+    single { Dir(get(), createDatabase()) }
     single { Kermit(getLogger()) }
-    single { TokenStore(get(),get()) }
-    single { YoutubeMusic(get(),get()) }
-    single { SpotifyProvider(get(),get(),get()) }
-    single { GaanaProvider(get(),get(),get()) }
-    single { YoutubeProvider(get(),get(),get()) }
-    single { YoutubeMp3(get(),get(),get()) }
-    single { FetchPlatformQueryResult(get(),get(),get(),get(),get(),get()) }
+    single { TokenStore(get(), get()) }
+    single { YoutubeMusic(get(), get()) }
+    single { SpotifyProvider(get(), get(), get()) }
+    single { GaanaProvider(get(), get(), get()) }
+    single { YoutubeProvider(get(), get(), get()) }
+    single { YoutubeMp3(get(), get(), get()) }
+    single { FetchPlatformQueryResult(get(), get(), get(), get(), get(), get()) }
 }
 
-val kotlinxSerializer = KotlinxSerializer( Json {
-    isLenient = true
-    ignoreUnknownKeys = true
-})
+val kotlinxSerializer = KotlinxSerializer(
+    Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+    }
+)
 
-fun createHttpClient(enableNetworkLogs: Boolean = false,serializer: KotlinxSerializer = kotlinxSerializer) = HttpClient {
+fun createHttpClient(enableNetworkLogs: Boolean = false, serializer: KotlinxSerializer = kotlinxSerializer) = HttpClient {
     install(JsonFeature) {
         this.serializer = serializer
     }

@@ -24,30 +24,29 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 data class TrackDetails(
-    var title:String,
-    var artists:List<String>,
-    var durationSec:Int,
-    var albumName:String?=null,
-    var year:String?=null,
-    var comment:String?=null,
-    var lyrics:String?=null,
-    var trackUrl:String?=null,
+    var title: String,
+    var artists: List<String>,
+    var durationSec: Int,
+    var albumName: String? = null,
+    var year: String? = null,
+    var comment: String? = null,
+    var lyrics: String? = null,
+    var trackUrl: String? = null,
     var albumArtPath: String,
     var albumArtURL: String,
     var source: Source,
     val progress: Int = 2,
     val downloaded: DownloadStatus = DownloadStatus.NotDownloaded,
     var outputFilePath: String,
-    var videoID:String? = null,
-):Parcelable
-
+    var videoID: String? = null,
+) : Parcelable
 
 @Serializable
-sealed class DownloadStatus:Parcelable {
-    @Parcelize object Downloaded :DownloadStatus()
-    @Parcelize data class Downloading(val progress: Int = 2):DownloadStatus()
-    @Parcelize object Queued :DownloadStatus()
-    @Parcelize object NotDownloaded :DownloadStatus()
-    @Parcelize object Converting :DownloadStatus()
-    @Parcelize object Failed :DownloadStatus()
+sealed class DownloadStatus : Parcelable {
+    @Parcelize object Downloaded : DownloadStatus()
+    @Parcelize data class Downloading(val progress: Int = 2) : DownloadStatus()
+    @Parcelize object Queued : DownloadStatus()
+    @Parcelize object NotDownloaded : DownloadStatus()
+    @Parcelize object Converting : DownloadStatus()
+    @Parcelize object Failed : DownloadStatus()
 }

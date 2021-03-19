@@ -21,7 +21,13 @@ package com.shabinder.common.uikit
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -39,21 +45,21 @@ import kotlinx.coroutines.withContext
 
 @Composable
 actual fun ImageLoad(
-    link:String,
-    loader:suspend (String) -> Picture,
+    link: String,
+    loader: suspend (String) -> Picture,
     desc: String,
-    modifier:Modifier,
-    //placeholder: ImageVector
+    modifier: Modifier,
+    // placeholder: ImageVector
 ) {
     var pic by remember(link) { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(link){
+    LaunchedEffect(link) {
         withContext(dispatcherIO) {
             pic = loader(link).image
         }
     }
 
-    Crossfade(pic){
-        if(it == null) Image(PlaceHolderImage(), desc, modifier,contentScale = ContentScale.Crop) else Image(it, desc, modifier,contentScale = ContentScale.Crop)
+    Crossfade(pic) {
+        if (it == null) Image(PlaceHolderImage(), desc, modifier, contentScale = ContentScale.Crop) else Image(it, desc, modifier, contentScale = ContentScale.Crop)
     }
 }
 
@@ -68,9 +74,8 @@ actual fun pristineFont() = FontFamily(
     Font(R.font.pristine_script, FontWeight.Bold)
 )
 
-
 @Composable
-actual fun DownloadImageTick(){
+actual fun DownloadImageTick() {
     Image(
         painterResource(R.drawable.ic_tick),
         "Download Done"
@@ -78,7 +83,7 @@ actual fun DownloadImageTick(){
 }
 
 @Composable
-actual fun DownloadImageError(){
+actual fun DownloadImageError() {
     Image(
         painterResource(R.drawable.ic_error),
         "Error! Cant Download this track"
@@ -86,7 +91,7 @@ actual fun DownloadImageError(){
 }
 
 @Composable
-actual fun DownloadImageArrow(modifier: Modifier){
+actual fun DownloadImageArrow(modifier: Modifier) {
     Image(
         painterResource(R.drawable.ic_arrow),
         "Start Download",
@@ -125,16 +130,16 @@ actual fun YoutubeMusicLogo() = vectorResource(R.drawable.ic_youtube_music_logo)
 actual fun GithubLogo() = vectorResource(R.drawable.ic_github)
 
 @Composable
-fun vectorResource(@DrawableRes id: Int) =  ImageVector.Companion.vectorResource(id)
+fun vectorResource(@DrawableRes id: Int) = ImageVector.Companion.vectorResource(id)
 
 @Composable
 actual fun Toast(
     text: String,
     visibility: MutableState<Boolean>,
     duration: ToastDuration
-){
-    //We Have Android's Implementation of Toast so its just Empty
+) {
+    // We Have Android's Implementation of Toast so its just Empty
 }
-actual fun showPopUpMessage(text: String){
-    android.widget.Toast.makeText(appContext,text, android.widget.Toast.LENGTH_SHORT).show()
+actual fun showPopUpMessage(text: String) {
+    android.widget.Toast.makeText(appContext, text, android.widget.Toast.LENGTH_SHORT).show()
 }

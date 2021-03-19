@@ -40,8 +40,10 @@ import kotlin.math.pow
  */
 fun Modifier.verticalGradientScrim(
     color: Color,
-    /*@FloatRange(from = 0.0, to = 1.0)*/ startYPercentage: Float = 0f,
-    /*@FloatRange(from = 0.0, to = 1.0)*/ endYPercentage: Float = 1f,
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    startYPercentage: Float = 0f,
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    endYPercentage: Float = 1f,
     decay: Float = 1.0f,
     numStops: Int = 16,
     fixedHeight: Float? = null

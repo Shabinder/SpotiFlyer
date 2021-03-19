@@ -20,7 +20,7 @@ import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.TrackDetails
 import kotlinx.coroutines.CoroutineDispatcher
 
-expect fun openPlatform(packageID:String, platformLink:String)
+expect fun openPlatform(packageID: String, platformLink: String)
 
 expect fun shareApp()
 
@@ -28,7 +28,7 @@ expect fun giveDonation()
 
 expect val dispatcherIO: CoroutineDispatcher
 
-expect val isInternetAvailable:Boolean
+expect val isInternetAvailable: Boolean
 
 expect val currentPlatform: AllPlatforms
 
