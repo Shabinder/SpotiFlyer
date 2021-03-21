@@ -95,7 +95,7 @@ dependencies {
     implementation(Decompose.extensionsCompose)
 
     //Firebase
-    implementation(platform("com.google.firebase:firebase-bom:26.5.0"))
+    implementation(platform("com.google.firebase:firebase-bom:26.7.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-perf-ktx")
