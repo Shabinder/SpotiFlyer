@@ -1,0 +1,35 @@
+name: Refresh Terraform State
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  refresh-Infrastructure:
+    runs-on: ubuntu-latest
+    name: Refresh Main Infrastructure
+    env:
+      ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
+      ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Terraform environment
+        uses: little-core-labs/install-terraform@v2.0.0
+        with:
+          version: 0.14.5
+      - name: Terraform init
+        run: terraform init
+        working-directory: infra
+      - name: Terraform refresh
+        run: terraform refresh
+        working-directory: infra
+        env:
+          TF_VAR_docker_registry_username: ${{ secrets.GH_PKG_USER }}
+          TF_VAR_docker_registry_password: ${{ secrets.GH_PKG_PASSWORD }}
