@@ -1,0 +1,95 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  release:
+    types: [ created ]
+
+jobs:
+  build:
+    name: Build App
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Restore Gradle cache
+        id: cache
+        uses: actions/cache@v2.1.4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - uses: actions/setup-java@v1.4.3
+        with:
+          java-version: 1.8
+      - name: Build Web App
+        run: ./gradlew :web-app:build
+      - name: Upload Static Web App Artifact
+        uses: actions/upload-artifact@v2
+        id: upload
+        with:
+          path: web-app/build/distributions
+          name: static-web-app
+          if-no-files-found: error
+
+  deploy-Infrastructure:
+    runs-on: ubuntu-latest
+    name: Deploy Main Infrastructure
+    needs: [ build ]
+    env:
+      ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
+      ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Terraform environment
+        uses: little-core-labs/install-terraform@v2.0.0
+        with:
+          version: 0.14.5
+      - name: Terraform init
+        run: terraform init
+        working-directory: infra
+      - name: Terraform apply
+        run: terraform apply -auto-approve
+        working-directory: infra
+        env:
+          TF_VAR_docker_registry_username: ${{ secrets.GH_PKG_USER }}
+          TF_VAR_docker_registry_password: ${{ secrets.GH_PKG_PASSWORD }}
+          TF_VAR_api_admin_user: ${{ secrets.API_ADMIN_USER }}
+          TF_VAR_api_admin_password: ${{ secrets.API_ADMIN_PASSWORD }}
+          TF_VAR_cors_anywhere_allow_list: ""
+          TF_VAR_cors_anywhere_rate_limit: ""
+
+  deploy-StaticWebApp:
+    runs-on: ubuntu-latest
+    name: Deploy Static Web App
+    needs: [ build ]
+    steps:
+      - name: Download Static Web App Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: static-web-app
+          path: dist/
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.0
+        with:
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: dist/ # The folder the action should deploy.
+          CLEAN: true # Automatically remove deleted files from the deploy branch
+#      - name: Deploy Azure Static Web App
+#        uses: Azure/static-web-apps-deploy@v0.0.1-preview
+#        with:
+#          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AMBITIOUS_WATER_0BC116E03 }}
+#          repo_token: ${{ github.token }} # Used for Github integrations (i.e. PR comments)
+#          action: "upload"
+#          ###### Repository/Build Configurations - These values can be configured to match you app requirements. ######
+#          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
+#          app_location: "/dist"
+#          ###### End of Repository/Build Configurations ######
