@@ -19,12 +19,3 @@ jobs:
       # Build application
       - name: Test and Build
         run: ./gradlew :web-app:build
-
-      # If main branch update, deploy to gh-pages
-      - name: Deploy
-        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/KMP'
-        uses: JamesIves/github-pages-deploy-action@4.1.0
-        with:
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: web-app/build/distributions # The folder the action should deploy.
-          CLEAN: true # Automatically remove deleted files from the deploy branch
