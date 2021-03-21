@@ -41,7 +41,6 @@ jobs:
     env:
       ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
       ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-      ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
@@ -62,8 +61,6 @@ jobs:
         env:
           TF_VAR_docker_registry_username: ${{ secrets.GH_PKG_USER }}
           TF_VAR_docker_registry_password: ${{ secrets.GH_PKG_PASSWORD }}
-          TF_VAR_api_admin_user: ${{ secrets.API_ADMIN_USER }}
-          TF_VAR_api_admin_password: ${{ secrets.API_ADMIN_PASSWORD }}
           TF_VAR_cors_anywhere_allow_list: ""
           TF_VAR_cors_anywhere_rate_limit: ""
 
@@ -72,6 +69,7 @@ jobs:
     name: Deploy Static Web App
     needs: [ build ]
     steps:
+      - uses: actions/checkout@v2
       - name: Download Static Web App Artifact
         uses: actions/download-artifact@v2
         with:
