@@ -29,7 +29,7 @@ kotlin {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
                 implementation(project(":fuzzywuzzy:app"))
-                implementation("org.jetbrains.kotlinx:atomicfu:0.15.1")
+                implementation("org.jetbrains.kotlinx:atomicfu:0.15.2")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
                 implementation(Ktor.clientCore)
