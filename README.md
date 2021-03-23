@@ -66,7 +66,7 @@ Have any questions, doubts or want to present your opinions, views? You're alway
 The availability of YouTube Music in your country is important for this app to work since we use YouTube Music to filter out our search results.
 To check if YouTube Music is available in your country, visit [YouTube Music](https://music.youtube.com).
 
-I am hosting a **server for WEB APP on my own personal device** , so expect some downtimes, If you have a **server** available and would like to share , open an issue or ping me wherever you can get a hold of me.
+<!--I am hosting a **server for WEB APP on my own personal device** , so expect some downtimes, If you have a **server** available and would like to share , open an issue or ping me wherever you can get a hold of me.-->
 
 License
 ![GPL-License](https://img.shields.io/github/license/Shabinder/SpotiFlyer?style=flat-square)
