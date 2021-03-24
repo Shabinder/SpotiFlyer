@@ -30,7 +30,8 @@ class YoutubeMp3(
 ) : Yt1sMp3 {
     suspend fun getMp3DownloadLink(videoID: String): String? = getLinkFromYt1sMp3(videoID)?.let {
         if (currentPlatform is AllPlatforms.Js/* && corsProxy !is CorsProxy.PublicProxyWithExtension*/)
-            "https://spotiflyer.azurewebsites.net/$it"
+            "https://kind-grasshopper-73.telebit.io/cors/$it"
+            // "https://spotiflyer.azurewebsites.net/$it" // Data OUT Limit issue 
         else it
     }
 }
