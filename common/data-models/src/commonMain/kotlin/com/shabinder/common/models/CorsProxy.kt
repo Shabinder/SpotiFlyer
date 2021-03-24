@@ -17,7 +17,7 @@
 package com.shabinder.common.models
 
 sealed class CorsProxy(open val url: String) {
-    data class SelfHostedCorsProxy(override val url: String = "https://spotiflyer.azurewebsites.net/") : CorsProxy(url)
+    data class SelfHostedCorsProxy(override val url: String = "https://kind-grasshopper-73.telebit.io/cors/" /*"https://spotiflyer.azurewebsites.net/"*/) : CorsProxy(url)
     data class PublicProxyWithExtension(override val url: String = "https://cors.bridged.cc/") : CorsProxy(url)
 
     fun toggle(mode: CorsProxy? = null): CorsProxy {
