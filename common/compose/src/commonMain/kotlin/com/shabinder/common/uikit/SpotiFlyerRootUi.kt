@@ -14,6 +14,8 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package com.shabinder.common.uikit
 
 import androidx.compose.animation.core.MutableTransitionState
@@ -37,6 +39,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -48,6 +51,7 @@ import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfadeScale
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.uikit.splash.Splash
@@ -58,39 +62,39 @@ import com.shabinder.common.uikit.utils.verticalGradientScrim
 private var isSplashShown = SplashState.Shown
 
 @Composable
-fun SpotiFlyerRootContent(component: SpotiFlyerRoot, statusBarHeight: Dp = 0.dp): SpotiFlyerRoot {
+fun SpotiFlyerRootContent(component: SpotiFlyerRoot, modifier: Modifier = Modifier): SpotiFlyerRoot {
 
     val transitionState = remember { MutableTransitionState(SplashState.Shown) }
-    val transition = updateTransition(transitionState)
+    val transition = updateTransition(transitionState, label = "transition")
 
     val splashAlpha by transition.animateFloat(
-        transitionSpec = { tween(durationMillis = 100) }
+        transitionSpec = { tween(durationMillis = 100) }, label = "Splash-Alpha"
     ) {
         if (it == SplashState.Shown && isSplashShown == SplashState.Shown) 1f else 0f
     }
     val contentAlpha by transition.animateFloat(
-        transitionSpec = { tween(durationMillis = 300) }
+        transitionSpec = { tween(durationMillis = 300) }, label = "Content-Alpha"
     ) {
         if (it == SplashState.Shown && isSplashShown == SplashState.Shown) 0f else 1f
     }
     val contentTopPadding by transition.animateDp(
-        transitionSpec = { spring(stiffness = StiffnessLow) }
+        transitionSpec = { spring(stiffness = StiffnessLow) }, label = "Content-Padding"
     ) {
         if (it == SplashState.Shown && isSplashShown == SplashState.Shown) 100.dp else 0.dp
     }
 
     Box {
         Splash(
-            modifier = Modifier.alpha(splashAlpha),
+            modifier = modifier.alpha(splashAlpha),
             onTimeout = {
                 transitionState.targetState = SplashState.Completed
                 isSplashShown = SplashState.Completed
             }
         )
         MainScreen(
-            Modifier.alpha(contentAlpha),
+            modifier,
+            contentAlpha,
             contentTopPadding,
-            statusBarHeight,
             component
         )
     }
@@ -98,20 +102,19 @@ fun SpotiFlyerRootContent(component: SpotiFlyerRoot, statusBarHeight: Dp = 0.dp)
 }
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier, topPadding: Dp = 0.dp, statusBarHeight: Dp = 0.dp, component: SpotiFlyerRoot) {
+fun MainScreen(modifier: Modifier = Modifier, alpha: Float,topPadding: Dp = 0.dp, component: SpotiFlyerRoot) {
 
     val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.65f)
 
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
+            .alpha(alpha)
             .verticalGradientScrim(
                 color = colorPrimaryDark.copy(alpha = 0.38f),
                 startYPercentage = 0.29f,
                 endYPercentage = 0f,
-            )
+            ).then(modifier)
     ) {
-        Spacer(Modifier.background(appBarColor).height(statusBarHeight).fillMaxWidth())
-        LocalViewConfiguration.current
 
         AppBar(
             backgroundColor = appBarColor,
@@ -120,8 +123,9 @@ fun MainScreen(modifier: Modifier = Modifier, topPadding: Dp = 0.dp, statusBarHe
         Spacer(Modifier.padding(top = topPadding))
         Children(
             routerState = component.routerState,
-        ) { child, _ ->
-            when (child) {
+            animation = crossfadeScale()
+        ) {
+            when (val child = it.instance) {
                 is Child.Main -> SpotiFlyerMainContent(component = child.component)
                 is Child.List -> SpotiFlyerListContent(component = child.component)
             }

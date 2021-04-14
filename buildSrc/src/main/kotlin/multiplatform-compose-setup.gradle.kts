@@ -22,15 +22,23 @@ plugins {
 }
 
 kotlin {
-    jvm("desktop")
-    android()
+    jvm("desktop").compilations.all {
+        kotlinOptions {
+            useIR = true
+        }
+    }
+    android().compilations.all {
+        kotlinOptions {
+            useIR = true
+        }
+    }
     sourceSets {
         named("commonMain") {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3-native-mt")
             }
         }
 

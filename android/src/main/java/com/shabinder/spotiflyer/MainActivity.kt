@@ -37,6 +37,7 @@ import androidx.compose.material.icons.rounded.SystemSecurityUpdate
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +50,10 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.statusBarsHeight
+import com.google.accompanist.insets.statusBarsPadding
 import com.razorpay.Checkout
 import com.razorpay.PaymentResultListener
 import com.shabinder.common.database.activityContext
@@ -58,6 +63,7 @@ import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.uikit.*
+import com.shabinder.common.uikit.utils.verticalGradientScrim
 import com.shabinder.spotiflyer.utils.*
 import com.tonyodev.fetch2.Status
 import kotlinx.coroutines.*
@@ -88,24 +94,29 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
         setContent {
             SpotiFlyerTheme {
                 Surface(contentColor = colorOffWhite) {
+                    ProvideWindowInsets {
+                        permissionGranted = remember { mutableStateOf(true) }
+                        val view = LocalView.current
 
-                    var statusBarHeight by remember { mutableStateOf(27.dp) }
-                    permissionGranted = remember { mutableStateOf(true) }
-                    val view = LocalView.current
-
-                    LaunchedEffect(view){
-                        permissionGranted.value = checkPermissions()
-                        view.setOnApplyWindowInsetsListener { _, insets ->
-                            statusBarHeight = insets.systemWindowInsetTop.dp
-                            insets
+                        LaunchedEffect(view) {
+                            permissionGranted.value = checkPermissions()
                         }
+                        Box {
+                            root = SpotiFlyerRootContent(
+                                rememberRootComponent(::spotiFlyerRoot),
+                                Modifier.statusBarsPadding().navigationBarsPadding()
+                            )
+                            Spacer(
+                                Modifier
+                                    .statusBarsHeight()
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colors.background.copy(alpha = 0.65f))
+                            )
+                        }
+
+                        NetworkDialog()
+                        PermissionDialog()
                     }
-
-                    root = SpotiFlyerRootContent(rememberRootComponent(::spotiFlyerRoot),statusBarHeight)
-
-
-                    NetworkDialog()
-                    PermissionDialog()
                 }
             }
         }

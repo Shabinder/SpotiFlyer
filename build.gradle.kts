@@ -33,4 +33,9 @@ allprojects {
         maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")
         maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions {
+            useIR = true
+        }
+    }
 }

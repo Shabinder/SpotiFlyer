@@ -21,10 +21,21 @@ plugins {
 }
 
 kotlin {
-    jvm("desktop")
-    android()
-    // ios()
+    jvm("desktop").compilations.all {
+        kotlinOptions {
+            useIR = true
+        }
+    }
+    android().compilations.all {
+        kotlinOptions {
+            useIR = true
+        }
+    }
     js() {
+        /*
+        * TODO Enable JS IR Compiler
+        *  waiting for Decompose & MVI Kotlin to support same
+        * */
         browser()
         // nodejs()
         binaries.executable()

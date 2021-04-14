@@ -49,7 +49,7 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-
+    kotlinOptions.useIR = true
     compileOptions {
         // Flag to enable support for the new language APIs
         //coreLibraryDesugaringEnabled = true
@@ -68,6 +68,7 @@ android {
     packagingOptions {
         exclude("META-INF/*")
     }
+    buildToolsVersion = "30.0.3"
     /*buildFeatures {
         compose = true
     }
@@ -90,12 +91,14 @@ dependencies {
     implementation(Koin.android)
     implementation(Koin.compose)
 
+    implementation("com.google.accompanist:accompanist-insets:0.7.1")
+
     //DECOMPOSE
     implementation(Decompose.decompose)
     implementation(Decompose.extensionsCompose)
 
     //Firebase
-    implementation(platform("com.google.firebase:firebase-bom:26.5.0"))
+    implementation(platform("com.google.firebase:firebase-bom:27.0.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-perf-ktx")
@@ -129,16 +132,5 @@ dependencies {
     androidTestImplementation(Androidx.expresso)
 
     //Desugaring
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.1")
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-        freeCompilerArgs = listOf(
-            "-Xallow-jvm-ir-dependencies","-Xallow-unstable-dependencies",
-            "-Xskip-prerelease-check",
-            "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi"
-        )
-    }
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 }

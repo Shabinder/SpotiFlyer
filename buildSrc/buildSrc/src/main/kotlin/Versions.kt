@@ -17,12 +17,12 @@
 @file:Suppress("MayBeConstant", "SpellCheckingInspection")
 
 object Versions {
+    // App's Version (To be bumped at each update)
     const val versionName = "2.2.0"
-    const val kotlinVersion = "1.4.31"
 
+    // Kotlin
+    const val kotlinVersion = "1.4.32"
     const val coroutinesVersion = "1.4.2"
-
-    const val coilVersion = "0.4.1"
 
     // Code Formatting
     const val ktLint = "10.0.0"
@@ -34,9 +34,9 @@ object Versions {
     const val kermit = "0.1.8"
 
     // Internet
-    const val ktor = "1.5.2"
+    const val ktor = "1.5.3"
 
-    const val kotlinxSerialization = "1.1.0-RC"
+    const val kotlinxSerialization = "1.1.0"
     // Database
     const val sqlDelight = "1.4.4"
 
@@ -86,19 +86,19 @@ object JetBrains {
 
     object Compose {
         // __LATEST_COMPOSE_RELEASE_VERSION__
-        const val VERSION = "0.3.2"
+        const val VERSION = "0.4.0-build182"
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
     }
 }
 object Decompose {
-    private const val VERSION = "0.1.9"
+    private const val VERSION = "0.2.1"
     const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
     const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
     const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"
     const val extensionsCompose = "com.arkivanov.decompose:extensions-compose-jetbrains:$VERSION"
 }
 object MVIKotlin {
-    private const val VERSION = "2.0.0"
+    private const val VERSION = "2.0.1"
     const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
     const val mvikotlin = "com.arkivanov.mvikotlin:mvikotlin:$VERSION"
     const val mvikotlinMain = "com.arkivanov.mvikotlin:mvikotlin-main:$VERSION"
