@@ -173,7 +173,7 @@ class ForegroundService : Service(), CoroutineScope {
      **/
     private fun downloadAllTracks(trackList: List<TrackDetails>) {
         trackList.forEach {
-            launch {
+            launch(Dispatchers.IO) {
                 if (!it.videoID.isNullOrBlank()) { // Video ID already known!
                     downloadTrack(it.videoID!!, it)
                 } else {
@@ -193,20 +193,18 @@ class ForegroundService : Service(), CoroutineScope {
         }
     }
 
-    private fun downloadTrack(videoID: String, track: TrackDetails) {
-        launch {
-            try {
-                val url = fetcher.youtubeMp3.getMp3DownloadLink(videoID)
-                if (url == null) {
-                    val audioData: Format = ytDownloader.getVideo(videoID).getData() ?: throw Exception("Java YT Dependency Error")
-                    val ytUrl: String = audioData.url()
-                    enqueueDownload(ytUrl, track)
-                } else enqueueDownload(url, track)
-            } catch (e: Exception) {
-                logger.d("Service YT Error") { e.message.toString() }
-                sendTrackBroadcast(Status.FAILED.name, track)
-                allTracksStatus[track.title] = DownloadStatus.Failed
-            }
+    private suspend fun downloadTrack(videoID: String, track: TrackDetails) {
+        try {
+            val url = fetcher.youtubeMp3.getMp3DownloadLink(videoID)
+            if (url == null) {
+                val audioData: Format = ytDownloader.getVideo(videoID).getData() ?: throw Exception("Java YT Dependency Error")
+                val ytUrl: String = audioData.url()
+                enqueueDownload(ytUrl, track)
+            } else enqueueDownload(url, track)
+        } catch (e: Exception) {
+            logger.d("Service YT Error") { e.message.toString() }
+            sendTrackBroadcast(Status.FAILED.name, track)
+            allTracksStatus[track.title] = DownloadStatus.Failed
         }
     }
 

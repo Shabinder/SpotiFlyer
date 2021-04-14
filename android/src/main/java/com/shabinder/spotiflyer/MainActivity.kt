@@ -98,9 +98,6 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                         permissionGranted = remember { mutableStateOf(true) }
                         val view = LocalView.current
 
-                        LaunchedEffect(view) {
-                            permissionGranted.value = checkPermissions()
-                        }
                         Box {
                             root = SpotiFlyerRootContent(
                                 rememberRootComponent(::spotiFlyerRoot),
@@ -114,6 +111,9 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                             )
                         }
 
+                        LaunchedEffect(view) {
+                            permissionGranted.value = checkPermissions()
+                        }
                         NetworkDialog()
                         PermissionDialog()
                     }

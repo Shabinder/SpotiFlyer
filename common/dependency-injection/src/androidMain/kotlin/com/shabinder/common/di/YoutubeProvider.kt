@@ -42,17 +42,15 @@ actual class YoutubeProvider actual constructor(
     private val sampleDomain2 = "youtube.com"
     private val sampleDomain3 = "youtu.be"
 
-    actual suspend fun query(fullLink: String): PlatformQueryResult? {
+    actual suspend fun query(fullLink: String): PlatformQueryResult? = withContext(Dispatchers.IO) {
         val link = fullLink.removePrefix("https://").removePrefix("http://")
         if (link.contains("playlist", true) || link.contains("list", true)) {
             // Given Link is of a Playlist
             logger.i { link }
             val playlistId = link.substringAfter("?list=").substringAfter("&list=").substringBefore("&").substringBefore("?")
-            return withContext(Dispatchers.IO) {
-                getYTPlaylist(
-                    playlistId
-                )
-            }
+            getYTPlaylist(
+                playlistId
+            )
         } else { // Given Link is of a Video
             var searchId = "error"
             when {
@@ -66,12 +64,10 @@ actual class YoutubeProvider actual constructor(
                     searchId = link.substringAfterLast("/", "error").substringBefore("&")
                 }
             }
-            return if (searchId != "error") {
-                withContext(Dispatchers.IO) {
-                    getYTTrack(
-                        searchId
-                    )
-                }
+            if (searchId != "error") {
+                getYTTrack(
+                    searchId
+                )
             } else {
                 logger.d { "Your Youtube Link is not of a Video!!" }
                 null
@@ -81,7 +77,7 @@ actual class YoutubeProvider actual constructor(
 
     private suspend fun getYTPlaylist(
         searchId: String
-    ): PlatformQueryResult? {
+    ): PlatformQueryResult? = withContext(Dispatchers.IO) {
         val result = PlatformQueryResult(
             folderType = "",
             subFolder = "",
@@ -133,14 +129,13 @@ actual class YoutubeProvider actual constructor(
                 logger.d { "An Error Occurred While Processing!" }
             }
         }
-        return if (result.title.isNotBlank()) result
-        else null
+        if (result.title.isNotBlank()) result else null
     }
 
     @Suppress("DefaultLocale")
     private suspend fun getYTTrack(
         searchId: String,
-    ): PlatformQueryResult? {
+    ): PlatformQueryResult? = withContext(Dispatchers.IO) {
         val result = PlatformQueryResult(
             folderType = "",
             subFolder = "",
@@ -188,7 +183,6 @@ actual class YoutubeProvider actual constructor(
                 logger.e { "An Error Occurred While Processing!,$searchId" }
             }
         }
-        return if (result.title.isNotBlank()) result
-        else null
+        if (result.title.isNotBlank()) result else null
     }
 }
