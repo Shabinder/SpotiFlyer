@@ -21,9 +21,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.core.content.ContextCompat
-import com.github.kiulian.downloader.model.YoutubeVideo
-import com.github.kiulian.downloader.model.formats.Format
-import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.razorpay.Checkout
 import com.shabinder.common.database.activityContext
 import com.shabinder.common.di.worker.ForegroundService
@@ -109,21 +106,5 @@ actual suspend fun downloadTracks(
         val serviceIntent = Intent(activityContext, ForegroundService::class.java)
         serviceIntent.putParcelableArrayListExtra("object", ArrayList<TrackDetails>(list))
         activityContext.let { ContextCompat.startForegroundService(it, serviceIntent) }
-    }
-}
-
-fun YoutubeVideo.getData(): Format? {
-    return try {
-        findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
-    } catch (e: java.lang.IndexOutOfBoundsException) {
-        try {
-            findAudioWithQuality(AudioQuality.high)?.get(0) as Format
-        } catch (e: java.lang.IndexOutOfBoundsException) {
-            try {
-                findAudioWithQuality(AudioQuality.low)?.get(0) as Format
-            } catch (e: java.lang.IndexOutOfBoundsException) {
-                null
-            }
-        }
     }
 }
