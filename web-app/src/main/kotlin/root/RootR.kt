@@ -32,7 +32,7 @@ class RootR(props: Props<SpotiFlyerRoot>) : RenderableRootComponent<SpotiFlyerRo
     initialState = State(routerState = props.model.routerState.value)
 ) {
     private val component: Child
-        get() = model.routerState.value.activeChild.component
+        get() = model.routerState.value.activeChild.instance
 
     private val callBacks get() = model.callBacks
 

@@ -37,6 +37,7 @@ kotlin {
                 implementation(Ktor.clientLogging)
                 implementation(Ktor.clientJson)
                 implementation(Ktor.auth)
+                api(Extras.youtubeDownloader)
                 // koin
                 api(Koin.core)
                 api(Koin.test)
@@ -50,7 +51,6 @@ kotlin {
                 implementation(Ktor.clientAndroid)
                 implementation(Extras.Android.fetch)
                 implementation(Extras.Android.razorpay)
-                api(Extras.youtubeDownloader)
                 api(Extras.mp3agic)
                 // api(files("$rootDir/libs/mobile-ffmpeg.aar"))
             }
@@ -60,7 +60,6 @@ kotlin {
                 implementation(compose.materialIconsExtended)
                 implementation(Ktor.clientApache)
                 implementation(Ktor.slf4j)
-                api(Extras.youtubeDownloader)
                 api(Extras.mp3agic)
             }
         }

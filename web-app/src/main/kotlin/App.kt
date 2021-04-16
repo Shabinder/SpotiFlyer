@@ -14,7 +14,6 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import co.touchlab.kermit.Kermit
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.lifecycle.LifecycleRegistry
 import com.arkivanov.decompose.lifecycle.destroy

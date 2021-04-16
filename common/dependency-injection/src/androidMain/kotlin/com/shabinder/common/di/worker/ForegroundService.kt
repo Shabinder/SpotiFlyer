@@ -38,14 +38,14 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import co.touchlab.kermit.Kermit
-import com.github.kiulian.downloader.YoutubeDownloader
-import com.github.kiulian.downloader.model.formats.Format
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.R
 import com.shabinder.common.di.getData
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.downloader.YoutubeDownloader
+import com.shabinder.downloader.models.formats.Format
 import com.tonyodev.fetch2.Download
 import com.tonyodev.fetch2.Error
 import com.tonyodev.fetch2.Fetch
@@ -198,7 +198,7 @@ class ForegroundService : Service(), CoroutineScope {
             val url = fetcher.youtubeMp3.getMp3DownloadLink(videoID)
             if (url == null) {
                 val audioData: Format = ytDownloader.getVideo(videoID).getData() ?: throw Exception("Java YT Dependency Error")
-                val ytUrl: String = audioData.url()
+                val ytUrl = audioData.url!! //We Will catch NPE
                 enqueueDownload(ytUrl, track)
             } else enqueueDownload(url, track)
         } catch (e: Exception) {

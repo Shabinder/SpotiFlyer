@@ -16,15 +16,12 @@
 
 package com.shabinder.common.di
 
-import com.github.kiulian.downloader.YoutubeDownloader
-import com.github.kiulian.downloader.model.YoutubeVideo
-import com.github.kiulian.downloader.model.formats.Format
-import com.github.kiulian.downloader.model.quality.AudioQuality
 import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.downloader.YoutubeDownloader
 import io.ktor.client.request.head
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -115,7 +112,7 @@ suspend fun downloadTrack(
         val audioData = ytDownloader.getVideo(videoID).getData()
 
         audioData?.let { format ->
-            val url: String = format.url()
+            val url = format.url ?: return
             downloadFile(url).collect {
                 when (it) {
                     is DownloadResult.Error -> {
@@ -145,20 +142,5 @@ suspend fun downloadTrack(
         }
     } catch (e: java.lang.Exception) {
         e.printStackTrace()
-    }
-}
-fun YoutubeVideo.getData(): Format? {
-    return try {
-        findAudioWithQuality(AudioQuality.medium)?.get(0) as Format
-    } catch (e: java.lang.IndexOutOfBoundsException) {
-        try {
-            findAudioWithQuality(AudioQuality.high)?.get(0) as Format
-        } catch (e: java.lang.IndexOutOfBoundsException) {
-            try {
-                findAudioWithQuality(AudioQuality.low)?.get(0) as Format
-            } catch (e: java.lang.IndexOutOfBoundsException) {
-                null
-            }
-        }
     }
 }
