@@ -41,6 +41,7 @@ android {
         versionCode = Versions.versionCode
         versionName = Versions.versionName
     }
+    buildToolsVersion = "30.0.3"
 
     buildTypes {
         getByName("release") {
@@ -49,10 +50,13 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-    kotlinOptions.useIR = true
+    kotlinOptions {
+        useIR = true
+        jvmTarget = "1.8"
+    }
     compileOptions {
         // Flag to enable support for the new language APIs
-        //coreLibraryDesugaringEnabled = true
+        coreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -68,14 +72,6 @@ android {
     packagingOptions {
         exclude("META-INF/*")
     }
-    buildToolsVersion = "30.0.3"
-    /*buildFeatures {
-        compose = true
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
-        useIR = true
-    }*/
 }
 dependencies {
     implementation(compose.material)
