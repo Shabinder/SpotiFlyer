@@ -219,7 +219,7 @@ fun SearchPanel(
 @Composable
 fun AboutColumn(modifier: Modifier = Modifier) {
     // TODO Make Scrollable
-    Column(modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+    Column(modifier.fillMaxSize().padding(8.dp).verticalScroll(rememberScrollState())) {
         Card(
             modifier = modifier.fillMaxWidth(),
             border = BorderStroke(1.dp, Color.Gray)
@@ -233,7 +233,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.padding(top = 12.dp))
                 Row(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
                     Icon(
-                        imageVector = SpotifyLogo(),
+                        SpotifyLogo(),
                         "Open Spotify",
                         tint = Color.Unspecified,
                         modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
@@ -242,7 +242,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                     )
                     Spacer(modifier = modifier.padding(start = 16.dp))
                     Icon(
-                        imageVector = GaanaLogo(),
+                        GaanaLogo(),
                         "Open Gaana",
                         tint = Color.Unspecified,
                         modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
@@ -251,7 +251,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                     )
                     Spacer(modifier = modifier.padding(start = 16.dp))
                     Icon(
-                        imageVector = YoutubeLogo(),
+                        YoutubeLogo(),
                         "Open Youtube",
                         tint = Color.Unspecified,
                         modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
@@ -260,7 +260,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                     )
                     Spacer(modifier = modifier.padding(start = 12.dp))
                     Icon(
-                        imageVector = YoutubeMusicLogo(),
+                        YoutubeMusicLogo(),
                         "Open Youtube Music",
                         tint = Color.Unspecified,
                         modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
@@ -289,7 +289,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                     )
                         .padding(vertical = 6.dp)
                 ) {
-                    Icon(imageVector = GithubLogo(), "Open Project Repo", tint = Color(0xFFCCCCCC))
+                    Icon(GithubLogo(), "Open Project Repo", tint = Color(0xFFCCCCCC))
                     Spacer(modifier = Modifier.padding(start = 16.dp))
                     Column {
                         Text(
@@ -373,7 +373,7 @@ fun HistoryColumn(
 ) {
     Crossfade(list) {
         if (it.isEmpty()) {
-            Column(Modifier.padding(bottom = 32.dp).fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(Modifier.padding(8.dp).fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
                     Icons.Outlined.Info, "No History Available Yet", modifier = Modifier.size(80.dp),
                     colorOffWhite
@@ -423,7 +423,7 @@ fun DownloadRecordItem(
             }
         }
         Image(
-            imageVector = ShareImage(),
+            ShareImage(),
             "Research",
             modifier = Modifier.clickable(
                 onClick = {

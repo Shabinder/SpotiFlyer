@@ -139,7 +139,7 @@ fun AppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    imageVector = SpotiFlyerLogo(),
+                    SpotiFlyerLogo(),
                     "SpotiFlyer Logo",
                     Modifier.size(32.dp),
                 )

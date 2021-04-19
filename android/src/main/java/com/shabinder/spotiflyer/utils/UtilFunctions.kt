@@ -42,15 +42,15 @@ fun Activity.checkIfLatestVersion() {
     }
 }
 
-fun Activity.checkPermissions():Boolean{
-    return (ContextCompat
+fun Activity.checkPermissions():Boolean = ContextCompat
         .checkSelfPermission(this,
             Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
             &&
-            ContextCompat.checkSelfPermission(this,
-                Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) == PackageManager.PERMISSION_GRANTED)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) == PackageManager.PERMISSION_GRANTED
+            } else true
 
-}
 
 @SuppressLint("BatteryLife", "ObsoleteSdkInt")
 fun Activity.disableDozeMode(requestCode:Int) {

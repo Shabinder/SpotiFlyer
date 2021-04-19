@@ -19,7 +19,7 @@ package com.shabinder.common.uikit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 import com.shabinder.common.di.Picture
 
 @Composable
@@ -28,41 +28,41 @@ expect fun ImageLoad(
     loader: suspend (String) -> Picture,
     desc: String = "Album Art",
     modifier: Modifier = Modifier,
-    // placeholder:ImageVector = PlaceHolderImage()
+    // placeholder:Painter = PlaceHolderImage()
 )
 
 @Composable
 expect fun DownloadImageTick()
 
 @Composable
-expect fun DownloadAllImage(): ImageVector
+expect fun DownloadAllImage(): Painter
 
 @Composable
-expect fun ShareImage(): ImageVector
+expect fun ShareImage(): Painter
 
 @Composable
-expect fun PlaceHolderImage(): ImageVector
+expect fun PlaceHolderImage(): Painter
 
 @Composable
-expect fun SpotiFlyerLogo(): ImageVector
+expect fun SpotiFlyerLogo(): Painter
 
 @Composable
-expect fun SpotifyLogo(): ImageVector
+expect fun SpotifyLogo(): Painter
 
 @Composable
-expect fun YoutubeLogo(): ImageVector
+expect fun YoutubeLogo(): Painter
 
 @Composable
-expect fun GaanaLogo(): ImageVector
+expect fun GaanaLogo(): Painter
 
 @Composable
-expect fun YoutubeMusicLogo(): ImageVector
+expect fun YoutubeMusicLogo(): Painter
 
 @Composable
-expect fun GithubLogo(): ImageVector
+expect fun GithubLogo(): Painter
 
 @Composable
-expect fun HeartIcon(): ImageVector
+expect fun HeartIcon(): Painter
 
 @Composable
 expect fun DownloadImageError()

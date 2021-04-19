@@ -27,7 +27,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorXmlResource
 import androidx.compose.ui.text.font.FontFamily
@@ -94,32 +97,32 @@ actual fun DownloadImageArrow(modifier: Modifier) {
 }
 
 @Composable
-actual fun DownloadAllImage(): ImageVector = vectorXmlResource("drawable/ic_download_arrow.xml")
+actual fun DownloadAllImage() = rememberVectorPainter(vectorXmlResource("drawable/ic_download_arrow.xml")) as Painter
 
 @Composable
-actual fun ShareImage(): ImageVector = vectorXmlResource("drawable/ic_share_open.xml")
+actual fun ShareImage() = rememberVectorPainter(vectorXmlResource("drawable/ic_share_open.xml"))  as Painter
 
 @Composable
-actual fun PlaceHolderImage(): ImageVector = vectorXmlResource("drawable/music.xml")
+actual fun PlaceHolderImage() = rememberVectorPainter(vectorXmlResource("drawable/music.xml"))
+        as Painter
+@Composable
+actual fun SpotiFlyerLogo() =
+    rememberVectorPainter(vectorXmlResource("drawable/ic_spotiflyer_logo.xml")) as Painter
 
 @Composable
-actual fun SpotiFlyerLogo(): ImageVector =
-    vectorXmlResource("drawable/ic_spotiflyer_logo.xml")
+actual fun HeartIcon() = rememberVectorPainter(vectorXmlResource("drawable/ic_heart.xml")) as Painter
 
 @Composable
-actual fun HeartIcon(): ImageVector = vectorXmlResource("drawable/ic_heart.xml")
+actual fun SpotifyLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_spotify_logo.xml"))  as Painter
 
 @Composable
-actual fun SpotifyLogo(): ImageVector = vectorXmlResource("drawable/ic_spotify_logo.xml")
+actual fun YoutubeLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_youtube.xml"))  as Painter
 
 @Composable
-actual fun YoutubeLogo(): ImageVector = vectorXmlResource("drawable/ic_youtube.xml")
+actual fun GaanaLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_gaana.xml")) as Painter
 
 @Composable
-actual fun GaanaLogo(): ImageVector = vectorXmlResource("drawable/ic_gaana.xml")
+actual fun YoutubeMusicLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_youtube_music_logo.xml")) as Painter
 
 @Composable
-actual fun YoutubeMusicLogo(): ImageVector = vectorXmlResource("drawable/ic_youtube_music_logo.xml")
-
-@Composable
-actual fun GithubLogo(): ImageVector = vectorXmlResource("drawable/ic_github.xml")
+actual fun GithubLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_github.xml")) as Painter

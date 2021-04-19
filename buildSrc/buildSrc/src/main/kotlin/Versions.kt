@@ -45,7 +45,7 @@ object Versions {
 
     // Android
     const val versionCode = 15
-    const val minSdkVersion = 24
+    const val minSdkVersion = 21
     const val compileSdkVersion = 29
     const val targetSdkVersion = 29
     const val androidLifecycle = "2.3.0"
@@ -139,7 +139,7 @@ object Extras {
     //const val youtubeDownloader = "com.github.sealedtx:java-youtube-downloader:2.5.1"
     const val youtubeDownloader = "com.shabinder.downloader:youtube-api-dl:0.1" //Local Maven
     const val fuzzyWuzzy = "me.xdrop:fuzzywuzzy:1.3.1"
-    const val mp3agic = "com.mpatric:mp3agic:0.9.1"
+    const val mp3agic = "com.mpatric:mp3agic:0.9.0"
     const val kermit = "co.touchlab:kermit:${Versions.kermit}"
     object Android {
         val razorpay = "com.razorpay:checkout:1.6.5"

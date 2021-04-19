@@ -18,7 +18,6 @@
 
 package com.shabinder.common.uikit
 
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
@@ -30,10 +29,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -52,6 +49,7 @@ actual fun ImageLoad(
     // placeholder: ImageVector
 ) {
     var pic by remember(link) { mutableStateOf<ImageBitmap?>(null) }
+
     LaunchedEffect(link) {
         withContext(dispatcherIO) {
             pic = loader(link).image
@@ -100,37 +98,34 @@ actual fun DownloadImageArrow(modifier: Modifier) {
 }
 
 @Composable
-actual fun DownloadAllImage() = vectorResource(R.drawable.ic_download_arrow)
+actual fun DownloadAllImage() = painterResource(R.drawable.ic_download_arrow)
 
 @Composable
-actual fun ShareImage() = vectorResource(R.drawable.ic_share_open)
+actual fun ShareImage() = painterResource(R.drawable.ic_share_open)
 
 @Composable
-actual fun PlaceHolderImage() = vectorResource(R.drawable.music)
+actual fun PlaceHolderImage() = painterResource(R.drawable.music)
 
 @Composable
-actual fun SpotiFlyerLogo() = vectorResource(R.drawable.ic_spotiflyer_logo)
+actual fun SpotiFlyerLogo() = painterResource(R.drawable.ic_spotiflyer_logo)
 
 @Composable
-actual fun HeartIcon() = vectorResource(R.drawable.ic_heart)
+actual fun HeartIcon() = painterResource(R.drawable.ic_heart)
 
 @Composable
-actual fun SpotifyLogo() = vectorResource(R.drawable.ic_spotify_logo)
+actual fun SpotifyLogo() = painterResource(R.drawable.ic_spotify_logo)
 
 @Composable
-actual fun GaanaLogo() = vectorResource(R.drawable.ic_gaana)
+actual fun GaanaLogo() = painterResource(R.drawable.ic_gaana)
 
 @Composable
-actual fun YoutubeLogo() = vectorResource(R.drawable.ic_youtube)
+actual fun YoutubeLogo() = painterResource(R.drawable.ic_youtube)
 
 @Composable
-actual fun YoutubeMusicLogo() = vectorResource(R.drawable.ic_youtube_music_logo)
+actual fun YoutubeMusicLogo() = painterResource(R.drawable.ic_youtube_music_logo)
 
 @Composable
-actual fun GithubLogo() = vectorResource(R.drawable.ic_github)
-
-@Composable
-fun vectorResource(@DrawableRes id: Int) = ImageVector.Companion.vectorResource(id)
+actual fun GithubLogo() = painterResource(R.drawable.ic_github)
 
 @Composable
 actual fun Toast(
@@ -140,6 +135,7 @@ actual fun Toast(
 ) {
     // We Have Android's Implementation of Toast so its just Empty
 }
+
 actual fun showPopUpMessage(text: String) {
     android.widget.Toast.makeText(appContext, text, android.widget.Toast.LENGTH_SHORT).show()
 }

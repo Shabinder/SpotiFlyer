@@ -186,7 +186,7 @@ fun DownloadAllButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     ExtendedFloatingActionButton(
         text = { Text("Download All") },
         onClick = onClick,
-        icon = { Icon(imageVector = DownloadAllImage(), "Download All Button", tint = Color(0xFF000000)) },
+        icon = { Icon(DownloadAllImage(), "Download All Button", tint = Color(0xFF000000)) },
         backgroundColor = colorAccent,
         modifier = modifier
     )

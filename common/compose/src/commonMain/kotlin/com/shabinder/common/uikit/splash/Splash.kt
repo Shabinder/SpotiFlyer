@@ -55,7 +55,7 @@ fun Splash(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
             delay(SplashWaitTime)
             currentOnTimeout()
         }
-        Image(imageVector = SpotiFlyerLogo(), "SpotiFlyer Logo")
+        Image(SpotiFlyerLogo(), "SpotiFlyer Logo")
         MadeInIndia(Modifier.align(Alignment.BottomCenter))
     }
 }

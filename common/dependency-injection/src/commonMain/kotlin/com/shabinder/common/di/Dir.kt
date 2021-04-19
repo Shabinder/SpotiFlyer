@@ -22,10 +22,14 @@ import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
-import io.ktor.client.request.get
+import com.shabinder.downloader.exceptions.YoutubeException
+import io.ktor.client.*
+import io.ktor.client.features.*
+import io.ktor.client.request.*
 import io.ktor.client.statement.HttpStatement
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
+import io.ktor.utils.io.errors.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt
@@ -67,6 +71,21 @@ suspend fun downloadFile(url: String): Flow<DownloadResult> {
         client.close()
     }
 }
+
+suspend fun downloadByteArray(
+    url: String,
+    httpBuilder: HttpRequestBuilder.()->Unit = {}
+): ByteArray? {
+    val client = createHttpClient()
+    val response = try {
+        client.get<ByteArray>(url,httpBuilder)
+    } catch (e: Exception){
+        return null
+    }
+    client.close()
+    return response
+}
+
 fun getNameURL(url: String): String {
     return url.substring(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1, url.length).replace('/', '_')
 }
