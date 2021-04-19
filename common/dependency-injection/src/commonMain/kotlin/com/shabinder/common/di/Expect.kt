@@ -18,7 +18,9 @@ package com.shabinder.common.di
 
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.TrackDetails
+import io.ktor.client.request.*
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 
 expect fun openPlatform(packageID: String, platformLink: String)
 
@@ -39,3 +41,18 @@ expect suspend fun downloadTracks(
 )
 
 expect fun queryActiveTracks()
+
+/*
+* Refactor This
+* */
+suspend fun isInternetAccessible(): Boolean {
+    return withContext(dispatcherIO) {
+        try {
+            ktorHttpClient.head<String>("http://google.com")
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+}

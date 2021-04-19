@@ -18,7 +18,6 @@ package com.shabinder.common.di
 
 import com.shabinder.common.models.TrackDetails
 import java.io.File
-import com.mp3.jaudiotagger.tag.images.ArtworkFactory
 import com.mpatric.mp3agic.ID3v1Tag
 import com.mpatric.mp3agic.ID3v24Tag
 import com.mpatric.mp3agic.Mp3File

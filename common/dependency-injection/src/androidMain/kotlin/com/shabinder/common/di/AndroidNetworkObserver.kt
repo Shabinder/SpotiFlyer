@@ -27,13 +27,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.lifecycle.LiveData
 import com.shabinder.common.database.appContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.IOException
+import java.lang.Exception
 import java.net.InetSocketAddress
-import javax.net.SocketFactory
 
 const val TAG = "C-Manager"
 
@@ -89,7 +86,7 @@ class ConnectionLiveData(context: Context = appContext) : LiveData<Boolean>() {
             if (hasInternetCapability == true) {
                 // check if this network actually has internet
                 CoroutineScope(Dispatchers.IO).launch {
-                    val hasInternet = DoesNetworkHaveInternet.execute(network.socketFactory)
+                    val hasInternet = DoesNetworkHaveInternet.execute(network)
                     if (hasInternet) {
                         withContext(Dispatchers.Main) {
                             Log.d(TAG, "onAvailable: adding network. $network")
@@ -117,19 +114,18 @@ class ConnectionLiveData(context: Context = appContext) : LiveData<Boolean>() {
      * If successful, that means we have internet.
      */
     object DoesNetworkHaveInternet {
-
-        // Make sure to execute this on a background thread.
-        fun execute(socketFactory: SocketFactory): Boolean {
-            return try {
+        suspend fun execute(network: Network): Boolean  = withContext(Dispatchers.IO) {
+            try {
                 Log.d(TAG, "PINGING google.")
-                val socket = socketFactory.createSocket() ?: throw IOException("Socket is null.")
+                val socket = network.socketFactory.createSocket() ?: throw IOException("Socket is null.")
                 socket.connect(InetSocketAddress("8.8.8.8", 53), 1500)
                 socket.close()
                 Log.d(TAG, "PING success.")
                 true
-            } catch (e: IOException) {
-                Log.e(TAG, "No internet connection. $e")
-                false
+            }catch (e:Exception){
+                e.printStackTrace()
+                // Handle VPN Connection / Google DNS Blocked Cases
+                isInternetAccessible()
             }
         }
     }

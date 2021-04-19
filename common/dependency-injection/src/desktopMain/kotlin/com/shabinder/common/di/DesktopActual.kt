@@ -47,25 +47,10 @@ actual fun giveDonation() {
 
 actual fun queryActiveTracks() {}
 
-/*
-* Refactor This
-* */
-private suspend fun isInternetAvailable(): Boolean {
-    return withContext(dispatcherIO) {
-        try {
-            ktorHttpClient.head<String>("http://google.com")
-            true
-        } catch (e: Exception) {
-            println(e.message)
-            false
-        }
-    }
-}
-
 actual val isInternetAvailable: Boolean
     get() {
         var result = false
-        val job = GlobalScope.launch { result = isInternetAvailable() }
+        val job = GlobalScope.launch { result = isInternetAccessible() }
         while (job.isActive) {}
         return result
     }

@@ -61,15 +61,14 @@ class SpotifyProvider(
             null
         } else {
             logger.d { "Spotify Provider Created with $token" }
-            httpClient = HttpClient {
+            HttpClient {
                 defaultRequest {
                     header("Authorization", "Bearer ${token.access_token}")
                 }
                 install(JsonFeature) {
                     serializer = kotlinxSerializer
                 }
-            }
-            httpClient
+            }?.also { httpClient = it }
         }
     }
 
