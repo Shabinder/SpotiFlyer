@@ -52,7 +52,7 @@ kotlin {
                 implementation(Extras.Android.fetch)
                 implementation(Extras.Android.razorpay)
                 api(Extras.mp3agic)
-                api(project(":jaudiotagger"))
+                api(Extras.jaudioTagger)
                 // api(files("$rootDir/libs/mobile-ffmpeg.aar"))
             }
         }
@@ -62,7 +62,7 @@ kotlin {
                 implementation(Ktor.clientApache)
                 implementation(Ktor.slf4j)
                 api(Extras.mp3agic)
-                api(project(":jaudiotagger"))
+                api(Extras.jaudioTagger)
             }
         }
         jsMain {

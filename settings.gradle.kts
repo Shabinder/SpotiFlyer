@@ -30,4 +30,3 @@ include(
     ":desktop",
     ":web-app"
 )
-include(":jaudiotagger")
