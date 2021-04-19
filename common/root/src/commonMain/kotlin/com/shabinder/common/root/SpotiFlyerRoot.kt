@@ -49,6 +49,7 @@ interface SpotiFlyerRoot {
         val directories: Dir
         val showPopUpMessage: (String) -> Unit
         val downloadProgressReport: MutableSharedFlow<HashMap<String, DownloadStatus>>
+        val setDownloadDirectoryAction:()->Unit
     }
 }
 

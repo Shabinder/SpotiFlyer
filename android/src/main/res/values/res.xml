@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <!-- <color name="colorPrimary">#2d6c55</color>
+    <color name="colorPrimaryDark">#235644</color>
+    <color name="colorAccent">#ff9c40</color>
+
+    <color name="colorCyanListClick">#d6c8f5f3</color>
+    <color name="colorListDivider">#89606060</color>
+
+    <color name="pathLayoutBgColor">#70ffffff</color>
+    <color name="chevronBgColor">#50ffffff</color>
+    <color name="inactiveGradientColor">#53000000</color>
+
+    &lt;!&ndash; dialog colors &ndash;&gt;
+    <color name="memory_status_color">#de6565</color>
+    <color name="memory_bar_color">#7bde65</color>
+    <color name="new_folder_color">#c14b84</color>
+    <color name="select_color">#6b3fa1</color>
+    <color name="cancel_color">#3fa19f</color>-->
+
+    <array name="default_light">
+        <!-- Overview -->
+        <item>@color/colorPrimary</item> <!--  Top Header bg -->
+        <item>@android:color/white</item> <!-- header text   -->
+        <item>@android:color/white</item> <!-- list bg  -->
+        <item>@android:color/black</item> <!--  storage list name text  -->
+        <item>@color/colorPrimary</item> <!-- free space text  -->
+        <item>@color/colorAccent</item> <!-- memory bar -->
+
+        <!-- secondary dialog colors -->
+        <item>@color/colorPrimary</item> <!-- address bar bg -->
+        <item>@android:color/white</item> <!-- list bg -->
+        <item>@android:color/black</item> <!-- list text -->
+        <item>@android:color/white</item> <!-- address bar tint -->
+        <item>@color/chevronBgColor</item> <!-- new folder hint tint -->
+        <item>#da6c6c</item> <!-- select button color -->
+        <item>#da6c6c</item> <!-- new folder layour bg -->
+        <item>#da6c6c</item> <!-- new folder layour bg -->
+        <item>@color/colorPrimary</item> <!-- new folder layour bg -->
+    </array>
+
+    <array name="default_dark">
+        <!-- Overview -->
+        <item>@color/colorPrimary</item> <!--  Top Header bg -->
+        <item>@android:color/white</item> <!-- header text   -->
+        <item>@android:color/black</item> <!-- list bg  -->
+        <item>@android:color/white</item> <!--  storage list name text  -->
+        <item>#da6c6c</item> <!-- free space text  -->
+        <item>@color/colorPrimary</item> <!-- memory bar -->
+
+        <!-- secondary dialog colors -->
+        <item>@color/colorPrimary</item> <!-- address bar bg -->
+        <item>@android:color/black</item> <!-- list bg -->
+        <item>@android:color/white</item> <!-- list text -->
+        <item>@android:color/white</item> <!-- address bar tint -->
+        <item>@color/grey</item> <!-- new folder hint tint -->
+        <item>#da6c6c</item> <!-- select button color -->
+        <item>#da6c6c</item> <!-- new folder layour bg -->
+        <item>#da6c6c</item> <!-- new multi fab -->
+        <item>#da6c6c</item> <!-- new multi fab -->
+    </array>
+</resources>

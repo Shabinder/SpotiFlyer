@@ -17,6 +17,8 @@
 package com.shabinder.common.di
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaScannerConnection
@@ -37,21 +39,33 @@ import java.net.URL
 
 actual class Dir actual constructor(
     private val logger: Kermit,
-    private val database: Database?
+    private val database: Database?,
 ) {
-    private val scope = CoroutineScope(Dispatchers.IO)
+    companion object {
+        const val SharedPreferencesKey = "configurations"
+        const val DirKey = "downloadDir"
+    }
 
     private val context: Context
         get() = appContext
+
+    private val sharedPreferences:SharedPreferences by lazy {
+        context.getSharedPreferences(SharedPreferencesKey,MODE_PRIVATE)
+    }
+
+    fun setDownloadDirectory(newBasePath:String){
+        sharedPreferences.edit().putString(DirKey,newBasePath).apply()
+    }
+
+    @Suppress("DEPRECATION")
+    private val defaultBaseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).toString()
 
     actual fun fileSeparator(): String = File.separator
 
     actual fun imageCacheDir(): String = context.cacheDir.absolutePath + File.separator
 
-    @Suppress("DEPRECATION")
-    actual fun defaultDir(): String =
-        Environment.getExternalStorageDirectory().toString() + File.separator +
-            Environment.DIRECTORY_MUSIC + File.separator +
+    // fun call in order to always access Updated Value
+    actual fun defaultDir(): String = sharedPreferences.getString(DirKey,defaultBaseDir)!! + File.separator +
             "SpotiFlyer" + File.separator
 
     actual fun isPresent(path: String): Boolean = File(path).exists()

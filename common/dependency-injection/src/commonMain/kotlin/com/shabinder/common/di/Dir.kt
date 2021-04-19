@@ -36,7 +36,7 @@ import kotlin.math.roundToInt
 
 expect class Dir(
     logger: Kermit,
-    database: Database? = createDatabase()
+    database: Database? = createDatabase(),
 ) {
     val db: Database?
     fun isPresent(path: String): Boolean

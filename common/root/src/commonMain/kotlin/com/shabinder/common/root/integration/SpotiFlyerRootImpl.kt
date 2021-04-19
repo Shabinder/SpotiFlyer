@@ -55,6 +55,7 @@ internal class SpotiFlyerRootImpl(
                 it !is Configuration.Main
             }
         }
+        override fun setDownloadDirectory() { setDownloadDirectoryAction() }
     }
 
     private fun createChild(configuration: Configuration, componentContext: ComponentContext): Child =

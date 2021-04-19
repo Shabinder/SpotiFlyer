@@ -81,10 +81,10 @@ class GaanaProvider(
                     getGaanaAlbum(seokey = link).also {
                         folderType = "Albums"
                         subFolder = link
-                        it.tracks.forEach { track ->
+                        it.tracks?.forEach { track ->
                             track.updateStatusIfPresent(folderType, subFolder)
                         }
-                        trackList = it.tracks.toTrackDetailsList(folderType, subFolder)
+                        trackList = it.tracks?.toTrackDetailsList(folderType, subFolder) ?: emptyList()
                         title = link
                         coverUrl = it.custom_artworks.size_480p
                     }

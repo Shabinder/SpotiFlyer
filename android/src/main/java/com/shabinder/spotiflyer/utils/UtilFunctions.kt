@@ -76,3 +76,8 @@ fun Activity.requestStoragePermission() {
         )
     }
 }
+/*
+fun Activity.requestBroaderStoragePermission() {
+    val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+    startActivity(intent)
+}*/

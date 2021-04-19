@@ -50,6 +50,8 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import com.codekidlabs.storagechooser.R
+import com.codekidlabs.storagechooser.StorageChooser
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsHeight
@@ -57,6 +59,7 @@ import com.google.accompanist.insets.statusBarsPadding
 import com.razorpay.Checkout
 import com.razorpay.PaymentResultListener
 import com.shabinder.common.database.activityContext
+import com.shabinder.common.database.appContext
 import com.shabinder.common.di.*
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
@@ -69,6 +72,7 @@ import com.tonyodev.fetch2.Status
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.android.ext.android.inject
+import java.io.File
 import com.shabinder.common.uikit.showPopUpMessage as uikitShowPopUpMessage
 
 const val disableDozeCode = 1223
@@ -128,6 +132,43 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
         dir.createDirectories()
         Checkout.preload(applicationContext)
         handleIntentFromExternalActivity()
+        Log.i("Download Path",dir.defaultDir())
+    }
+
+    @Suppress("DEPRECATION")
+    private fun setUpOnPrefClickListener() {
+        // Initialize Builder
+        val chooser = StorageChooser.Builder()
+            .withActivity(this)
+            .withFragmentManager(fragmentManager)
+            .withMemoryBar(true)
+            .setTheme(StorageChooser.Theme(appContext).apply {
+                scheme = applicationContext.resources.getIntArray(R.array.default_dark)
+            })
+            .setDialogTitle("Set Download Directory")
+            .allowCustomPath(true)
+            .setType(StorageChooser.DIRECTORY_CHOOSER)
+            .build()
+
+        // get path that the user has chosen
+        chooser.setOnSelectListener { path ->
+            Log.d("Setting Base Path", path)
+            val f = File(path)
+            if (f.canWrite()) {
+                // hell yeah :)
+                dir.setDownloadDirectory(path)
+                com.shabinder.common.uikit.showPopUpMessage(
+                    "Download Directory Set to:\n${dir.defaultDir()} "
+                )
+            }else{
+                com.shabinder.common.uikit.showPopUpMessage(
+                    "NO WRITE ACCESS on \n$path ,\nReverting Back to Previous"
+                )
+            }
+        }
+
+        // Show dialog whenever you want by
+        chooser.show()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -145,6 +186,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                 override val directories: Dir = this@MainActivity.dir
                 override val showPopUpMessage: (String) -> Unit = ::uikitShowPopUpMessage
                 override val downloadProgressReport: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
+                override val setDownloadDirectoryAction: () -> Unit = ::setUpOnPrefClickListener
             }
         )
 
@@ -289,10 +331,14 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
             AlertDialog(
                 onDismissRequest = {},
                 buttons = {
-                    TextButton({
-                        requestStoragePermission()
-                        disableDozeMode(disableDozeCode)
-                    },Modifier.padding(bottom = 16.dp,start = 16.dp,end = 16.dp).fillMaxWidth().background(colorPrimary,shape = SpotiFlyerShapes.medium).padding(horizontal = 8.dp),
+                    TextButton(
+                        {
+                            requestStoragePermission()
+                            disableDozeMode(disableDozeCode)
+                        },
+                        Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp).fillMaxWidth()
+                            .background(colorPrimary, shape = SpotiFlyerShapes.medium)
+                            .padding(horizontal = 8.dp),
                     ){
                         Text("Grant Permissions",color = Color.Black,fontSize = 18.sp,textAlign = TextAlign.Center)
                     }

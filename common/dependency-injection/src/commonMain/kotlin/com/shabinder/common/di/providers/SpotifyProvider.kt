@@ -68,7 +68,7 @@ class SpotifyProvider(
                 install(JsonFeature) {
                     serializer = kotlinxSerializer
                 }
-            }?.also { httpClient = it }
+            }.also { httpClient = it }
         }
     }
 
@@ -127,10 +127,7 @@ class SpotifyProvider(
                         it.updateStatusIfPresent(folderType, subFolder)
                         trackList = listOf(it).toTrackDetailsList(folderType, subFolder)
                         title = it.name.toString()
-                        coverUrl = (
-                            it.album?.images?.elementAtOrNull(1)?.url
-                                ?: it.album?.images?.elementAtOrNull(0)?.url
-                            ).toString()
+                        coverUrl = it.album?.images?.elementAtOrNull(0)?.url.toString()
                     }
                 }
 
@@ -143,22 +140,19 @@ class SpotifyProvider(
                         it.album = Album(
                             images = listOf(
                                 Image(
-                                    url = albumObject.images?.elementAtOrNull(1)?.url
-                                        ?: albumObject.images?.elementAtOrNull(0)?.url
+                                    url = albumObject.images?.elementAtOrNull(0)?.url
                                 )
                             )
                         )
                     }
+
                     albumObject.tracks?.items?.toTrackDetailsList(folderType, subFolder).let {
                         if (it.isNullOrEmpty()) {
                             // TODO Handle Error
                         } else {
                             trackList = it
                             title = albumObject.name.toString()
-                            coverUrl = (
-                                albumObject.images?.elementAtOrNull(1)?.url
-                                    ?: albumObject.images?.elementAtOrNull(0)?.url
-                                ).toString()
+                            coverUrl = albumObject.images?.elementAtOrNull(0)?.url.toString()
                         }
                     }
                 }
@@ -189,8 +183,7 @@ class SpotifyProvider(
                     // log("Total Tracks Fetched", tempTrackList.size.toString())
                     trackList = tempTrackList.toTrackDetailsList(folderType, subFolder)
                     title = playlistObject.name.toString()
-                    coverUrl = playlistObject.images?.elementAtOrNull(1)?.url
-                        ?: playlistObject.images?.firstOrNull()?.url.toString()
+                    coverUrl = playlistObject.images?.firstOrNull()?.url.toString()
                 }
                 "episode" -> { // TODO
                 }
@@ -221,14 +214,14 @@ class SpotifyProvider(
             title = it.name.toString(),
             artists = it.artists?.map { artist -> artist?.name.toString() } ?: listOf(),
             durationSec = (it.duration_ms / 1000).toInt(),
-            albumArtPath = dir.imageCacheDir() + (it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg",
+            albumArtPath = dir.imageCacheDir() + (it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg",
             albumName = it.album?.name,
             year = it.album?.release_date,
             comment = "Genres:${it.album?.genres?.joinToString()}",
             trackUrl = it.href,
             downloaded = it.downloaded,
             source = Source.Spotify,
-            albumArtURL = it.album?.images?.elementAtOrNull(1)?.url ?: it.album?.images?.firstOrNull()?.url.toString(),
+            albumArtURL = it.album?.images?.firstOrNull()?.url.toString(),
             outputFilePath = dir.finalOutputDir(it.name.toString(), type, subFolder, dir.defaultDir()/*,".m4a"*/)
         )
     }

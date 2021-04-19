@@ -34,9 +34,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -114,6 +114,7 @@ fun MainScreen(modifier: Modifier = Modifier, alpha: Float,topPadding: Dp = 0.dp
 
         AppBar(
             backgroundColor = appBarColor,
+            setDownloadDirectory = component.callBacks::setDownloadDirectory,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.padding(top = topPadding))
@@ -132,6 +133,7 @@ fun MainScreen(modifier: Modifier = Modifier, alpha: Float,topPadding: Dp = 0.dp
 @Composable
 fun AppBar(
     backgroundColor: Color,
+    setDownloadDirectory:()->Unit,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -149,14 +151,14 @@ fun AppBar(
                     style = appNameStyle
                 )
             }
-        }, /*
+        },
         actions = {
                 IconButton(
-                    onClick = {  *//*TODO: Open Preferences*//* }
+                    onClick = { setDownloadDirectory() }
                 ) {
                     Icon(Icons.Filled.Settings,"Preferences", tint = Color.Gray)
                 }
-        },*/
+        },
         modifier = modifier,
         elevation = 0.dp
     )

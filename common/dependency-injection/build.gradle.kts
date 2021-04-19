@@ -53,6 +53,7 @@ kotlin {
                 implementation(Extras.Android.razorpay)
                 api(Extras.mp3agic)
                 api(Extras.jaudioTagger)
+                api("com.github.shabinder:storage-chooser:2.0.4.45")
                 // api(files("$rootDir/libs/mobile-ffmpeg.aar"))
             }
         }
