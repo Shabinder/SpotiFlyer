@@ -52,6 +52,16 @@ Or to save a click, [this link](https://github.com/Shabinder/SpotiFlyer/releases
 Want to contribute? Great!
 All contributions are welcome, from code to documentation to graphics to design suggestions to bug reports. Please use GitHub to its fullest-- contribute Pull Requests, contribute tutorials or other wiki content-- whatever you have to offer, we can use it!
 
+
+**Please Donate to support me and my work!**
+</br>
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R84CS1D)
+</br>
+<a href="https://opencollective.com/spotiflyer/donate">
+    <img src="https://opencollective.com/spotiflyer/tiers/donate.svg?avatarHeight=52">
+</a>
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/shabinder)
+
 ### Want to discuss? 💬
 Have any questions, doubts or want to present your opinions, views? You're always welcome. You can [start discussions](https://github.com/Shabinder/SpotiFlyer/discussions).
 
