@@ -37,7 +37,6 @@ import androidx.compose.material.icons.rounded.SystemSecurityUpdate
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
@@ -66,7 +65,6 @@ import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.uikit.*
-import com.shabinder.common.uikit.utils.verticalGradientScrim
 import com.shabinder.spotiflyer.utils.*
 import com.tonyodev.fetch2.Status
 import kotlinx.coroutines.*

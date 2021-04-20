@@ -16,6 +16,7 @@
 
 package com.shabinder.common.di
 
+import android.util.Log
 import com.shabinder.common.models.TrackDetails
 import java.io.File
 import com.mpatric.mp3agic.ID3v1Tag
@@ -119,6 +120,7 @@ suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails) {
         this.id3v2Tag = id3v2Tag
         saveFile(track.outputFilePath)
     } catch (e: java.io.FileNotFoundException) {
+        Log.e("Error", "Couldn't Write Cached Mp3 Album Art, error: ${e.stackTrace}")
         try {
             // Image Still Not Downloaded!
             // Lets Download Now and Write it into Album Art
@@ -134,7 +136,8 @@ suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails) {
                 }
             }
         } catch (e: Exception) {
-            // log("Error", "Couldn't Write Mp3 Album Art, error: ${e.stackTrace}")
+            Log.e("Error", "Couldn't Write Mp3 Album Art, error:")
+            e.printStackTrace()
         }
     }
 }

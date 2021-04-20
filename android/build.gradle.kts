@@ -14,6 +14,7 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.compose.compose
 
 plugins {
@@ -33,7 +34,21 @@ repositories {
 }
 
 android {
+    val props = gradleLocalProperties(rootDir)
+
+    if(props.containsKey("storeFileDir")) {
+        signingConfigs {
+            create("release") {
+                storeFile = file(props.getProperty("storeFileDir"))
+                storePassword = props.getProperty("storePassword")
+                keyAlias = props.getProperty("keyAlias")
+                keyPassword = props.getProperty("keyPassword")
+            }
+        }
+    }
     compileSdkVersion(29)
+    buildToolsVersion = "30.0.3"
+
     defaultConfig {
         applicationId = "com.shabinder.spotiflyer"
         minSdkVersion(Versions.minSdkVersion)
@@ -41,12 +56,14 @@ android {
         versionCode = Versions.versionCode
         versionName = Versions.versionName
     }
-    buildToolsVersion = "30.0.3"
 
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
+            if(props.containsKey("storeFileDir")){
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }

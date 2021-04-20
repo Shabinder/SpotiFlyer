@@ -57,7 +57,9 @@ actual fun ImageLoad(
     }
 
     Crossfade(pic) {
-        if (it == null) Image(PlaceHolderImage(), desc, modifier, contentScale = ContentScale.Crop) else Image(it, desc, modifier, contentScale = ContentScale.Crop)
+        if (it == null) {
+            Image(PlaceHolderImage(), desc, modifier, contentScale = ContentScale.Crop)
+        } else Image(it, desc, modifier, contentScale = ContentScale.Crop)
     }
 }
 
@@ -104,7 +106,7 @@ actual fun DownloadAllImage() = painterResource(R.drawable.ic_download_arrow)
 actual fun ShareImage() = painterResource(R.drawable.ic_share_open)
 
 @Composable
-actual fun PlaceHolderImage() = painterResource(R.drawable.music)
+actual fun PlaceHolderImage() = painterResource(R.drawable.ic_song_placeholder)
 
 @Composable
 actual fun SpotiFlyerLogo() = painterResource(R.drawable.ic_spotiflyer_logo)

@@ -458,6 +458,7 @@ class ForegroundService : Service(), CoroutineScope {
             serviceJob.cancel()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 stopForeground(true)
+                stopSelf()
             } else {
                 stopSelf() // System will automatically close it
             }
