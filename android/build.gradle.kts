@@ -104,7 +104,7 @@ dependencies {
     implementation(Koin.android)
     implementation(Koin.compose)
 
-    implementation("com.google.accompanist:accompanist-insets:0.7.1")
+    implementation("com.google.accompanist:accompanist-insets:0.8.0")
 
     //DECOMPOSE
     implementation(Decompose.decompose)
