@@ -15,7 +15,7 @@
  */
 
 plugins {
-    id("multiplatform-setup-test")
+    id("multiplatform-setup")
     id("android-setup")
     id("com.squareup.sqldelight")
 }
@@ -31,7 +31,6 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":common:data-models"))
-                // implementation(Badoo.Reaktive.reaktive)
                 // SQL Delight
                 implementation(SqlDelight.runtime)
                 implementation(SqlDelight.coroutineExtensions)
@@ -52,10 +51,10 @@ kotlin {
             }
         }
 
-        /*iosMain {
+        val iosMain by getting {
             dependencies {
-                implementation(Deps.Squareup.SQLDelight.nativeDriver)
+                implementation(SqlDelight.nativeDriver)
             }
-        }*/
+        }
     }
 }

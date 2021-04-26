@@ -20,18 +20,38 @@ plugins {
     id("multiplatform-setup")
     id("android-setup")
     kotlin("plugin.serialization")
+    kotlin("native.cocoapods") //version "1.4.32"
 }
 
+version = "1.0"
+
 kotlin {
+
+    cocoapods {
+        // Configure fields required by CocoaPods.
+        summary = "SpotiFlyer Native Module"
+        homepage = "https://github.com/Shabinder/SpotiFlyer"
+        authors = "Shabinder Singh"
+        // You can change the name of the produced framework.
+        // By default, it is the name of the Gradle project.
+        frameworkName = "SpotiFlyer"
+        ios.deploymentTarget = "13.5"
+
+        // Dependencies
+        pod("TagLibIOS") {
+            version = "~> 0.3"
+        }
+    }
+
     sourceSets {
         commonMain {
             dependencies {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
-                implementation(project(":fuzzywuzzy:app"))
-                implementation("org.jetbrains.kotlinx:atomicfu:0.15.1")
+                implementation("org.jetbrains.kotlinx:atomicfu:0.15.2")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
+                implementation("com.shabinder.fuzzywuzzy:fuzzywuzzy:1.0")
                 implementation(Ktor.clientCore)
                 implementation(Ktor.clientSerialization)
                 implementation(Ktor.clientLogging)
@@ -72,7 +92,6 @@ kotlin {
                 implementation(Ktor.clientJs)
                 implementation(npm("browser-id3-writer", "4.4.0"))
                 implementation(npm("file-saver", "2.0.4"))
-                // implementation(npm("@types/file-saver","2.0.1",generateExternals = true))
             }
         }
     }

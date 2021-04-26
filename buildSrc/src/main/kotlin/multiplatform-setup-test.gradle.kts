@@ -40,6 +40,7 @@ kotlin {
         // nodejs()
         binaries.executable()
     }
+    ios()
     sourceSets {
         named("commonTest") {
             dependencies {

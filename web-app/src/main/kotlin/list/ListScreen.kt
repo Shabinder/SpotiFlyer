@@ -50,9 +50,9 @@ class ListScreen(
                 id = "list-screen"
             }
 
-            if(result == null){
+            if(result == null) {
                 LoadingAnim {  }
-            }else{
+            }else {
                 CoverImage {
                     coverImageURL = result.coverUrl
                     coverName = result.title
@@ -66,7 +66,7 @@ class ListScreen(
                     link = state.data.link
                 }
 
-                styledDiv{
+                styledDiv {
                     css {
                         display =Display.flex
                         flexGrow = 1.0

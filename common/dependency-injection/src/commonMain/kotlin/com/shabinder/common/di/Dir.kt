@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt
 
-expect class Dir(
+expect class Dir (
     logger: Kermit,
     database: Database? = createDatabase(),
 ) {
@@ -89,6 +89,7 @@ suspend fun downloadByteArray(
 fun getNameURL(url: String): String {
     return url.substring(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1, url.length).replace('/', '_')
 }
+
 /*
 * Call this function at startup!
 * */
@@ -100,6 +101,7 @@ fun Dir.createDirectories() {
     createDirectory(defaultDir() + "Playlists/")
     createDirectory(defaultDir() + "YT_Downloads/")
 }
+
 fun Dir.finalOutputDir(itemName: String, type: String, subFolder: String, defaultDir: String, extension: String = ".mp3"): String =
     defaultDir + removeIllegalChars(type) + this.fileSeparator() +
         if (subFolder.isEmpty())"" else { removeIllegalChars(subFolder) + this.fileSeparator() } +

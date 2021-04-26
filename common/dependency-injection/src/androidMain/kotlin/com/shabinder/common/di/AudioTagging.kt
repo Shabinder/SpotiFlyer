@@ -88,7 +88,7 @@ fun Mp3File.removeAllTags(): Mp3File {
 
 fun Mp3File.setId3v1Tags(track: TrackDetails): Mp3File {
     val id3v1Tag = ID3v1Tag().apply {
-        artist = track.artists.joinToString(",")
+        artist = track.artists.joinToString(", ")
         title = track.title
         album = track.albumName
         year = track.year
@@ -102,7 +102,7 @@ fun Mp3File.setId3v1Tags(track: TrackDetails): Mp3File {
 suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails) {
     val id3v2Tag = ID3v24Tag().apply {
 
-        artist = track.artists.joinToString(",")
+        artist = track.artists.joinToString(", ")
         title = track.title
         album = track.albumName
         year = track.year

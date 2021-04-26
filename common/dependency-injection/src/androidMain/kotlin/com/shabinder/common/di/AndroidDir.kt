@@ -86,18 +86,6 @@ actual class Dir actual constructor(
         File(imageCacheDir()).deleteRecursively()
     }
 
-    actual suspend fun cacheImage(image: Any, path: String) {
-        withContext(Dispatchers.IO){
-            try {
-                FileOutputStream(path).use { out ->
-                    (image as? Bitmap)?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-    }
-
     @Suppress("BlockingMethodInNonBlockingContext")
     actual suspend fun saveFileWithMetadata(
         mp3ByteArray: ByteArray,
@@ -175,6 +163,18 @@ actual class Dir actual constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             null
+        }
+    }
+
+    actual suspend fun cacheImage(image: Any, path: String) {
+        withContext(Dispatchers.IO){
+            try {
+                FileOutputStream(path).use { out ->
+                    (image as? Bitmap)?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
         }
     }
 
