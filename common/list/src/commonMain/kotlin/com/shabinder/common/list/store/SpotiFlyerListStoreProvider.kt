@@ -58,6 +58,7 @@ internal class SpotiFlyerListStoreProvider(
         data class ResultFetched(val result: PlatformQueryResult, val trackList: List<TrackDetails>) : Result()
         data class UpdateTrackList(val list: List<TrackDetails>) : Result()
         data class UpdateTrackItem(val item: TrackDetails) : Result()
+        data class ErrorOccurred(val error: Exception) : Result()
     }
 
     private inner class ExecutorImpl : SuspendExecutor<Intent, Unit, State, Result, Nothing>() {
@@ -74,10 +75,19 @@ internal class SpotiFlyerListStoreProvider(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) {
             when (intent) {
-                is Intent.SearchLink -> fetchQuery.query(link)?.let { result ->
-                    result.trackList = result.trackList.toMutableList()
-                    dispatch((Result.ResultFetched(result, result.trackList.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0) { hashMapOf() }))))
-                    executeIntent(Intent.RefreshTracksStatuses, getState)
+                is Intent.SearchLink -> {
+                    try {
+                        val result = fetchQuery.query(link)
+                        if( result != null) {
+                            result.trackList = result.trackList.toMutableList()
+                            dispatch((Result.ResultFetched(result, result.trackList.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0) { hashMapOf() }))))
+                            executeIntent(Intent.RefreshTracksStatuses, getState)
+                        } else {
+                            throw Exception("An Error Occurred, Check your Link / Connection")
+                        }
+                    } catch (e:Exception) {
+                        dispatch(Result.ErrorOccurred(e))
+                    }
                 }
 
                 is Intent.StartDownloadAll -> {
@@ -107,6 +117,7 @@ internal class SpotiFlyerListStoreProvider(
                 is Result.ResultFetched -> copy(queryResult = result.result, trackList = result.trackList, link = link)
                 is Result.UpdateTrackList -> copy(trackList = result.list)
                 is Result.UpdateTrackItem -> updateTrackItem(result.item)
+                is Result.ErrorOccurred -> copy(errorOccurred = result.error)
             }
 
         private fun State.updateTrackItem(item: TrackDetails): State {

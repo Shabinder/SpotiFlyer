@@ -63,10 +63,6 @@ private suspend fun isInternetAvailable(): Boolean {
 actual val isInternetAvailable: Boolean
     get() {
         return true
-        /*var result = false
-        val job = GlobalScope.launch { result = isInternetAvailable() }
-        while(job.isActive){}
-        return result*/
     }
 
 val DownloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = MutableSharedFlow(1)

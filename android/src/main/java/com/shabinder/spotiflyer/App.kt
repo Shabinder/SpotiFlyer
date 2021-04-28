@@ -33,7 +33,7 @@ class App: Application(), KoinComponent {
         val loggingEnabled = true
 
         initKoin(loggingEnabled) {
-            androidLogger(Level.NONE)
+            androidLogger(Level.NONE) // No virtual method elapsedNow
             androidContext(this@App)
             modules(appModule(loggingEnabled))
         }

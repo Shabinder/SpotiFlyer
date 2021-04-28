@@ -43,7 +43,6 @@ import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.downloader.YoutubeDownloader
 import com.shabinder.downloader.models.formats.Format
 import com.shabinder.common.models.Status
 import kotlinx.coroutines.CoroutineScope
@@ -57,6 +56,7 @@ import java.io.File
 import kotlin.coroutines.CoroutineContext
 
 class ForegroundService : Service(), CoroutineScope {
+
     private val tag: String = "Foreground Service"
     private val channelId = "ForegroundDownloaderService"
     private val notificationId = 101
@@ -64,26 +64,25 @@ class ForegroundService : Service(), CoroutineScope {
     private var converted = 0 // Total Files Converted
     private var downloaded = 0 // Total Files downloaded
     private var failed = 0 // Total Files failed
-    private val isFinished: Boolean
-        get() = converted + failed == total
-    private var isSingleDownload: Boolean = false
+    private val isFinished get() = converted + failed == total
+    private var isSingleDownload = false
 
     private lateinit var serviceJob: Job
     override val coroutineContext: CoroutineContext
         get() = serviceJob + Dispatchers.IO
 
     private val allTracksStatus = hashMapOf<String, DownloadStatus>()
+    private var messageList = mutableListOf("", "", "", "", "")
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
-    private var messageList = mutableListOf("", "", "", "", "")
     private lateinit var cancelIntent: PendingIntent
+
     private lateinit var downloadManager: DownloadManager
     private lateinit var downloadService: ParallelExecutor
+    private val ytDownloader get() = fetcher.youtubeProvider.ytDownloader
     private val fetcher: FetchPlatformQueryResult by inject()
     private val logger: Kermit by inject()
     private val dir: Dir by inject()
-    private val ytDownloader: YoutubeDownloader
-        get() = fetcher.youtubeProvider.ytDownloader
 
     override fun onBind(intent: Intent): IBinder? = null
 

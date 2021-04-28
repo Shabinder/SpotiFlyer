@@ -53,23 +53,27 @@ expect class Dir (
 
 suspend fun downloadFile(url: String): Flow<DownloadResult> {
     return flow {
-        val client = createHttpClient()
-        val response = client.get<HttpStatement>(url).execute()
-        val data = ByteArray(response.contentLength()!!.toInt())
-        var offset = 0
-        do {
-            // Set Length optimally, after how many kb you want a progress update, now it 0.25mb
-            val currentRead = response.content.readAvailable(data, offset, 250000)
-            offset += currentRead
-            val progress = (offset * 100f / data.size).roundToInt()
-            emit(DownloadResult.Progress(progress))
-        } while (currentRead > 0)
-        if (response.status.isSuccess()) {
-            emit(DownloadResult.Success(data))
-        } else {
-            emit(DownloadResult.Error("File not downloaded"))
+        try {
+            val client = createHttpClient()
+            val response = client.get<HttpStatement>(url).execute()
+            val data = ByteArray(response.contentLength()!!.toInt())
+            var offset = 0
+            do {
+                // Set Length optimally, after how many kb you want a progress update, now it 0.25mb
+                val currentRead = response.content.readAvailable(data, offset, 250000)
+                offset += currentRead
+                val progress = (offset * 100f / data.size).roundToInt()
+                emit(DownloadResult.Progress(progress))
+            } while (currentRead > 0)
+            if (response.status.isSuccess()) {
+                emit(DownloadResult.Success(data))
+            } else {
+                emit(DownloadResult.Error("File not downloaded"))
+            }
+            client.close()
+        } catch (e:Exception) {
+            emit(DownloadResult.Error(e.message ?: "File not downloaded"))
         }
-        client.close()
     }
 }
 

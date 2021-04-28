@@ -24,6 +24,7 @@ import com.shabinder.common.di.providers.SpotifyProvider
 import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
 import io.ktor.client.HttpClient
+import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.features.logging.DEFAULT
@@ -65,6 +66,12 @@ fun createHttpClient(enableNetworkLogs: Boolean = false, serializer: KotlinxSeri
     install(JsonFeature) {
         this.serializer = serializer
     }
+    // Timeout
+    install(HttpTimeout) {
+        requestTimeoutMillis = 15000L
+        connectTimeoutMillis = 15000L
+        socketTimeoutMillis = 15000L
+    }
     if (enableNetworkLogs) {
         install(Logging) {
             logger = Logger.DEFAULT
@@ -72,4 +79,5 @@ fun createHttpClient(enableNetworkLogs: Boolean = false, serializer: KotlinxSeri
         }
     }
 }
+/*Client Active Throughout App's Lifetime*/
 val ktorHttpClient = HttpClient {}

@@ -73,7 +73,8 @@ interface SpotiFlyerList {
     data class State(
         val queryResult: PlatformQueryResult? = null,
         val link: String = "",
-        val trackList: List<TrackDetails> = emptyList()
+        val trackList: List<TrackDetails> = emptyList(),
+        val errorOccurred: Exception? = null
     )
 }
 

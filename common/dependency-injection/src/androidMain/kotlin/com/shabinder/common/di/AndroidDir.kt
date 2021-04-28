@@ -150,8 +150,9 @@ actual class Dir actual constructor(
                 }
             }catch (e:Exception){
                 withContext(Dispatchers.Main){
-                    Toast.makeText(appContext,"Could Not Create File:\n${songFile.absolutePath}",Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(appContext,"Could Not Create File:\n${songFile.absolutePath}",Toast.LENGTH_SHORT).show()
                 }
+                if(songFile.exists()) songFile.delete()
                 logger.e { "${songFile.absolutePath} could not be created" }
             }
         }
