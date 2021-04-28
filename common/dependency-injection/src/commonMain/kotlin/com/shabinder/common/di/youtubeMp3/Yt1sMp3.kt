@@ -16,6 +16,7 @@
 
 package com.shabinder.common.di.youtubeMp3
 
+import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.gaana.corsApi
 import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.FormDataContent
@@ -31,7 +32,7 @@ import kotlinx.serialization.json.jsonPrimitive
 interface Yt1sMp3 {
 
     val httpClient: HttpClient
-
+    val logger: Kermit
     /*
     * Downloadable Mp3 Link for YT videoID.
     * */

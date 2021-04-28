@@ -29,11 +29,12 @@ class App: Application(), KoinComponent {
         super.onCreate()
 
         appContext = this
+        val loggingEnabled = true
 
-        initKoin {
+        initKoin(loggingEnabled) {
             androidLogger()
             androidContext(this@App)
-            modules(appModule)
+            modules(appModule(loggingEnabled))
         }
     }
 }

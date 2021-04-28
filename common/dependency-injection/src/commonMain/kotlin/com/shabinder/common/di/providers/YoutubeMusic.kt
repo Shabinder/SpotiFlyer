@@ -20,7 +20,7 @@ import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.gaana.corsApi
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.YoutubeTrack
-import com.willowtreeapps.fuzzywuzzy.diffutils.FuzzySearch
+import com.shabinder.fuzzywuzzy.diffutils.FuzzySearch
 import io.ktor.client.HttpClient
 import io.ktor.client.request.headers
 import io.ktor.client.request.post

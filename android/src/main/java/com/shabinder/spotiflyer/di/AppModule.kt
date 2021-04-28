@@ -21,15 +21,16 @@ import com.tonyodev.fetch2.Fetch
 import com.tonyodev.fetch2.FetchConfiguration
 import org.koin.dsl.module
 
-val appModule = module {
-    single { createFetchInstance() }
+fun appModule(enableLogging:Boolean = false) = module {
+    single { createFetchInstance(enableLogging) }
 }
 
-private fun createFetchInstance():Fetch{
+private fun createFetchInstance(enableLogging:Boolean = false):Fetch{
     val fetchConfiguration =
         FetchConfiguration.Builder(appContext).run {
             setNamespace("ForegroundDownloaderService")
             setDownloadConcurrentLimit(4)
+            enableLogging(enableLogging)
             build()
         }
 
