@@ -28,7 +28,7 @@ object Versions {
     const val ktLint = "10.0.0"
     
     // DI
-    const val koin = "3.0.1-beta-1"
+    const val koin = "3.0.1"
 
     // Logger
     const val kermit = "0.1.8"
@@ -49,6 +49,13 @@ object Versions {
     const val compileSdkVersion = 29
     const val targetSdkVersion = 29
     const val androidLifecycle = "2.3.0"
+}
+object HostOS {
+    // Host OS Properties
+    private val hostOs = System.getProperty("os.name")
+    val isMingwX64 = hostOs.startsWith("Windows",true)
+    val isMac = hostOs.startsWith("Mac",true)
+    val isLinux = hostOs.startsWith("Linux",true)
 }
 object Koin {
     val core = "io.insert-koin:koin-core:${Versions.koin}"

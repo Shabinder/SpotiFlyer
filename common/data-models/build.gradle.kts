@@ -30,6 +30,5 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3-native-mt")
             }
         }
-        val iosMain by getting
     }
 }

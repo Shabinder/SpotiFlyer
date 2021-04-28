@@ -23,12 +23,15 @@ plugins {
 
 kotlin {
 
-    val sdkName: String? = System.getenv("SDK_NAME")
-    val isiOSDevice = sdkName.orEmpty().startsWith("iphoneos")
-    if (isiOSDevice) {
-        iosArm64("ios")
-    } else {
-        iosX64("ios")
+    /*IOS Target Can be only built on Mac*/
+    if(HostOS.isMac){
+        val sdkName: String? = System.getenv("SDK_NAME")
+        val isiOSDevice = sdkName.orEmpty().startsWith("iphoneos")
+        if (isiOSDevice) {
+            iosArm64("ios")
+        } else {
+            iosX64("ios")
+        }
     }
 
     jvm("desktop").compilations.all {
@@ -50,6 +53,7 @@ kotlin {
         // nodejs()
         binaries.executable()
     }
+
     sourceSets {
         named("commonMain") {
             dependencies {}
@@ -84,6 +88,11 @@ kotlin {
                 implementation("org.jetbrains:kotlin-react:17.0.1-pre.148-kotlin-1.4.30")
                 implementation("org.jetbrains:kotlin-styled:1.0.0-pre.115-kotlin-1.4.10")
                 implementation("org.jetbrains:kotlin-react-dom:17.0.1-pre.148-kotlin-1.4.30")
+            }
+        }
+        if(HostOS.isMac){
+            named("iosMain"){
+                dependencies {  }
             }
         }
     }
