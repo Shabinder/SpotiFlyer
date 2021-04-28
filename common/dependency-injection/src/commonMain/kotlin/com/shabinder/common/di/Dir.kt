@@ -58,7 +58,8 @@ suspend fun downloadFile(url: String): Flow<DownloadResult> {
         val data = ByteArray(response.contentLength()!!.toInt())
         var offset = 0
         do {
-            val currentRead = response.content.readAvailable(data, offset, data.size)
+            // Set Length optimally, after how many kb you want a progress update, now it 0.25mb
+            val currentRead = response.content.readAvailable(data, offset, 250000)
             offset += currentRead
             val progress = (offset * 100f / data.size).roundToInt()
             emit(DownloadResult.Progress(progress))

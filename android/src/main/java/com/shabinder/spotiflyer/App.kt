@@ -23,6 +23,7 @@ import com.shabinder.spotiflyer.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.component.KoinComponent
+import org.koin.core.logger.Level
 
 class App: Application(), KoinComponent {
     override fun onCreate() {
@@ -32,7 +33,7 @@ class App: Application(), KoinComponent {
         val loggingEnabled = true
 
         initKoin(loggingEnabled) {
-            androidLogger()
+            androidLogger(Level.NONE)
             androidContext(this@App)
             modules(appModule(loggingEnabled))
         }

@@ -23,6 +23,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaScannerConnection
 import android.os.Environment
+import android.widget.Toast
 import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
@@ -93,53 +94,65 @@ actual class Dir actual constructor(
     ) {
         withContext(Dispatchers.IO){
             val songFile = File(trackDetails.outputFilePath)
-            /*
-            * Check , if Fetch was Used, File is saved Already, else write byteArray we Received
-            * */
-            // if(!m4aFile.exists()) m4aFile.writeBytes(mp3ByteArray)
+            try {
+                /*
+                * Check , if Fetch was Used, File is saved Already, else write byteArray we Received
+                * */
+                if(!songFile.exists()) {
+                    /*Make intermediate Dirs if they don't exist yet*/
+                    songFile.parentFile.mkdirs()
+                }
 
-            when (trackDetails.outputFilePath.substringAfterLast('.')) {
-                ".mp3" -> {
-                    Mp3File(File(songFile.absolutePath))
-                        .removeAllTags()
-                        .setId3v1Tags(trackDetails)
-                        .setId3v2TagsAndSaveFile(trackDetails)
-                    addToLibrary(songFile.absolutePath)
-                }
-                ".m4a" -> {
-                    /*FFmpeg.executeAsync(
-                        "-i ${m4aFile.absolutePath} -y -b:a 160k -acodec libmp3lame -vn ${m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"}"
-                    ){ _, returnCode ->
-                        when (returnCode) {
-                            Config.RETURN_CODE_SUCCESS  -> {
-                                //FFMPEG task Completed
-                                logger.d{ "Async command execution completed successfully." }
-                                scope.launch {
-                                    Mp3File(File(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"))
-                                        .removeAllTags()
-                                        .setId3v1Tags(trackDetails)
-                                        .setId3v2TagsAndSaveFile(trackDetails)
-                                    addToLibrary(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3")
-                                }
-                            }
-                            Config.RETURN_CODE_CANCEL -> {
-                                logger.d{"Async command execution cancelled by user."}
-                            }
-                            else -> {
-                                logger.d { "Async command execution failed with rc=$returnCode" }
-                            }
-                        }
-                    }*/
-                }
-                else -> {
-                    try {
+                if(mp3ByteArray.isNotEmpty()) songFile.writeBytes(mp3ByteArray)
+
+                when (trackDetails.outputFilePath.substringAfterLast('.')) {
+                    ".mp3" -> {
                         Mp3File(File(songFile.absolutePath))
                             .removeAllTags()
                             .setId3v1Tags(trackDetails)
                             .setId3v2TagsAndSaveFile(trackDetails)
                         addToLibrary(songFile.absolutePath)
-                    } catch (e: Exception) { e.printStackTrace() }
+                    }
+                    ".m4a" -> {
+                        /*FFmpeg.executeAsync(
+                            "-i ${m4aFile.absolutePath} -y -b:a 160k -acodec libmp3lame -vn ${m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"}"
+                        ){ _, returnCode ->
+                            when (returnCode) {
+                                Config.RETURN_CODE_SUCCESS  -> {
+                                    //FFMPEG task Completed
+                                    logger.d{ "Async command execution completed successfully." }
+                                    scope.launch {
+                                        Mp3File(File(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"))
+                                            .removeAllTags()
+                                            .setId3v1Tags(trackDetails)
+                                            .setId3v2TagsAndSaveFile(trackDetails)
+                                        addToLibrary(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3")
+                                    }
+                                }
+                                Config.RETURN_CODE_CANCEL -> {
+                                    logger.d{"Async command execution cancelled by user."}
+                                }
+                                else -> {
+                                    logger.d { "Async command execution failed with rc=$returnCode" }
+                                }
+                            }
+                        }*/
+                    }
+                    else -> {
+                        try {
+                            Mp3File(File(songFile.absolutePath))
+                                .removeAllTags()
+                                .setId3v1Tags(trackDetails)
+                                .setId3v2TagsAndSaveFile(trackDetails)
+                            addToLibrary(songFile.absolutePath)
+                        } catch (e: Exception) { e.printStackTrace() }
+                    }
                 }
+            }catch (e:Exception){
+                withContext(Dispatchers.Main){
+                    Toast.makeText(appContext,"Could Not Create File:\n${songFile.absolutePath}",Toast.LENGTH_SHORT).show()
+                }
+                logger.e { "${songFile.absolutePath} could not be created" }
             }
         }
     }
