@@ -45,15 +45,7 @@ import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.downloader.YoutubeDownloader
 import com.shabinder.downloader.models.formats.Format
-import com.tonyodev.fetch2.Download
-import com.tonyodev.fetch2.Error
-import com.tonyodev.fetch2.Fetch
-import com.tonyodev.fetch2.FetchListener
-import com.tonyodev.fetch2.NetworkType
-import com.tonyodev.fetch2.Priority
-import com.tonyodev.fetch2.Request
-import com.tonyodev.fetch2.Status
-import com.tonyodev.fetch2core.DownloadBlock
+import com.shabinder.common.models.Status
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -80,7 +72,6 @@ class ForegroundService : Service(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = serviceJob + Dispatchers.IO
 
-    //private val requestMap = hashMapOf<Request, TrackDetails>()
     private val allTracksStatus = hashMapOf<String, DownloadStatus>()
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
@@ -90,7 +81,6 @@ class ForegroundService : Service(), CoroutineScope {
     private lateinit var downloadService: ParallelExecutor
     private val fetcher: FetchPlatformQueryResult by inject()
     private val logger: Kermit by inject()
-    private val fetch: Fetch by inject()
     private val dir: Dir by inject()
     private val ytDownloader: YoutubeDownloader
         get() = fetcher.youtubeProvider.ytDownloader
@@ -111,7 +101,6 @@ class ForegroundService : Service(), CoroutineScope {
         ).apply { action = "kill" }
         cancelIntent = PendingIntent.getService(this, 0, intent, FLAG_CANCEL_CURRENT)
         downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        //fetch.removeAllListeners().addListener(fetchListener)
     }
 
     @SuppressLint("WakelockTimeout")
@@ -245,14 +234,14 @@ class ForegroundService : Service(), CoroutineScope {
                             sendBroadcast(intent)
                         }
 
-                        is DownloadResult.Success -> { // Todo clear map
+                        is DownloadResult.Success -> {
                             try {
                                 // Save File and Embed Metadata
                                 val job = launch(Dispatchers.Default) { dir.saveFileWithMetadata(it.byteArray, track) }
                                 allTracksStatus[track.title] = DownloadStatus.Converting
                                 sendTrackBroadcast("Converting", track)
                                 addToNotification("Processing ${track.title}")
-                                job.invokeOnCompletion { _ ->
+                                job.invokeOnCompletion {
                                     converted++
                                     allTracksStatus[track.title] = DownloadStatus.Downloaded
                                     sendTrackBroadcast(Status.COMPLETED.name, track)
@@ -274,152 +263,12 @@ class ForegroundService : Service(), CoroutineScope {
                 }
             }
         }
-
-       /* val request = Request(url, track.outputFilePath).apply {
-            priority = Priority.NORMAL
-            networkType = NetworkType.ALL
-        }
-        fetch.enqueue(
-            request,
-            { request1 ->
-                requestMap[request1] = track
-                logger.d(tag) { "Enqueuing Download" }
-            },
-            { error ->
-                logger.d(tag) { "Enqueuing Error:${error.throwable}" }
-            }
-        )*/
     }
-
-    /**
-     * Fetch Listener/ Responsible for Fetch Behaviour
-     **/
-    /*private var fetchListener: FetchListener = object : FetchListener {
-        override fun onQueued(
-            download: Download,
-            waitingOnNetwork: Boolean
-        ) {
-            requestMap[download.request]?.let { sendTrackBroadcast(Status.QUEUED.name, it) }
-        }
-
-        override fun onRemoved(download: Download) {
-            // TODO("Not yet implemented")
-        }
-
-        override fun onResumed(download: Download) {
-            // TODO("Not yet implemented")
-        }
-
-        override fun onStarted(
-            download: Download,
-            downloadBlocks: List<DownloadBlock>,
-            totalBlocks: Int
-        ) {
-            launch {
-                val track = requestMap[download.request]
-                addToNotification("Downloading ${track?.title}")
-                logger.d(tag) { "${track?.title} Download Started" }
-                track?.let {
-                    allTracksStatus[it.title] = DownloadStatus.Downloading()
-                    sendTrackBroadcast(Status.DOWNLOADING.name, track)
-                }
-            }
-        }
-
-        override fun onWaitingNetwork(download: Download) {
-            // TODO("Not yet implemented")
-        }
-
-        override fun onAdded(download: Download) {
-            // TODO("Not yet implemented")
-        }
-
-        override fun onCancelled(download: Download) {
-            // TODO("Not yet implemented")
-        }
-
-        override fun onCompleted(download: Download) {
-            val track = requestMap[download.request]
-            try {
-                track?.let {
-                    val job = launch { dir.saveFileWithMetadata(byteArrayOf(), it) }
-                    allTracksStatus[it.title] = DownloadStatus.Converting
-                    sendTrackBroadcast("Converting", it)
-                    addToNotification("Processing ${it.title}")
-                    job.invokeOnCompletion { _ ->
-                        converted++
-                        allTracksStatus[it.title] = DownloadStatus.Downloaded
-                        sendTrackBroadcast(Status.COMPLETED.name, it)
-                        removeFromNotification("Processing ${it.title}")
-                    }
-                }
-                logger.d(tag) { "${track?.title} Download Completed" }
-            } catch (
-                e: KotlinNullPointerException
-            ) {
-                logger.d(tag) { "${track?.title} Download Failed! Error:Fetch!!!!" }
-                logger.d(tag) { "${track?.title} Requesting Download thru Android DM" }
-                downloadUsingDM(download.request.url, download.request.file, track!!)
-            }
-            downloaded++
-            requestMap.remove(download.request)
-            removeFromNotification("Downloading ${track?.title}")
-        }
-
-        override fun onDeleted(download: Download) {
-            // TODO("Not yet implemented")
-        }
-
-        override fun onDownloadBlockUpdated(
-            download: Download,
-            downloadBlock: DownloadBlock,
-            totalBlocks: Int
-        ) {
-            // TODO("Not yet implemented")
-        }
-
-        override fun onError(download: Download, error: Error, throwable: Throwable?) {
-            launch {
-                val track = requestMap[download.request]
-                downloaded++
-                logger.d(tag) { download.error.throwable.toString() }
-                logger.d(tag) { "${track?.title} Requesting Download thru Android DM" }
-                downloadUsingDM(download.request.url, download.request.file, track!!)
-                requestMap.remove(download.request)
-                removeFromNotification("Downloading ${track.title}")
-            }
-            updateNotification()
-        }
-
-        override fun onPaused(download: Download) {
-            // TODO("Not yet implemented")
-        }
-
-        override fun onProgress(
-            download: Download,
-            etaInMilliSeconds: Long,
-            downloadedBytesPerSecond: Long
-        ) {
-            launch {
-                requestMap[download.request]?.run {
-                    allTracksStatus[title] = DownloadStatus.Downloading(download.progress)
-                    logger.d(tag) { "$title ETA: ${etaInMilliSeconds / 1000} sec" }
-
-                    val intent = Intent().apply {
-                        action = "Progress"
-                        putExtra("progress", download.progress)
-                        putExtra("track", this@run)
-                    }
-                    sendBroadcast(intent)
-                }
-            }
-        }
-    }*/
 
     /**
      * If fetch Fails , Android Download Manager To RESCUE!!
      **/
-    fun downloadUsingDM(url: String, outputDir: String, track: TrackDetails) {
+    private fun downloadUsingDM(url: String, outputDir: String, track: TrackDetails) {
         launch {
             val uri = Uri.parse(url)
             val request = DownloadManager.Request(uri).apply {
@@ -514,8 +363,6 @@ class ForegroundService : Service(), CoroutineScope {
         launch {
             logger.d(tag) { "Killing Self" }
             messageList = mutableListOf("Cleaning And Exiting", "", "", "", "")
-            fetch.cancelAll()
-            fetch.removeAll()
             downloadService.close()
             updateNotification()
             cleanFiles(File(dir.defaultDir()))
@@ -573,18 +420,11 @@ class ForegroundService : Service(), CoroutineScope {
         updateNotification()
     }
 
-    fun sendTrackBroadcast(action: String, track: TrackDetails) {
+    private fun sendTrackBroadcast(action: String, track: TrackDetails) {
         val intent = Intent().apply {
             setAction(action)
             putExtra("track", track)
         }
         this@ForegroundService.sendBroadcast(intent)
     }
-}
-
-private fun Fetch.removeAllListeners(): Fetch {
-    for (listener in this.getListenerSet()) {
-        this.removeListener(listener)
-    }
-    return this
 }

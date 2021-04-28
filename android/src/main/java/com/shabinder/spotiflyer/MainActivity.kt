@@ -66,7 +66,7 @@ import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.uikit.*
 import com.shabinder.spotiflyer.utils.*
-import com.tonyodev.fetch2.Status
+import com.shabinder.common.models.Status
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.android.ext.android.inject

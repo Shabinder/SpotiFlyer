@@ -16,28 +16,6 @@
 
 package com.shabinder.spotiflyer.di
 
-import com.shabinder.common.database.appContext
-import com.tonyodev.fetch2.Fetch
-import com.tonyodev.fetch2.FetchConfiguration
 import org.koin.dsl.module
 
-fun appModule(enableLogging:Boolean = false) = module {
-    single { createFetchInstance(enableLogging) }
-}
-
-private fun createFetchInstance(enableLogging:Boolean = false):Fetch{
-    val fetchConfiguration =
-        FetchConfiguration.Builder(appContext).run {
-            setNamespace("ForegroundDownloaderService")
-            setDownloadConcurrentLimit(4)
-            enableLogging(enableLogging)
-            build()
-        }
-
-    return Fetch.run {
-        setDefaultInstanceConfiguration(fetchConfiguration)
-        getDefaultInstance()
-    }.apply {
-        removeAll() //Starting fresh
-    }
-}
+fun appModule(enableLogging:Boolean = false) = module {}

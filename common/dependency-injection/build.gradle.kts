@@ -20,7 +20,7 @@ plugins {
     id("multiplatform-setup")
     id("android-setup")
     kotlin("plugin.serialization")
-    kotlin("native.cocoapods") //version "1.4.32"
+    kotlin("native.cocoapods")
 }
 
 version = "1.0"
@@ -69,7 +69,6 @@ kotlin {
                 implementation(compose.materialIconsExtended)
                 implementation(Koin.android)
                 implementation(Ktor.clientAndroid)
-                implementation(Extras.Android.fetch)
                 implementation(Extras.Android.razorpay)
                 api(Extras.mp3agic)
                 api(Extras.jaudioTagger)

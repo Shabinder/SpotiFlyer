@@ -106,31 +106,19 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-insets:0.7.1")
 
-    //DECOMPOSE
+    // DECOMPOSE
     implementation(Decompose.decompose)
     implementation(Decompose.extensionsCompose)
 
-    //Firebase
+    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:27.0.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-perf-ktx")
 
-/*
-    //Lifecycle
-    Versions.androidLifecycle.let{
-        implementation("androidx.lifecycle:lifecycle-runtime-ktx:$it")
-        implementation("androidx.lifecycle:lifecycle-livedata-ktx:$it")
-        implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$it")
-        implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$it")
-    }
-*/
-
-
     Extras.Android.apply {
         implementation(appUpdator)
         implementation(razorpay)
-        implementation(fetch)
     }
     implementation(MVIKotlin.mvikotlin)
     implementation(MVIKotlin.mvikotlinMain)
@@ -139,11 +127,11 @@ dependencies {
     implementation(Decompose.decompose)
     implementation(Decompose.extensionsCompose)
 
-    //Test
+    // Test
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation(Androidx.junit)
     androidTestImplementation(Androidx.expresso)
 
-    //Desugaring
+    // Desugaring
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 }
