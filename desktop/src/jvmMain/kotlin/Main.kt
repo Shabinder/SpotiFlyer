@@ -42,8 +42,7 @@ import com.shabinder.common.uikit.colorOffWhite
 import com.shabinder.common.uikit.showToast
 import com.shabinder.database.Database
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 private val koin = initKoin(enableNetworkLogs = true).koin
 
@@ -96,11 +95,8 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                 override val dispatcherIO = Dispatchers.IO
 
                 override val isInternetAvailable: Boolean
-                    get() {
-                        var result = false
-                        val job = GlobalScope.launch { result = isInternetAccessible() }
-                        while (job.isActive) {/*TODO Better Way*/}
-                        return result
+                    get() =  runBlocking {
+                        isInternetAccessible()
                     }
 
                 override val currentPlatform = AllPlatforms.Jvm

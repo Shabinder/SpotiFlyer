@@ -29,18 +29,19 @@ kotlin {
 
     cocoapods {
         // Configure fields required by CocoaPods.
-        summary = "SpotiFlyer Native Module"
+        summary = "SpotiFlyer-DI Native Module"
         homepage = "https://github.com/Shabinder/SpotiFlyer"
         authors = "Shabinder Singh"
         // You can change the name of the produced framework.
         // By default, it is the name of the Gradle project.
-        frameworkName = "SpotiFlyer"
-        ios.deploymentTarget = "13.5"
+        frameworkName = "SpotiFlyer-DI"
+        ios.deploymentTarget = "9.0"
 
         // Dependencies
         pod("TagLibIOS") {
             version = "~> 0.3"
         }
+        //podfile = project.file("spotiflyer-ios/Podfile")
     }
 
     sourceSets {

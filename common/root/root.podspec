@@ -1,20 +1,20 @@
 Pod::Spec.new do |spec|
-    spec.name                     = 'dependency_injection'
+    spec.name                     = 'root'
     spec.version                  = '1.0'
     spec.homepage                 = 'https://github.com/Shabinder/SpotiFlyer'
     spec.source                   = { :git => "Not Published", :tag => "Cocoapods/#{spec.name}/#{spec.version}" }
     spec.authors                  = 'Shabinder Singh'
     spec.license                  = ''
-    spec.summary                  = 'SpotiFlyer-DI Native Module'
+    spec.summary                  = 'SpotiFlyer Native Module'
 
     spec.static_framework         = true
-    spec.vendored_frameworks      = "build/cocoapods/framework/SpotiFlyer-DI.framework"
+    spec.vendored_frameworks      = "build/cocoapods/framework/SpotiFlyer.framework"
     spec.libraries                = "c++"
     spec.module_name              = "#{spec.name}_umbrella"
 
-    spec.ios.deployment_target = '9.0'
+    spec.ios.deployment_target = '11.0'
 
-    spec.dependency 'TagLibIOS', '~> 0.3'
+                
 
     spec.pod_target_xcconfig = {
         'KOTLIN_TARGET[sdk=iphonesimulator*]' => 'ios_x64',
@@ -28,13 +28,13 @@ Pod::Spec.new do |spec|
 
     spec.script_phases = [
         {
-            :name => 'Build dependency_injection',
+            :name => 'Build root',
             :execution_position => :before_compile,
             :shell_path => '/bin/sh',
             :script => <<-SCRIPT
                 set -ev
                 REPO_ROOT="$PODS_TARGET_SRCROOT"
-                "$REPO_ROOT/../../gradlew" -p "$REPO_ROOT" :common:dependency-injection:syncFramework \
+                "$REPO_ROOT/../../gradlew" -p "$REPO_ROOT" :common:root:syncFramework \
                     -Pkotlin.native.cocoapods.target=$KOTLIN_TARGET \
                     -Pkotlin.native.cocoapods.configuration=$CONFIGURATION \
                     -Pkotlin.native.cocoapods.cflags="$OTHER_CFLAGS" \

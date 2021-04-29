@@ -7,7 +7,7 @@ import org.koin.dsl.module
 import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
 
 @Suppress("RedundantNullableReturnType")
-actual fun databaseModule(): Module {
+actual fun databaseModule() = module {
     single {
         val driver = NativeSqliteDriver(Database.Schema, "Database.db")
         SpotiFlyerDatabase(Database(driver))

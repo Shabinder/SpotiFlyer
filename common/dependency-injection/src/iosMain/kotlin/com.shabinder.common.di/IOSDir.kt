@@ -1,14 +1,25 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
+import cocoapods.TagLibIOS.TLAudio
+import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import platform.Foundation.*
+import platform.Foundation.NSCachesDirectory
+import platform.Foundation.NSDirectoryEnumerationSkipsHiddenFiles
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSMusicDirectory
+import platform.Foundation.NSURL
+import platform.Foundation.NSURLConnection
+import platform.Foundation.NSURLRequest
+import platform.Foundation.NSUserDomainMask
+import platform.Foundation.URLByAppendingPathComponent
+import platform.Foundation.sendSynchronousRequest
+import platform.Foundation.writeToFile
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
-import cocoapods.TagLibIOS.TLAudio
 
 actual class Dir actual constructor(
     private val logger: Kermit,
@@ -87,7 +98,7 @@ actual class Dir actual constructor(
 
     private suspend fun loadFreshImage(url: String):UIImage? {
         return try {
-            val nsURL = NSURL(url)
+            val nsURL = NSURL(string = url)
             val data = NSURLConnection.sendSynchronousRequest(NSURLRequest.requestWithURL(nsURL),null,null)
             if (data != null) {
                 UIImage.imageWithData(data)?.also {
