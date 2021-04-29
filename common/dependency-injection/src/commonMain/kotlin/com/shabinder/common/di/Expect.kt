@@ -16,23 +16,10 @@
 
 package com.shabinder.common.di
 
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.methods
 import io.ktor.client.request.*
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-
-expect fun openPlatform(packageID: String, platformLink: String)
-
-expect fun shareApp()
-
-expect fun giveDonation()
-
-expect val dispatcherIO: CoroutineDispatcher
-
-expect val isInternetAvailable: Boolean
-
-expect val currentPlatform: AllPlatforms
 
 expect suspend fun downloadTracks(
     list: List<TrackDetails>,
@@ -40,13 +27,8 @@ expect suspend fun downloadTracks(
     dir: Dir
 )
 
-expect fun queryActiveTracks()
-
-/*
-* Refactor This
-* */
 suspend fun isInternetAccessible(): Boolean {
-    return withContext(dispatcherIO) {
+    return withContext(methods.dispatcherIO) {
         try {
             ktorHttpClient.head<String>("http://google.com")
             true

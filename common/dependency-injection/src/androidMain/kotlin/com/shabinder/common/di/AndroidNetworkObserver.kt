@@ -23,23 +23,13 @@ import android.net.Network
 import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
 import android.net.NetworkRequest
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.lifecycle.LiveData
-import com.shabinder.common.database.appContext
 import kotlinx.coroutines.*
 import java.io.IOException
 import java.lang.Exception
 import java.net.InetSocketAddress
 
 const val TAG = "C-Manager"
-
-val internetAvailability by lazy { ConnectionLiveData(appContext) }
-
-@Composable
-fun isInternetAvailableState(): State<Boolean?> {
-    return internetAvailability.observeAsState()
-}
 
 /**
  * Save all available networks with an internet connection to a set (@validNetworks).
@@ -49,7 +39,7 @@ fun isInternetAvailableState(): State<Boolean?> {
  * Inspired by:
  * https://github.com/AlexSheva-mason/Rick-Morty-Database/blob/master/app/src/main/java/com/shevaalex/android/rickmortydatabase/utils/networking/ConnectionLiveData.kt
  */
-class ConnectionLiveData(context: Context = appContext) : LiveData<Boolean>() {
+class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
 
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager

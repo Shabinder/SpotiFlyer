@@ -16,7 +16,6 @@
 
 package com.shabinder.common.di.gaana
 
-import com.shabinder.common.di.currentPlatform
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.corsProxy
 import com.shabinder.common.models.gaana.GaanaAlbum
@@ -24,10 +23,11 @@ import com.shabinder.common.models.gaana.GaanaArtistDetails
 import com.shabinder.common.models.gaana.GaanaArtistTracks
 import com.shabinder.common.models.gaana.GaanaPlaylist
 import com.shabinder.common.models.gaana.GaanaSong
+import com.shabinder.common.models.methods
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 
-val corsApi get() = if (currentPlatform is AllPlatforms.Js) {
+val corsApi get() = if (methods.currentPlatform is AllPlatforms.Js) {
     corsProxy.url
 } //  "https://spotiflyer-cors.azurewebsites.net/" //"https://spotiflyer-cors.herokuapp.com/"//"https://cors.bridged.cc/"
 else ""

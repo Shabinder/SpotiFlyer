@@ -52,24 +52,21 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.0")
                 implementation("com.shabinder.fuzzywuzzy:fuzzywuzzy:1.0")
-                implementation(Ktor.clientCore)
-                implementation(Ktor.clientSerialization)
-                implementation(Ktor.clientLogging)
-                implementation(Ktor.clientJson)
-                implementation(Ktor.auth)
+                api(Ktor.clientCore)
+                api(Ktor.clientSerialization)
+                api(Ktor.clientLogging)
+                api(Ktor.clientJson)
+                api(Ktor.auth)
                 api(Extras.youtubeDownloader)
-                // koin
-                api(Koin.core)
-                api(Koin.test)
                 api(Extras.kermit)
             }
         }
         androidMain {
             dependencies {
                 implementation(compose.materialIconsExtended)
-                implementation(Koin.android)
-                implementation(Ktor.clientAndroid)
-                implementation(Extras.Android.razorpay)
+                api(Koin.android)
+                api(Ktor.clientAndroid)
+                api(Extras.Android.razorpay)
                 api(Extras.mp3agic)
                 api(Extras.jaudioTagger)
                 api("com.github.shabinder:storage-chooser:2.0.4.45")
@@ -79,18 +76,18 @@ kotlin {
         desktopMain {
             dependencies {
                 implementation(compose.materialIconsExtended)
-                implementation(Ktor.clientApache)
-                implementation(Ktor.slf4j)
+                api(Ktor.clientApache)
+                api(Ktor.slf4j)
                 api(Extras.mp3agic)
                 api(Extras.jaudioTagger)
             }
         }
         jsMain {
             dependencies {
-                implementation(project(":common:data-models"))
-                implementation(Ktor.clientJs)
                 implementation(npm("browser-id3-writer", "4.4.0"))
                 implementation(npm("file-saver", "2.0.4"))
+                implementation(project(":common:data-models"))
+                api(Ktor.clientJs)
             }
         }
     }

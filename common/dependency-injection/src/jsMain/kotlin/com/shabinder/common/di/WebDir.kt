@@ -17,6 +17,7 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
+import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.di.gaana.corsApi
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult
@@ -32,7 +33,7 @@ import org.w3c.dom.ImageBitmap
 
 actual class Dir actual constructor(
     private val logger: Kermit,
-    private val database: Database?,
+    private val spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
 
     /*init {
@@ -112,8 +113,7 @@ actual class Dir actual constructor(
 
     private suspend fun freshImage(url: String): ImageBitmap? = null
 
-    actual val db: Database?
-        get() = database
+    actual val db: Database? get() = spotiFlyerDatabase.instance
 }
 
 fun ByteArray.toArrayBuffer(): ArrayBuffer {

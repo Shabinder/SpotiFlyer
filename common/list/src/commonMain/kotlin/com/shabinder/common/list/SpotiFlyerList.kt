@@ -64,7 +64,6 @@ interface SpotiFlyerList {
         val dir: Dir
         val link: String
         val listOutput: Consumer<Output>
-        val showPopUpMessage: (String) -> Unit
         val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>
     }
     sealed class Output {

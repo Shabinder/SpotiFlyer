@@ -29,14 +29,21 @@ import com.shabinder.common.di.Dir
 import com.shabinder.common.di.DownloadProgressFlow
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.initKoin
+import com.shabinder.common.di.isInternetAccessible
+import com.shabinder.common.models.Actions
+import com.shabinder.common.models.AllPlatforms
+import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.uikit.SpotiFlyerColors
 import com.shabinder.common.uikit.SpotiFlyerRootContent
 import com.shabinder.common.uikit.SpotiFlyerShapes
 import com.shabinder.common.uikit.SpotiFlyerTypography
 import com.shabinder.common.uikit.colorOffWhite
+import com.shabinder.common.uikit.showToast
 import com.shabinder.database.Database
-import com.shabinder.common.uikit.showPopUpMessage as uikitShowPopUpMessage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 private val koin = initKoin(enableNetworkLogs = true).koin
 
@@ -70,7 +77,33 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
             override val fetchPlatformQueryResult: FetchPlatformQueryResult = koin.get()
             override val directories: Dir = koin.get()
             override val database: Database? = directories.db
-            override val showPopUpMessage: (String) -> Unit = ::uikitShowPopUpMessage
             override val downloadProgressReport = DownloadProgressFlow
+            override val actions = object: Actions {
+                override val platformActions = object : PlatformActions {}
+
+                override fun showPopUpMessage(string: String, long: Boolean) = showToast(string)
+
+                override fun setDownloadDirectoryAction() {}
+
+                override fun queryActiveTracks() {}
+
+                override fun giveDonation() {}
+
+                override fun shareApp() {}
+
+                override fun openPlatform(packageID: String, platformLink: String) {}
+
+                override val dispatcherIO = Dispatchers.IO
+
+                override val isInternetAvailable: Boolean
+                    get() {
+                        var result = false
+                        val job = GlobalScope.launch { result = isInternetAccessible() }
+                        while (job.isActive) {/*TODO Better Way*/}
+                        return result
+                    }
+
+                override val currentPlatform = AllPlatforms.Jvm
+            }
         }
     )

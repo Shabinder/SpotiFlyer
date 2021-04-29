@@ -17,43 +17,13 @@
 package com.shabinder.common.di
 
 import com.shabinder.common.di.utils.ParallelExecutor
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.downloader.YoutubeDownloader
-import io.ktor.client.request.head
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
-actual fun openPlatform(packageID: String, platformLink: String) {
-    // TODO
-}
-actual val currentPlatform: AllPlatforms = AllPlatforms.Jvm
-
-actual val dispatcherIO = Dispatchers.IO
-
-actual fun shareApp() {
-    // TODO
-}
-
-actual fun giveDonation() {
-    // TODO
-}
-
-actual fun queryActiveTracks() {}
-
-actual val isInternetAvailable: Boolean
-    get() {
-        var result = false
-        val job = GlobalScope.launch { result = isInternetAccessible() }
-        while (job.isActive) {}
-        return result
-    }
 
 val DownloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = MutableSharedFlow(1)
 

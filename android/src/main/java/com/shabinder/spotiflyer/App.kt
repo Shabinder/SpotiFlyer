@@ -17,7 +17,6 @@
 package com.shabinder.spotiflyer
 
 import android.app.Application
-import com.shabinder.common.database.appContext
 import com.shabinder.common.di.initKoin
 import com.shabinder.spotiflyer.di.appModule
 import org.koin.android.ext.koin.androidContext
@@ -29,7 +28,6 @@ class App: Application(), KoinComponent {
     override fun onCreate() {
         super.onCreate()
 
-        appContext = this
         val loggingEnabled = true
 
         initKoin(loggingEnabled) {

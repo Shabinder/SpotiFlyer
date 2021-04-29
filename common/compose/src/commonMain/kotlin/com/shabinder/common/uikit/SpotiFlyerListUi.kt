@@ -50,6 +50,7 @@ import com.shabinder.common.di.Picture
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.methods
 import kotlinx.coroutines.delay
 
 @Composable
@@ -62,7 +63,7 @@ fun SpotiFlyerListContent(
     LaunchedEffect(model.errorOccurred) {
         /*Handle if Any Exception Occurred*/
         model.errorOccurred?.let {
-            showPopUpMessage(it.message ?: "An Error Occurred, Check your Link / Connection")
+            methods.showPopUpMessage(it.message ?: "An Error Occurred, Check your Link / Connection")
             component.onBackPressed()
         }
     }

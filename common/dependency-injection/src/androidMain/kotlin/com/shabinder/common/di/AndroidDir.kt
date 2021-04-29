@@ -16,19 +16,16 @@
 
 package com.shabinder.common.di
 
-import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.media.MediaScannerConnection
 import android.os.Environment
-import android.widget.Toast
 import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
-import com.shabinder.common.database.appContext
+import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.methods
 import com.shabinder.database.Database
 import kotlinx.coroutines.*
 import java.io.File
@@ -40,19 +37,13 @@ import java.net.URL
 
 actual class Dir actual constructor(
     private val logger: Kermit,
-    private val database: Database?,
+    private val spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     companion object {
-        const val SharedPreferencesKey = "configurations"
         const val DirKey = "downloadDir"
     }
 
-    private val context: Context
-        get() = appContext
-
-    private val sharedPreferences:SharedPreferences by lazy {
-        context.getSharedPreferences(SharedPreferencesKey,MODE_PRIVATE)
-    }
+    private val sharedPreferences:SharedPreferences by lazy { methods.platformActions.sharedPreferences }
 
     fun setDownloadDirectory(newBasePath:String){
         sharedPreferences.edit().putString(DirKey,newBasePath).apply()
@@ -63,7 +54,7 @@ actual class Dir actual constructor(
 
     actual fun fileSeparator(): String = File.separator
 
-    actual fun imageCacheDir(): String = context.cacheDir.absolutePath + File.separator
+    actual fun imageCacheDir(): String = methods.platformActions.imageCacheDir
 
     // fun call in order to always access Updated Value
     actual fun defaultDir(): String = sharedPreferences.getString(DirKey,defaultBaseDir)!! + File.separator +
@@ -158,13 +149,7 @@ actual class Dir actual constructor(
         }
     }
 
-    actual fun addToLibrary(path: String) {
-        logger.d { "Scanning File" }
-        MediaScannerConnection.scanFile(
-            appContext,
-            listOf(path).toTypedArray(), null, null
-        )
-    }
+    actual fun addToLibrary(path: String) = methods.platformActions.addToLibrary(path)
 
     actual suspend fun loadImage(url: String): Picture = withContext(Dispatchers.IO){
         val cachePath = imageCacheDir() + getNameURL(url)
@@ -214,5 +199,5 @@ actual class Dir actual constructor(
         }
     }
 
-    actual val db: Database? = database
+    actual val db: Database? = spotiFlyerDatabase.instance
 }

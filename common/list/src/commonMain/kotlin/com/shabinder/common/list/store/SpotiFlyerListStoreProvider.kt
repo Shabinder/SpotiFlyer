@@ -25,12 +25,12 @@ import com.shabinder.common.database.getLogger
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.downloadTracks
-import com.shabinder.common.di.queryActiveTracks
 import com.shabinder.common.list.SpotiFlyerList.State
 import com.shabinder.common.list.store.SpotiFlyerListStore.Intent
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.methods
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -39,7 +39,6 @@ internal class SpotiFlyerListStoreProvider(
     private val storeFactory: StoreFactory,
     private val fetchQuery: FetchPlatformQueryResult,
     private val link: String,
-    private val showPopUpMessage: (String) -> Unit,
     private val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>
 ) {
     val logger = getLogger()
@@ -93,7 +92,7 @@ internal class SpotiFlyerListStoreProvider(
                 is Intent.StartDownloadAll -> {
                     val finalList =
                         intent.trackList.filter { it.downloaded == DownloadStatus.NotDownloaded }
-                    if (finalList.isNullOrEmpty()) showPopUpMessage("All Songs are Processed")
+                    if (finalList.isNullOrEmpty()) methods.showPopUpMessage("All Songs are Processed")
                     else downloadTracks(finalList, fetchQuery, dir)
 
                     val list = intent.trackList.map {
@@ -107,7 +106,7 @@ internal class SpotiFlyerListStoreProvider(
                     downloadTracks(listOf(intent.track), fetchQuery, dir)
                     dispatch(Result.UpdateTrackItem(intent.track.copy(downloaded = DownloadStatus.Queued)))
                 }
-                is Intent.RefreshTracksStatuses -> queryActiveTracks()
+                is Intent.RefreshTracksStatuses -> methods.queryActiveTracks()
             }
         }
     }

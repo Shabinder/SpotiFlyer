@@ -14,7 +14,7 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.spotiflyer.utils
+package com.shabinder.spotiflyer.ui
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.Image
@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.shabinder.common.di.isInternetAvailableState
 import com.shabinder.common.uikit.SpotiFlyerShapes
 import com.shabinder.common.uikit.SpotiFlyerTypography
 import com.shabinder.common.uikit.colorOffWhite
@@ -39,7 +38,7 @@ import kotlinx.coroutines.delay
 @ExperimentalAnimationApi
 @Composable
 fun NetworkDialog(
-    networkAvailability: State<Boolean?> = isInternetAvailableState()
+    networkAvailability: State<Boolean?>
 ){
     var visible by remember { mutableStateOf(false) }
 

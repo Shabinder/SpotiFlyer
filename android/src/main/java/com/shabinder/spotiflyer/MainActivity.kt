@@ -17,10 +17,14 @@
 package com.shabinder.spotiflyer
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
@@ -31,18 +35,10 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.SdStorage
-import androidx.compose.material.icons.rounded.SystemSecurityUpdate
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.arkivanov.decompose.ComponentContext
@@ -57,21 +53,27 @@ import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
 import com.razorpay.Checkout
 import com.razorpay.PaymentResultListener
-import com.shabinder.common.database.activityContext
-import com.shabinder.common.database.appContext
 import com.shabinder.common.di.*
+import com.shabinder.common.di.worker.ForegroundService
+import com.shabinder.common.models.Actions
+import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadStatus
+import com.shabinder.common.models.PlatformActions
+import com.shabinder.common.models.PlatformActions.Companion.SharedPreferencesKey
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.uikit.*
 import com.shabinder.spotiflyer.utils.*
 import com.shabinder.common.models.Status
+import com.shabinder.common.models.methods
+import com.shabinder.spotiflyer.ui.NetworkDialog
+import com.shabinder.spotiflyer.ui.PermissionDialog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import java.io.File
-import com.shabinder.common.uikit.showPopUpMessage as uikitShowPopUpMessage
 
 const val disableDozeCode = 1223
 
@@ -87,6 +89,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
     private var permissionGranted = mutableStateOf(true)
     private lateinit var updateUIReceiver: BroadcastReceiver
     private lateinit var queryReceiver: BroadcastReceiver
+    private val internetAvailability by lazy { ConnectionLiveData(applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,8 +119,12 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                         LaunchedEffect(view) {
                             permissionGranted.value = checkPermissions()
                         }
-                        NetworkDialog()
-                        PermissionDialog()
+                        NetworkDialog(isInternetAvailableState())
+                        PermissionDialog(
+                            permissionGranted.value,
+                            { requestStoragePermission() },
+                            { disableDozeMode(disableDozeCode) }
+                        )
                     }
                 }
             }
@@ -127,10 +134,13 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 
     private fun initialise() {
         checkIfLatestVersion()
-        dir.createDirectories()
         Checkout.preload(applicationContext)
         handleIntentFromExternalActivity()
-        Log.i("Download Path",dir.defaultDir())
+    }
+
+    @Composable
+    private fun isInternetAvailableState(): State<Boolean?> {
+        return internetAvailability.observeAsState()
     }
 
     @Suppress("DEPRECATION")
@@ -140,7 +150,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
             .withActivity(this)
             .withFragmentManager(fragmentManager)
             .withMemoryBar(true)
-            .setTheme(StorageChooser.Theme(appContext).apply {
+            .setTheme(StorageChooser.Theme(applicationContext).apply {
                 scheme = applicationContext.resources.getIntArray(R.array.default_dark)
             })
             .setDialogTitle("Set Download Directory")
@@ -155,11 +165,11 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
             if (f.canWrite()) {
                 // hell yeah :)
                 dir.setDownloadDirectory(path)
-                com.shabinder.common.uikit.showPopUpMessage(
+                showPopUpMessage(
                     "Download Directory Set to:\n${dir.defaultDir()} "
                 )
             }else{
-                com.shabinder.common.uikit.showPopUpMessage(
+                showPopUpMessage(
                     "NO WRITE ACCESS on \n$path ,\nReverting Back to Previous"
                 )
             }
@@ -167,6 +177,14 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 
         // Show dialog whenever you want by
         chooser.show()
+    }
+
+    private fun showPopUpMessage(string: String, long: Boolean = false) {
+        android.widget.Toast.makeText(
+            applicationContext,
+            string,
+            if(long) android.widget.Toast.LENGTH_LONG else android.widget.Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -182,9 +200,74 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                 override val database = this@MainActivity.dir.db
                 override val fetchPlatformQueryResult = this@MainActivity.fetcher
                 override val directories: Dir = this@MainActivity.dir
-                override val showPopUpMessage: (String) -> Unit = ::uikitShowPopUpMessage
                 override val downloadProgressReport: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
-                override val setDownloadDirectoryAction: () -> Unit = ::setUpOnPrefClickListener
+                override val actions = object: Actions {
+
+                    override val platformActions = object : PlatformActions {
+                        override val imageCacheDir: String = applicationContext.cacheDir.absolutePath + File.separator
+                        override val sharedPreferences = applicationContext.getSharedPreferences(SharedPreferencesKey,
+                            MODE_PRIVATE
+                        )
+
+                        override fun addToLibrary(path: String) {
+                            MediaScannerConnection.scanFile(
+                                applicationContext,
+                                listOf(path).toTypedArray(), null, null
+                            )
+                        }
+
+                        override fun sendTracksToService(array: ArrayList<TrackDetails>) {
+                            for (list in array.chunked(50)){
+                                val serviceIntent = Intent(this@MainActivity, ForegroundService::class.java)
+                                serviceIntent.putParcelableArrayListExtra("object", list as ArrayList)
+                                ContextCompat.startForegroundService(this@MainActivity, serviceIntent)
+                            }
+                        }
+                    }
+
+                    override fun showPopUpMessage(string: String, long: Boolean) = this@MainActivity.showPopUpMessage(string,long)
+
+                    override fun setDownloadDirectoryAction() = setUpOnPrefClickListener()
+
+                    override fun queryActiveTracks() {
+                        val serviceIntent = Intent(this@MainActivity, ForegroundService::class.java).apply {
+                            action = "query"
+                        }
+                        ContextCompat.startForegroundService(this@MainActivity, serviceIntent)
+                    }
+
+                    override fun giveDonation() = startPayment(this@MainActivity)
+
+                    override fun shareApp() {
+                        val sendIntent: Intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, "Hey, checkout this excellent Music Downloader http://github.com/Shabinder/SpotiFlyer")
+                            type = "text/plain"
+                        }
+
+                        val shareIntent = Intent.createChooser(sendIntent, null)
+                        startActivity(shareIntent)
+                    }
+
+                    override fun openPlatform(packageID: String, platformLink: String) {
+                        val manager: PackageManager = applicationContext.packageManager
+                        try {
+                            val intent = manager.getLaunchIntentForPackage(packageID)
+                                ?: throw PackageManager.NameNotFoundException()
+                            intent.addCategory(Intent.CATEGORY_LAUNCHER)
+                            startActivity(intent)
+                        } catch (e: PackageManager.NameNotFoundException) {
+                            val uri: Uri =
+                                Uri.parse(platformLink)
+                            val intent = Intent(Intent.ACTION_VIEW, uri)
+                            startActivity(intent)
+                        }
+                    }
+
+                    override val isInternetAvailable get()  = internetAvailability.value ?: true
+                    override val dispatcherIO = Dispatchers.IO
+                    override val currentPlatform = AllPlatforms.Jvm
+                }
             }
         )
 
@@ -208,6 +291,9 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
         }
     }
 
+    /*
+    * Broadcast Handlers
+    * */
     private fun initializeBroadcast(){
         val intentFilter = IntentFilter().apply {
             addAction(Status.QUEUED.name)
@@ -292,7 +378,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                         while(!this@MainActivity::root.isInitialized){
                             delay(100)
                         }
-                        if(isInternetAvailable)callBacks.searchLink(link)
+                        if(methods.isInternetAvailable)callBacks.searchLink(link)
                     }
                 }
             }
@@ -301,7 +387,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 
     override fun onPaymentError(errorCode: Int, response: String?) {
         try{
-            uikitShowPopUpMessage("Payment Failed, Response:$response")
+            showPopUpMessage("Payment Failed, Response:$response")
         }catch (e: Exception){
             Log.d("Razorpay Payment","Exception in onPaymentSuccess $response")
         }
@@ -309,82 +395,39 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 
     override fun onPaymentSuccess(razorpayPaymentId: String?) {
         try{
-            uikitShowPopUpMessage("Payment Successful, ThankYou!")
+            showPopUpMessage("Payment Successful, ThankYou!")
         }catch (e: Exception){
-            uikitShowPopUpMessage("Razorpay Payment, Error Occurred.")
+            showPopUpMessage("Razorpay Payment, Error Occurred.")
             Log.d("Razorpay Payment","Exception in onPaymentSuccess, ${e.message}")
         }
     }
 
-    @Composable
-    private fun PermissionDialog(){
-        var askForPermission by remember { mutableStateOf(false) }
-        LaunchedEffect(Unit){
-            delay(2000)
-            askForPermission = true
+    /*
+    * RazorPay Payment
+    * */
+    private fun startPayment(mainActivity: Activity) {
+        val co = Checkout().apply {
+            setKeyID("rzp_live_3ZQeoFYOxjmXye")
+            setImage(com.shabinder.common.di.R.drawable.ic_spotiflyer_logo)
         }
-        AnimatedVisibility(
-            askForPermission && !permissionGranted.value
-        ){
-            AlertDialog(
-                onDismissRequest = {},
-                buttons = {
-                    TextButton(
-                        {
-                            requestStoragePermission()
-                            disableDozeMode(disableDozeCode)
-                        },
-                        Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp).fillMaxWidth()
-                            .background(colorPrimary, shape = SpotiFlyerShapes.medium)
-                            .padding(horizontal = 8.dp),
-                    ){
-                        Text("Grant Permissions",color = Color.Black,fontSize = 18.sp,textAlign = TextAlign.Center)
-                    }
-                },title = {Text("Required Permissions:",style = SpotiFlyerTypography.h5,textAlign = TextAlign.Center)},
-                backgroundColor = Color.DarkGray,
-                text = {
-                    Column{
-                        Spacer(modifier = Modifier.padding(8.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        ) {
-                            Icon(Icons.Rounded.SdStorage,"Storage Permission.")
-                            Spacer(modifier = Modifier.padding(start = 16.dp))
-                            Column {
-                                Text(
-                                    text = "Storage Permission.",
-                                    style = SpotiFlyerTypography.h6.copy(fontWeight = FontWeight.SemiBold)
-                                )
-                                Text(
-                                    text = "To download your favourite songs to this device.",
-                                    style = SpotiFlyerTypography.subtitle2,
-                                )
-                            }
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Rounded.SystemSecurityUpdate,"Allow Background Running")
-                            Spacer(modifier = Modifier.padding(start = 16.dp))
-                            Column {
-                                Text(
-                                    text = "Background Running.",
-                                    style = SpotiFlyerTypography.h6.copy(fontWeight = FontWeight.SemiBold)
-                                )
-                                Text(
-                                    text = "To download all songs in background without any System Interruptions",
-                                    style = SpotiFlyerTypography.subtitle2,
-                                )
-                            }
-                        }
-                    }
-                }
-            )
-        }
-    }
 
-    init {
-        activityContext = this
+        try {
+            val preFill = JSONObject()
+
+            val options = JSONObject().apply {
+                put("name", "SpotiFlyer")
+                put("description", "Thanks For the Donation!")
+                // You can omit the image option to fetch the image from dashboard
+                // put("image","https://github.com/Shabinder/SpotiFlyer/raw/master/app/SpotifyDownload.png")
+                put("currency", "INR")
+                put("amount", "4900")
+                put("prefill", preFill)
+            }
+
+            co.open(mainActivity, options)
+        } catch (e: Exception) {
+            // showPop("Error in payment: "+ e.message)
+            e.printStackTrace()
+        }
     }
 }

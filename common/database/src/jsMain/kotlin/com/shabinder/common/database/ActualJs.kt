@@ -19,6 +19,7 @@ package com.shabinder.common.database
 import co.touchlab.kermit.CommonLogger
 import co.touchlab.kermit.Logger
 import com.shabinder.database.Database
+import org.koin.dsl.module
 
-actual fun createDatabase(): Database? = null
+actual fun databaseModule() = module { single { SpotiFlyerDatabase(null) } }
 actual fun getLogger(): Logger = CommonLogger()

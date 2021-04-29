@@ -19,7 +19,6 @@ package com.shabinder.common.di.providers
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.TokenStore
-import com.shabinder.common.di.currentPlatform
 import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.kotlinxSerializer
 import com.shabinder.common.di.spotify.SpotifyRequests
@@ -27,6 +26,7 @@ import com.shabinder.common.di.spotify.authenticateSpotify
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.methods
 import com.shabinder.common.models.spotify.Album
 import com.shabinder.common.models.spotify.Image
 import com.shabinder.common.models.spotify.Source
@@ -45,14 +45,14 @@ class SpotifyProvider(
     private val dir: Dir,
 ) : SpotifyRequests {
 
-    init {
+   /* init {
         logger.d { "Creating Spotify Provider" }
         GlobalScope.launch(Dispatchers.Default) {
-            if (currentPlatform is AllPlatforms.Js) {
+            if (methods.currentPlatform is AllPlatforms.Js) {
                 authenticateSpotifyClient(override = true)
             } else authenticateSpotifyClient()
         }
-    }
+    }*/
 
     override suspend fun authenticateSpotifyClient(override: Boolean): HttpClient? {
         val token = if (override) authenticateSpotify() else tokenStore.getToken()

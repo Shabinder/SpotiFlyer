@@ -56,7 +56,6 @@ interface SpotiFlyerMain {
         val storeFactory: StoreFactory
         val database: Database?
         val dir: Dir
-        val showPopUpMessage: (String) -> Unit
     }
 
     sealed class Output {

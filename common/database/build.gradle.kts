@@ -35,6 +35,9 @@ kotlin {
                 implementation(SqlDelight.runtime)
                 implementation(SqlDelight.coroutineExtensions)
                 api(Extras.kermit)
+                // koin
+                api(Koin.core)
+                api(Koin.test)
             }
         }
 

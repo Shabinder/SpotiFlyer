@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
+import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +39,7 @@ import javax.imageio.ImageIO
 
 actual class Dir actual constructor(
     private val logger: Kermit,
-    private val database: Database?,
+    private val spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
 
     init {
@@ -137,9 +138,9 @@ actual class Dir actual constructor(
         }
     }
 
-    actual val db: Database?
-        get() = database
+    actual val db: Database? get() = spotiFlyerDatabase.instance
 }
+
 fun BufferedImage.toImageBitmap() = Image.makeFromEncoded(
     toByteArray(this)
 ).asImageBitmap()

@@ -12,7 +12,7 @@ import cocoapods.TagLibIOS.TLAudio
 
 actual class Dir actual constructor(
     private val logger: Kermit,
-    private val database: Database?
+    private val spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
 
     init {
@@ -142,5 +142,5 @@ actual class Dir actual constructor(
         // TODO
     }
 
-    actual val db: Database? = database
+    actual val db: Database? = spotiFlyerDatabase.instance
 }

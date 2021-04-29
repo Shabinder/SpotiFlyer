@@ -24,8 +24,6 @@ enum class ToastDuration(val value: Int) {
     Short(1000), Long(3000)
 }
 
-expect fun showPopUpMessage(text: String)
-
 @Composable
 expect fun Toast(
     text: String,

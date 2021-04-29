@@ -28,8 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorXmlResource
@@ -37,7 +35,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.Font
 import com.shabinder.common.di.Picture
-import com.shabinder.common.di.dispatcherIO
+import com.shabinder.common.models.methods
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -50,7 +48,7 @@ actual fun ImageLoad(
 ) {
     var pic by remember(link) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(link) {
-        withContext(dispatcherIO) {
+        withContext(methods.dispatcherIO) {
             pic = loader(link).image
         }
     }

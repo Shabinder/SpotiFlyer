@@ -35,9 +35,8 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import com.shabinder.common.database.R
-import com.shabinder.common.database.appContext
 import com.shabinder.common.di.Picture
-import com.shabinder.common.di.dispatcherIO
+import com.shabinder.common.models.methods
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -51,7 +50,7 @@ actual fun ImageLoad(
     var pic by remember(link) { mutableStateOf<ImageBitmap?>(null) }
 
     LaunchedEffect(link) {
-        withContext(dispatcherIO) {
+        withContext(methods.dispatcherIO) {
             pic = loader(link).image
         }
     }
@@ -136,8 +135,4 @@ actual fun Toast(
     duration: ToastDuration
 ) {
     // We Have Android's Implementation of Toast so its just Empty
-}
-
-actual fun showPopUpMessage(text: String) {
-    android.widget.Toast.makeText(appContext, text, android.widget.Toast.LENGTH_SHORT).show()
 }

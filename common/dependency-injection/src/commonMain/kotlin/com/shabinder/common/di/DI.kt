@@ -17,7 +17,7 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.database.createDatabase
+import com.shabinder.common.database.databaseModule
 import com.shabinder.common.database.getLogger
 import com.shabinder.common.di.providers.GaanaProvider
 import com.shabinder.common.di.providers.SpotifyProvider
@@ -39,12 +39,12 @@ import org.koin.dsl.module
 fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclaration = {}) =
     startKoin {
         appDeclaration()
-        modules(commonModule(enableNetworkLogs = enableNetworkLogs))
+        modules(commonModule(enableNetworkLogs = enableNetworkLogs), databaseModule())
     }
 
 fun commonModule(enableNetworkLogs: Boolean) = module {
     single { createHttpClient(enableNetworkLogs = enableNetworkLogs) }
-    single { Dir(get(), createDatabase()) }
+    single { Dir(get(), get()) }
     single { Kermit(getLogger()) }
     single { TokenStore(get(), get()) }
     single { YoutubeMusic(get(), get()) }

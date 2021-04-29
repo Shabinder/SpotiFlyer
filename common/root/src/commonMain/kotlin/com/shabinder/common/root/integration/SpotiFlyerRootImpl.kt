@@ -28,16 +28,31 @@ import com.arkivanov.decompose.value.Value
 import com.shabinder.common.di.Dir
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
+import com.shabinder.common.models.Actions
+import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.Consumer
+import com.shabinder.common.models.methods
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 internal class SpotiFlyerRootImpl(
     componentContext: ComponentContext,
     dependencies: Dependencies,
-) : SpotiFlyerRoot, ComponentContext by componentContext, Dependencies by dependencies {
+) : SpotiFlyerRoot, ComponentContext by componentContext, Dependencies by dependencies, Actions by dependencies.actions {
+
+    init {
+        methods = actions
+        GlobalScope.launch {
+            /*Authenticate Spotify Client*/
+            if (methods.currentPlatform is AllPlatforms.Js) {
+                fetchPlatformQueryResult.spotifyProvider.authenticateSpotifyClient(override = true)
+            } else fetchPlatformQueryResult.spotifyProvider.authenticateSpotifyClient()
+        }
+    }
 
     private val router =
         router<Configuration, Child>(

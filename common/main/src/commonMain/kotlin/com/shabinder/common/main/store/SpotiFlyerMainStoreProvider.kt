@@ -21,13 +21,11 @@ import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
-import com.shabinder.common.di.giveDonation
-import com.shabinder.common.di.openPlatform
-import com.shabinder.common.di.shareApp
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.State
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
 import com.shabinder.common.models.DownloadRecord
+import com.shabinder.common.models.methods
 import com.shabinder.database.Database
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
@@ -38,7 +36,6 @@ import kotlinx.coroutines.flow.map
 
 internal class SpotiFlyerMainStoreProvider(
     private val storeFactory: StoreFactory,
-    private val showPopUpMessage: (String) -> Unit,
     private val database: Database?
 ) {
 
@@ -81,9 +78,9 @@ internal class SpotiFlyerMainStoreProvider(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) {
             when (intent) {
-                is Intent.OpenPlatform -> openPlatform(intent.platformID, intent.platformLink)
-                is Intent.GiveDonation -> giveDonation()
-                is Intent.ShareApp -> shareApp()
+                is Intent.OpenPlatform -> methods.openPlatform(intent.platformID, intent.platformLink)
+                is Intent.GiveDonation -> methods.giveDonation()
+                is Intent.ShareApp -> methods.shareApp()
                 is Intent.SetLink -> dispatch(Result.LinkChanged(link = intent.link))
                 is Intent.SelectCategory -> dispatch(Result.CategoryChanged(intent.category))
             }

@@ -36,11 +36,12 @@ object Versions {
     // Internet
     const val ktor = "1.5.3"
 
-    const val kotlinxSerialization = "1.1.0"
-    // Database
-    const val sqlDelight = "1.4.4"
+    const val kotlinxSerialization = "1.2.0"
 
-    const val sqliteJdbcDriver = "3.30.1"
+    // Database
+    const val sqlDelight = "1.5.0"
+
+    const val sqliteJdbcDriver = "3.34.0"
     const val slf4j = "1.7.30"
 
     // Android

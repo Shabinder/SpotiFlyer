@@ -17,7 +17,7 @@
 package com.shabinder.common.database
 
 import co.touchlab.kermit.Logger
-import com.shabinder.database.Database
+import org.koin.core.module.Module
 
-expect fun createDatabase(): Database?
+expect fun databaseModule(): Module
 expect fun getLogger(): Logger

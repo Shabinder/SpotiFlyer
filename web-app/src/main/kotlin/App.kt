@@ -22,9 +22,13 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.shabinder.common.di.DownloadProgressFlow
+import com.shabinder.common.models.Actions
+import com.shabinder.common.models.AllPlatforms
+import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.database.Database
 import extras.renderableChild
+import kotlinx.coroutines.Dispatchers
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -50,14 +54,33 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
     private val dependencies = props.dependencies
 
     private val root = SpotiFlyerRoot(ctx,
-        object : SpotiFlyerRoot.Dependencies{
+        object : SpotiFlyerRoot.Dependencies {
             override val storeFactory: StoreFactory = LoggingStoreFactory(DefaultStoreFactory)
             override val fetchPlatformQueryResult = dependencies.fetchPlatformQueryResult
             override val directories = dependencies.directories
             override val database: Database? = directories.db
-            override val showPopUpMessage: (String) -> Unit = {}//TODO
             override val downloadProgressReport = DownloadProgressFlow
+            override val actions = object : Actions {
+                override val platformActions = object : PlatformActions {}
 
+                override fun showPopUpMessage(string: String, long: Boolean) {
+                    /*TODO("Not yet implemented")*/
+                }
+
+                override fun setDownloadDirectoryAction() {}
+
+                override fun queryActiveTracks() {}
+
+                override fun giveDonation() {}
+
+                override fun shareApp() {}
+
+                override fun openPlatform(packageID: String, platformLink: String) {}
+
+                override val dispatcherIO = Dispatchers.Default
+                override val isInternetAvailable: Boolean = true
+                override val currentPlatform = AllPlatforms.Js
+            }
         }
     )
 

@@ -17,26 +17,22 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.database.createDatabase
+import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
-import com.shabinder.downloader.exceptions.YoutubeException
-import io.ktor.client.*
-import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.HttpStatement
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
-import io.ktor.utils.io.errors.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt
 
 expect class Dir (
     logger: Kermit,
-    database: Database? = createDatabase(),
+    spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     val db: Database?
     fun isPresent(path: String): Boolean

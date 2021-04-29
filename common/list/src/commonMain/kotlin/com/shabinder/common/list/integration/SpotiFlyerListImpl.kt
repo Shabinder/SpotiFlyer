@@ -40,8 +40,7 @@ internal class SpotiFlyerListImpl(
                 storeFactory = storeFactory,
                 fetchQuery = fetchQuery,
                 downloadProgressFlow = downloadProgressFlow,
-                link = link,
-                showPopUpMessage = showPopUpMessage
+                link = link
             ).provide()
         }
 

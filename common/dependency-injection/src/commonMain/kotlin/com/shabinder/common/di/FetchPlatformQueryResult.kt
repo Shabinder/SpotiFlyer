@@ -26,12 +26,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class FetchPlatformQueryResult(
-    private val gaanaProvider: GaanaProvider,
-    private val spotifyProvider: SpotifyProvider,
+    val gaanaProvider: GaanaProvider,
+    val spotifyProvider: SpotifyProvider,
     val youtubeProvider: YoutubeProvider,
     val youtubeMusic: YoutubeMusic,
     val youtubeMp3: YoutubeMp3,
-    private val dir: Dir
+    val dir: Dir
 ) {
     private val db: DownloadRecordDatabaseQueries?
         get() = dir.db?.downloadRecordDatabaseQueries

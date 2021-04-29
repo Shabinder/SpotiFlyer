@@ -16,54 +16,13 @@
 
 package com.shabinder.common.di
 
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import io.ktor.client.request.head
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
+import com.shabinder.common.models.methods
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
-
-actual val currentPlatform: AllPlatforms = AllPlatforms.Js
-
-actual fun openPlatform(packageID: String, platformLink: String) {
-    // TODO
-}
-
-actual fun shareApp() {
-    // TODO
-}
-
-actual fun giveDonation() {
-    // TODO
-}
-
-actual fun queryActiveTracks() {}
-
-actual val dispatcherIO: CoroutineDispatcher = Dispatchers.Default
-
-/*
-* Refactor This
-* */
-private suspend fun isInternetAvailable(): Boolean {
-    return withContext(dispatcherIO) {
-        try {
-            ktorHttpClient.head<String>("http://google.com")
-            true
-        } catch (e: Exception) {
-            println(e.message)
-            false
-        }
-    }
-}
-
-actual val isInternetAvailable: Boolean
-    get() {
-        return true
-    }
 
 val DownloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = MutableSharedFlow(1)
 // Error:https://github.com/Kotlin/kotlinx.atomicfu/issues/182
@@ -76,7 +35,7 @@ actual suspend fun downloadTracks(
     dir: Dir
 ) {
     list.forEach {
-        withContext(dispatcherIO) {
+        withContext(methods.dispatcherIO) {
             allTracksStatus[it.title] = DownloadStatus.Queued
             if (!it.videoID.isNullOrBlank()) { // Video ID already known!
                 downloadTrack(it.videoID!!, it, fetcher, dir)

@@ -46,6 +46,7 @@ android {
             }
         }
     }
+
     compileSdkVersion(29)
     buildToolsVersion = "30.0.3"
 
@@ -104,14 +105,14 @@ dependencies {
     implementation(Koin.android)
     implementation(Koin.compose)
 
-    implementation("com.google.accompanist:accompanist-insets:0.7.1")
+    implementation("com.google.accompanist:accompanist-insets:0.8.1")
 
     // DECOMPOSE
     implementation(Decompose.decompose)
     implementation(Decompose.extensionsCompose)
 
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:27.0.0"))
+    implementation(platform("com.google.firebase:firebase-bom:27.1.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-perf-ktx")

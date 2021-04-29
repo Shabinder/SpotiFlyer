@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 private val message: MutableState<String> = mutableStateOf("")
 private val state: MutableState<Boolean> = mutableStateOf(false)
 
-actual fun showPopUpMessage(text: String) {
+fun showToast(text: String) {
     message.value = text
     state.value = true
 }
