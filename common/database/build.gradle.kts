@@ -50,10 +50,11 @@ kotlin {
                 implementation(SqlDelight.jdbcDriver)
             }
         }
-
-        val iosMain by getting {
-            dependencies {
-                implementation(SqlDelight.nativeDriver)
+        if(HostOS.isMac){
+            val iosMain by getting {
+                dependencies {
+                    implementation(SqlDelight.nativeDriver)
+                }
             }
         }
     }

@@ -21,6 +21,18 @@ plugins {
 }
 
 kotlin {
+
+    /*IOS Target Can be only built on Mac*/
+    if(HostOS.isMac){
+        val sdkName: String? = System.getenv("SDK_NAME")
+        val isiOSDevice = sdkName.orEmpty().startsWith("iphoneos")
+        if (isiOSDevice) {
+            iosArm64("ios")
+        } else {
+            iosX64("ios")
+        }
+    }
+
     jvm("desktop").compilations.all {
         kotlinOptions {
             useIR = true
@@ -40,7 +52,6 @@ kotlin {
         // nodejs()
         binaries.executable()
     }
-    ios()
     sourceSets {
         named("commonTest") {
             dependencies {

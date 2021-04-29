@@ -20,7 +20,7 @@ plugins {
     id("multiplatform-setup")
     id("android-setup")
     kotlin("plugin.serialization")
-    kotlin("native.cocoapods") //version "1.4.32"
+    kotlin("native.cocoapods")
 }
 
 version = "1.0"
@@ -48,9 +48,9 @@ kotlin {
             dependencies {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
-                implementation("org.jetbrains.kotlinx:atomicfu:0.15.2")
+                implementation("org.jetbrains.kotlinx:atomicfu:0.16.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.0")
                 implementation("com.shabinder.fuzzywuzzy:fuzzywuzzy:1.0")
                 implementation(Ktor.clientCore)
                 implementation(Ktor.clientSerialization)
@@ -69,7 +69,6 @@ kotlin {
                 implementation(compose.materialIconsExtended)
                 implementation(Koin.android)
                 implementation(Ktor.clientAndroid)
-                implementation(Extras.Android.fetch)
                 implementation(Extras.Android.razorpay)
                 api(Extras.mp3agic)
                 api(Extras.jaudioTagger)

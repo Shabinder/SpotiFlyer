@@ -28,9 +28,13 @@ import io.ktor.client.request.post
 import io.ktor.http.Parameters
 
 suspend fun authenticateSpotify(): TokenData? {
-    return if (isInternetAvailable) spotifyAuthClient.post("https://accounts.spotify.com/api/token") {
-        body = FormDataContent(Parameters.build { append("grant_type", "client_credentials") })
-    } else null
+    return try {
+        if (isInternetAvailable) spotifyAuthClient.post("https://accounts.spotify.com/api/token") {
+            body = FormDataContent(Parameters.build { append("grant_type", "client_credentials") })
+        } else null
+    }catch (e:Exception) {
+        null
+    }
 }
 
 private val spotifyAuthClient by lazy {

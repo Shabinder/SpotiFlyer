@@ -35,6 +35,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -49,6 +50,7 @@ import com.shabinder.common.di.Picture
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
+import kotlinx.coroutines.delay
 
 @Composable
 fun SpotiFlyerListContent(
@@ -57,10 +59,18 @@ fun SpotiFlyerListContent(
 ) {
     val model by component.models.collectAsState(SpotiFlyerList.State())
 
+    LaunchedEffect(model.errorOccurred) {
+        /*Handle if Any Exception Occurred*/
+        model.errorOccurred?.let {
+            showPopUpMessage(it.message ?: "An Error Occurred, Check your Link / Connection")
+            component.onBackPressed()
+        }
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
-        // TODO Better Null Handling
         val result = model.queryResult
         if (result == null) {
+            /* Loading Bar */
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier.padding(8.dp))

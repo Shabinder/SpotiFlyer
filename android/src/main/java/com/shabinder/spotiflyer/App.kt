@@ -23,17 +23,19 @@ import com.shabinder.spotiflyer.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.component.KoinComponent
+import org.koin.core.logger.Level
 
 class App: Application(), KoinComponent {
     override fun onCreate() {
         super.onCreate()
 
         appContext = this
+        val loggingEnabled = true
 
-        initKoin {
-            androidLogger()
+        initKoin(loggingEnabled) {
+            androidLogger(Level.NONE) // No virtual method elapsedNow
             androidContext(this@App)
-            modules(appModule)
+            modules(appModule(loggingEnabled))
         }
     }
 }
