@@ -28,11 +28,15 @@ class YoutubeMp3(
     override val logger: Kermit,
     private val dir: Dir,
 ) : Yt1sMp3 {
-    suspend fun getMp3DownloadLink(videoID: String): String? = getLinkFromYt1sMp3(videoID)?.let {
-        logger.i { "Download Link:   $it" }
-        if (currentPlatform is AllPlatforms.Js/* && corsProxy !is CorsProxy.PublicProxyWithExtension*/)
-            "https://kind-grasshopper-73.telebit.io/cors/$it"
-            // "https://spotiflyer.azurewebsites.net/$it" // Data OUT Limit issue 
-        else it
+    suspend fun getMp3DownloadLink(videoID: String): String? = try {
+        getLinkFromYt1sMp3(videoID)?.let {
+            logger.i { "Download Link:   $it" }
+            if (currentPlatform is AllPlatforms.Js/* && corsProxy !is CorsProxy.PublicProxyWithExtension*/)
+                "https://kind-grasshopper-73.telebit.io/cors/$it"
+            // "https://spotiflyer.azurewebsites.net/$it" // Data OUT Limit issue
+            else it
+        }
+    } catch (e: Exception) {
+        null
     }
 }

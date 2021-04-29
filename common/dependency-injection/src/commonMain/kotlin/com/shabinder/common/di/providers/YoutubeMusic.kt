@@ -47,12 +47,17 @@ class YoutubeMusic constructor(
     private val tag = "YT Music"
 
     suspend fun getYTIDBestMatch(query: String, trackDetails: TrackDetails): String? {
-        return sortByBestMatch(
-            getYTTracks(query),
-            trackName = trackDetails.title,
-            trackArtists = trackDetails.artists,
-            trackDurationSec = trackDetails.durationSec
-        ).keys.firstOrNull()
+        return try {
+            sortByBestMatch(
+                getYTTracks(query),
+                trackName = trackDetails.title,
+                trackArtists = trackDetails.artists,
+                trackDurationSec = trackDetails.durationSec
+            ).keys.firstOrNull()
+        } catch (e:Exception) {
+            // All Internet/Client Related Errors
+            null
+        }
     }
     private suspend fun getYTTracks(query: String): List<YoutubeTrack> {
         val youtubeTracks = mutableListOf<YoutubeTrack>()

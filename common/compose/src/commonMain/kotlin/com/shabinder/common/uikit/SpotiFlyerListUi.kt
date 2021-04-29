@@ -59,8 +59,15 @@ fun SpotiFlyerListContent(
 ) {
     val model by component.models.collectAsState(SpotiFlyerList.State())
 
+    LaunchedEffect(model.errorOccurred) {
+        /*Handle if Any Exception Occurred*/
+        model.errorOccurred?.let {
+            showPopUpMessage(it.message ?: "An Error Occurred, Check your Link / Connection")
+            component.onBackPressed()
+        }
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
-        // TODO Better Null Handling
         val result = model.queryResult
         if (result == null) {
             /* Loading Bar */
@@ -68,14 +75,6 @@ fun SpotiFlyerListContent(
                 CircularProgressIndicator()
                 Spacer(modifier.padding(8.dp))
                 Text("Loading..", style = appNameStyle, color = colorPrimary)
-            }
-            LaunchedEffect(Unit) {
-                delay(350)
-                /*Handle if Any Exception Occurred*/
-                model.errorOccurred?.let {
-                    showPopUpMessage(it.message ?: "An Error Occurred, Check your Link / Connection")
-                    component.onBackPressed()
-                }
             }
         } else {
             LazyColumn(

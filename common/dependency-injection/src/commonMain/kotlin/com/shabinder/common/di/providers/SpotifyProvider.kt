@@ -100,10 +100,24 @@ class SpotifyProvider(
             return null
         }
 
-        return spotifySearch(
-            type,
-            link
-        )
+        return try {
+            spotifySearch(
+                type,
+                link
+            )
+        }catch (e: Exception){
+            // Try Reinitialising Client // Handle 401 Token Expiry ,etc Exceptions
+            authenticateSpotifyClient(true)
+            // Retry Search
+            try {
+                spotifySearch(
+                    type,
+                    link
+                )
+            } catch (e:Exception){
+                null
+            }
+        }
     }
 
     private suspend fun spotifySearch(

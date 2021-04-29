@@ -46,10 +46,14 @@ class GaanaProvider(
         if (type == "Error" || link == "Error") {
             return null
         }
-        return gaanaSearch(
-            type,
-            link
-        )
+        return try {
+            gaanaSearch(
+                type,
+                link
+            )
+        } catch (e: Exception) {
+            null
+        }
     }
 
     private suspend fun gaanaSearch(
