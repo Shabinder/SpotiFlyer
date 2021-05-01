@@ -38,6 +38,7 @@ import io.ktor.client.request.header
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.native.concurrent.ThreadLocal
 
 class SpotifyProvider(
     private val tokenStore: TokenStore,
@@ -48,7 +49,7 @@ class SpotifyProvider(
    /* init {
         logger.d { "Creating Spotify Provider" }
         GlobalScope.launch(Dispatchers.Default) {
-            if (methods.currentPlatform is AllPlatforms.Js) {
+            if (methods.value.currentPlatform is AllPlatforms.Js) {
                 authenticateSpotifyClient(override = true)
             } else authenticateSpotifyClient()
         }

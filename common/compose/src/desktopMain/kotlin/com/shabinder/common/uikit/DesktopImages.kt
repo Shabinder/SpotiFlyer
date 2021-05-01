@@ -48,7 +48,7 @@ actual fun ImageLoad(
 ) {
     var pic by remember(link) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(link) {
-        withContext(methods.dispatcherIO) {
+        withContext(methods.value.dispatcherIO) {
             pic = loader(link).image
         }
     }

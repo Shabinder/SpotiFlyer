@@ -27,7 +27,7 @@ import com.shabinder.common.models.methods
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 
-val corsApi get() = if (methods.currentPlatform is AllPlatforms.Js) {
+val corsApi get() = if (methods.value.currentPlatform is AllPlatforms.Js) {
     corsProxy.url
 } //  "https://spotiflyer-cors.azurewebsites.net/" //"https://spotiflyer-cors.herokuapp.com/"//"https://cors.bridged.cc/"
 else ""

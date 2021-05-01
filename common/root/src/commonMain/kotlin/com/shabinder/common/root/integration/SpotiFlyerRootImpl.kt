@@ -16,6 +16,7 @@
 
 package com.shabinder.common.root.integration
 
+import co.touchlab.stately.freeze
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.pop
@@ -36,6 +37,7 @@ import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -45,12 +47,12 @@ internal class SpotiFlyerRootImpl(
 ) : SpotiFlyerRoot, ComponentContext by componentContext, Dependencies by dependencies, Actions by dependencies.actions {
 
     init {
-        methods = actions
-        GlobalScope.launch {
-            /*Authenticate Spotify Client*/
-            if (methods.currentPlatform is AllPlatforms.Js) {
+        methods.value = actions.freeze()
+        GlobalScope.launch(Dispatchers.Default) {
+            //*Authenticate Spotify Client*//*
+            /*if (methods.value.currentPlatform is AllPlatforms.Js) {
                 fetchPlatformQueryResult.spotifyProvider.authenticateSpotifyClient(override = true)
-            } else fetchPlatformQueryResult.spotifyProvider.authenticateSpotifyClient()
+            } else fetchPlatformQueryResult.spotifyProvider.authenticateSpotifyClient()*/
         }
     }
 

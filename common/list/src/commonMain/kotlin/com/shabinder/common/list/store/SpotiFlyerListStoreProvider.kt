@@ -92,7 +92,7 @@ internal class SpotiFlyerListStoreProvider(
                 is Intent.StartDownloadAll -> {
                     val finalList =
                         intent.trackList.filter { it.downloaded == DownloadStatus.NotDownloaded }
-                    if (finalList.isNullOrEmpty()) methods.showPopUpMessage("All Songs are Processed")
+                    if (finalList.isNullOrEmpty()) methods.value.showPopUpMessage("All Songs are Processed")
                     else downloadTracks(finalList, fetchQuery, dir)
 
                     val list = intent.trackList.map {
@@ -106,7 +106,7 @@ internal class SpotiFlyerListStoreProvider(
                     downloadTracks(listOf(intent.track), fetchQuery, dir)
                     dispatch(Result.UpdateTrackItem(intent.track.copy(downloaded = DownloadStatus.Queued)))
                 }
-                is Intent.RefreshTracksStatuses -> methods.queryActiveTracks()
+                is Intent.RefreshTracksStatuses -> methods.value.queryActiveTracks()
             }
         }
     }

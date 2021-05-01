@@ -43,7 +43,7 @@ expect class Dir (
     suspend fun cacheImage(image: Any, path: String) // in Android = ImageBitmap, Desktop = BufferedImage
     suspend fun loadImage(url: String): Picture
     suspend fun clearCache()
-    suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, trackDetails: TrackDetails)
+    suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, trackDetails: TrackDetails,postProcess:(track: TrackDetails)->Unit = {})
     fun addToLibrary(path: String)
 }
 

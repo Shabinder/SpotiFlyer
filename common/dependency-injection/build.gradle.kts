@@ -20,29 +20,9 @@ plugins {
     id("multiplatform-setup")
     id("android-setup")
     kotlin("plugin.serialization")
-    kotlin("native.cocoapods")
 }
 
-version = "1.0"
-
 kotlin {
-
-    cocoapods {
-        // Configure fields required by CocoaPods.
-        summary = "SpotiFlyer-DI Native Module"
-        homepage = "https://github.com/Shabinder/SpotiFlyer"
-        authors = "Shabinder Singh"
-        // You can change the name of the produced framework.
-        // By default, it is the name of the Gradle project.
-        frameworkName = "SpotiFlyer-DI"
-        ios.deploymentTarget = "9.0"
-
-        // Dependencies
-        pod("TagLibIOS") {
-            version = "~> 0.3"
-        }
-        //podfile = project.file("spotiflyer-ios/Podfile")
-    }
 
     sourceSets {
         commonMain {
@@ -50,45 +30,33 @@ kotlin {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
                 implementation("org.jetbrains.kotlinx:atomicfu:0.16.1")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.0")
                 implementation("com.shabinder.fuzzywuzzy:fuzzywuzzy:1.0")
-                api(Ktor.clientCore)
-                api(Ktor.clientSerialization)
-                api(Ktor.clientLogging)
-                api(Ktor.clientJson)
-                api(Ktor.auth)
-                api(Extras.youtubeDownloader)
-                api(Extras.kermit)
+                implementation(Extras.youtubeDownloader)
+                implementation(MVIKotlin.rx)
             }
         }
         androidMain {
             dependencies {
                 implementation(compose.materialIconsExtended)
-                api(Koin.android)
-                api(Ktor.clientAndroid)
-                api(Extras.Android.razorpay)
-                api(Extras.mp3agic)
-                api(Extras.jaudioTagger)
-                api("com.github.shabinder:storage-chooser:2.0.4.45")
-                // api(files("$rootDir/libs/mobile-ffmpeg.aar"))
+                implementation(Extras.Android.razorpay)
+                implementation(Extras.mp3agic)
+                //implementation(Extras.jaudioTagger)
+                implementation("com.github.shabinder:storage-chooser:2.0.4.45")
+                // implementation(files("$rootDir/libs/mobile-ffmpeg.aar"))
             }
         }
         desktopMain {
             dependencies {
                 implementation(compose.materialIconsExtended)
-                api(Ktor.clientApache)
-                api(Ktor.slf4j)
-                api(Extras.mp3agic)
-                api(Extras.jaudioTagger)
+                implementation(Extras.mp3agic)
+                //implementation(Extras.jaudioTagger)
             }
         }
         jsMain {
             dependencies {
                 implementation(npm("browser-id3-writer", "4.4.0"))
                 implementation(npm("file-saver", "2.0.4"))
-                implementation(project(":common:data-models"))
-                api(Ktor.clientJs)
             }
         }
     }

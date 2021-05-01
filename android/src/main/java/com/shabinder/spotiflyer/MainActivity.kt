@@ -210,14 +210,14 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                         )
 
                         override fun addToLibrary(path: String) {
-                            MediaScannerConnection.scanFile(
+                            MediaScannerConnection.scanFile (
                                 applicationContext,
                                 listOf(path).toTypedArray(), null, null
                             )
                         }
 
                         override fun sendTracksToService(array: ArrayList<TrackDetails>) {
-                            for (list in array.chunked(50)){
+                            for (list in array.chunked(50)) {
                                 val serviceIntent = Intent(this@MainActivity, ForegroundService::class.java)
                                 serviceIntent.putParcelableArrayListExtra("object", list as ArrayList)
                                 ContextCompat.startForegroundService(this@MainActivity, serviceIntent)
@@ -378,7 +378,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                         while(!this@MainActivity::root.isInitialized){
                             delay(100)
                         }
-                        if(methods.isInternetAvailable)callBacks.searchLink(link)
+                        if(methods.value.isInternetAvailable)callBacks.searchLink(link)
                     }
                 }
             }

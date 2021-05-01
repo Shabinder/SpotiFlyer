@@ -36,7 +36,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,24 +45,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arkivanov.decompose.extensions.compose.jetbrains.asState
 import com.shabinder.common.di.Picture
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
-import kotlinx.coroutines.delay
 
 @Composable
 fun SpotiFlyerListContent(
     component: SpotiFlyerList,
     modifier: Modifier = Modifier
 ) {
-    val model by component.models.collectAsState(SpotiFlyerList.State())
+    val model by component.models.asState()
 
     LaunchedEffect(model.errorOccurred) {
         /*Handle if Any Exception Occurred*/
         model.errorOccurred?.let {
-            methods.showPopUpMessage(it.message ?: "An Error Occurred, Check your Link / Connection")
+            methods.value.showPopUpMessage(it.message ?: "An Error Occurred, Check your Link / Connection")
             component.onBackPressed()
         }
     }

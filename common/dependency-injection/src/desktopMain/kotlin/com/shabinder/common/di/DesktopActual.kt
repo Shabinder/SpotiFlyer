@@ -61,7 +61,7 @@ private val ytDownloader = YoutubeDownloader()
 suspend fun downloadTrack(
     videoID: String,
     trackDetails: TrackDetails,
-    saveFileWithMetaData: suspend (mp3ByteArray: ByteArray, trackDetails: TrackDetails) -> Unit
+    saveFileWithMetaData: suspend (mp3ByteArray: ByteArray, trackDetails: TrackDetails,postProcess:(TrackDetails)->Unit) -> Unit
 ) {
     try {
         val audioData = ytDownloader.getVideo(videoID).getData()
@@ -85,7 +85,7 @@ suspend fun downloadTrack(
                         )
                     }
                     is DownloadResult.Success -> { // Todo clear map
-                        saveFileWithMetaData(it.byteArray, trackDetails)
+                        saveFileWithMetaData(it.byteArray, trackDetails){}
                         DownloadProgressFlow.emit(
                             DownloadProgressFlow.replayCache.getOrElse(
                                 0

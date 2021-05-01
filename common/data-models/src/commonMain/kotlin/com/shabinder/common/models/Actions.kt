@@ -1,11 +1,13 @@
 package com.shabinder.common.models
 
+import co.touchlab.stately.freeze
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 
 /*
 * Holder to call platform actions from anywhere
 * */
-lateinit var methods: Actions
+var methods: NativeAtomicReference<Actions> = NativeAtomicReference(stubActions().freeze())
 
 /*
 * Interface Having All Platform Dependent Functions
@@ -44,4 +46,18 @@ interface Actions {
 
     // Current Platform Info
     val currentPlatform: AllPlatforms
+}
+
+
+private fun stubActions() = object :Actions{
+    override val platformActions = object: PlatformActions{}
+    override fun showPopUpMessage(string: String, long: Boolean) {}
+    override fun setDownloadDirectoryAction() {}
+    override fun queryActiveTracks() {}
+    override fun giveDonation() {}
+    override fun shareApp() {}
+    override fun openPlatform(packageID: String, platformLink: String) {}
+    override val dispatcherIO: CoroutineDispatcher = Dispatchers.Default
+    override val isInternetAvailable: Boolean = true
+    override val currentPlatform: AllPlatforms = AllPlatforms.Jvm
 }

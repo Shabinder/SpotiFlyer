@@ -17,6 +17,7 @@
 package com.shabinder.common.list
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.value.Value
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
@@ -26,12 +27,11 @@ import com.shabinder.common.models.Consumer
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 interface SpotiFlyerList {
 
-    val models: Flow<State>
+    val models: Value<State>
 
     /*
     * Download All Tracks(after filtering already Downloaded)
@@ -66,9 +66,11 @@ interface SpotiFlyerList {
         val listOutput: Consumer<Output>
         val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>
     }
+
     sealed class Output {
         object Finished : Output()
     }
+
     data class State(
         val queryResult: PlatformQueryResult? = null,
         val link: String = "",

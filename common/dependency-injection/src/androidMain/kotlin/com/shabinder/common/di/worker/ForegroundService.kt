@@ -236,7 +236,7 @@ class ForegroundService : Service(), CoroutineScope {
                         is DownloadResult.Success -> {
                             try {
                                 // Save File and Embed Metadata
-                                val job = launch(Dispatchers.Default) { dir.saveFileWithMetadata(it.byteArray, track) }
+                                val job = launch(Dispatchers.Default) { dir.saveFileWithMetadata(it.byteArray, track){} }
                                 allTracksStatus[track.title] = DownloadStatus.Converting
                                 sendTrackBroadcast("Converting", track)
                                 addToNotification("Processing ${track.title}")
@@ -293,7 +293,7 @@ class ForegroundService : Service(), CoroutineScope {
                     // Checking if the received broadcast is for our enqueued download by matching download id
                     if (downloadID == id) {
                         allTracksStatus[track.title] = DownloadStatus.Converting
-                        launch { dir.saveFileWithMetadata(byteArrayOf(), track); converted++ }
+                        launch { dir.saveFileWithMetadata(byteArrayOf(), track){}; converted++ }
                         // Unregister this broadcast Receiver
                         this@ForegroundService.unregisterReceiver(this)
                     }

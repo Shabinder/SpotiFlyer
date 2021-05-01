@@ -17,8 +17,9 @@
 package com.shabinder.common.main.integration
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.mvikotlin.extensions.coroutines.states
+import com.arkivanov.decompose.value.Value
 import com.shabinder.common.di.Picture
+import com.shabinder.common.di.utils.asValue
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.Dependencies
 import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
@@ -28,7 +29,6 @@ import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
 import com.shabinder.common.main.store.SpotiFlyerMainStoreProvider
 import com.shabinder.common.main.store.getStore
 import com.shabinder.common.models.methods
-import kotlinx.coroutines.flow.Flow
 
 internal class SpotiFlyerMainImpl(
     componentContext: ComponentContext,
@@ -43,11 +43,11 @@ internal class SpotiFlyerMainImpl(
             ).provide()
         }
 
-    override val models: Flow<State> = store.states
+    override val models: Value<State> = store.asValue()
 
     override fun onLinkSearch(link: String) {
-        if (methods.isInternetAvailable) mainOutput.callback(Output.Search(link = link))
-        else methods.showPopUpMessage("Check Network Connection Please")
+        if (methods.value.isInternetAvailable) mainOutput.callback(Output.Search(link = link))
+        else methods.value.showPopUpMessage("Check Network Connection Please")
     }
 
     override fun onInputLinkChanged(link: String) {

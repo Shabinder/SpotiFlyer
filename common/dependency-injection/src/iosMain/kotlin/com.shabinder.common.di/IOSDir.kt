@@ -1,7 +1,6 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
-import cocoapods.TagLibIOS.TLAudio
 import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
@@ -27,7 +26,7 @@ actual class Dir actual constructor(
 ) {
 
     init {
-        createDirectories()
+        //createDirectories()
     }
 
     actual fun isPresent(path: String): Boolean = NSFileManager.defaultManager.fileExistsAtPath(path)
@@ -135,16 +134,18 @@ actual class Dir actual constructor(
 
     actual suspend fun saveFileWithMetadata(
         mp3ByteArray: ByteArray,
-        trackDetails: TrackDetails
+        trackDetails: TrackDetails,
+        postProcess:(track: TrackDetails)->Unit
     ) {
         when (trackDetails.outputFilePath.substringAfterLast('.')) {
             ".mp3" -> {
-                val file = TLAudio(trackDetails.outputFilePath)
+                postProcess(trackDetails)
+                /*val file = TLAudio(trackDetails.outputFilePath)
                 file.addTagsAndSave(
                     trackDetails,
                     this::loadCachedImage,
                     this::addToLibrary
-                )
+                )*/
             }
         }
     }

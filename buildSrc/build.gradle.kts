@@ -22,10 +22,9 @@ group = "com.shabinder"
 version = "2.1"
 
 repositories {
-    jcenter()
+    google()
     mavenLocal()
     mavenCentral()
-    google()
     maven(url = "https://jitpack.io")
     maven(url = "https://plugins.gradle.org/m2/")
     maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")

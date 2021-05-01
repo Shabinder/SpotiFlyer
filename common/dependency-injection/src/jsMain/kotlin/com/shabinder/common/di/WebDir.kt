@@ -62,7 +62,8 @@ actual class Dir actual constructor(
     @Suppress("BlockingMethodInNonBlockingContext")
     actual suspend fun saveFileWithMetadata(
         mp3ByteArray: ByteArray,
-        trackDetails: TrackDetails
+        trackDetails: TrackDetails,
+        postProcess:(track: TrackDetails)->Unit
     ) {
         val writer = ID3Writer(mp3ByteArray.toArrayBuffer())
         val albumArt = downloadFile(corsApi + trackDetails.albumArtURL)

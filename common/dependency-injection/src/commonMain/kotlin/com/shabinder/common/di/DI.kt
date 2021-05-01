@@ -42,6 +42,9 @@ fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclarat
         modules(commonModule(enableNetworkLogs = enableNetworkLogs), databaseModule())
     }
 
+// Called by IOS
+fun initKoin() = initKoin(enableNetworkLogs = false) { }
+
 fun commonModule(enableNetworkLogs: Boolean) = module {
     single { createHttpClient(enableNetworkLogs = enableNetworkLogs) }
     single { Dir(get(), get()) }

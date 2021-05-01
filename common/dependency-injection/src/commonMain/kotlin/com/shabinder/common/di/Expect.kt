@@ -19,6 +19,7 @@ package com.shabinder.common.di
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
 import io.ktor.client.request.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 expect suspend fun downloadTracks(
@@ -28,7 +29,7 @@ expect suspend fun downloadTracks(
 )
 
 suspend fun isInternetAccessible(): Boolean {
-    return withContext(methods.dispatcherIO) {
+    return withContext(methods.value.dispatcherIO) {
         try {
             ktorHttpClient.head<String>("http://google.com")
             true
@@ -38,3 +39,5 @@ suspend fun isInternetAccessible(): Boolean {
         }
     }
 }
+
+internal val dispatcherDefault = Dispatchers.Default

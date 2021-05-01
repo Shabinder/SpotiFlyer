@@ -17,7 +17,7 @@
 package com.shabinder.common.di.utils
 
 // Dependencies:
-// implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+// implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9-native-mt")
 // implementation("org.jetbrains.kotlinx:atomicfu:0.14.4")
 // Gist: https://gist.github.com/fluidsonic/ba32de21c156bbe8424c8d5fc20dcd8e
 
@@ -37,7 +37,7 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
 class ParallelExecutor(
-    parentContext: CoroutineContext = methods.dispatcherIO,
+    parentContext: CoroutineContext = methods.value.dispatcherIO,
 ) : Closeable {
 
     private val concurrentOperationLimit = atomic(4)

@@ -46,7 +46,7 @@ actual class Dir actual constructor(
         const val DirKey = "downloadDir"
     }
 
-    private val sharedPreferences:SharedPreferences by lazy { methods.platformActions.sharedPreferences }
+    private val sharedPreferences:SharedPreferences by lazy { methods.value.platformActions.sharedPreferences }
 
     fun setDownloadDirectory(newBasePath:String){
         sharedPreferences.edit().putString(DirKey,newBasePath).apply()
@@ -57,7 +57,7 @@ actual class Dir actual constructor(
 
     actual fun fileSeparator(): String = File.separator
 
-    actual fun imageCacheDir(): String = methods.platformActions.imageCacheDir
+    actual fun imageCacheDir(): String = methods.value.platformActions.imageCacheDir
 
     // fun call in order to always access Updated Value
     actual fun defaultDir(): String = sharedPreferences.getString(DirKey,defaultBaseDir)!! + File.separator +
@@ -84,7 +84,8 @@ actual class Dir actual constructor(
     @Suppress("BlockingMethodInNonBlockingContext")
     actual suspend fun saveFileWithMetadata(
         mp3ByteArray: ByteArray,
-        trackDetails: TrackDetails
+        trackDetails: TrackDetails,
+        postProcess:(track: TrackDetails)->Unit
     ) {
         withContext(Dispatchers.IO){
             val songFile = File(trackDetails.outputFilePath)
@@ -152,7 +153,7 @@ actual class Dir actual constructor(
         }
     }
 
-    actual fun addToLibrary(path: String) = methods.platformActions.addToLibrary(path)
+    actual fun addToLibrary(path: String) = methods.value.platformActions.addToLibrary(path)
 
     actual suspend fun loadImage(url: String): Picture = withContext(Dispatchers.IO){
         val cachePath = imageCacheDir() + getNameURL(url)

@@ -28,9 +28,6 @@ kotlin {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
                 implementation(SqlDelight.coroutineExtensions)
-                implementation(MVIKotlin.coroutines)
-                implementation(MVIKotlin.mvikotlin)
-                implementation(Decompose.decompose)
             }
         }
     }

@@ -17,8 +17,9 @@
 package com.shabinder.common.list.integration
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.mvikotlin.extensions.coroutines.states
+import com.arkivanov.decompose.value.Value
 import com.shabinder.common.di.Picture
+import com.shabinder.common.di.utils.asValue
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.list.SpotiFlyerList.Dependencies
 import com.shabinder.common.list.SpotiFlyerList.State
@@ -26,7 +27,6 @@ import com.shabinder.common.list.store.SpotiFlyerListStore.Intent
 import com.shabinder.common.list.store.SpotiFlyerListStoreProvider
 import com.shabinder.common.list.store.getStore
 import com.shabinder.common.models.TrackDetails
-import kotlinx.coroutines.flow.Flow
 
 internal class SpotiFlyerListImpl(
     componentContext: ComponentContext,
@@ -44,7 +44,7 @@ internal class SpotiFlyerListImpl(
             ).provide()
         }
 
-    override val models: Flow<State> = store.states
+    override val models: Value<State> = store.asValue()
 
     override fun onDownloadAllClicked(trackList: List<TrackDetails>) {
         store.accept(Intent.StartDownloadAll(trackList))

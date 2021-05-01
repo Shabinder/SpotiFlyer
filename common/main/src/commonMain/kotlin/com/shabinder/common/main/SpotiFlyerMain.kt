@@ -17,6 +17,7 @@
 package com.shabinder.common.main
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.value.Value
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.Picture
@@ -28,7 +29,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface SpotiFlyerMain {
 
-    val models: Flow<State>
+    val models: Value<State>
 
     /*
     * We Intend to Move to List Screen
@@ -67,6 +68,7 @@ interface SpotiFlyerMain {
         val link: String = "",
         val selectedCategory: HomeCategory = HomeCategory.About
     )
+
     enum class HomeCategory {
         About, History
     }

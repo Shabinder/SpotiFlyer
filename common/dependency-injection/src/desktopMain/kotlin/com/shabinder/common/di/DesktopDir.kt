@@ -85,7 +85,8 @@ actual class Dir actual constructor(
     @Suppress("BlockingMethodInNonBlockingContext")
     actual suspend fun saveFileWithMetadata(
         mp3ByteArray: ByteArray,
-        trackDetails: TrackDetails
+        trackDetails: TrackDetails,
+        postProcess:(track: TrackDetails)->Unit
     ) {
         val file = File(trackDetails.outputFilePath)
         file.writeBytes(mp3ByteArray)

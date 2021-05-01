@@ -20,6 +20,7 @@ import org.jetbrains.compose.compose
 plugins {
     id("com.android.application")
     kotlin("android")
+    id("kotlin-parcelize")
     id("org.jetbrains.compose")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
@@ -96,20 +97,26 @@ dependencies {
     implementation(compose.materialIconsExtended)
     implementation(Androidx.androidxActivity)
 
+    // Project's SubModules
     implementation(project(":common:database"))
     implementation(project(":common:compose"))
     implementation(project(":common:root"))
     implementation(project(":common:dependency-injection"))
     implementation(project(":common:data-models"))
 
+    // Koin
     implementation(Koin.android)
     implementation(Koin.compose)
-
-    implementation("com.google.accompanist:accompanist-insets:0.8.1")
 
     // DECOMPOSE
     implementation(Decompose.decompose)
     implementation(Decompose.extensionsCompose)
+
+    // MVI
+    implementation(MVIKotlin.mvikotlin)
+    implementation(MVIKotlin.mvikotlinMain)
+    implementation(MVIKotlin.mvikotlinLogging)
+    implementation(MVIKotlin.mvikotlinTimeTravel)
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:27.1.0"))
@@ -117,16 +124,15 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-perf-ktx")
 
+    // Extras
     Extras.Android.apply {
         implementation(appUpdator)
         implementation(razorpay)
     }
-    implementation(MVIKotlin.mvikotlin)
-    implementation(MVIKotlin.mvikotlinMain)
-    implementation(MVIKotlin.mvikotlinLogging)
-    implementation(MVIKotlin.mvikotlinTimeTravel)
-    implementation(Decompose.decompose)
-    implementation(Decompose.extensionsCompose)
+
+    implementation("dev.icerock.moko:parcelize:0.6.1")
+    implementation("com.github.shabinder:storage-chooser:2.0.4.45")
+    implementation("com.google.accompanist:accompanist-insets:0.8.1")
 
     // Test
     testImplementation("junit:junit:4.13.2")

@@ -35,7 +35,7 @@ actual suspend fun downloadTracks(
     dir: Dir
 ) {
     list.forEach {
-        withContext(methods.dispatcherIO) {
+        withContext(methods.value.dispatcherIO) {
             allTracksStatus[it.title] = DownloadStatus.Queued
             if (!it.videoID.isNullOrBlank()) { // Video ID already known!
                 downloadTrack(it.videoID!!, it, fetcher, dir)
@@ -66,7 +66,7 @@ suspend fun downloadTrack(videoID: String, track: TrackDetails, fetcher: FetchPl
             when (it) {
                 is DownloadResult.Success -> {
                     println("Download Completed")
-                    dir.saveFileWithMetadata(it.byteArray, track)
+                    dir.saveFileWithMetadata(it.byteArray, track){}
                 }
                 is DownloadResult.Error -> {
                     allTracksStatus[track.title] = DownloadStatus.Failed

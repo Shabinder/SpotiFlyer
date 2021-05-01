@@ -19,7 +19,6 @@ import org.jetbrains.compose.compose
 plugins {
     id("multiplatform-compose-setup")
     id("android-setup")
-    id("kotlin-parcelize")
 }
 
 kotlin {
@@ -33,8 +32,6 @@ kotlin {
                 implementation(project(":common:database"))
                 implementation(project(":common:data-models"))
                 implementation(project(":common:dependency-injection"))
-                // DECOMPOSE
-                implementation(Decompose.decompose)
                 implementation(Decompose.extensionsCompose)
             }
         }

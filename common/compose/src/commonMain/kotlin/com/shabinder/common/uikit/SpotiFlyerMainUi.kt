@@ -58,7 +58,6 @@ import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,6 +71,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arkivanov.decompose.extensions.compose.jetbrains.asState
 import com.shabinder.common.di.Picture
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
@@ -80,7 +80,7 @@ import com.shabinder.common.models.methods
 
 @Composable
 fun SpotiFlyerMainContent(component: SpotiFlyerMain) {
-    val model by component.models.collectAsState(SpotiFlyerMain.State())
+    val model by component.models.asState()
 
     Column {
         SearchPanel(
@@ -193,7 +193,7 @@ fun SearchPanel(
         OutlinedButton(
             modifier = Modifier.padding(12.dp).wrapContentWidth(),
             onClick = {
-                if (link.isBlank()) methods.showPopUpMessage("Enter A Link!")
+                if (link.isBlank()) methods.value.showPopUpMessage("Enter A Link!")
                 else {
                     // TODO if(!isOnline(ctx)) showPopUpMessage("Check Your Internet Connection") else
                     onSearch(link)
@@ -235,7 +235,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         "Open Spotify",
                         tint = Color.Unspecified,
                         modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                            onClick = { methods.openPlatform("com.spotify.music", "http://open.spotify.com") }
+                            onClick = { methods.value.openPlatform("com.spotify.music", "http://open.spotify.com") }
                         )
                     )
                     Spacer(modifier = modifier.padding(start = 16.dp))
@@ -244,7 +244,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         "Open Gaana",
                         tint = Color.Unspecified,
                         modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                            onClick = { methods.openPlatform("com.gaana", "http://gaana.com") }
+                            onClick = { methods.value.openPlatform("com.gaana", "http://gaana.com") }
                         )
                     )
                     Spacer(modifier = modifier.padding(start = 16.dp))
@@ -253,7 +253,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         "Open Youtube",
                         tint = Color.Unspecified,
                         modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                            onClick = { methods.openPlatform("com.google.android.youtube", "http://m.youtube.com") }
+                            onClick = { methods.value.openPlatform("com.google.android.youtube", "http://m.youtube.com") }
                         )
                     )
                     Spacer(modifier = modifier.padding(start = 12.dp))
@@ -262,7 +262,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         "Open Youtube Music",
                         tint = Color.Unspecified,
                         modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                            onClick = { methods.openPlatform("com.google.android.apps.youtube.music", "https://music.youtube.com/") }
+                            onClick = { methods.value.openPlatform("com.google.android.apps.youtube.music", "https://music.youtube.com/") }
                         )
                     )
                 }
@@ -283,7 +283,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth().clickable(
-                        onClick = { methods.openPlatform("", "http://github.com/Shabinder/SpotiFlyer") }
+                        onClick = { methods.value.openPlatform("", "http://github.com/Shabinder/SpotiFlyer") }
                     )
                         .padding(vertical = 6.dp)
                 ) {
@@ -302,7 +302,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                 }
                 Row(
                     modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        .clickable(onClick = { methods.openPlatform("", "http://github.com/Shabinder/SpotiFlyer") }),
+                        .clickable(onClick = { methods.value.openPlatform("", "http://github.com/Shabinder/SpotiFlyer") }),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(Icons.Rounded.Flag, "Help Translate", Modifier.size(32.dp))
@@ -320,7 +320,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                 }
                 Row(
                     modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        .clickable(onClick = { methods.giveDonation() }),
+                        .clickable(onClick = { methods.value.giveDonation() }),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(Icons.Rounded.CardGiftcard, "Support Developer")
@@ -340,7 +340,7 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                     modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
                         .clickable(
                             onClick = {
-                                methods.shareApp()
+                                methods.value.shareApp()
                             }
                         ),
                     verticalAlignment = Alignment.CenterVertically

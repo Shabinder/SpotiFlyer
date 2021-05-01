@@ -31,13 +31,13 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":common:data-models"))
+
                 // SQL Delight
                 implementation(SqlDelight.runtime)
                 implementation(SqlDelight.coroutineExtensions)
-                api(Extras.kermit)
+
                 // koin
-                api(Koin.core)
-                api(Koin.test)
+                implementation(Koin.test)
             }
         }
 
@@ -53,7 +53,8 @@ kotlin {
                 implementation(SqlDelight.jdbcDriver)
             }
         }
-        if(HostOS.isMac){
+
+        if(HostOS.isMac) {
             val iosMain by getting {
                 dependencies {
                     implementation(SqlDelight.nativeDriver)

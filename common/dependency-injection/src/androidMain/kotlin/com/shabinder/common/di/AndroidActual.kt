@@ -25,6 +25,6 @@ actual suspend fun downloadTracks(
     dir: Dir
 ) {
     if (!list.isNullOrEmpty()) {
-        methods.platformActions.sendTracksToService(ArrayList(list))
+        methods.value.platformActions.sendTracksToService(ArrayList(list))
     }
 }

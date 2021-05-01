@@ -78,9 +78,9 @@ internal class SpotiFlyerMainStoreProvider(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) {
             when (intent) {
-                is Intent.OpenPlatform -> methods.openPlatform(intent.platformID, intent.platformLink)
-                is Intent.GiveDonation -> methods.giveDonation()
-                is Intent.ShareApp -> methods.shareApp()
+                is Intent.OpenPlatform -> methods.value.openPlatform(intent.platformID, intent.platformLink)
+                is Intent.GiveDonation -> methods.value.giveDonation()
+                is Intent.ShareApp -> methods.value.shareApp()
                 is Intent.SetLink -> dispatch(Result.LinkChanged(link = intent.link))
                 is Intent.SelectCategory -> dispatch(Result.CategoryChanged(intent.category))
             }

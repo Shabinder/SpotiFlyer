@@ -18,6 +18,7 @@ plugins {
     id("com.android.library")
     id("kotlin-multiplatform")
     id("org.jetbrains.compose")
+    id("kotlin-parcelize")
     id("ktlint-setup")
 }
 
@@ -35,10 +36,22 @@ kotlin {
     sourceSets {
         named("commonMain") {
             dependencies {
+                // Decompose
+                implementation(Decompose.decompose)
+
+                // MVI
+                implementation(MVIKotlin.coroutines)
+                implementation(MVIKotlin.mvikotlin)
+
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3-native-mt")
+
+                implementation(Extras.kermit)
+                implementation("dev.icerock.moko:parcelize:0.6.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3-native-mt") {
+                    isForce = true
+                }
             }
         }
 
