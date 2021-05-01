@@ -26,6 +26,7 @@ import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.post
 import io.ktor.http.Parameters
+import kotlin.native.concurrent.SharedImmutable
 
 suspend fun authenticateSpotify(): TokenData? {
     return try {
@@ -37,6 +38,7 @@ suspend fun authenticateSpotify(): TokenData? {
     }
 }
 
+@SharedImmutable
 private val spotifyAuthClient by lazy {
     HttpClient {
         val clientId = "694d8bf4f6ec420fa66ea7fb4c68f89d"

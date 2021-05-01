@@ -17,16 +17,17 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
+import co.touchlab.stately.freeze
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.TokenStore
 import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.kotlinxSerializer
+import com.shabinder.common.di.ktorHttpClient
 import com.shabinder.common.di.spotify.SpotifyRequests
 import com.shabinder.common.di.spotify.authenticateSpotify
-import com.shabinder.common.models.AllPlatforms
+import com.shabinder.common.models.NativeAtomicReference
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.models.methods
 import com.shabinder.common.models.spotify.Album
 import com.shabinder.common.models.spotify.Image
 import com.shabinder.common.models.spotify.Source
@@ -35,10 +36,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.features.defaultRequest
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.header
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlin.native.concurrent.ThreadLocal
 
 class SpotifyProvider(
     private val tokenStore: TokenStore,
@@ -55,11 +52,10 @@ class SpotifyProvider(
         }
     }*/
 
-    override suspend fun authenticateSpotifyClient(override: Boolean): HttpClient? {
+    override suspend fun authenticateSpotifyClient(override: Boolean) {
         val token = if (override) authenticateSpotify() else tokenStore.getToken()
-        return if (token == null) {
+        if (token == null) {
             logger.d { "Please Check your Network Connection" }
-            null
         } else {
             logger.d { "Spotify Provider Created with $token" }
             HttpClient {
@@ -69,17 +65,13 @@ class SpotifyProvider(
                 install(JsonFeature) {
                     serializer = kotlinxSerializer
                 }
-            }.also { httpClient = it }
+            }.also { httpClientRef.value = it.freeze() }
         }
     }
 
-    override lateinit var httpClient: HttpClient
+    override val httpClientRef = NativeAtomicReference(ktorHttpClient)
 
     suspend fun query(fullLink: String): PlatformQueryResult? {
-
-        if (!this::httpClient.isInitialized) {
-            authenticateSpotifyClient()
-        }
 
         var spotifyLink =
             "https://" + fullLink.substringAfterLast("https://").substringBefore(" ").trim()

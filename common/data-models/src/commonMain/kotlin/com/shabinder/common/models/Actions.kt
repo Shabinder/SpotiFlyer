@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 /*
 * Holder to call platform actions from anywhere
 * */
-var methods: NativeAtomicReference<Actions> = NativeAtomicReference(stubActions().freeze())
+val methods: NativeAtomicReference<Actions> = NativeAtomicReference(stubActions().freeze())
 
 /*
 * Interface Having All Platform Dependent Functions

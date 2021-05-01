@@ -26,7 +26,9 @@ import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
 import com.arkivanov.decompose.value.Value
+import com.shabinder.common.database.getLogger
 import com.shabinder.common.di.Dir
+import com.shabinder.common.di.createDirectories
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.models.Actions
@@ -48,11 +50,17 @@ internal class SpotiFlyerRootImpl(
 
     init {
         methods.value = actions.freeze()
-        GlobalScope.launch(Dispatchers.Default) {
+        GlobalScope.launch {
+            /*TESTING*/
+            getLogger().apply {
+                d("Hey...","Background Thread")
+                //d(directories.defaultDir(),"Background Thread")
+                d("Hey...","Background Thread")
+            }
             //*Authenticate Spotify Client*//*
-            /*if (methods.value.currentPlatform is AllPlatforms.Js) {
-                fetchPlatformQueryResult.spotifyProvider.authenticateSpotifyClient(override = true)
-            } else fetchPlatformQueryResult.spotifyProvider.authenticateSpotifyClient()*/
+            /*fetchPlatformQueryResult.spotifyProvider.authenticateSpotifyClient(
+                override = true //methods.value.currentPlatform is AllPlatforms.Js
+            )*/
         }
     }
 

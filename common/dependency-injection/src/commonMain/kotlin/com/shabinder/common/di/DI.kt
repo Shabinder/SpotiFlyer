@@ -23,6 +23,7 @@ import com.shabinder.common.di.providers.GaanaProvider
 import com.shabinder.common.di.providers.SpotifyProvider
 import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
+import com.shabinder.common.models.NativeAtomicReference
 import io.ktor.client.HttpClient
 import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.json.JsonFeature
@@ -35,6 +36,7 @@ import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
+import kotlin.native.concurrent.SharedImmutable
 
 fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclaration = {}) =
     startKoin {
@@ -58,6 +60,7 @@ fun commonModule(enableNetworkLogs: Boolean) = module {
     single { FetchPlatformQueryResult(get(), get(), get(), get(), get(), get()) }
 }
 
+@SharedImmutable
 val kotlinxSerializer = KotlinxSerializer(
     Json {
         isLenient = true
@@ -82,5 +85,7 @@ fun createHttpClient(enableNetworkLogs: Boolean = false, serializer: KotlinxSeri
         }
     }
 }
+
 /*Client Active Throughout App's Lifetime*/
+@SharedImmutable
 val ktorHttpClient = HttpClient {}

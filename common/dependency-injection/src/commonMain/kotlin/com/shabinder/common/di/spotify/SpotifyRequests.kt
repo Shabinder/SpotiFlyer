@@ -17,6 +17,7 @@
 package com.shabinder.common.di.spotify
 
 import com.shabinder.common.di.gaana.corsApi
+import com.shabinder.common.models.NativeAtomicReference
 import com.shabinder.common.models.spotify.Album
 import com.shabinder.common.models.spotify.PagingObjectPlaylistTrack
 import com.shabinder.common.models.spotify.Playlist
@@ -28,9 +29,10 @@ private val BASE_URL get() = "${corsApi}https://api.spotify.com/v1"
 
 interface SpotifyRequests {
 
-    val httpClient: HttpClient
+    val httpClientRef: NativeAtomicReference<HttpClient>
+    val httpClient get() = httpClientRef.value
 
-    suspend fun authenticateSpotifyClient(override: Boolean = false): HttpClient?
+    suspend fun authenticateSpotifyClient(override: Boolean = false)
 
     suspend fun getPlaylist(playlistID: String): Playlist {
         return httpClient.get("$BASE_URL/playlists/$playlistID")
