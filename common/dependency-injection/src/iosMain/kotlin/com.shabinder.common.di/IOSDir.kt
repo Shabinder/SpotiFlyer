@@ -6,6 +6,7 @@ import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSDirectoryEnumerationSkipsHiddenFiles
 import platform.Foundation.NSFileManager
@@ -25,10 +26,6 @@ actual class Dir actual constructor(
     private val spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
 
-    init {
-        //createDirectories()
-    }
-
     actual fun isPresent(path: String): Boolean = NSFileManager.defaultManager.fileExistsAtPath(path)
 
     actual fun fileSeparator(): String = "/"
@@ -37,6 +34,7 @@ actual class Dir actual constructor(
     actual fun defaultDir(): String = defaultDirURL.path!!
 
     val defaultDirURL: NSURL by lazy {
+        createDirectories()
         val musicDir = NSFileManager.defaultManager.URLForDirectory(NSMusicDirectory, NSUserDomainMask,null,true,null)!!
         musicDir.URLByAppendingPathComponent("SpotiFlyer",true)!!
     }
@@ -44,6 +42,7 @@ actual class Dir actual constructor(
     actual fun imageCacheDir(): String = imageCacheURL.path!!
 
     val imageCacheURL: NSURL by lazy {
+        createDirectories()
         val cacheDir = NSFileManager.defaultManager.URLForDirectory(NSCachesDirectory, NSUserDomainMask,null,true,null)
         cacheDir?.URLByAppendingPathComponent("SpotiFlyer",true)!!
     }
@@ -64,7 +63,7 @@ actual class Dir actual constructor(
         }
     }
 
-    actual suspend fun cacheImage(image: Any, path: String) {
+    actual suspend fun cacheImage(image: Any, path: String): Unit = withContext(dispatcherIO){
         try {
             (image as? UIImage)?.let {
                 // We Will Be Using JPEG as default format everywhere
@@ -76,8 +75,8 @@ actual class Dir actual constructor(
         }
     }
 
-    actual suspend fun loadImage(url: String): Picture {
-        return try {
+    actual suspend fun loadImage(url: String): Picture = withContext(dispatcherIO){
+        try {
             val cachePath = imageCacheURL.URLByAppendingPathComponent(getNameURL(url))
             Picture(image = cachePath?.path?.let { loadCachedImage(it) } ?: loadFreshImage(url))
         } catch (e: Exception) {
@@ -95,8 +94,8 @@ actual class Dir actual constructor(
         }
     }
 
-    private suspend fun loadFreshImage(url: String):UIImage? {
-        return try {
+    private suspend fun loadFreshImage(url: String):UIImage? = withContext(dispatcherIO){
+        try {
             val nsURL = NSURL(string = url)
             val data = NSURLConnection.sendSynchronousRequest(NSURLRequest.requestWithURL(nsURL),null,null)
             if (data != null) {
@@ -112,7 +111,7 @@ actual class Dir actual constructor(
         }
     }
 
-    actual suspend fun clearCache() {
+    actual suspend fun clearCache(): Unit = withContext(dispatcherIO) {
         try {
             val fileManager = NSFileManager.defaultManager
             val paths = fileManager.contentsOfDirectoryAtURL(imageCacheURL,
@@ -136,7 +135,7 @@ actual class Dir actual constructor(
         mp3ByteArray: ByteArray,
         trackDetails: TrackDetails,
         postProcess:(track: TrackDetails)->Unit
-    ) {
+    ) : Unit = withContext(dispatcherIO) {
         when (trackDetails.outputFilePath.substringAfterLast('.')) {
             ".mp3" -> {
                 postProcess(trackDetails)

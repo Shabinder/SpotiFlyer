@@ -25,7 +25,6 @@ fun <T : Store<*, *, *>> InstanceKeeper.getStore(key: Any, factory: () -> T): T 
         .store
 
 inline fun <reified T :
-
         Store<*, *, *>> InstanceKeeper.getStore(noinline factory: () -> T): T =
     getStore(T::class, factory)
 

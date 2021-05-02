@@ -16,6 +16,7 @@
 
 package com.shabinder.common.root.integration
 
+import co.touchlab.stately.ensureNeverFrozen
 import co.touchlab.stately.freeze
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.RouterState
@@ -26,9 +27,9 @@ import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
 import com.arkivanov.decompose.value.Value
-import com.shabinder.common.database.getLogger
 import com.shabinder.common.di.Dir
-import com.shabinder.common.di.createDirectories
+import com.shabinder.common.di.currentPlatform
+import com.shabinder.common.di.providers.SpotifyProvider
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.models.Actions
@@ -45,23 +46,40 @@ import kotlinx.coroutines.launch
 
 internal class SpotiFlyerRootImpl(
     componentContext: ComponentContext,
-    dependencies: Dependencies,
-) : SpotiFlyerRoot, ComponentContext by componentContext, Dependencies by dependencies, Actions by dependencies.actions {
+    private val main: (ComponentContext, output:Consumer<SpotiFlyerMain.Output>)->SpotiFlyerMain,
+    private val list: (ComponentContext, link:String, output:Consumer<SpotiFlyerList.Output>)->SpotiFlyerList,
+    private val actions: Actions
+) : SpotiFlyerRoot, ComponentContext by componentContext {
 
-    init {
-        methods.value = actions.freeze()
-        GlobalScope.launch {
-            /*TESTING*/
-            getLogger().apply {
-                d("Hey...","Background Thread")
-                //d(directories.defaultDir(),"Background Thread")
-                d("Hey...","Background Thread")
-            }
-            //*Authenticate Spotify Client*//*
-            /*fetchPlatformQueryResult.spotifyProvider.authenticateSpotifyClient(
-                override = true //methods.value.currentPlatform is AllPlatforms.Js
-            )*/
-        }
+    constructor(
+        componentContext: ComponentContext,
+        dependencies: Dependencies,
+    ):this(
+        componentContext = componentContext,
+        main = { childContext,output ->
+            spotiFlyerMain(
+                childContext,
+                output,
+                dependencies
+            )
+        },
+        list = { childContext, link, output ->
+            spotiFlyerList(
+                childContext,
+                link,
+                output,
+                dependencies
+            )
+        },
+        actions = dependencies.actions.freeze()
+    ) {
+        instanceKeeper.ensureNeverFrozen()
+        methods.value = dependencies.actions.freeze()
+        /*Authenticate Spotify Client*/
+        authenticateSpotify(
+            dependencies.fetchPlatformQueryResult.spotifyProvider,
+            currentPlatform is AllPlatforms.Js
+        )
     }
 
     private val router =
@@ -80,35 +98,14 @@ internal class SpotiFlyerRootImpl(
                 it !is Configuration.Main
             }
         }
-        override fun setDownloadDirectory() { setDownloadDirectoryAction() }
+        override fun setDownloadDirectory() { actions.setDownloadDirectoryAction() }
     }
 
     private fun createChild(configuration: Configuration, componentContext: ComponentContext): Child =
         when (configuration) {
-            is Configuration.Main -> Child.Main(spotiFlyerMain(componentContext))
-            is Configuration.List -> Child.List(spotiFlyerList(componentContext, link = configuration.link))
+            is Configuration.Main -> Child.Main(main(componentContext, Consumer(::onMainOutput)))
+            is Configuration.List -> Child.List(list(componentContext, configuration.link, Consumer(::onListOutput)))
         }
-
-    private fun spotiFlyerMain(componentContext: ComponentContext): SpotiFlyerMain =
-        SpotiFlyerMain(
-            componentContext = componentContext,
-            dependencies = object : SpotiFlyerMain.Dependencies, Dependencies by this {
-                override val mainOutput: Consumer<SpotiFlyerMain.Output> = Consumer(::onMainOutput)
-                override val dir: Dir = directories
-            }
-        )
-
-    private fun spotiFlyerList(componentContext: ComponentContext, link: String): SpotiFlyerList =
-        SpotiFlyerList(
-            componentContext = componentContext,
-            dependencies = object : SpotiFlyerList.Dependencies, Dependencies by this {
-                override val fetchQuery = fetchPlatformQueryResult
-                override val dir: Dir = directories
-                override val link: String = link
-                override val listOutput: Consumer<SpotiFlyerList.Output> = Consumer(::onListOutput)
-                override val downloadProgressFlow = downloadProgressReport
-            }
-        )
 
     private fun onMainOutput(output: SpotiFlyerMain.Output) =
         when (output) {
@@ -120,6 +117,13 @@ internal class SpotiFlyerRootImpl(
             is SpotiFlyerList.Output.Finished -> router.pop()
         }
 
+    private fun authenticateSpotify(spotifyProvider: SpotifyProvider, override:Boolean){
+        GlobalScope.launch(Dispatchers.Default) {
+            /*Authenticate Spotify Client*/
+            spotifyProvider.authenticateSpotifyClient(override)
+        }
+    }
+
     private sealed class Configuration : Parcelable {
         @Parcelize
         object Main : Configuration()
@@ -128,3 +132,24 @@ internal class SpotiFlyerRootImpl(
         data class List(val link: String) : Configuration()
     }
 }
+
+private fun spotiFlyerMain(componentContext: ComponentContext, output: Consumer<SpotiFlyerMain.Output> ,dependencies: Dependencies): SpotiFlyerMain =
+    SpotiFlyerMain(
+        componentContext = componentContext,
+        dependencies = object : SpotiFlyerMain.Dependencies, Dependencies by dependencies {
+            override val mainOutput: Consumer<SpotiFlyerMain.Output> = output
+            override val dir: Dir = directories
+        }
+    )
+
+private fun spotiFlyerList(componentContext: ComponentContext, link: String, output: Consumer<SpotiFlyerList.Output>, dependencies: Dependencies): SpotiFlyerList =
+    SpotiFlyerList(
+        componentContext = componentContext,
+        dependencies = object : SpotiFlyerList.Dependencies, Dependencies by dependencies {
+            override val fetchQuery = fetchPlatformQueryResult
+            override val dir: Dir = directories
+            override val link: String = link
+            override val listOutput: Consumer<SpotiFlyerList.Output> = output
+            override val downloadProgressFlow = downloadProgressReport
+        }
+    )

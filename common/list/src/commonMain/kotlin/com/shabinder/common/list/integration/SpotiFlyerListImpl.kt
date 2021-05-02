@@ -16,6 +16,7 @@
 
 package com.shabinder.common.list.integration
 
+import co.touchlab.stately.ensureNeverFrozen
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.shabinder.common.di.Picture
@@ -32,6 +33,10 @@ internal class SpotiFlyerListImpl(
     componentContext: ComponentContext,
     dependencies: Dependencies
 ) : SpotiFlyerList, ComponentContext by componentContext, Dependencies by dependencies {
+
+    init {
+        instanceKeeper.ensureNeverFrozen()
+    }
 
     private val store =
         instanceKeeper.getStore {

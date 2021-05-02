@@ -46,7 +46,7 @@ class SpotifyProvider(
    /* init {
         logger.d { "Creating Spotify Provider" }
         GlobalScope.launch(Dispatchers.Default) {
-            if (methods.value.currentPlatform is AllPlatforms.Js) {
+            if (currentPlatform is AllPlatforms.Js) {
                 authenticateSpotifyClient(override = true)
             } else authenticateSpotifyClient()
         }

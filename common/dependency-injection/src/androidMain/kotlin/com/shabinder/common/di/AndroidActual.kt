@@ -16,8 +16,17 @@
 
 package com.shabinder.common.di
 
+import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+
+// IO-Dispatcher
+actual val dispatcherIO: CoroutineDispatcher = Dispatchers.IO
+
+// Current Platform Info
+actual val currentPlatform: AllPlatforms = AllPlatforms.Jvm
 
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,

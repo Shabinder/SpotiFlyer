@@ -21,6 +21,7 @@ package com.shabinder.common.di.utils
 // implementation("org.jetbrains.kotlinx:atomicfu:0.14.4")
 // Gist: https://gist.github.com/fluidsonic/ba32de21c156bbe8424c8d5fc20dcd8e
 
+import com.shabinder.common.di.dispatcherIO
 import com.shabinder.common.models.methods
 import io.ktor.utils.io.core.Closeable
 import kotlinx.atomicfu.atomic
@@ -37,7 +38,7 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
 class ParallelExecutor(
-    parentContext: CoroutineContext = methods.value.dispatcherIO,
+    parentContext: CoroutineContext = dispatcherIO,
 ) : Closeable {
 
     private val concurrentOperationLimit = atomic(4)

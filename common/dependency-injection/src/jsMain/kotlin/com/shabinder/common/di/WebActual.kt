@@ -16,10 +16,13 @@
 
 package com.shabinder.common.di
 
+import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
@@ -29,13 +32,19 @@ val DownloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = M
 // val DownloadScope = ParallelExecutor(Dispatchers.Default) //Download Pool of 4 parallel
 val allTracksStatus: HashMap<String, DownloadStatus> = hashMapOf()
 
+// IO-Dispatcher
+actual val dispatcherIO: CoroutineDispatcher = Dispatchers.Default
+
+// Current Platform Info
+actual val currentPlatform: AllPlatforms = AllPlatforms.Js
+
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,
     fetcher: FetchPlatformQueryResult,
     dir: Dir
 ) {
     list.forEach {
-        withContext(methods.value.dispatcherIO) {
+        withContext(dispatcherIO) {
             allTracksStatus[it.title] = DownloadStatus.Queued
             if (!it.videoID.isNullOrBlank()) { // Video ID already known!
                 downloadTrack(it.videoID!!, it, fetcher, dir)

@@ -265,8 +265,6 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                     }
 
                     override val isInternetAvailable get()  = internetAvailability.value ?: true
-                    override val dispatcherIO = Dispatchers.IO
-                    override val currentPlatform = AllPlatforms.Jvm
                 }
             }
         )

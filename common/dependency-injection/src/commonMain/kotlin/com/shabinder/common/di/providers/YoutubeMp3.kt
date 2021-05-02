@@ -18,6 +18,7 @@ package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.Dir
+import com.shabinder.common.di.currentPlatform
 import com.shabinder.common.di.youtubeMp3.Yt1sMp3
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.methods
@@ -31,7 +32,7 @@ class YoutubeMp3(
     suspend fun getMp3DownloadLink(videoID: String): String? = try {
         getLinkFromYt1sMp3(videoID)?.let {
             logger.i { "Download Link:   $it" }
-            if (methods.value.currentPlatform is AllPlatforms.Js/* && corsProxy !is CorsProxy.PublicProxyWithExtension*/)
+            if (currentPlatform is AllPlatforms.Js/* && corsProxy !is CorsProxy.PublicProxyWithExtension*/)
                 "https://kind-grasshopper-73.telebit.io/cors/$it"
             // "https://spotiflyer.azurewebsites.net/$it" // Data OUT Limit issue
             else it

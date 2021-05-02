@@ -46,7 +46,8 @@ actual class Dir actual constructor(
         const val DirKey = "downloadDir"
     }
 
-    private val sharedPreferences:SharedPreferences by lazy { methods.value.platformActions.sharedPreferences }
+    // This Wont throw `NPE` as We will never pass null
+    private val sharedPreferences:SharedPreferences by lazy { methods.value.platformActions.sharedPreferences!! }
 
     fun setDownloadDirectory(newBasePath:String){
         sharedPreferences.edit().putString(DirKey,newBasePath).apply()
@@ -77,7 +78,7 @@ actual class Dir actual constructor(
         }
     }
 
-    actual suspend fun clearCache() {
+    actual suspend fun clearCache(): Unit = withContext(dispatcherIO) {
         File(imageCacheDir()).deleteRecursively()
     }
 
@@ -86,76 +87,74 @@ actual class Dir actual constructor(
         mp3ByteArray: ByteArray,
         trackDetails: TrackDetails,
         postProcess:(track: TrackDetails)->Unit
-    ) {
-        withContext(Dispatchers.IO){
-            val songFile = File(trackDetails.outputFilePath)
-            try {
-                /*
-                * Check , if Fetch was Used, File is saved Already, else write byteArray we Received
-                * */
-                if(!songFile.exists()) {
-                    /*Make intermediate Dirs if they don't exist yet*/
-                    songFile.parentFile.mkdirs()
+    )  = withContext(dispatcherIO) {
+        val songFile = File(trackDetails.outputFilePath)
+        try {
+            /*
+            * Check , if Fetch was Used, File is saved Already, else write byteArray we Received
+            * */
+            if(!songFile.exists()) {
+                /*Make intermediate Dirs if they don't exist yet*/
+                songFile.parentFile.mkdirs()
+            }
+
+            if(mp3ByteArray.isNotEmpty()) songFile.writeBytes(mp3ByteArray)
+
+            when (trackDetails.outputFilePath.substringAfterLast('.')) {
+                ".mp3" -> {
+                    Mp3File(File(songFile.absolutePath))
+                        .removeAllTags()
+                        .setId3v1Tags(trackDetails)
+                        .setId3v2TagsAndSaveFile(trackDetails)
+                    addToLibrary(songFile.absolutePath)
                 }
-
-                if(mp3ByteArray.isNotEmpty()) songFile.writeBytes(mp3ByteArray)
-
-                when (trackDetails.outputFilePath.substringAfterLast('.')) {
-                    ".mp3" -> {
+                ".m4a" -> {
+                    /*FFmpeg.executeAsync(
+                        "-i ${m4aFile.absolutePath} -y -b:a 160k -acodec libmp3lame -vn ${m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"}"
+                    ){ _, returnCode ->
+                        when (returnCode) {
+                            Config.RETURN_CODE_SUCCESS  -> {
+                                //FFMPEG task Completed
+                                logger.d{ "Async command execution completed successfully." }
+                                scope.launch {
+                                    Mp3File(File(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"))
+                                        .removeAllTags()
+                                        .setId3v1Tags(trackDetails)
+                                        .setId3v2TagsAndSaveFile(trackDetails)
+                                    addToLibrary(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3")
+                                }
+                            }
+                            Config.RETURN_CODE_CANCEL -> {
+                                logger.d{"Async command execution cancelled by user."}
+                            }
+                            else -> {
+                                logger.d { "Async command execution failed with rc=$returnCode" }
+                            }
+                        }
+                    }*/
+                }
+                else -> {
+                    try {
                         Mp3File(File(songFile.absolutePath))
                             .removeAllTags()
                             .setId3v1Tags(trackDetails)
                             .setId3v2TagsAndSaveFile(trackDetails)
                         addToLibrary(songFile.absolutePath)
-                    }
-                    ".m4a" -> {
-                        /*FFmpeg.executeAsync(
-                            "-i ${m4aFile.absolutePath} -y -b:a 160k -acodec libmp3lame -vn ${m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"}"
-                        ){ _, returnCode ->
-                            when (returnCode) {
-                                Config.RETURN_CODE_SUCCESS  -> {
-                                    //FFMPEG task Completed
-                                    logger.d{ "Async command execution completed successfully." }
-                                    scope.launch {
-                                        Mp3File(File(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"))
-                                            .removeAllTags()
-                                            .setId3v1Tags(trackDetails)
-                                            .setId3v2TagsAndSaveFile(trackDetails)
-                                        addToLibrary(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3")
-                                    }
-                                }
-                                Config.RETURN_CODE_CANCEL -> {
-                                    logger.d{"Async command execution cancelled by user."}
-                                }
-                                else -> {
-                                    logger.d { "Async command execution failed with rc=$returnCode" }
-                                }
-                            }
-                        }*/
-                    }
-                    else -> {
-                        try {
-                            Mp3File(File(songFile.absolutePath))
-                                .removeAllTags()
-                                .setId3v1Tags(trackDetails)
-                                .setId3v2TagsAndSaveFile(trackDetails)
-                            addToLibrary(songFile.absolutePath)
-                        } catch (e: Exception) { e.printStackTrace() }
-                    }
+                    } catch (e: Exception) { e.printStackTrace() }
                 }
-            }catch (e:Exception){
-                withContext(Dispatchers.Main){
-                    //Toast.makeText(appContext,"Could Not Create File:\n${songFile.absolutePath}",Toast.LENGTH_SHORT).show()
-                }
-                if(songFile.exists()) songFile.delete()
-                logger.e { "${songFile.absolutePath} could not be created" }
             }
+        }catch (e:Exception){
+            withContext(Dispatchers.Main){
+                //Toast.makeText(appContext,"Could Not Create File:\n${songFile.absolutePath}",Toast.LENGTH_SHORT).show()
+            }
+            if(songFile.exists()) songFile.delete()
+            logger.e { "${songFile.absolutePath} could not be created" }
         }
     }
 
     actual fun addToLibrary(path: String) = methods.value.platformActions.addToLibrary(path)
 
-    actual suspend fun loadImage(url: String): Picture = withContext(Dispatchers.IO){
+    actual suspend fun loadImage(url: String): Picture = withContext(dispatcherIO){
         val cachePath = imageCacheDir() + getNameURL(url)
         Picture(image = (loadCachedImage(cachePath) ?: freshImage(url))?.asImageBitmap())
     }
@@ -169,19 +168,17 @@ actual class Dir actual constructor(
         }
     }
 
-    actual suspend fun cacheImage(image: Any, path: String) {
-        withContext(Dispatchers.IO){
-            try {
-                FileOutputStream(path).use { out ->
-                    (image as? Bitmap)?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
+    actual suspend fun cacheImage(image: Any, path: String):Unit = withContext(dispatcherIO) {
+        try {
+            FileOutputStream(path).use { out ->
+                (image as? Bitmap)?.compress(Bitmap.CompressFormat.JPEG, 100, out)
             }
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 
-    private suspend fun freshImage(url: String): Bitmap? = withContext(Dispatchers.IO) {
+    private suspend fun freshImage(url: String): Bitmap? = withContext(dispatcherIO) {
         try {
             val source = URL(url)
             val connection: HttpURLConnection = source.openConnection() as HttpURLConnection
