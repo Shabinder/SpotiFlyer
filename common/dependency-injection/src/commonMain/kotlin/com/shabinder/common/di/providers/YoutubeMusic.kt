@@ -56,6 +56,7 @@ class YoutubeMusic constructor(
             ).keys.firstOrNull()
         } catch (e:Exception) {
             // All Internet/Client Related Errors
+            e.printStackTrace()
             null
         }
     }

@@ -34,6 +34,7 @@ suspend fun authenticateSpotify(): TokenData? {
             body = FormDataContent(Parameters.build { append("grant_type", "client_credentials") })
         } else null
     }catch (e:Exception) {
+        e.printStackTrace()
         null
     }
 }

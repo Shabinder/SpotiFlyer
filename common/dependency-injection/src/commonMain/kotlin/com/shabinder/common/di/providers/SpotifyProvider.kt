@@ -99,6 +99,7 @@ class SpotifyProvider(
                 link
             )
         }catch (e: Exception){
+            e.printStackTrace()
             // Try Reinitialising Client // Handle 401 Token Expiry ,etc Exceptions
             authenticateSpotifyClient(true)
             // Retry Search
@@ -108,6 +109,7 @@ class SpotifyProvider(
                     link
                 )
             } catch (e:Exception){
+                e.printStackTrace()
                 null
             }
         }

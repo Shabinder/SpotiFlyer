@@ -38,6 +38,7 @@ class YoutubeMp3(
             else it
         }
     } catch (e: Exception) {
+        e.printStackTrace()
         null
     }
 }

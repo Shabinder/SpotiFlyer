@@ -52,6 +52,7 @@ class GaanaProvider(
                 link
             )
         } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
     }
