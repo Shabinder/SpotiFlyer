@@ -18,6 +18,7 @@ package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.gaana.corsApi
+import com.shabinder.common.di.utils.postData
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.YoutubeTrack
 import com.shabinder.fuzzywuzzy.diffutils.FuzzySearch
@@ -283,7 +284,7 @@ class YoutubeMusic constructor(
     }
 
     private suspend fun getYoutubeMusicResponse(query: String): String {
-        return httpClient.post("${corsApi}https://music.youtube.com/youtubei/v1/search?alt=json&key=$apiKey") {
+        return httpClient.postData("${corsApi}https://music.youtube.com/youtubei/v1/search?alt=json&key=$apiKey") {
             contentType(ContentType.Application.Json)
             headers {
                 append("referer", "https://music.youtube.com/search")

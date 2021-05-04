@@ -17,9 +17,11 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
+import co.touchlab.stately.ensureNeverFrozen
 import co.touchlab.stately.freeze
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.TokenStore
+import com.shabinder.common.di.createHttpClient
 import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.kotlinxSerializer
 import com.shabinder.common.di.ktorHttpClient
@@ -33,9 +35,12 @@ import com.shabinder.common.models.spotify.Image
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.models.spotify.Track
 import io.ktor.client.HttpClient
+import io.ktor.client.features.auth.*
+import io.ktor.client.features.auth.providers.*
 import io.ktor.client.features.defaultRequest
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.header
+import kotlin.native.concurrent.SharedImmutable
 
 class SpotifyProvider(
     private val tokenStore: TokenStore,
@@ -62,14 +67,14 @@ class SpotifyProvider(
                 defaultRequest {
                     header("Authorization", "Bearer ${token.access_token}")
                 }
-                install(JsonFeature) {
+               /*install(JsonFeature)  {
                     serializer = kotlinxSerializer
-                }
-            }.also { httpClientRef.value = it.freeze() }
+               }*/
+            }.also { httpClientRef.value = it }
         }
     }
 
-    override val httpClientRef = NativeAtomicReference(ktorHttpClient)
+    override val httpClientRef = NativeAtomicReference(createHttpClient(true))
 
     suspend fun query(fullLink: String): PlatformQueryResult? {
 

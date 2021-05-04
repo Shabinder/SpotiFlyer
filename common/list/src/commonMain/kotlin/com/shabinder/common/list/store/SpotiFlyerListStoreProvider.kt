@@ -24,6 +24,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.shabinder.common.database.getLogger
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.di.dispatcherIO
 import com.shabinder.common.di.downloadTracks
 import com.shabinder.common.list.SpotiFlyerList.State
 import com.shabinder.common.list.store.SpotiFlyerListStore.Intent
@@ -33,6 +34,7 @@ import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.withContext
 
 internal class SpotiFlyerListStoreProvider(
     private val dir: Dir,
@@ -85,6 +87,7 @@ internal class SpotiFlyerListStoreProvider(
                             throw Exception("An Error Occurred, Check your Link / Connection")
                         }
                     } catch (e:Exception) {
+                        e.printStackTrace()
                         dispatch(Result.ErrorOccurred(e))
                     }
                 }

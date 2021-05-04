@@ -31,18 +31,16 @@ actual class Dir actual constructor(
     actual fun fileSeparator(): String = "/"
 
     // TODO Error Handling
-    actual fun defaultDir(): String = defaultDirURL.path!!
+    actual fun defaultDir(): String = defaultDirURL.path!! + fileSeparator()
 
-    val defaultDirURL: NSURL by lazy {
-        createDirectories()
+    private val defaultDirURL: NSURL by lazy {
         val musicDir = NSFileManager.defaultManager.URLForDirectory(NSMusicDirectory, NSUserDomainMask,null,true,null)!!
         musicDir.URLByAppendingPathComponent("SpotiFlyer",true)!!
     }
 
-    actual fun imageCacheDir(): String = imageCacheURL.path!!
+    actual fun imageCacheDir(): String = imageCacheURL.path!! + fileSeparator()
 
-    val imageCacheURL: NSURL by lazy {
-        createDirectories()
+    private val imageCacheURL: NSURL by lazy {
         val cacheDir = NSFileManager.defaultManager.URLForDirectory(NSCachesDirectory, NSUserDomainMask,null,true,null)
         cacheDir?.URLByAppendingPathComponent("SpotiFlyer",true)!!
     }

@@ -16,6 +16,51 @@
 
 package com.shabinder.common.di.utils
 
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
+import kotlin.native.concurrent.SharedImmutable
+import kotlin.native.concurrent.ThreadLocal
+
+/*
+* WorkAround: https://github.com/Kotlin/kotlinx.serialization/issues/1450
+* */
+@OptIn(InternalSerializationApi::class)
+suspend inline fun <reified T: Any> HttpClient.getData(
+    urlString: String,
+    block: HttpRequestBuilder.() -> Unit = {}
+): T {
+    val response = get<HttpResponse> {
+        url.takeFrom(urlString)
+        block()
+    }
+    val jsonBody = response.readText()
+    return json.decodeFromString(T::class.serializer(),jsonBody)
+}
+
+@OptIn(InternalSerializationApi::class)
+suspend inline fun <reified T: Any> HttpClient.postData(
+    urlString: String,
+    block: HttpRequestBuilder.() -> Unit = {}
+): T {
+    val response = post<HttpResponse> {
+        url.takeFrom(urlString)
+        block()
+    }
+    val jsonBody = response.readText()
+    return json.decodeFromString(T::class.serializer(),jsonBody)
+}
+
+@ThreadLocal
+val json by lazy { Json {
+    isLenient = true
+    ignoreUnknownKeys = true
+} }
+
 /**
  * Removing Illegal Chars from File Name
  * **/

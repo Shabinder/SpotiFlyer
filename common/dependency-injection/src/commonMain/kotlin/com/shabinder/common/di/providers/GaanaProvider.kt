@@ -79,7 +79,7 @@ class GaanaProvider(
                         it.updateStatusIfPresent(folderType, subFolder)
                         trackList = listOf(it).toTrackDetailsList(folderType, subFolder)
                         title = it.track_title
-                        coverUrl = it.artworkLink
+                        coverUrl = it.artworkLink.replace("http:","https:")
                     }
                 }
                 "album" -> {
@@ -91,7 +91,7 @@ class GaanaProvider(
                         }
                         trackList = it.tracks?.toTrackDetailsList(folderType, subFolder) ?: emptyList()
                         title = link
-                        coverUrl = it.custom_artworks.size_480p
+                        coverUrl = it.custom_artworks.size_480p.replace("http:","https:")
                     }
                 }
                 "playlist" -> {
@@ -114,7 +114,7 @@ class GaanaProvider(
                     getGaanaArtistDetails(seokey = link).artist.firstOrNull()
                         ?.also {
                             title = it.name
-                            coverUrl = it.artworkLink ?: gaanaPlaceholderImageUrl
+                            coverUrl = it.artworkLink?.replace("http:","https:") ?: gaanaPlaceholderImageUrl
                         }
                     getGaanaArtistTracks(seokey = link).also {
                         it.tracks?.forEach { track ->
@@ -143,7 +143,7 @@ class GaanaProvider(
             trackUrl = it.lyrics_url,
             downloaded = it.downloaded ?: DownloadStatus.NotDownloaded,
             source = Source.Gaana,
-            albumArtURL = it.artworkLink,
+            albumArtURL = it.artworkLink.replace("http:","https:"),
             outputFilePath = dir.finalOutputDir(it.track_title, type, subFolder, dir.defaultDir()/*,".m4a"*/)
         )
     }

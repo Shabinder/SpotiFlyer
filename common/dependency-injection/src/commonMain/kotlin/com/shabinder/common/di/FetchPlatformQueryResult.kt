@@ -23,6 +23,10 @@ import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
 import com.shabinder.common.models.PlatformQueryResult
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class FetchPlatformQueryResult(
@@ -54,13 +58,19 @@ class FetchPlatformQueryResult(
                 null
             }
         }
-        result?.run {
-            withContext(Dispatchers.Default) {
-                db?.add(
-                    folderType, title, link, coverUrl, trackList.size.toLong()
-                )
-            }
+        if (result != null) {
+            addToDatabaseAsync(
+                link,
+                result.copy() // Send a copy in order to not to freeze Result itself
+            )
         }
         return result
+    }
+    private fun addToDatabaseAsync(link: String, result: PlatformQueryResult) {
+        GlobalScope.launch(dispatcherIO) {
+            db?.add(
+                result.folderType, result.title, link, result.coverUrl, result.trackList.size.toLong()
+            )
+        }
     }
 }

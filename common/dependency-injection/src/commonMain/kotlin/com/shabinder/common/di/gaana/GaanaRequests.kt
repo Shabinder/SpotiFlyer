@@ -17,6 +17,7 @@
 package com.shabinder.common.di.gaana
 
 import com.shabinder.common.di.currentPlatform
+import com.shabinder.common.di.utils.getData
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.corsProxy
 import com.shabinder.common.models.gaana.GaanaAlbum
@@ -52,7 +53,7 @@ interface GaanaRequests {
         format: String = "JSON",
         limit: Int = 2000
     ): GaanaPlaylist {
-        return httpClient.get(
+        return httpClient.getData(
             "$BASE_URL/?type=$type&subtype=$subtype&seokey=$seokey&token=$TOKEN&format=$format&limit=$limit"
         )
     }
@@ -69,7 +70,7 @@ interface GaanaRequests {
         format: String = "JSON",
         limit: Int = 2000
     ): GaanaAlbum {
-        return httpClient.get(
+        return httpClient.getData(
             "$BASE_URL/?type=$type&subtype=$subtype&seokey=$seokey&token=$TOKEN&format=$format&limit=$limit"
         )
     }
@@ -85,7 +86,7 @@ interface GaanaRequests {
         seokey: String,
         format: String = "JSON",
     ): GaanaSong {
-        return httpClient.get(
+        return httpClient.getData(
             "$BASE_URL/?type=$type&subtype=$subtype&seokey=$seokey&token=$TOKEN&format=$format"
         )
     }
@@ -101,7 +102,7 @@ interface GaanaRequests {
         seokey: String,
         format: String = "JSON",
     ): GaanaArtistDetails {
-        return httpClient.get(
+        return httpClient.getData(
             "$BASE_URL/?type=$type&subtype=$subtype&seokey=$seokey&token=$TOKEN&format=$format"
         )
     }
@@ -118,7 +119,7 @@ interface GaanaRequests {
         format: String = "JSON",
         limit: Int = 50
     ): GaanaArtistTracks {
-        return httpClient.get(
+        return httpClient.getData(
             "$BASE_URL/?type=$type&subtype=$subtype&seokey=$seokey&token=$TOKEN&format=$format&limit=$limit"
         )
     }

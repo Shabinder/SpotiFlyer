@@ -17,6 +17,7 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
+import co.touchlab.stately.ensureNeverFrozen
 import com.shabinder.common.database.databaseModule
 import com.shabinder.common.database.getLogger
 import com.shabinder.common.di.providers.GaanaProvider
@@ -37,6 +38,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 import kotlin.native.concurrent.SharedImmutable
+import kotlin.native.concurrent.ThreadLocal
 
 fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclaration = {}) =
     startKoin {
@@ -60,7 +62,7 @@ fun commonModule(enableNetworkLogs: Boolean) = module {
     single { FetchPlatformQueryResult(get(), get(), get(), get(), get(), get()) }
 }
 
-@SharedImmutable
+@ThreadLocal
 val kotlinxSerializer = KotlinxSerializer(
     Json {
         isLenient = true
@@ -68,10 +70,16 @@ val kotlinxSerializer = KotlinxSerializer(
     }
 )
 
-fun createHttpClient(enableNetworkLogs: Boolean = false, serializer: KotlinxSerializer = kotlinxSerializer) = HttpClient {
-    install(JsonFeature) {
-        this.serializer = serializer
-    }
+fun createHttpClient(enableNetworkLogs: Boolean = false) = HttpClient {
+    // https://github.com/Kotlin/kotlinx.serialization/issues/1450
+    /*install(JsonFeature) {
+        serializer = KotlinxSerializer(
+            Json {
+                isLenient = true
+                ignoreUnknownKeys = true
+            }
+        )
+    }*/
     // Timeout
     install(HttpTimeout) {
         requestTimeoutMillis = 15000L
