@@ -22,7 +22,7 @@ import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 
 actual class Dir actual constructor(
-    private val logger: Kermit,
+    val logger: Kermit,
     private val spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
 
@@ -134,16 +134,36 @@ actual class Dir actual constructor(
         trackDetails: TrackDetails,
         postProcess:(track: TrackDetails)->Unit
     ) : Unit = withContext(dispatcherIO) {
-        when (trackDetails.outputFilePath.substringAfterLast('.')) {
-            ".mp3" -> {
-                postProcess(trackDetails)
-                /*val file = TLAudio(trackDetails.outputFilePath)
-                file.addTagsAndSave(
+        try {
+            if (mp3ByteArray.isNotEmpty()) {
+                mp3ByteArray.toNSData().writeToFile(
+                    trackDetails.outputFilePath,
+                    true
+                )
+            }
+            when (trackDetails.outputFilePath.substringAfterLast('.')) {
+                ".mp3" -> {
+                    if(!isPresent(trackDetails.albumArtPath)) {
+                        val imageData = downloadByteArray(
+                           trackDetails.albumArtURL
+                        )?.toNSData()
+                        if (imageData != null) {
+                            UIImage.imageWithData(imageData)?.also {
+                                cacheImage(it, trackDetails.albumArtPath)
+                            }
+                        }
+                    }
+                    postProcess(trackDetails)
+                    /*val file = TLAudio(trackDetails.outputFilePath)
+                    file.addTagsAndSave(
                     trackDetails,
                     this::loadCachedImage,
                     this::addToLibrary
                 )*/
+                }
             }
+        }catch (e:Exception){
+            e.printStackTrace()
         }
     }
 

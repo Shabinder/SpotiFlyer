@@ -30,6 +30,7 @@ class YoutubeMp3(
     private val dir: Dir,
 ) : Yt1sMp3 {
     suspend fun getMp3DownloadLink(videoID: String): String? = try {
+        logger.i { "Youtube MP3 Link Fetching!" }
         getLinkFromYt1sMp3(videoID)?.let {
             logger.i { "Download Link:   $it" }
             if (currentPlatform is AllPlatforms.Js/* && corsProxy !is CorsProxy.PublicProxyWithExtension*/)

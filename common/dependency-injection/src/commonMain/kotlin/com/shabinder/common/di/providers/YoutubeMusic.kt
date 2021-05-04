@@ -29,6 +29,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -65,7 +66,7 @@ class YoutubeMusic constructor(
         val youtubeTracks = mutableListOf<YoutubeTrack>()
 
         val responseObj = Json.parseToJsonElement(getYoutubeMusicResponse(query))
-
+        logger.i { "Youtube Music Response Recieved" }
         val contentBlocks = responseObj.jsonObject["contents"]
             ?.jsonObject?.get("sectionListRenderer")
             ?.jsonObject?.get("contents")?.jsonArray
@@ -284,7 +285,8 @@ class YoutubeMusic constructor(
     }
 
     private suspend fun getYoutubeMusicResponse(query: String): String {
-        return httpClient.postData("${corsApi}https://music.youtube.com/youtubei/v1/search?alt=json&key=$apiKey") {
+        logger.i { "Fetching Youtube Music Response" }
+        return httpClient.post("${corsApi}https://music.youtube.com/youtubei/v1/search?alt=json&key=$apiKey") {
             contentType(ContentType.Application.Json)
             headers {
                 append("referer", "https://music.youtube.com/search")

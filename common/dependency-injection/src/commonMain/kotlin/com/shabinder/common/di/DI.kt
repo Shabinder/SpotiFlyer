@@ -72,6 +72,9 @@ val kotlinxSerializer = KotlinxSerializer(
 
 fun createHttpClient(enableNetworkLogs: Boolean = false) = HttpClient {
     // https://github.com/Kotlin/kotlinx.serialization/issues/1450
+    install(JsonFeature) {
+        serializer = KotlinxSerializer()
+    }
     /*install(JsonFeature) {
         serializer = KotlinxSerializer(
             Json {

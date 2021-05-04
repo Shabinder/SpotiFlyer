@@ -264,6 +264,8 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                         }
                     }
 
+                    override fun writeMp3Tags(trackDetails: TrackDetails) {/*IMPLEMENTED*/}
+
                     override val isInternetAvailable get()  = internetAvailability.value ?: true
                 }
             }

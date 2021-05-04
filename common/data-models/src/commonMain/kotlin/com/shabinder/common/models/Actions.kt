@@ -38,6 +38,7 @@ interface Actions {
 
     // Open / Redirect to another Platform
     fun openPlatform(packageID: String, platformLink: String)
+    fun writeMp3Tags(trackDetails: TrackDetails)
 }
 
 
@@ -49,5 +50,7 @@ private fun stubActions() = object :Actions{
     override fun giveDonation() {}
     override fun shareApp() {}
     override fun openPlatform(packageID: String, platformLink: String) {}
+    override fun writeMp3Tags(trackDetails: TrackDetails) {}
+
     override val isInternetAvailable: Boolean = true
 }

@@ -33,6 +33,7 @@ import com.shabinder.common.di.isInternetAccessible
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.PlatformActions
+import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.uikit.SpotiFlyerColors
 import com.shabinder.common.uikit.SpotiFlyerRootContent
@@ -92,14 +93,12 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
 
                 override fun openPlatform(packageID: String, platformLink: String) {}
 
-                override val dispatcherIO = Dispatchers.IO
+                override fun writeMp3Tags(trackDetails: TrackDetails) {/*IMPLEMENTED*/}
 
                 override val isInternetAvailable: Boolean
                     get() =  runBlocking {
                         isInternetAccessible()
                     }
-
-                override val currentPlatform = AllPlatforms.Jvm
             }
         }
     )

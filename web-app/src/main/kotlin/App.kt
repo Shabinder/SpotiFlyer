@@ -25,6 +25,7 @@ import com.shabinder.common.di.DownloadProgressFlow
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.PlatformActions
+import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.database.Database
 import extras.renderableChild
@@ -77,9 +78,9 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
 
                 override fun openPlatform(packageID: String, platformLink: String) {}
 
-                override val dispatcherIO = Dispatchers.Default
+                override fun writeMp3Tags(trackDetails: TrackDetails) {/*IMPLEMENTED*/}
+
                 override val isInternetAvailable: Boolean = true
-                override val currentPlatform = AllPlatforms.Js
             }
         }
     )

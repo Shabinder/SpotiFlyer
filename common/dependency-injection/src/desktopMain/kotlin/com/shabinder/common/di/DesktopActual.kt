@@ -16,6 +16,7 @@
 
 package com.shabinder.common.di
 
+import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
@@ -46,7 +47,7 @@ actual suspend fun downloadTracks(
     list.forEach {
         DownloadScope.execute { // Send Download to Pool.
             if (!it.videoID.isNullOrBlank()) { // Video ID already known!
-                downloadTrack(it.videoID!!, it, dir::saveFileWithMetadata)
+                downloadTrack(it.videoID!!, it, dir::saveFileWithMetadata, fetcher.youtubeMp3)
             } else {
                 val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
                 val videoId = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery, it)
@@ -57,7 +58,7 @@ actual suspend fun downloadTracks(
                         ) { hashMapOf() }.apply { set(it.title, DownloadStatus.Failed) }
                     )
                 } else { // Found Youtube Video ID
-                    downloadTrack(videoId, it, dir::saveFileWithMetadata)
+                    downloadTrack(videoId, it, dir::saveFileWithMetadata,fetcher.youtubeMp3)
                 }
             }
         }
@@ -69,37 +70,38 @@ private val ytDownloader = YoutubeDownloader()
 suspend fun downloadTrack(
     videoID: String,
     trackDetails: TrackDetails,
-    saveFileWithMetaData: suspend (mp3ByteArray: ByteArray, trackDetails: TrackDetails,postProcess:(TrackDetails)->Unit) -> Unit
+    saveFileWithMetaData: suspend (mp3ByteArray: ByteArray, trackDetails: TrackDetails, postProcess: (TrackDetails) -> Unit) -> Unit,
+    youtubeMp3: YoutubeMp3
 ) {
     try {
-        val audioData = ytDownloader.getVideo(videoID).getData()
+        var link = youtubeMp3.getMp3DownloadLink(videoID)
 
-        audioData?.let { format ->
-            val url = format.url ?: return
-            downloadFile(url).collect {
-                when (it) {
-                    is DownloadResult.Error -> {
-                        DownloadProgressFlow.emit(
-                            DownloadProgressFlow.replayCache.getOrElse(
-                                0
-                            ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Failed) }
-                        )
-                    }
-                    is DownloadResult.Progress -> {
-                        DownloadProgressFlow.emit(
-                            DownloadProgressFlow.replayCache.getOrElse(
-                                0
-                            ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Downloading(it.progress)) }
-                        )
-                    }
-                    is DownloadResult.Success -> { // Todo clear map
-                        saveFileWithMetaData(it.byteArray, trackDetails){}
-                        DownloadProgressFlow.emit(
-                            DownloadProgressFlow.replayCache.getOrElse(
-                                0
-                            ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Downloaded) }
-                        )
-                    }
+        if (link == null) {
+            link = ytDownloader.getVideo(videoID).getData()?.url ?: return
+        }
+        downloadFile(link).collect {
+            when (it) {
+                is DownloadResult.Error -> {
+                    DownloadProgressFlow.emit(
+                        DownloadProgressFlow.replayCache.getOrElse(
+                            0
+                        ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Failed) }
+                    )
+                }
+                is DownloadResult.Progress -> {
+                    DownloadProgressFlow.emit(
+                        DownloadProgressFlow.replayCache.getOrElse(
+                            0
+                        ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Downloading(it.progress)) }
+                    )
+                }
+                is DownloadResult.Success -> { // Todo clear map
+                    saveFileWithMetaData(it.byteArray, trackDetails){}
+                    DownloadProgressFlow.emit(
+                        DownloadProgressFlow.replayCache.getOrElse(
+                            0
+                        ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Downloaded) }
+                    )
                 }
             }
         }

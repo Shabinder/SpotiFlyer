@@ -12,6 +12,6 @@ object IOSDeps: KoinComponent {
     val dir: Dir by inject() // = get()
     val fetchPlatformQueryResult: FetchPlatformQueryResult by inject() //  get()
     val database get() = dir.db
-    val sharedFlow = MutableSharedFlow<HashMap<String, DownloadStatus>>(1)
+    val sharedFlow = DownloadProgressFlow
     val defaultDispatcher = dispatcherDefault
 }
