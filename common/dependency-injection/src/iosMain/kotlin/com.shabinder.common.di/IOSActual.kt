@@ -1,6 +1,5 @@
 package com.shabinder.common.di
 
-import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
@@ -68,32 +67,35 @@ suspend fun downloadTrack(
         fetcher.dir.logger.i { "LINK: $videoID -> $link" }
         downloadFile(link).collect {
             fetcher.dir.logger.d { it.toString() }
-            when (it) {
+            /*Construct a `NEW Map` from frozen Map to Modify for Native Platforms*/
+            val map: MutableMap<String, DownloadStatus> = when (it) {
                 is DownloadResult.Error -> {
-                    DownloadProgressFlow.emit(
-                        DownloadProgressFlow.replayCache.getOrElse(
-                            0
-                        ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Failed) }
-                    )
+                    DownloadProgressFlow.replayCache.getOrElse(
+                        0
+                    ) { hashMapOf() }.toMutableMap().apply {
+                        set(trackDetails.title, DownloadStatus.Failed)
+                    }
                 }
                 is DownloadResult.Progress -> {
-                    DownloadProgressFlow.emit(
-                        DownloadProgressFlow.replayCache.getOrElse(
-                            0
-                        ) { hashMapOf() }.apply {
-                            set(trackDetails.title, DownloadStatus.Downloading(it.progress))
-                        }
-                    )
+                    DownloadProgressFlow.replayCache.getOrElse(
+                        0
+                    ) { hashMapOf() }.toMutableMap().apply {
+                        set(trackDetails.title,DownloadStatus.Downloading(it.progress))
+                    }
                 }
                 is DownloadResult.Success -> { // Todo clear map
                     saveFileWithMetaData(it.byteArray, trackDetails, methods.value::writeMp3Tags)
-                    DownloadProgressFlow.emit(
-                        DownloadProgressFlow.replayCache.getOrElse(
-                            0
-                        ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Downloaded) }
-                    )
+                    DownloadProgressFlow.replayCache.getOrElse(
+                        0
+                    ) { hashMapOf() }.toMutableMap().apply {
+                        set(trackDetails.title, DownloadStatus.Downloaded)
+                    }
                 }
+                else -> { mutableMapOf() }
             }
+            DownloadProgressFlow.emit(
+                map as HashMap<String, DownloadStatus>
+            )
         }
     } catch (e: Exception) {
         e.printStackTrace()
