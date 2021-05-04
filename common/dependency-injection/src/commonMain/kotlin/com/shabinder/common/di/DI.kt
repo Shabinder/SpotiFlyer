@@ -75,6 +75,8 @@ fun createHttpClient(enableNetworkLogs: Boolean = false) = HttpClient {
     install(JsonFeature) {
         serializer = KotlinxSerializer()
     }
+    // WorkAround for Freezing
+    // Use httpClient.getData / httpClient.postData Extensions
     /*install(JsonFeature) {
         serializer = KotlinxSerializer(
             Json {

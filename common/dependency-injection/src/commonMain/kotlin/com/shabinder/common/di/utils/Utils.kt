@@ -49,7 +49,6 @@ suspend inline fun <reified T: Any> HttpClient.postData(
 ): T {
     val response = post<HttpResponse> {
         url.takeFrom(urlString)
-        header(HttpHeaders.ContentType, ContentType.Application.Json)
         block()
     }
     val jsonBody = response.readText()

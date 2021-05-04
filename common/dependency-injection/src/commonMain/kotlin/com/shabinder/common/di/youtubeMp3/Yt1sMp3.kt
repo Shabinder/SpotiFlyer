@@ -45,7 +45,7 @@ interface Yt1sMp3 {
     * Body Form= q:yt video link ,vt:format=mp3
     * */
     private suspend fun getKey(videoID: String): String {
-        val response: JsonObject? = httpClient.postData("${corsApi}https://yt1s.com/api/ajaxSearch/index") {
+        val response: JsonObject? = httpClient.post("${corsApi}https://yt1s.com/api/ajaxSearch/index") {
             body = FormDataContent(
                 Parameters.build {
                     append("q", "https://www.youtube.com/watch?v=$videoID")
@@ -57,7 +57,7 @@ interface Yt1sMp3 {
     }
 
     private suspend fun getConvertedMp3Link(videoID: String, key: String): JsonObject? {
-        return httpClient.postData("${corsApi}https://yt1s.com/api/ajaxConvert/convert") {
+        return httpClient.post("${corsApi}https://yt1s.com/api/ajaxConvert/convert") {
             body = FormDataContent(
                 Parameters.build {
                     append("vid", videoID)
