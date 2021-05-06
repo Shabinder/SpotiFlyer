@@ -37,6 +37,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 - Spotify
 - Gaana
 - Youtube
+- Youtube Music
 - _(more coming soon)_
 
 ### Downloads
