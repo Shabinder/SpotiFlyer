@@ -163,19 +163,21 @@ class ForegroundService : Service(), CoroutineScope {
     private fun downloadAllTracks(trackList: List<TrackDetails>) {
         trackList.forEach {
             launch(Dispatchers.IO) {
-                if (!it.videoID.isNullOrBlank()) { // Video ID already known!
-                    downloadTrack(it.videoID!!, it)
-                } else {
-                    val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
-                    val videoID = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery, it)
-                    logger.d("Service VideoID") { videoID ?: "Not Found" }
-                    if (videoID.isNullOrBlank()) {
-                        sendTrackBroadcast(Status.FAILED.name, it)
-                        failed++
-                        updateNotification()
-                        allTracksStatus[it.title] = DownloadStatus.Failed
-                    } else { // Found Youtube Video ID
-                        downloadTrack(videoID, it)
+                downloadService.execute {
+                    if (!it.videoID.isNullOrBlank()) { // Video ID already known!
+                        downloadTrack(it.videoID!!, it)
+                    } else {
+                        val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
+                        val videoID = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery, it)
+                        logger.d("Service VideoID") { videoID ?: "Not Found" }
+                        if (videoID.isNullOrBlank()) {
+                            sendTrackBroadcast(Status.FAILED.name, it)
+                            failed++
+                            updateNotification()
+                            allTracksStatus[it.title] = DownloadStatus.Failed
+                        } else { // Found Youtube Video ID
+                            downloadTrack(videoID, it)
+                        }
                     }
                 }
             }
@@ -197,7 +199,7 @@ class ForegroundService : Service(), CoroutineScope {
         }
     }
 
-    private fun enqueueDownload(url: String, track: TrackDetails) {
+    private suspend fun enqueueDownload(url: String, track: TrackDetails) {
         // Initiating Download
         addToNotification("Downloading ${track.title}")
         logger.d(tag) { "${track.title} Download Started" }
@@ -205,60 +207,56 @@ class ForegroundService : Service(), CoroutineScope {
         sendTrackBroadcast(Status.DOWNLOADING.name, track)
 
         // Enqueueing Download
-        launch {
-            downloadService.execute {
-                downloadFile(url).collect {
-                    when (it) {
-                        is DownloadResult.Error -> {
-                            launch {
-                                logger.d(tag) { it.message }
-                                logger.d(tag) { "${track.title} Requesting Download thru Android DM" }
-                                downloadUsingDM(url, track.outputFilePath, track)
-                                removeFromNotification("Downloading ${track.title}")
-                                downloaded++
-                            }
-                            updateNotification()
-                            sendTrackBroadcast(Status.FAILED.name,track)
-                        }
-
-                        is DownloadResult.Progress -> {
-                            allTracksStatus[track.title] = DownloadStatus.Downloading(it.progress)
-                            logger.d(tag) { "${track.title} Progress: ${it.progress} %" }
-
-                            val intent = Intent().apply {
-                                action = "Progress"
-                                putExtra("progress", it.progress)
-                                putExtra("track", track)
-                            }
-                            sendBroadcast(intent)
-                        }
-
-                        is DownloadResult.Success -> {
-                            try {
-                                // Save File and Embed Metadata
-                                val job = launch(Dispatchers.Default) { dir.saveFileWithMetadata(it.byteArray, track){} }
-                                allTracksStatus[track.title] = DownloadStatus.Converting
-                                sendTrackBroadcast("Converting", track)
-                                addToNotification("Processing ${track.title}")
-                                job.invokeOnCompletion {
-                                    converted++
-                                    allTracksStatus[track.title] = DownloadStatus.Downloaded
-                                    sendTrackBroadcast(Status.COMPLETED.name, track)
-                                    removeFromNotification("Processing ${track.title}")
-                                }
-                                logger.d(tag) { "${track.title} Download Completed" }
-                            } catch (
-                                e: KotlinNullPointerException
-                            ) {
-                                // Try downloading using android DM
-                                logger.d(tag) { "${track.title} Download Failed! Error:Fetch!!!!" }
-                                logger.d(tag) { "${track.title} Requesting Download thru Android DM" }
-                                downloadUsingDM(url, track.outputFilePath, track)
-                            }
-                            downloaded++
-                            removeFromNotification("Downloading ${track.title}")
-                        }
+        downloadFile(url).collect {
+            when (it) {
+                is DownloadResult.Error -> {
+                    launch {
+                        logger.d(tag) { it.message }
+                        logger.d(tag) { "${track.title} Requesting Download thru Android DM" }
+                        downloadUsingDM(url, track.outputFilePath, track)
+                        removeFromNotification("Downloading ${track.title}")
+                        downloaded++
                     }
+                    updateNotification()
+                    sendTrackBroadcast(Status.FAILED.name,track)
+                }
+
+                is DownloadResult.Progress -> {
+                    allTracksStatus[track.title] = DownloadStatus.Downloading(it.progress)
+                    logger.d(tag) { "${track.title} Progress: ${it.progress} %" }
+
+                    val intent = Intent().apply {
+                        action = "Progress"
+                        putExtra("progress", it.progress)
+                        putExtra("track", track)
+                    }
+                    sendBroadcast(intent)
+                }
+
+                is DownloadResult.Success -> {
+                    try {
+                        // Save File and Embed Metadata
+                        val job = launch(Dispatchers.Default) { dir.saveFileWithMetadata(it.byteArray, track){} }
+                        allTracksStatus[track.title] = DownloadStatus.Converting
+                        sendTrackBroadcast("Converting", track)
+                        addToNotification("Processing ${track.title}")
+                        job.invokeOnCompletion {
+                            converted++
+                            allTracksStatus[track.title] = DownloadStatus.Downloaded
+                            sendTrackBroadcast(Status.COMPLETED.name, track)
+                            removeFromNotification("Processing ${track.title}")
+                        }
+                        logger.d(tag) { "${track.title} Download Completed" }
+                    } catch (
+                        e: KotlinNullPointerException
+                    ) {
+                        // Try downloading using android DM
+                        logger.d(tag) { "${track.title} Download Failed! Error:Fetch!!!!" }
+                        logger.d(tag) { "${track.title} Requesting Download thru Android DM" }
+                        downloadUsingDM(url, track.outputFilePath, track)
+                    }
+                    downloaded++
+                    removeFromNotification("Downloading ${track.title}")
                 }
             }
         }
