@@ -14,7 +14,7 @@ Supports- Playlist, Albums, Tracks. _(If You know Any Source for Episodes/Podcas
  - [Android (Jetpack Compose)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.2.0/SpotiFlyer-v2.2.0.apk) 
  - [Desktop (Compose for Desktop) <sup>β</sup>](https://github.com/Shabinder/SpotiFlyer#running-desktop-application)
  - [Web (Kotlin/JS + React Wrapper) <sup>β</sup>](http://shabinder.github.io/SpotiFlyer/)
- - [IOS SOON _(WIP)_](https://github.com/Shabinder/spotiflyer-ios)
+ - [_(WIP)_ IOS SOON (SWIFTUI)](https://github.com/Shabinder/spotiflyer-ios)
 
 [![SpotiFlyer Web App](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=FF7139&label=SpotiFlyer&logo=firefox&style=for-the-badge)](https://shabinder.github.io/SpotiFlyer/)    [![SpotiFlyer Android App](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=SpotiFlyer&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.2.0/SpotiFlyer-v2.2.0.apk)
 </br>
