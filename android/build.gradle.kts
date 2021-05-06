@@ -132,7 +132,7 @@ dependencies {
 
     implementation("dev.icerock.moko:parcelize:0.6.1")
     implementation("com.github.shabinder:storage-chooser:2.0.4.45")
-    implementation("com.google.accompanist:accompanist-insets:0.8.1")
+    implementation("com.google.accompanist:accompanist-insets:0.9.0")
 
     // Test
     testImplementation("junit:junit:4.13.2")
