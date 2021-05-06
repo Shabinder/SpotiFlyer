@@ -17,8 +17,8 @@
 
 <AppUpdater>
     <update>
-        <latestVersion>2.2.5</latestVersion>
-        <latestVersionCode>16</latestVersionCode>
+        <latestVersion>2.3.0</latestVersion>
+        <latestVersionCode>17</latestVersionCode>
         <url>https://github.com/Shabinder/SpotiFlyer/releases/latest/</url>
     </update>
 </AppUpdater>
