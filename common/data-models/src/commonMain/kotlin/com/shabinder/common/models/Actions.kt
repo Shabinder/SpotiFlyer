@@ -42,8 +42,8 @@ interface Actions {
 }
 
 
-private fun stubActions() = object :Actions{
-    override val platformActions = object: PlatformActions{}
+private fun stubActions() = object :Actions {
+    override val platformActions = StubPlatformActions
     override fun showPopUpMessage(string: String, long: Boolean) {}
     override fun setDownloadDirectoryAction() {}
     override fun queryActiveTracks() {}

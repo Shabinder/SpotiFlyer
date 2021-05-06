@@ -19,6 +19,7 @@
 package com.shabinder.common.uikit
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -128,6 +129,12 @@ actual fun YoutubeMusicLogo() = painterResource(R.drawable.ic_youtube_music_logo
 
 @Composable
 actual fun GithubLogo() = painterResource(R.drawable.ic_github)
+
+@Composable
+actual fun PaypalLogo() = painterResource(R.drawable.ic_paypal_logo)
+
+@Composable
+actual fun RazorPay() = painterResource(R.drawable.ic_indian_rupee)
 
 @Composable
 actual fun Toast(

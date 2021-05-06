@@ -67,6 +67,14 @@ actual fun DownloadImageTick() {
     )
 }
 
+@Composable
+actual fun DonationDialog(
+    isVisible:Boolean,
+    onDismiss:()->Unit
+){
+
+}
+
 actual fun montserratFont() = FontFamily(
     Font("font/montserrat_light.ttf", FontWeight.Light),
     Font("font/montserrat_regular.ttf", FontWeight.Normal),
@@ -125,3 +133,9 @@ actual fun YoutubeMusicLogo() = rememberVectorPainter(vectorXmlResource("drawabl
 
 @Composable
 actual fun GithubLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_github.xml")) as Painter
+
+@Composable
+actual fun PaypalLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_paypal_logo.xml")) as Painter
+
+@Composable
+actual fun RazorPay() = rememberVectorPainter(vectorXmlResource("drawable/ic_indian_rupee.xml")) as Painter

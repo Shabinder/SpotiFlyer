@@ -21,10 +21,29 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+val statelyVersion = "1.1.6"
+val statelyIsoVersion = "1.1.6-a1"
+
 kotlin {
     sourceSets {
+        /*
+        * Depend on https://github.com/ReactiveCircus/cache4k
+        * -As Soon as Kotlin 1.5 and Compose becomes compatible
+        * */
+        all {
+            languageSettings.apply {
+                progressiveMode = true
+                enableLanguageFeature("NewInference")
+                useExperimentalAnnotation("kotlin.Experimental")
+                useExperimentalAnnotation("kotlin.time.ExperimentalTime")
+            }
+        }
         commonMain {
-            dependencies {}
+            dependencies {
+                implementation("co.touchlab:stately-concurrency:$statelyVersion")
+                implementation("co.touchlab:stately-isolate:$statelyIsoVersion")
+                implementation("co.touchlab:stately-iso-collections:$statelyIsoVersion")
+            }
         }
     }
 }

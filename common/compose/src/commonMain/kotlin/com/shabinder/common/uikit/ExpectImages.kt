@@ -62,6 +62,12 @@ expect fun YoutubeMusicLogo(): Painter
 expect fun GithubLogo(): Painter
 
 @Composable
+expect fun PaypalLogo(): Painter
+
+@Composable
+expect fun RazorPay(): Painter
+
+@Composable
 expect fun HeartIcon(): Painter
 
 @Composable
@@ -69,3 +75,9 @@ expect fun DownloadImageError()
 
 @Composable
 expect fun DownloadImageArrow(modifier: Modifier)
+
+@Composable
+expect fun DonationDialog(
+    isVisible:Boolean,
+    onDismiss:()->Unit
+)

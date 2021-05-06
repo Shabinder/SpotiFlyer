@@ -44,6 +44,7 @@ internal class SpotiFlyerListStoreProvider(
     private val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>
 ) {
     val logger = getLogger()
+
     fun provide(): SpotiFlyerListStore =
         object :
             SpotiFlyerListStore,

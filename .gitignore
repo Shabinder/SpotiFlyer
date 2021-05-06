@@ -6,3 +6,4 @@ build/
 .gradle/
 terraform.tfvars
 .terraform/
+/spotiflyer-ios/Pods/

@@ -18,6 +18,7 @@ package com.shabinder.common.main.integration
 
 import co.touchlab.stately.ensureNeverFrozen
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.lifecycle.doOnDestroy
 import com.arkivanov.decompose.value.Value
 import com.shabinder.common.di.Picture
 import com.shabinder.common.di.utils.asValue
@@ -30,6 +31,7 @@ import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
 import com.shabinder.common.main.store.SpotiFlyerMainStoreProvider
 import com.shabinder.common.main.store.getStore
 import com.shabinder.common.models.methods
+import com.shabinder.common.caching.Cache
 
 internal class SpotiFlyerMainImpl(
     componentContext: ComponentContext,
@@ -38,6 +40,9 @@ internal class SpotiFlyerMainImpl(
 
     init {
         instanceKeeper.ensureNeverFrozen()
+        lifecycle.doOnDestroy {
+            cache.invalidateAll()
+        }
     }
 
     private val store =
@@ -47,6 +52,11 @@ internal class SpotiFlyerMainImpl(
                 database = database
             ).provide()
         }
+
+    private val cache = Cache.Builder
+        .newBuilder()
+        .maximumCacheSize(20)
+        .build<String, Picture>()
 
     override val models: Value<State> = store.asValue()
 
@@ -63,5 +73,9 @@ internal class SpotiFlyerMainImpl(
         store.accept(Intent.SelectCategory(category))
     }
 
-    override suspend fun loadImage(url: String): Picture = dir.loadImage(url)
+    override suspend fun loadImage(url: String): Picture {
+        return cache.get(url) {
+            dir.loadImage(url)
+        }
+    }
 }

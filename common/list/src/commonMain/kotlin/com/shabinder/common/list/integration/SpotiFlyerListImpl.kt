@@ -28,6 +28,7 @@ import com.shabinder.common.list.store.SpotiFlyerListStore.Intent
 import com.shabinder.common.list.store.SpotiFlyerListStoreProvider
 import com.shabinder.common.list.store.getStore
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.caching.Cache
 
 internal class SpotiFlyerListImpl(
     componentContext: ComponentContext,
@@ -49,6 +50,11 @@ internal class SpotiFlyerListImpl(
             ).provide()
         }
 
+    private val cache = Cache.Builder
+        .newBuilder()
+        .maximumCacheSize(150)
+        .build<String, Picture>()
+
     override val models: Value<State> = store.asValue()
 
     override fun onDownloadAllClicked(trackList: List<TrackDetails>) {
@@ -67,5 +73,9 @@ internal class SpotiFlyerListImpl(
         store.accept(Intent.RefreshTracksStatuses)
     }
 
-    override suspend fun loadImage(url: String): Picture = dir.loadImage(url)
+    override suspend fun loadImage(url: String): Picture {
+        return cache.get(url) {
+            dir.loadImage(url)
+        }
+    }
 }

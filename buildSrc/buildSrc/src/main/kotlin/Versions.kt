@@ -106,7 +106,7 @@ object Decompose {
     const val extensionsCompose = "com.arkivanov.decompose:extensions-compose-jetbrains:$VERSION"
 }
 object MVIKotlin {
-    private const val VERSION = "2.0.2"
+    private const val VERSION = "2.0.3"
     const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
     const val mvikotlin = "com.arkivanov.mvikotlin:mvikotlin:$VERSION"
     const val mvikotlinMain = "com.arkivanov.mvikotlin:mvikotlin-main:$VERSION"

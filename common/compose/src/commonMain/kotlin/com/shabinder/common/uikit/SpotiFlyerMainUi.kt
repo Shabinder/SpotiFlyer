@@ -59,6 +59,9 @@ import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -318,9 +321,18 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                         )
                     }
                 }
+
+                var isDonationDialogVisible by remember { mutableStateOf(false) }
+
+                DonationDialog(
+                    isDonationDialogVisible
+                ) {
+                    isDonationDialogVisible = false
+                }
+
                 Row(
                     modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        .clickable(onClick = { methods.value.giveDonation() }),
+                        .clickable(onClick = { isDonationDialogVisible = true }),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(Icons.Rounded.CardGiftcard, "Support Developer")
@@ -331,7 +343,8 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                             style = SpotiFlyerTypography.h6
                         )
                         Text(
-                            text = "If you think I deserve to get paid for my work, you can leave me some money here.",
+                            text = "If you think I deserve to get paid for my work, you can support me here.",
+                            //text = "SpotiFlyer will always be, Free and Open-Source. You can however show us that you care by sending a small donation.",
                             style = SpotiFlyerTypography.subtitle2
                         )
                     }

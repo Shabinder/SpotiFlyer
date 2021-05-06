@@ -16,14 +16,12 @@
 
 plugins {
     kotlin("js")
-    //id("org.jetbrains.kotlin.js") version "1.4.31"
 }
 
 group = "com.shabinder"
 version = "0.1"
 
 repositories {
-    jcenter()
     mavenCentral()
     maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")
 }
