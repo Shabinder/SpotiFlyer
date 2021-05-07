@@ -40,12 +40,12 @@ import com.shabinder.common.uikit.SpotiFlyerRootContent
 import com.shabinder.common.uikit.SpotiFlyerShapes
 import com.shabinder.common.uikit.SpotiFlyerTypography
 import com.shabinder.common.uikit.colorOffWhite
-import com.shabinder.common.uikit.showToast
 import com.shabinder.database.Database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
 private val koin = initKoin(enableNetworkLogs = true).koin
+private lateinit var showToast: (String)->Unit
 
 fun main() {
 
@@ -63,7 +63,8 @@ fun main() {
                 typography = SpotiFlyerTypography,
                 shapes = SpotiFlyerShapes
             ) {
-                SpotiFlyerRootContent(rememberRootComponent(factory = ::spotiFlyerRoot))
+                val root = SpotiFlyerRootContent(rememberRootComponent(factory = ::spotiFlyerRoot))
+                showToast =  root.callBacks::showToast
             }
         }
     }
@@ -81,17 +82,27 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
             override val actions = object: Actions {
                 override val platformActions = object : PlatformActions {}
 
-                override fun showPopUpMessage(string: String, long: Boolean) = showToast(string)
+                override fun showPopUpMessage(string: String, long: Boolean) {
+                    if(::showToast.isInitialized){
+                        showToast(string)
+                    }
+                }
 
-                override fun setDownloadDirectoryAction() {}
+                override fun setDownloadDirectoryAction() {
+                    showToast("TODO: Still needs to be Implemented")
+                }
 
                 override fun queryActiveTracks() {}
 
-                override fun giveDonation() {}
+                override fun giveDonation() {
+
+                }
 
                 override fun shareApp() {}
 
-                override fun openPlatform(packageID: String, platformLink: String) {}
+                override fun openPlatform(packageID: String, platformLink: String) {
+                    showToast("TODO: Still needs to be Implemented")
+                }
 
                 override fun writeMp3Tags(trackDetails: TrackDetails) {/*IMPLEMENTED*/}
 

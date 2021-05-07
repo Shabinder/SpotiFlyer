@@ -18,6 +18,7 @@ package com.shabinder.common.root.callbacks
 
 interface SpotiFlyerRootCallBacks {
     fun searchLink(link: String)
+    fun showToast(text:String)
     fun popBackToHomeScreen()
     fun setDownloadDirectory()
 }

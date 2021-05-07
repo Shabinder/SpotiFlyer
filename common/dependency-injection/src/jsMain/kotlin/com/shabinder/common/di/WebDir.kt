@@ -17,6 +17,7 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
+import com.russhwolf.settings.Settings
 import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.di.gaana.corsApi
 import com.shabinder.common.di.utils.removeIllegalChars
@@ -33,8 +34,12 @@ import org.w3c.dom.ImageBitmap
 
 actual class Dir actual constructor(
     private val logger: Kermit,
+    private val settings: Settings,
     private val spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
+    companion object {
+        const val DirKey = "downloadDir"
+    }
 
     /*init {
         createDirectories()

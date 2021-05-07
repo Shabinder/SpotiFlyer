@@ -18,6 +18,7 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import co.touchlab.stately.ensureNeverFrozen
+import com.russhwolf.settings.Settings
 import com.shabinder.common.database.databaseModule
 import com.shabinder.common.database.getLogger
 import com.shabinder.common.di.providers.GaanaProvider
@@ -51,7 +52,8 @@ fun initKoin() = initKoin(enableNetworkLogs = false) { }
 
 fun commonModule(enableNetworkLogs: Boolean) = module {
     single { createHttpClient(enableNetworkLogs = enableNetworkLogs) }
-    single { Dir(get(), get()) }
+    single { Dir(get(), get(), get()) }
+    single { Settings() }
     single { Kermit(getLogger()) }
     single { TokenStore(get(), get()) }
     single { YoutubeMusic(get(), get()) }

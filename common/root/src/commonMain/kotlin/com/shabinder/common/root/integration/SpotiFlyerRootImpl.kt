@@ -42,6 +42,7 @@ import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 internal class SpotiFlyerRootImpl(
@@ -91,6 +92,8 @@ internal class SpotiFlyerRootImpl(
 
     override val routerState: Value<RouterState<*, Child>> = router.state
 
+    override val toastState = MutableStateFlow("")
+
     override val callBacks = object : SpotiFlyerRootCallBacks {
         override fun searchLink(link: String) = onMainOutput(SpotiFlyerMain.Output.Search(link))
         override fun popBackToHomeScreen() {
@@ -98,6 +101,7 @@ internal class SpotiFlyerRootImpl(
                 it !is Configuration.Main
             }
         }
+        override fun showToast(text:String) { toastState.value = text }
         override fun setDownloadDirectory() { actions.setDownloadDirectoryAction() }
     }
 

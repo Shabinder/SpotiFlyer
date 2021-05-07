@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
+import com.russhwolf.settings.Settings
 import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
@@ -39,8 +40,12 @@ import javax.imageio.ImageIO
 
 actual class Dir actual constructor(
     private val logger: Kermit,
+    private val settings: Settings,
     private val spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
+    companion object {
+        const val DirKey = "downloadDir"
+    }
 
     init {
         createDirectories()
@@ -51,8 +56,12 @@ actual class Dir actual constructor(
     actual fun imageCacheDir(): String = System.getProperty("user.home") +
         fileSeparator() + "SpotiFlyer/.images" + fileSeparator()
 
-    actual fun defaultDir(): String = System.getProperty("user.home") + fileSeparator() +
+    private val defaultBaseDir = System.getProperty("user.home")!!
+
+    actual fun defaultDir(): String = (settings.getStringOrNull(DirKey) ?: defaultBaseDir) + fileSeparator() +
         "SpotiFlyer" + fileSeparator()
+
+    actual fun setDownloadDirectory(newBasePath:String) = settings.putString(DirKey,newBasePath)
 
     actual fun isPresent(path: String): Boolean = File(path).exists()
 
@@ -88,13 +97,68 @@ actual class Dir actual constructor(
         trackDetails: TrackDetails,
         postProcess:(track: TrackDetails)->Unit
     ) {
-        val file = File(trackDetails.outputFilePath)
-        file.writeBytes(mp3ByteArray)
+        val songFile = File(trackDetails.outputFilePath)
+        try {
+            /*
+            * Check , if Fetch was Used, File is saved Already, else write byteArray we Received
+            * */
+            if(!songFile.exists()) {
+                /*Make intermediate Dirs if they don't exist yet*/
+                songFile.parentFile.mkdirs()
+            }
 
-        Mp3File(file)
-            .removeAllTags()
-            .setId3v1Tags(trackDetails)
-            .setId3v2TagsAndSaveFile(trackDetails)
+            if(mp3ByteArray.isNotEmpty()) songFile.writeBytes(mp3ByteArray)
+
+            when (trackDetails.outputFilePath.substringAfterLast('.')) {
+                ".mp3" -> {
+                    Mp3File(File(songFile.absolutePath))
+                        .removeAllTags()
+                        .setId3v1Tags(trackDetails)
+                        .setId3v2TagsAndSaveFile(trackDetails)
+                    addToLibrary(songFile.absolutePath)
+                }
+                ".m4a" -> {
+                    /*FFmpeg.executeAsync(
+                        "-i ${m4aFile.absolutePath} -y -b:a 160k -acodec libmp3lame -vn ${m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"}"
+                    ){ _, returnCode ->
+                        when (returnCode) {
+                            Config.RETURN_CODE_SUCCESS  -> {
+                                //FFMPEG task Completed
+                                logger.d{ "Async command execution completed successfully." }
+                                scope.launch {
+                                    Mp3File(File(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"))
+                                        .removeAllTags()
+                                        .setId3v1Tags(trackDetails)
+                                        .setId3v2TagsAndSaveFile(trackDetails)
+                                    addToLibrary(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3")
+                                }
+                            }
+                            Config.RETURN_CODE_CANCEL -> {
+                                logger.d{"Async command execution cancelled by user."}
+                            }
+                            else -> {
+                                logger.d { "Async command execution failed with rc=$returnCode" }
+                            }
+                        }
+                    }*/
+                }
+                else -> {
+                    try {
+                        Mp3File(File(songFile.absolutePath))
+                            .removeAllTags()
+                            .setId3v1Tags(trackDetails)
+                            .setId3v2TagsAndSaveFile(trackDetails)
+                        addToLibrary(songFile.absolutePath)
+                    } catch (e: Exception) { e.printStackTrace() }
+                }
+            }
+        }catch (e:Exception){
+            withContext(Dispatchers.Main){
+                //Toast.makeText(appContext,"Could Not Create File:\n${songFile.absolutePath}",Toast.LENGTH_SHORT).show()
+            }
+            if(songFile.exists()) songFile.delete()
+            logger.e { "${songFile.absolutePath} could not be created" }
+        }
     }
     actual fun addToLibrary(path: String) {}
 

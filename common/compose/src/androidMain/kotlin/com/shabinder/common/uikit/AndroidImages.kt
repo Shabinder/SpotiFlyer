@@ -39,6 +39,7 @@ import com.shabinder.common.database.R
 import com.shabinder.common.di.Picture
 import com.shabinder.common.di.dispatcherIO
 import com.shabinder.common.models.methods
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -138,8 +139,7 @@ actual fun RazorPay() = painterResource(R.drawable.ic_indian_rupee)
 
 @Composable
 actual fun Toast(
-    text: String,
-    visibility: MutableState<Boolean>,
+    flow: MutableStateFlow<String>,
     duration: ToastDuration
 ) {
     // We Have Android's Implementation of Toast so its just Empty

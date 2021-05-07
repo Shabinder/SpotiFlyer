@@ -18,6 +18,8 @@
 
 package com.shabinder.common.uikit
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Spring.StiffnessLow
 import androidx.compose.animation.core.animateDp
@@ -26,6 +28,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,8 +40,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +55,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfadeScale
+import com.arkivanov.decompose.extensions.compose.jetbrains.asState
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.uikit.splash.Splash
@@ -93,6 +101,10 @@ fun SpotiFlyerRootContent(component: SpotiFlyerRoot, modifier: Modifier = Modifi
             contentTopPadding,
             component
         )
+        Toast(
+            flow = component.toastState,
+            duration = ToastDuration.Long
+        )
     }
     return component
 }
@@ -112,9 +124,13 @@ fun MainScreen(modifier: Modifier = Modifier, alpha: Float,topPadding: Dp = 0.dp
             ).then(modifier)
     ) {
 
+        val activeComponent = component.routerState.asState()
+        val callBacks = component.callBacks
         AppBar(
             backgroundColor = appBarColor,
-            setDownloadDirectory = component.callBacks::setDownloadDirectory,
+            onBackPressed = callBacks::popBackToHomeScreen ,
+            setDownloadDirectory = callBacks::setDownloadDirectory,
+            isBackButtonVisible = activeComponent.value.activeChild.instance is Child.List,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.padding(top = topPadding))
@@ -130,16 +146,28 @@ fun MainScreen(modifier: Modifier = Modifier, alpha: Float,topPadding: Dp = 0.dp
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AppBar(
     backgroundColor: Color,
+    onBackPressed:()->Unit,
     setDownloadDirectory:()->Unit,
+    isBackButtonVisible: Boolean,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
         backgroundColor = backgroundColor,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                AnimatedVisibility(isBackButtonVisible) {
+                    Icon(
+                        Icons.Rounded.ArrowBackIosNew,
+                        contentDescription = "Back Button",
+                        modifier = Modifier.clickable { onBackPressed() },
+                        tint = Color.LightGray
+                    )
+                    Spacer(Modifier.padding(horizontal = 4.dp))
+                }
                 Image(
                     SpotiFlyerLogo(),
                     "SpotiFlyer Logo",

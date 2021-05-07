@@ -19,14 +19,14 @@ package com.shabinder.common.uikit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.flow.MutableStateFlow
 
 enum class ToastDuration(val value: Int) {
-    Short(1000), Long(3000)
+    Short(1000), Long(2500)
 }
 
 @Composable
 expect fun Toast(
-    text: String,
-    visibility: MutableState<Boolean> = mutableStateOf(false),
-    duration: ToastDuration = ToastDuration.Long
+    flow: MutableStateFlow<String>,
+    duration: ToastDuration
 )

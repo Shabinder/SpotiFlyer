@@ -74,10 +74,15 @@ suspend fun downloadTrack(
     youtubeMp3: YoutubeMp3
 ) {
     try {
-        var link = youtubeMp3.getMp3DownloadLink(videoID)
+        val link = youtubeMp3.getMp3DownloadLink(videoID) ?: ytDownloader.getVideo(videoID).getData()?.url
 
         if (link == null) {
-            link = ytDownloader.getVideo(videoID).getData()?.url ?: return
+            DownloadProgressFlow.emit(
+                DownloadProgressFlow.replayCache.getOrElse(
+                    0
+                ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Failed) }
+            )
+            return
         }
         downloadFile(link).collect {
             when (it) {

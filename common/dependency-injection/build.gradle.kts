@@ -32,6 +32,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:atomicfu:0.16.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.0")
                 implementation("com.shabinder.fuzzywuzzy:fuzzywuzzy:1.0")
+                implementation("com.russhwolf:multiplatform-settings-no-arg:0.7.6")
                 implementation(Extras.youtubeDownloader)
                 implementation(MVIKotlin.rx)
             }
@@ -49,7 +50,6 @@ kotlin {
             dependencies {
                 implementation(compose.materialIconsExtended)
                 implementation(Extras.mp3agic)
-                //implementation(Extras.jaudioTagger)
             }
         }
         jsMain {

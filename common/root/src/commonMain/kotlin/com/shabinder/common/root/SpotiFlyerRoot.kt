@@ -30,11 +30,15 @@ import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.root.integration.SpotiFlyerRootImpl
 import com.shabinder.database.Database
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 interface SpotiFlyerRoot {
 
     val routerState: Value<RouterState<*, Child>>
+
+    val toastState: MutableStateFlow<String>
 
     val callBacks: SpotiFlyerRootCallBacks
 

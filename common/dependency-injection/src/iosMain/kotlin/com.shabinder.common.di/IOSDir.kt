@@ -1,6 +1,7 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
+import com.russhwolf.settings.Settings
 import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
@@ -20,18 +21,28 @@ import platform.Foundation.sendSynchronousRequest
 import platform.Foundation.writeToFile
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
+import java.lang.System
 
 actual class Dir actual constructor(
     val logger: Kermit,
+    private val settings: Settings,
     private val spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
+    companion object {
+        const val DirKey = "downloadDir"
+    }
 
     actual fun isPresent(path: String): Boolean = NSFileManager.defaultManager.fileExistsAtPath(path)
 
     actual fun fileSeparator(): String = "/"
 
+    private val defaultBaseDir = NSFileManager.defaultManager.URLForDirectory(NSMusicDirectory, NSUserDomainMask,null,true,null)!!.path!!
+
     // TODO Error Handling
-    actual fun defaultDir(): String = defaultDirURL.path!! + fileSeparator()
+    actual fun defaultDir(): String = (settings.getStringOrNull(DirKey) ?: defaultBaseDir) +
+            fileSeparator() + "SpotiFlyer" + fileSeparator()
+
+    actual fun setDownloadDirectory(newBasePath:String) = settings.putString(DirKey,newBasePath)
 
     private val defaultDirURL: NSURL by lazy {
         val musicDir = NSFileManager.defaultManager.URLForDirectory(NSMusicDirectory, NSUserDomainMask,null,true,null)!!

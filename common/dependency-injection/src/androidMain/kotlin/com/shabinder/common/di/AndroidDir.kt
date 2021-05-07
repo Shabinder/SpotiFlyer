@@ -16,13 +16,13 @@
 
 package com.shabinder.common.di
 
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
 import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
+import com.russhwolf.settings.Settings
 import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
@@ -40,18 +40,14 @@ import java.net.URL
 
 actual class Dir actual constructor(
     private val logger: Kermit,
+    private val settings: Settings,
     private val spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     companion object {
         const val DirKey = "downloadDir"
     }
 
-    // This Wont throw `NPE` as We will never pass null
-    private val sharedPreferences:SharedPreferences by lazy { methods.value.platformActions.sharedPreferences!! }
-
-    fun setDownloadDirectory(newBasePath:String){
-        sharedPreferences.edit().putString(DirKey,newBasePath).apply()
-    }
+    actual fun setDownloadDirectory(newBasePath:String) = settings.putString(DirKey,newBasePath)
 
     @Suppress("DEPRECATION")
     private val defaultBaseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).toString()
@@ -61,8 +57,8 @@ actual class Dir actual constructor(
     actual fun imageCacheDir(): String = methods.value.platformActions.imageCacheDir
 
     // fun call in order to always access Updated Value
-    actual fun defaultDir(): String = sharedPreferences.getString(DirKey,defaultBaseDir)!! + File.separator +
-            "SpotiFlyer" + File.separator
+    actual fun defaultDir(): String = (settings.getStringOrNull(DirKey) ?: defaultBaseDir) +
+            File.separator + "SpotiFlyer" + File.separator
 
     actual fun isPresent(path: String): Boolean = File(path).exists()
 

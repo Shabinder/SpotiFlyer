@@ -40,10 +40,16 @@ kotlin {
                 implementation(project(":common:compose"))
                 implementation(project(":common:data-models"))
                 implementation(project(":common:root"))
+                // Decompose
                 implementation(Decompose.decompose)
                 implementation(Decompose.extensionsCompose)
+
+                // MVI
                 implementation(MVIKotlin.mvikotlin)
                 implementation(MVIKotlin.mvikotlinMain)
+
+                // Koin
+                implementation(Koin.core)
             }
         }
         val jvmTest by getting
@@ -55,6 +61,7 @@ compose.desktop {
         mainClass = "MainKt"
         description = "Music Downloader for Spotify, Gaana, Youtube Music."
         nativeDistributions {
+            modules("java.sql", "java.security.jgss")
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "SpotiFlyer"
         }

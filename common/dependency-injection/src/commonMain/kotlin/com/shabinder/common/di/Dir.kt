@@ -17,6 +17,8 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
+import com.russhwolf.settings.Settings
+import com.russhwolf.settings.SettingsListener
 import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult
@@ -32,6 +34,7 @@ import kotlin.math.roundToInt
 
 expect class Dir (
     logger: Kermit,
+    settings: Settings,
     spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     val db: Database?
@@ -40,6 +43,7 @@ expect class Dir (
     fun defaultDir(): String
     fun imageCacheDir(): String
     fun createDirectory(dirPath: String)
+    fun setDownloadDirectory(newBasePath:String)
     suspend fun cacheImage(image: Any, path: String) // in Android = ImageBitmap, Desktop = BufferedImage
     suspend fun loadImage(url: String): Picture
     suspend fun clearCache()
