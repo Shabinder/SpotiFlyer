@@ -212,10 +212,10 @@ class ForegroundService : Service(), CoroutineScope {
                 is DownloadResult.Error -> {
                     launch {
                         logger.d(tag) { it.message }
-                        logger.d(tag) { "${track.title} Requesting Download thru Android DM" }
-                        downloadUsingDM(url, track.outputFilePath, track)
+                        /*logger.d(tag) { "${track.title} Requesting Download thru Android DM" }
+                        downloadUsingDM(url, track.outputFilePath, track)*/
                         removeFromNotification("Downloading ${track.title}")
-                        downloaded++
+                        failed++
                     }
                     updateNotification()
                     sendTrackBroadcast(Status.FAILED.name,track)
@@ -247,15 +247,16 @@ class ForegroundService : Service(), CoroutineScope {
                             removeFromNotification("Processing ${track.title}")
                         }
                         logger.d(tag) { "${track.title} Download Completed" }
+                        downloaded++
                     } catch (
-                        e: KotlinNullPointerException
+                        e: Exception
                     ) {
                         // Try downloading using android DM
                         logger.d(tag) { "${track.title} Download Failed! Error:Fetch!!!!" }
-                        logger.d(tag) { "${track.title} Requesting Download thru Android DM" }
-                        downloadUsingDM(url, track.outputFilePath, track)
+                        failed++
+                        /*logger.d(tag) { "${track.title} Requesting Download thru Android DM" }
+                        downloadUsingDM(url, track.outputFilePath, track)*/
                     }
-                    downloaded++
                     removeFromNotification("Downloading ${track.title}")
                 }
             }
@@ -263,7 +264,7 @@ class ForegroundService : Service(), CoroutineScope {
     }
 
     /**
-     * If fetch Fails , Android Download Manager To RESCUE!!
+     * If Custom Downloader Fails , Android Download Manager To RESCUE!!
      **/
     private fun downloadUsingDM(url: String, outputDir: String, track: TrackDetails) {
         launch {

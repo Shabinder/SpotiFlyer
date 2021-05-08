@@ -18,7 +18,7 @@
 
 object Versions {
     // App's Version (To be bumped at each update)
-    const val versionName = "2.3.0"
+    const val versionName = "2.3.5"
 
     // Kotlin
     const val kotlinVersion = "1.4.32"
@@ -45,7 +45,7 @@ object Versions {
     const val slf4j = "1.7.30"
 
     // Android
-    const val versionCode = 17
+    const val versionCode = 18
     const val minSdkVersion = 21
     const val compileSdkVersion = 29
     const val targetSdkVersion = 29
@@ -142,7 +142,7 @@ object Extras {
     const val jaudioTagger = "com.github.Shabinder:JAudioTagger-Android:1.0"
     const val kermit = "co.touchlab:kermit:${Versions.kermit}"
     object Android {
-        val razorpay = "com.razorpay:checkout:1.6.5"
+        val razorpay = "com.razorpay:checkout:1.6.7"
         val fetch = "androidx.tonyodev.fetch2:xfetch2:3.1.6"
         val appUpdator = "com.github.amitbd1508:AppUpdater:4.1.0"
     }

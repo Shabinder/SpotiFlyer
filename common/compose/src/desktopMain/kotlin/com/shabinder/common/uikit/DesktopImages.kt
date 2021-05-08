@@ -67,14 +67,6 @@ actual fun DownloadImageTick() {
     )
 }
 
-@Composable
-actual fun DonationDialog(
-    isVisible:Boolean,
-    onDismiss:()->Unit
-){
-
-}
-
 actual fun montserratFont() = FontFamily(
     Font("font/montserrat_light.ttf", FontWeight.Light),
     Font("font/montserrat_regular.ttf", FontWeight.Normal),

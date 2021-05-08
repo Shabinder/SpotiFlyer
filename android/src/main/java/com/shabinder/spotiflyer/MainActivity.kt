@@ -236,7 +236,13 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                         ContextCompat.startForegroundService(this@MainActivity, serviceIntent)
                     }
 
-                    override fun giveDonation() = startPayment(this@MainActivity)
+                    override fun giveDonation() {
+                        try {
+                            startPayment(this@MainActivity)
+                        }catch (e:Exception) {
+                            openPlatform("",platformLink = "https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button")
+                        }
+                    }
 
                     override fun shareApp() {
                         val sendIntent: Intent = Intent().apply {

@@ -23,9 +23,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,6 +37,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -125,7 +128,7 @@ fun HomeTabBar(
 
     TabRow(
         selectedTabIndex = selectedIndex,
-        indicator = indicator,
+        indicator = indicator as @Composable (List<TabPosition>) -> Unit,
         modifier = modifier,
     ) {
         categories.forEachIndexed { index, category ->
@@ -219,160 +222,169 @@ fun SearchPanel(
 
 @Composable
 fun AboutColumn(modifier: Modifier = Modifier) {
-    // TODO Make Scrollable
-    Column(modifier.fillMaxSize().padding(8.dp).verticalScroll(rememberScrollState())) {
-        Card(
-            modifier = modifier.fillMaxWidth(),
-            border = BorderStroke(1.dp, Color.Gray)
-        ) {
-            Column(modifier.padding(12.dp)) {
-                Text(
-                    text = "Supported Platforms",
-                    style = SpotiFlyerTypography.body1,
-                    color = colorAccent
-                )
-                Spacer(modifier = Modifier.padding(top = 12.dp))
-                Row(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
-                    Icon(
-                        SpotifyLogo(),
-                        "Open Spotify",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                            onClick = { methods.value.openPlatform("com.spotify.music", "http://open.spotify.com") }
-                        )
-                    )
-                    Spacer(modifier = modifier.padding(start = 16.dp))
-                    Icon(
-                        GaanaLogo(),
-                        "Open Gaana",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                            onClick = { methods.value.openPlatform("com.gaana", "http://gaana.com") }
-                        )
-                    )
-                    Spacer(modifier = modifier.padding(start = 16.dp))
-                    Icon(
-                        YoutubeLogo(),
-                        "Open Youtube",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                            onClick = { methods.value.openPlatform("com.google.android.youtube", "http://m.youtube.com") }
-                        )
-                    )
-                    Spacer(modifier = modifier.padding(start = 12.dp))
-                    Icon(
-                        YoutubeMusicLogo(),
-                        "Open Youtube Music",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                            onClick = { methods.value.openPlatform("com.google.android.apps.youtube.music", "https://music.youtube.com/") }
-                        )
-                    )
-                }
-            }
-        }
-        Spacer(modifier = Modifier.padding(top = 8.dp))
-        Card(
-            modifier = modifier.fillMaxWidth(),
-            border = BorderStroke(1.dp, Color.Gray) // Gray
-        ) {
-            Column(modifier.padding(12.dp)) {
-                Text(
-                    text = "Support Development",
-                    style = SpotiFlyerTypography.body1,
-                    color = colorAccent
-                )
-                Spacer(modifier = Modifier.padding(top = 6.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().clickable(
-                        onClick = { methods.value.openPlatform("", "http://github.com/Shabinder/SpotiFlyer") }
-                    )
-                        .padding(vertical = 6.dp)
-                ) {
-                    Icon(GithubLogo(), "Open Project Repo", tint = Color(0xFFCCCCCC))
-                    Spacer(modifier = Modifier.padding(start = 16.dp))
-                    Column {
-                        Text(
-                            text = "GitHub",
-                            style = SpotiFlyerTypography.h6
-                        )
-                        Text(
-                            text = "Star / Fork the project on Github.",
-                            style = SpotiFlyerTypography.subtitle2
-                        )
-                    }
-                }
-                Row(
-                    modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        .clickable(onClick = { methods.value.openPlatform("", "http://github.com/Shabinder/SpotiFlyer") }),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Rounded.Flag, "Help Translate", Modifier.size(32.dp))
-                    Spacer(modifier = Modifier.padding(start = 16.dp))
-                    Column {
-                        Text(
-                            text = "Translate",
-                            style = SpotiFlyerTypography.h6
-                        )
-                        Text(
-                            text = "Help us translate this app in your local language.",
-                            style = SpotiFlyerTypography.subtitle2
-                        )
-                    }
-                }
 
-                var isDonationDialogVisible by remember { mutableStateOf(false) }
+    Box {
+        val stateVertical = rememberScrollState(0)
 
-                DonationDialog(
-                    isDonationDialogVisible
-                ) {
-                    isDonationDialogVisible = false
-                }
-
-                Row(
-                    modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        .clickable(onClick = { isDonationDialogVisible = true }),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Rounded.CardGiftcard, "Support Developer")
-                    Spacer(modifier = Modifier.padding(start = 16.dp))
-                    Column {
-                        Text(
-                            text = "Donate",
-                            style = SpotiFlyerTypography.h6
+        Column(modifier.fillMaxSize().padding(8.dp).verticalScroll(stateVertical)) {
+            Card(
+                modifier = modifier.fillMaxWidth(),
+                border = BorderStroke(1.dp, Color.Gray)
+            ) {
+                Column(modifier.padding(12.dp)) {
+                    Text(
+                        text = "Supported Platforms",
+                        style = SpotiFlyerTypography.body1,
+                        color = colorAccent
+                    )
+                    Spacer(modifier = Modifier.padding(top = 12.dp))
+                    Row(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
+                        Icon(
+                            SpotifyLogo(),
+                            "Open Spotify",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
+                                onClick = { methods.value.openPlatform("com.spotify.music", "http://open.spotify.com") }
+                            )
                         )
-                        Text(
-                            text = "If you think I deserve to get paid for my work, you can support me here.",
-                            //text = "SpotiFlyer will always be, Free and Open-Source. You can however show us that you care by sending a small donation.",
-                            style = SpotiFlyerTypography.subtitle2
+                        Spacer(modifier = modifier.padding(start = 16.dp))
+                        Icon(
+                            GaanaLogo(),
+                            "Open Gaana",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
+                                onClick = { methods.value.openPlatform("com.gaana", "http://gaana.com") }
+                            )
                         )
-                    }
-                }
-                Row(
-                    modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                        .clickable(
-                            onClick = {
-                                methods.value.shareApp()
-                            }
-                        ),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Rounded.Share, "Share SpotiFlyer App")
-                    Spacer(modifier = Modifier.padding(start = 16.dp))
-                    Column {
-                        Text(
-                            text = "Share",
-                            style = SpotiFlyerTypography.h6
+                        Spacer(modifier = modifier.padding(start = 16.dp))
+                        Icon(
+                            YoutubeLogo(),
+                            "Open Youtube",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
+                                onClick = { methods.value.openPlatform("com.google.android.youtube", "http://m.youtube.com") }
+                            )
                         )
-                        Text(
-                            text = "Share this app with your friends and family.",
-                            style = SpotiFlyerTypography.subtitle2
+                        Spacer(modifier = modifier.padding(start = 12.dp))
+                        Icon(
+                            YoutubeMusicLogo(),
+                            "Open Youtube Music",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
+                                onClick = { methods.value.openPlatform("com.google.android.apps.youtube.music", "https://music.youtube.com/") }
+                            )
                         )
                     }
                 }
             }
+            Spacer(modifier = Modifier.padding(top = 8.dp))
+            Card(
+                modifier = modifier.fillMaxWidth(),
+                border = BorderStroke(1.dp, Color.Gray) // Gray
+            ) {
+                Column(modifier.padding(12.dp)) {
+                    Text(
+                        text = "Support Development",
+                        style = SpotiFlyerTypography.body1,
+                        color = colorAccent
+                    )
+                    Spacer(modifier = Modifier.padding(top = 6.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth().clickable(
+                            onClick = { methods.value.openPlatform("", "http://github.com/Shabinder/SpotiFlyer") }
+                        )
+                            .padding(vertical = 6.dp)
+                    ) {
+                        Icon(GithubLogo(), "Open Project Repo", tint = Color(0xFFCCCCCC))
+                        Spacer(modifier = Modifier.padding(start = 16.dp))
+                        Column {
+                            Text(
+                                text = "GitHub",
+                                style = SpotiFlyerTypography.h6
+                            )
+                            Text(
+                                text = "Star / Fork the project on Github.",
+                                style = SpotiFlyerTypography.subtitle2
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
+                            .clickable(onClick = { methods.value.openPlatform("", "http://github.com/Shabinder/SpotiFlyer") }),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Rounded.Flag, "Help Translate", Modifier.size(32.dp))
+                        Spacer(modifier = Modifier.padding(start = 16.dp))
+                        Column {
+                            Text(
+                                text = "Translate",
+                                style = SpotiFlyerTypography.h6
+                            )
+                            Text(
+                                text = "Help us translate this app in your local language.",
+                                style = SpotiFlyerTypography.subtitle2
+                            )
+                        }
+                    }
+
+                    var isDonationDialogVisible by remember { mutableStateOf(false) }
+
+                    DonationDialog(
+                        isDonationDialogVisible
+                    ) {
+                        isDonationDialogVisible = false
+                    }
+
+                    Row(
+                        modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
+                            .clickable(onClick = { isDonationDialogVisible = true }),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Rounded.CardGiftcard, "Support Developer")
+                        Spacer(modifier = Modifier.padding(start = 16.dp))
+                        Column {
+                            Text(
+                                text = "Donate",
+                                style = SpotiFlyerTypography.h6
+                            )
+                            Text(
+                                text = "If you think I deserve to get paid for my work, you can support me here.",
+                                //text = "SpotiFlyer will always be, Free and Open-Source. You can however show us that you care by sending a small donation.",
+                                style = SpotiFlyerTypography.subtitle2
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
+                            .clickable(
+                                onClick = {
+                                    methods.value.shareApp()
+                                }
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Rounded.Share, "Share SpotiFlyer App")
+                        Spacer(modifier = Modifier.padding(start = 16.dp))
+                        Column {
+                            Text(
+                                text = "Share",
+                                style = SpotiFlyerTypography.h6
+                            )
+                            Text(
+                                text = "Share this app with your friends and family.",
+                                style = SpotiFlyerTypography.subtitle2
+                            )
+                        }
+                    }
+                }
+            }
         }
+
+        VerticalScrollbar(
+            modifier = Modifier.padding(end = 2.dp).align(Alignment.CenterEnd).fillMaxHeight(),
+            adapter = rememberScrollbarAdapter(stateVertical)
+        )
     }
 }
 
@@ -392,19 +404,35 @@ fun HistoryColumn(
                 Text("No History Available", style = SpotiFlyerTypography.h4.copy(fontWeight = FontWeight.Light), textAlign = TextAlign.Center)
             }
         } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                content = {
-                    items(it.distinctBy { record -> record.coverUrl }) { record ->
-                        DownloadRecordItem(
-                            item = record,
-                            loadImage,
-                            onItemClicked
-                        )
-                    }
-                },
-                modifier = Modifier.padding(top = 8.dp).fillMaxSize()
-            )
+            Box {
+
+                val listState = rememberLazyListState()
+                val itemList = it.distinctBy { record -> record.coverUrl }
+
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    content = {
+                        items(itemList) { record ->
+                            DownloadRecordItem(
+                                item = record,
+                                loadImage,
+                                onItemClicked
+                            )
+                        }
+                    },
+                    state = listState,
+                    modifier = Modifier.padding(top = 8.dp).fillMaxSize()
+                )
+
+                VerticalScrollbar(
+                    modifier = Modifier.padding(end = 2.dp).align(Alignment.CenterEnd).fillMaxHeight(),
+                    adapter = rememberScrollbarAdapter(
+                        scrollState = listState,
+                        itemCount = itemList.size,
+                        averageItemSize = 70.dp
+                    )
+                )
+            }
         }
     }
 }

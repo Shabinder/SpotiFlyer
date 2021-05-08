@@ -61,9 +61,21 @@ compose.desktop {
         mainClass = "MainKt"
         description = "Music Downloader for Spotify, Gaana, Youtube Music."
         nativeDistributions {
-            modules("java.sql", "java.security.jgss")
+            modules("java.sql", "java.security.jgss", "jdk.crypto.ec")
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "SpotiFlyer"
+            copyright = "© 2021 Shabinder. All rights reserved."
+            vendor = "Shabinder"
+            val iconsRoot = project.file("src/jvmMain/resources/drawable")
+            macOS {
+                iconFile.set(iconsRoot.resolve("spotiflyer.icns"))
+            }
+            windows {
+                iconFile.set(iconsRoot.resolve("spotiflyer.ico"))
+            }
+            linux {
+                iconFile.set(iconsRoot.resolve("spotiflyer.png"))
+            }
         }
     }
 }

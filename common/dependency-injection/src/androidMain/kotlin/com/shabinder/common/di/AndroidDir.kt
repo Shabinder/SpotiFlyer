@@ -161,6 +161,9 @@ actual class Dir actual constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             null
+        } catch (e: OutOfMemoryError) {
+            e.printStackTrace()
+            null
         }
     }
 

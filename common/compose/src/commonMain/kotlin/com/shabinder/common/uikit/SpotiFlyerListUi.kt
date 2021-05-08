@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,6 +30,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
@@ -77,6 +79,9 @@ fun SpotiFlyerListContent(
                 Text("Loading..", style = appNameStyle, color = colorPrimary)
             }
         } else {
+
+            val listState = rememberLazyListState()
+
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 content = {
@@ -91,11 +96,22 @@ fun SpotiFlyerListContent(
                         )
                     }
                 },
+                state = listState,
                 modifier = Modifier.fillMaxSize(),
             )
+
             DownloadAllButton(
                 onClick = { component.onDownloadAllClicked(model.trackList) },
                 modifier = Modifier.padding(bottom = 24.dp).align(Alignment.BottomCenter)
+            )
+
+            VerticalScrollbar(
+                modifier = Modifier.padding(end = 2.dp).align(Alignment.CenterEnd).fillMaxHeight(),
+                adapter = rememberScrollbarAdapter(
+                    scrollState = listState,
+                    itemCount = model.trackList.size,
+                    averageItemSize = 72.dp
+                )
             )
         }
     }
