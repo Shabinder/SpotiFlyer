@@ -23,15 +23,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import com.shabinder.common.di.Picture
 
 @Composable
-expect fun ImageLoad(
-    link: String,
-    loader: suspend (String) -> Picture,
-    desc: String = "Album Art",
-    modifier: Modifier = Modifier,
-    // placeholder:Painter = PlaceHolderImage()
-)
-
-@Composable
 expect fun DownloadImageTick()
 
 @Composable

@@ -68,33 +68,36 @@ kotlin {
             }
         }
     }
-
-    /*Required to Export `packForXcode`*/
-    sourceSets {
-        named("iosMain") {
-            dependencies {
-                api(project(":common:dependency-injection"))
-                api(project(":common:data-models"))
-                api(project(":common:database"))
-                api(project(":common:list"))
-                api(project(":common:main"))
-                api(Decompose.decompose)
-                api(MVIKotlin.mvikotlinMain)
-                api(MVIKotlin.mvikotlinLogging)
+    if(HostOS.isMac){
+        /*Required to Export `packForXcode`*/
+        sourceSets {
+            named("iosMain") {
+                dependencies {
+                    api(project(":common:dependency-injection"))
+                    api(project(":common:data-models"))
+                    api(project(":common:database"))
+                    api(project(":common:list"))
+                    api(project(":common:main"))
+                    api(Decompose.decompose)
+                    api(MVIKotlin.mvikotlinMain)
+                    api(MVIKotlin.mvikotlinLogging)
+                }
             }
         }
     }
 }
 
 val packForXcode by tasks.creating(Sync::class) {
-    group = "build"
-    val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
-    val targetName = "ios"
-    val framework = kotlin.targets.getByName<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>(targetName)
-        .binaries.getFramework(mode)
-    inputs.property("mode", mode)
-    dependsOn(framework.linkTask)
-    val targetDir = File(buildDir, "xcode-frameworks")
-    from(framework.outputDirectory)
-    into(targetDir)
+    if(HostOS.isMac){
+        group = "build"
+        val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
+        val targetName = "ios"
+        val framework = kotlin.targets.getByName<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>(targetName)
+            .binaries.getFramework(mode)
+        inputs.property("mode", mode)
+        dependsOn(framework.linkTask)
+        val targetDir = File(buildDir, "xcode-frameworks")
+        from(framework.outputDirectory)
+        into(targetDir)
+    }
 }

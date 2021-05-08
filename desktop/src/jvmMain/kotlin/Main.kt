@@ -47,7 +47,6 @@ import java.awt.Desktop
 import java.net.URI
 import javax.swing.JFileChooser
 import javax.swing.JFileChooser.APPROVE_OPTION
-import javax.swing.JFileChooser.CANCEL_OPTION
 
 private val koin = initKoin(enableNetworkLogs = true).koin
 private lateinit var showToast: (String)->Unit

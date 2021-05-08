@@ -40,26 +40,6 @@ import com.shabinder.common.models.methods
 import kotlinx.coroutines.withContext
 
 @Composable
-actual fun ImageLoad(
-    link: String,
-    loader: suspend (String) -> Picture,
-    desc: String,
-    modifier: Modifier,
-    // placeholder: ImageVector
-) {
-    var pic by remember(link) { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(link) {
-        withContext(dispatcherIO) {
-            pic = loader(link).image
-        }
-    }
-
-    Crossfade(pic) {
-        if (it == null) Image(PlaceHolderImage(), desc, modifier, contentScale = ContentScale.Crop) else Image(it, desc, modifier, contentScale = ContentScale.Crop)
-    }
-}
-
-@Composable
 actual fun DownloadImageTick() {
     Image(
         vectorXmlResource("drawable/ic_tick.xml"),

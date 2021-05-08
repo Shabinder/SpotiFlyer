@@ -424,14 +424,14 @@ fun HistoryColumn(
                     modifier = Modifier.padding(top = 8.dp).fillMaxSize()
                 )
 
-                VerticalScrollbar(
+                /*VerticalScrollbar(
                     modifier = Modifier.padding(end = 2.dp).align(Alignment.CenterEnd).fillMaxHeight(),
                     adapter = rememberScrollbarAdapter(
                         scrollState = listState,
                         itemCount = itemList.size,
                         averageItemSize = 70.dp
                     )
-                )
+                )*/
             }
         }
     }
