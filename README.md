@@ -44,7 +44,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 The latest release and pre-release versions are available on GitHub.
 Or to save a click, [this link](https://github.com/Shabinder/SpotiFlyer/releases/latest) should always point to the most recent release.
 
-[![APK Download](https://img.shields.io/github/downloads/Shabinder/SpotiFlyer/total?style=for-the-badge&logo=android&color=17B2E7)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.2.0/SpotiFlyer-v2.2.0.apk)
+[![APK Download](https://img.shields.io/github/downloads/Shabinder/SpotiFlyer/total?style=for-the-badge&logo=android&color=17B2E7)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.0/SpotiFlyer.v2.3.0.apk)
 
 ### Running desktop application
 ```./gradlew :desktop:run```
@@ -72,13 +72,13 @@ Have any questions, doubts or want to present your opinions, views? You're alway
  - Support for Podcasts/Episodes and Shows.
  - Preference Screen.
  - Another Source for Music in addition to youtube.
- - IOS(Swift UI)(I can't afford MacBook for Dev. as of now, however **pull requests are welcome!**)
+ - Build a Media Player into this app. _SEE: #113 _
  
 ### Note
 The availability of YouTube Music in your country is important for this app to work since we use YouTube Music to filter out our search results.
 To check if YouTube Music is available in your country, visit [YouTube Music](https://music.youtube.com).
 
-<!--I am hosting a **server for WEB APP on my own personal device** , so expect some downtimes, If you have a **server** available and would like to share , open an issue or ping me wherever you can get a hold of me.-->
+I am hosting a **server for WEB APP on my own personal device** , so expect some downtimes, If you have a **server** available and would like to share , open an issue or ping me wherever you can get a hold of me.
 
 License
 ![GPL-License](https://img.shields.io/github/license/Shabinder/SpotiFlyer?style=flat-square)
