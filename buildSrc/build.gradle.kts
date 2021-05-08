@@ -27,7 +27,6 @@ repositories {
     mavenCentral()
     maven(url = "https://jitpack.io")
     maven(url = "https://plugins.gradle.org/m2/")
-    maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")
     maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
