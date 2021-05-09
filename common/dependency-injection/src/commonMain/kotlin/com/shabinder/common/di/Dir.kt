@@ -72,6 +72,7 @@ suspend fun downloadFile(url: String): Flow<DownloadResult> {
             }
             client.close()
         } catch (e:Exception) {
+            e.printStackTrace()
             emit(DownloadResult.Error(e.message ?: "File not downloaded"))
         }
     }

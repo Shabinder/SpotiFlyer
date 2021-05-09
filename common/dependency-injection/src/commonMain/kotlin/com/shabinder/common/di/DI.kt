@@ -89,7 +89,7 @@ fun createHttpClient(enableNetworkLogs: Boolean = false) = HttpClient {
     }*/
     // Timeout
     install(HttpTimeout) {
-        requestTimeoutMillis = 15000L
+        // requestTimeoutMillis = 20000L
         connectTimeoutMillis = 15000L
         socketTimeoutMillis = 15000L
     }
