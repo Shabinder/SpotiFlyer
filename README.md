@@ -11,13 +11,11 @@
 Supports- Playlist, Albums, Tracks. _(If You know Any Source for Episodes/Podcasts create an Issue sharing It.)_
 
  **Currently running on:**
- - [Android (Jetpack Compose)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.2.0/SpotiFlyer-v2.2.0.apk) 
- - [Desktop (Compose for Desktop) <sup>β</sup>](https://github.com/Shabinder/SpotiFlyer#running-desktop-application)
+ - [Android (Jetpack Compose)](https://github.com/Shabinder/SpotiFlyer#install) 
+ - [Desktop (Compose for Desktop) <sup>β</sup>](https://github.com/Shabinder/SpotiFlyer#install)
  - [Web (Kotlin/JS + React Wrapper) <sup>β</sup>](http://shabinder.github.io/SpotiFlyer/)
  - [_(WIP)_ IOS SOON (SWIFTUI)](https://github.com/Shabinder/spotiflyer-ios)
 
-[![SpotiFlyer Web App](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=FF7139&label=SpotiFlyer&logo=firefox&style=for-the-badge)](https://shabinder.github.io/SpotiFlyer/)    [![SpotiFlyer Android App](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=SpotiFlyer&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.2.0/SpotiFlyer-v2.2.0.apk)
-</br>
 <!--[![Build Status](https://github.com/Shabinder/SpotiFlyer/blob/master/app/build_passing.svg)](https://github.com/Shabinder/SpotiFlyer/releases)
 ![API](https://img.shields.io/badge/API-26%2B-brightgreen.svg)
 </br>-->
@@ -40,15 +38,22 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 - Youtube Music
 - _(more coming soon)_
 
-### Downloads
-The latest release and pre-release versions are available on GitHub.
-Or to save a click, [this link](https://github.com/Shabinder/SpotiFlyer/releases/latest) should always point to the most recent release.
 
-[![APK Download](https://img.shields.io/github/downloads/Shabinder/SpotiFlyer/total?style=for-the-badge&logo=android&color=17B2E7)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.0/SpotiFlyer.v2.3.0.apk)
+## 💻 Install 
 
-### Running desktop application
-```./gradlew :desktop:run```
+| Platform | Download | Status |
+|----------|----------|--------|
+| Android    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=Android-Apk&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/SpotiFlyer-Android-v2.3.5.apk)| ✅ Stable | 
+| Windows    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=00A8E8&label=Windows-msi&logo=windows&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/SpotiFlyer-Windows-2.3.5.msi)| ✅ Stable | 
+| MacOS    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=5F85CE&label=MacOS-dmg&logo=apple&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/SpotiFlyer-MacOS-2.3.5.dmg) | ✅ Stable | 
+| MacOS-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=5F85CE&label=MacOS-jar&logo=apple&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/SpotiFlyer-MacOSJAR-2.3.5.jar) | ✅ Stable |
+| Linux-DEB    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=D0074E&label=Linux-deb&logo=debian&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/spotiflyer_2.3.5-LinuxDeb.deb)| ✅ Stable |
+| Linux-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=EBA201&label=Linux-jar&logo=linux&style=for-the-badge)](https://github.com/theapache64/stackzy/releases/latest)| ✅ Stable | 
+| Web    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=FF7139&label=SpotiFlyer&logo=firefox&style=for-the-badge)](https://shabinder.github.io/SpotiFlyer/) | ✅ Beta | 
 
+- To run the `jar` version, you need Java 15 or above.
+
+[![Latest Download](https://img.shields.io/github/downloads/Shabinder/SpotiFlyer/total?style=for-the-badge&color=17B2E7)](https://github.com/Shabinder/SpotiFlyer/releases/latest)
 
 ### Want to Contribute 🙋‍♂️?
 Want to contribute? Great!
