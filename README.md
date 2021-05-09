@@ -52,7 +52,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 | Web    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=FF7139&label=SpotiFlyer&logo=firefox&style=for-the-badge)](https://shabinder.github.io/SpotiFlyer/) | ✅ Beta | 
 
 - To run the `jar` version, you need Java 15 or above.
-
+- MacOs DMG is not notarized and signed using a certificate , so Use jar in mac for now.
 [![Latest Download](https://img.shields.io/github/downloads/Shabinder/SpotiFlyer/total?style=for-the-badge&color=17B2E7)](https://github.com/Shabinder/SpotiFlyer/releases/latest)
 
 ### Want to Contribute 🙋‍♂️?
