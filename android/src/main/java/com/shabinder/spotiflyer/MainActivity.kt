@@ -17,7 +17,6 @@
 package com.shabinder.spotiflyer
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -51,12 +50,9 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
-import com.razorpay.Checkout
-import com.razorpay.PaymentResultListener
 import com.shabinder.common.di.*
 import com.shabinder.common.di.worker.ForegroundService
 import com.shabinder.common.models.Actions
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.PlatformActions.Companion.SharedPreferencesKey
@@ -71,14 +67,13 @@ import com.shabinder.spotiflyer.ui.NetworkDialog
 import com.shabinder.spotiflyer.ui.PermissionDialog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import java.io.File
 
 const val disableDozeCode = 1223
 
 @ExperimentalAnimationApi
-class MainActivity : ComponentActivity(), PaymentResultListener {
+class MainActivity : ComponentActivity() {
 
     private val fetcher: FetchPlatformQueryResult by inject()
     private val dir: Dir by inject()
@@ -134,7 +129,6 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 
     private fun initialise() {
         checkIfLatestVersion()
-        Checkout.preload(applicationContext)
         handleIntentFromExternalActivity()
     }
 
@@ -237,11 +231,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                     }
 
                     override fun giveDonation() {
-                        try {
-                            startPayment(this@MainActivity)
-                        }catch (e:Exception) {
-                            openPlatform("",platformLink = "https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button")
-                        }
+                        openPlatform("",platformLink = "https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button")
                     }
 
                     override fun shareApp() {
@@ -388,52 +378,6 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                     }
                 }
             }
-        }
-    }
-
-    override fun onPaymentError(errorCode: Int, response: String?) {
-        try{
-            showPopUpMessage("Payment Failed, Response:$response")
-        }catch (e: Exception){
-            Log.d("Razorpay Payment","Exception in onPaymentSuccess $response")
-        }
-    }
-
-    override fun onPaymentSuccess(razorpayPaymentId: String?) {
-        try{
-            showPopUpMessage("Payment Successful, ThankYou!")
-        }catch (e: Exception){
-            showPopUpMessage("Razorpay Payment, Error Occurred.")
-            Log.d("Razorpay Payment","Exception in onPaymentSuccess, ${e.message}")
-        }
-    }
-
-    /*
-    * RazorPay Payment
-    * */
-    private fun startPayment(mainActivity: Activity) {
-        val co = Checkout().apply {
-            setKeyID("rzp_live_3ZQeoFYOxjmXye")
-            setImage(com.shabinder.common.di.R.drawable.ic_spotiflyer_logo)
-        }
-
-        try {
-            val preFill = JSONObject()
-
-            val options = JSONObject().apply {
-                put("name", "SpotiFlyer")
-                put("description", "Thanks For the Donation!")
-                // You can omit the image option to fetch the image from dashboard
-                // put("image","https://github.com/Shabinder/SpotiFlyer/raw/master/app/SpotifyDownload.png")
-                put("currency", "INR")
-                put("amount", "4900")
-                put("prefill", preFill)
-            }
-
-            co.open(mainActivity, options)
-        } catch (e: Exception) {
-            // showPop("Error in payment: "+ e.message)
-            e.printStackTrace()
         }
     }
 }

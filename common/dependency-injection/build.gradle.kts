@@ -40,7 +40,6 @@ kotlin {
         androidMain {
             dependencies {
                 implementation(compose.materialIconsExtended)
-                implementation(Extras.Android.razorpay)
                 implementation(Extras.mp3agic)
                 implementation("com.github.shabinder:storage-chooser:2.0.4.45")
                 // implementation(files("$rootDir/libs/mobile-ffmpeg.aar"))

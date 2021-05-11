@@ -17,8 +17,14 @@
 package com.shabinder.spotiflyer
 
 import android.app.Application
+import android.content.Context
 import com.shabinder.common.di.initKoin
 import com.shabinder.spotiflyer.di.appModule
+import org.acra.config.httpSender
+import org.acra.config.notification
+import org.acra.data.StringFormat
+import org.acra.ktx.initAcra
+import org.acra.sender.HttpSender
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.component.KoinComponent
@@ -29,11 +35,42 @@ class App: Application(), KoinComponent {
         super.onCreate()
 
         val loggingEnabled = true
-
+        // KOIN - DI
         initKoin(loggingEnabled) {
             androidLogger(Level.NONE) // No virtual method elapsedNow
             androidContext(this@App)
             modules(appModule(loggingEnabled))
+        }
+    }
+
+    @Suppress("SpellCheckingInspection")
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        // Crashlytics
+        initAcra {
+            buildConfigClass = BuildConfig::class.java
+            reportFormat = StringFormat.JSON
+            /*
+            * Prompt User Before Sending Any Crash Report
+            * Obeying `F-Droid Inclusion Privacy Rules`
+            * */
+            notification {
+                title = getString(R.string.acra_notification_title)
+                text = getString(R.string.acra_notification_text)
+                channelName = getString(R.string.acra_notification_channel)
+                channelDescription = getString(R.string.acra_notification_channel_desc)
+                sendOnClick = true
+            }
+            // Send Crash Report to self hosted Acrarium (FOSS)
+            httpSender {
+                uri = "https://kind-grasshopper-73.telebit.io/acrarium/report"
+                basicAuthLogin = "sDj2xCKQIxw0dujf"
+                basicAuthPassword = "O83du0TsgsDJ69zN"
+                httpMethod = HttpSender.Method.POST
+                connectionTimeout = 15000
+                socketTimeout = 20000
+                compress = true
+            }
         }
     }
 }

@@ -14,6 +14,7 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import Extras.Android.Acra
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.compose.compose
 
@@ -22,9 +23,6 @@ plugins {
     kotlin("android")
     id("kotlin-parcelize")
     id("org.jetbrains.compose")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
-    id("com.google.firebase.firebase-perf")
 }
 
 group = "com.shabinder"
@@ -32,6 +30,10 @@ version = Versions.versionName
 
 repositories {
     google()
+    mavenCentral()
+    // Remove jcenter as soon as following issue closes
+    // https://github.com/matomo-org/matomo-sdk-android/issues/301
+    jcenter()
 }
 
 android {
@@ -126,13 +128,15 @@ dependencies {
 
     // Extras
     Extras.Android.apply {
+        implementation(Acra.notification)
+        implementation(Acra.http)
         implementation(appUpdator)
-        implementation(razorpay)
+        implementation(matomo)
     }
 
     implementation("dev.icerock.moko:parcelize:0.6.1")
     implementation("com.github.shabinder:storage-chooser:2.0.4.45")
-    implementation("com.google.accompanist:accompanist-insets:0.9.0")
+    implementation("com.google.accompanist:accompanist-insets:0.9.1")
 
     // Test
     testImplementation("junit:junit:4.13.2")

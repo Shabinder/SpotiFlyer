@@ -31,6 +31,7 @@ kotlin {
             kotlinOptions.jvmTarget = "14"
         }
     }
+
     sourceSets {
         val jvmMain by getting {
             dependencies {
@@ -40,6 +41,7 @@ kotlin {
                 implementation(project(":common:compose"))
                 implementation(project(":common:data-models"))
                 implementation(project(":common:root"))
+
                 // Decompose
                 implementation(Decompose.decompose)
                 implementation(Decompose.extensionsCompose)
@@ -66,8 +68,10 @@ compose.desktop {
             packageName = "SpotiFlyer"
             copyright = "© 2021 Shabinder. All rights reserved."
             vendor = "Shabinder"
+
             val iconsRoot = project.file("src/jvmMain/resources/drawable")
             macOS {
+                bundleID = "com.shabinder.spotiflyer"
                 iconFile.set(iconsRoot.resolve("spotiflyer.icns"))
             }
             windows {

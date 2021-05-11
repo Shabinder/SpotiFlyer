@@ -30,4 +30,8 @@
     <string name="share_subtitle">Share this app with your friends and family.</string>
     <string name="made_with_love">Made with</string>
     <string name="in_india">in India</string>
+    <string name="acra_notification_title">OOPS, SpotiFlyer Crashed</string>
+    <string name="acra_notification_text">Please Send Crash Report to App Developers, So this unfortunate event may not happen again.</string>
+    <string name="acra_notification_channel">SpotiFlyer_Crashlytics</string>
+    <string name="acra_notification_channel_desc">Notification Channel to send Spotiflyer Crashes.</string>
 </resources>

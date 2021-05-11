@@ -142,8 +142,14 @@ object Extras {
     const val jaudioTagger = "com.github.Shabinder:JAudioTagger-Android:1.0"
     const val kermit = "co.touchlab:kermit:${Versions.kermit}"
     object Android {
-        val razorpay = "com.razorpay:checkout:1.6.7"
-        val fetch = "androidx.tonyodev.fetch2:xfetch2:3.1.6"
+        object Acra {
+            // Self Hosted Crashlytics (FOSS)
+            private const val VERSION = "5.8.1-beta11"
+            val http = "ch.acra:acra-http:$VERSION"
+            val notification = "ch.acra:acra-notification:$VERSION"
+        }
+        // Self Hosted Analytics (FOSS)
+        val matomo = "org.matomo.sdk:tracker:4.1.2"
         val appUpdator = "com.github.amitbd1508:AppUpdater:4.1.0"
     }
 }
