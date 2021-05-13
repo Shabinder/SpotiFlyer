@@ -16,17 +16,16 @@
 
 package com.shabinder.common.di
 
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Environment
-import android.util.Log
+import android.provider.MediaStore
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.documentfile.provider.DocumentFile
 import co.touchlab.kermit.Kermit
 import com.github.k1rakishou.fsaf.FileManager
-import com.github.k1rakishou.fsaf.file.AbstractFile
 import com.github.k1rakishou.fsaf.file.DirectorySegment
 import com.github.k1rakishou.fsaf.file.FileSegment
 import com.github.k1rakishou.fsaf.manager.base_directory.BaseDirectory
@@ -45,12 +44,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+
 
 /*
 * Ignore Deprecation
@@ -60,22 +59,32 @@ import java.net.URL
 actual class Dir actual constructor(
     private val logger: Kermit,
     private val settings: Settings,
-    private val spotiFlyerDatabase: SpotiFlyerDatabase,
+    spotiFlyerDatabase: SpotiFlyerDatabase,
 ): KoinComponent {
 
     private val context: Context = get()
     val fileManager = FileManager(context)
 
     init {
-        fileManager.registerBaseDir<SpotiFlyerBaseDir>(SpotiFlyerBaseDir({ getDirType() },
-            getJavaFile = {
-                java.io.File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).toString()
-                            + "/SpotiFlyer/"
-                )
-            },
-            getSAFUri = { null }
-        ))
+        fileManager.apply {
+            registerBaseDir<SpotiFlyerBaseDir>(SpotiFlyerBaseDir({ getDirType() },
+                getJavaFile = {
+                    java.io.File(
+                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
+                            .toString()
+                                + "/SpotiFlyer/"
+                    )
+                },
+                getSAFUri = {
+                    settings.getStringOrNull(DirKey)?.let {
+                        Uri.parse(it)
+                    }
+                }
+            ))
+            defaultDir().documentFile?.let {
+                createSnapshot(it,true)
+            }
+        }
     }
 
     companion object {
@@ -105,26 +114,31 @@ actual class Dir actual constructor(
 
     actual fun setDownloadDirectory(newBasePath:File) = settings.putString(
         DirKey,
-        newBasePath.documentFile?.getFullPath()!!
+        newBasePath.documentFile!!.getFullPath()
     )
 
     fun setDownloadDirectory(treeUri:Uri) {
-        fileManager.registerBaseDir<SpotiFlyerBaseDir>(SpotiFlyerBaseDir(
-            { getDirType() },
-            getJavaFile = {
-                null
-            },
-            getSAFUri = {
-                treeUri
+        try {
+            fileManager.apply {
+                registerBaseDir<SpotiFlyerBaseDir>(SpotiFlyerBaseDir(
+                    { getDirType() },
+                    getJavaFile = {
+                        null
+                    },
+                    getSAFUri = {
+                        treeUri
+                    }
+                ))
+                fromUri(treeUri)?.let { createSnapshot(it,true) }
             }
-        ))
+        } catch (e:IllegalArgumentException) {
+            methods.value.showPopUpMessage("This Directory is already set as Download Directory")
+        }
+        GlobalScope.launch {
+            setDownloadDirectory(File(fileManager.fromUri(treeUri)))
+            createDirectories()
+        }
     }
-
-    @Suppress("DEPRECATION")// By Default Save Files to /Music/SpotiFlyer/
-    private val defaultBaseDir = SpotiFlyerBaseDir({ getDirType() },
-        getJavaFile = {java.io.File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).toString() + "/SpotiFlyer/")},
-        getSAFUri = { null }
-    )
 
     // Image Cache Path
     // We Will Handling Image relating operations using java.io.File (reason: Faster)
@@ -145,25 +159,9 @@ actual class Dir actual constructor(
                 fileManager.create(dirPath.documentFile!!)
             }
         }
-
-        /*try {
-            val yourAppDir =  File(dirPath)
-
-            if (!yourAppDir.exists() && !yourAppDir.isDirectory) { // create empty directory
-                if (yourAppDir.mkdirs()) { logger.i { "$dirPath created" } } else {
-                    logger.e { "Unable to create Dir: $dirPath!" }
-                }
-            } else {
-                logger.i { "$dirPath already exists" }
-            }
-        } catch (e: SecurityException) {
-            //TRY USING SAF
-            Log.d("Directory","USING SAF to create $dirPath")
-            val file = DocumentFile.fromTreeUri(context, Uri.parse(defaultDir()))
-            DocumentFile.fromFile()
-        }*/
     }
 
+    @Suppress("unused")
     actual suspend fun clearCache(): Unit = withContext(dispatcherIO) {
         try {
             java.io.File(imageCachePath).deleteRecursively()
@@ -178,20 +176,20 @@ actual class Dir actual constructor(
         trackDetails: TrackDetails,
         postProcess: (track: TrackDetails) -> Unit,
     ): Unit  = withContext(dispatcherIO) {
-        val songFile = java.io.File(imageCachePath+"Tracks/"+ removeIllegalChars(trackDetails.title) + ".mp3")
+        val mediaFile = java.io.File(imageCachePath+"Tracks/"+ removeIllegalChars(trackDetails.title) + ".mp3")
         try {
-
             /*Make intermediate Dirs if they don't exist yet*/
-            if(!songFile.exists()) {
-                songFile.parentFile?.mkdirs()
+            if(!mediaFile.exists()) {
+                mediaFile.parentFile?.mkdirs()
             }
+            // Write Bytes to Media File
+            mediaFile.writeBytes(mp3ByteArray)
 
-            if(mp3ByteArray.isNotEmpty()) songFile.writeBytes(mp3ByteArray)
-
-            Mp3File(songFile)
+            // Add Metadata to Media File
+            Mp3File(mediaFile)
                 .removeAllTags()
                 .setId3v1Tags(trackDetails)
-                .setId3v2TagsAndSaveFile(trackDetails,songFile.absolutePath)
+                .setId3v2TagsAndSaveFile(trackDetails,mediaFile.absolutePath)
 
             // Copy File to Desired Location
             val documentFile = when(getDirType()){
@@ -201,105 +199,52 @@ actual class Dir actual constructor(
                 BaseDirectory.ActiveBaseDirType.JavaFileBaseDir -> {
                     fileManager.fromPath(trackDetails.outputFilePath)
                 }
-            }.also { fileManager.create(it!!) }
+            }.also {
+                // Create Desired File if it doesn't exists yet
+                fileManager.create(it!!)
+            }
 
             try {
                 fileManager.copyFileContents(
-                    fileManager.fromRawFile(songFile),
+                    fileManager.fromRawFile(mediaFile),
                     documentFile!!
                 )
-                songFile.deleteOnExit()
-                /*val inStream = FileInputStream(songFile)
-
-                val buffer = ByteArray(1024)
-                var readLen: Int
-                while (inStream.read(buffer).also { readLen = it } != -1) {
-                    outStream?.write(buffer, 0, readLen)
-                }
-                inStream.close()
-                // write the output file (You have now copied the file)
-                outStream?.flush()
-                outStream?.close()*/
-
+                mediaFile.deleteOnExit()
             }catch (e:Exception) {
                 e.printStackTrace()
             }
 
             documentFile?.let {
-                addToLibrary(File(it))
+                addToLibrary(File(it),trackDetails)
             }
-
-            /*when (trackDetails.outputFilePath.substringAfterLast('.')) {
-                ".mp3" -> {
-                    Mp3File(songFile)
-                        .removeAllTags()
-                        .setId3v1Tags(trackDetails)
-                        .setId3v2TagsAndSaveFile(trackDetails,songFile.absolutePath)
-
-                    // Copy File to DocumentUri
-                    val documentFile = DocumentFile.fromSingleUri(context,Uri.parse(trackDetails.outputFilePath))
-                    try {
-                        val outStream = context.contentResolver.openOutputStream(documentFile?.uri!!)
-                        val inStream = FileInputStream(songFile)
-
-                        val buffer = ByteArray(1024)
-                        var readLen: Int
-                        while (inStream.read(buffer).also { readLen = it } != -1) {
-                            outStream?.write(buffer, 0, readLen)
-                        }
-                        inStream.close()
-                        // write the output file (You have now copied the file)
-                        outStream?.flush()
-                        outStream?.close()
-
-                    }catch (e:Exception) {
-                        e.printStackTrace()
-                    }
-
-                    documentFile?.let {
-                        addToLibrary(File(it))
-                    }
-                }
-                ".m4a" -> {
-                    *//*FFmpeg.executeAsync(
-                        "-i ${m4aFile.absolutePath} -y -b:a 160k -acodec libmp3lame -vn ${m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"}"
-                    ){ _, returnCode ->
-                        when (returnCode) {
-                            Config.RETURN_CODE_SUCCESS  -> {
-                                //FFMPEG task Completed
-                                logger.d{ "Async command execution completed successfully." }
-                                scope.launch {
-                                    Mp3File(File(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3"))
-                                        .removeAllTags()
-                                        .setId3v1Tags(trackDetails)
-                                        .setId3v2TagsAndSaveFile(trackDetails)
-                                    addToLibrary(m4aFile.absolutePath.substringBeforeLast('.') + ".mp3")
-                                }
-                            }
-                            Config.RETURN_CODE_CANCEL -> {
-                                logger.d{"Async command execution cancelled by user."}
-                            }
-                            else -> {
-                                logger.d { "Async command execution failed with rc=$returnCode" }
-                            }
-                        }
-                    }*//*
-                }
-                else -> {
-                    // TODO
-                }
-            }*/
         }catch (e:Exception){
-            withContext(Dispatchers.Main){
-                //Toast.makeText(appContext,"Could Not Create File:\n${songFile.absolutePath}",Toast.LENGTH_SHORT).show()
-            }
-            if(songFile.exists()) songFile.delete()
-            logger.e { "${songFile.absolutePath} could not be created" }
+            e.printStackTrace()
+            if(mediaFile.exists()) mediaFile.delete()
+            logger.e { "${mediaFile.absolutePath} could not be created" }
         }
     }
 
-    actual fun addToLibrary(file: File) {
-//        methods.value.platformActions.addToLibrary(path)
+    actual fun addToLibrary(file: File,track: TrackDetails) {
+        try {
+            when (getDirType()) {
+                BaseDirectory.ActiveBaseDirType.SafBaseDir -> {
+                    val values = ContentValues(4).apply {
+                        put(MediaStore.Audio.Media.TITLE, track.title)
+                        put(MediaStore.Audio.Media.DISPLAY_NAME, track.title)
+                        put(MediaStore.Audio.Media.DATE_ADDED,
+                            (System.currentTimeMillis() / 1000).toInt())
+                        put(MediaStore.Audio.Media.MIME_TYPE, "audio/mpeg")
+                    }
+                    context.contentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        values)
+                }
+                BaseDirectory.ActiveBaseDirType.JavaFileBaseDir -> {
+                    file.documentFile?.getFullPath()?.let {
+                        methods.value.platformActions.addToLibrary(it)
+                    }
+                }
+            }
+        } catch (e:Exception) { e.printStackTrace() }
     }
 
     actual suspend fun loadImage(url: String): Picture = withContext(dispatcherIO){
@@ -319,6 +264,7 @@ actual class Dir actual constructor(
         }
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     actual suspend fun cacheImage(image: Any, path: String):Unit = withContext(dispatcherIO) {
         try {
             java.io.File(path).parentFile?.mkdirs()
@@ -330,6 +276,7 @@ actual class Dir actual constructor(
         }
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun freshImage(url: String): Bitmap? = withContext(dispatcherIO) {
         try {
             val source = URL(url)
@@ -372,59 +319,17 @@ actual class Dir actual constructor(
         subFolder: String,
         extension: String,
     ):File {
+        // Create Intermediate Directories
         val file = fileManager.create(
             defaultDir().documentFile!!, //Base Dir
             DirectorySegment(removeIllegalChars(type)),
             DirectorySegment(removeIllegalChars(subFolder)),
-
+            FileSegment(removeIllegalChars(itemName) + extension)
         )
-        return File(file?.clone(FileSegment(removeIllegalChars(itemName) + extension)))/*.also {
-            if(fileManager.getLength(it.documentFile!!) == 0L){
-                fileManager.delete(it.documentFile!!)
-            }
-        }*/
-        /*GlobalScope.launch {
-            // Create Intermediate Directories
-            var file = defaultDir().documentFile
-            file = file.findFile(removeIllegalChars(type))
-                ?: file.createDirectory(removeIllegalChars(type))
-                    ?: throw Exception("Couldn't Find/Create $type Directory")
-
-            if (subFolder.isNotEmpty()) file.findFile(removeIllegalChars(subFolder))
-                ?: file.createDirectory(removeIllegalChars(subFolder))
-                   ?: throw Exception("Couldn't Find/Create $subFolder Directory")
-
-        }
-        val sep = "%2F"
-        val finalUri = defaultDir().documentFile.uri.toString() + sep +
-                removeIllegalChars(type) + sep +
-                removeIllegalChars(subFolder) + sep +
-                removeIllegalChars(itemName) + extension
-        return File(
-            DocumentFile.fromSingleUri(context,Uri.parse(finalUri))!!
-        ).also {
-            Log.d("Final Output File",it.documentFile.uri.toString())
-        }*/
-
-
-        /*file = file?.findFile(removeIllegalChars(type))
-                    ?: file?.createDirectory(removeIllegalChars(type))
-                            ?: throw Exception("Couldn't Find/Create $type Directory")
-
-        if (subFolder.isNotEmpty()) file = file.findFile(removeIllegalChars(subFolder))
-            ?: file.createDirectory(removeIllegalChars(subFolder))
-                    ?: throw Exception("Couldn't Find/Create $subFolder Directory")
-
-        // TODO check Mime
-        file = file.findFile(removeIllegalChars(itemName))
-            ?: file.createFile("audio/mpeg",removeIllegalChars(itemName))
-                    ?: throw Exception("Couldn't Find/Create ${removeIllegalChars(itemName) + extension} File")
-        Log.d("Final Output File",file.uri.toString())
-
         return File(file).also {
-            val size = it.documentFile.length()
-            Log.d("File size", size.toString())
-            if(size == 0L) it.documentFile.delete()
-        }*/
+            if(fileManager.getLength(it.documentFile!!) == 0L) fileManager.delete(it.documentFile!!)
+        }
+
+    //?.clone(FileSegment(removeIllegalChars(itemName) + extension)))
     }
 }

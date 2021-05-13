@@ -56,7 +56,7 @@ expect class Dir (
     suspend fun loadImage(url: String): Picture
     suspend fun clearCache()
     suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, trackDetails: TrackDetails,postProcess:(track: TrackDetails)->Unit = {})
-    fun addToLibrary(file: File)
+    fun addToLibrary(file: File,track: TrackDetails)
     fun finalOutputFile(itemName: String, type: String, subFolder: String, extension: String = ".mp3"): File
     fun finalOutputPath(itemName: String, type: String, subFolder: String, extension: String = ".mp3"): String
 }

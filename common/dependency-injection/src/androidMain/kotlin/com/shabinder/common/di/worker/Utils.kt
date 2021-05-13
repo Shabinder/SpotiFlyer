@@ -37,7 +37,10 @@ fun cleanFiles(directory: AbstractFile,fm: FileManager,logger: Kermit) {
             if (fm.isDirectory(file)) {
                 cleanFiles(file, fm, logger)
             } else if (fm.isFile(file)) {
-                if (file.getFullPath().substringAfterLast(".") != "mp3") {
+                if (file.getFullPath().substringAfterLast(".") != "mp3"
+                    ||
+                    fm.getLength(file) == 0L
+                    ) {
                     logger.d("Files Cleaning") { "Cleaning ${file.getFullPath()}" }
                     fm.delete(file)
                 }

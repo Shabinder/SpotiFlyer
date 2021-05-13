@@ -46,7 +46,6 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponen
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.github.k1rakishou.fsaf.FileChooser
-import com.github.k1rakishou.fsaf.FileManager
 import com.github.k1rakishou.fsaf.callback.directory.DirectoryChooserCallback
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
@@ -58,7 +57,6 @@ import com.shabinder.common.models.Actions
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.PlatformActions.Companion.SharedPreferencesKey
-import com.shabinder.common.models.SpotiFlyerBaseDir
 import com.shabinder.common.models.Status
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
@@ -148,34 +146,13 @@ class MainActivity : ComponentActivity() {
 
     @Suppress("DEPRECATION")
     private fun setUpOnPrefClickListener() {
-        /*Get User Permission to access External SD*//*
+        /*Get User Permission to access External SD*/
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
         }
-        startActivityForResult(intent, externalSDWriteAccess)*/
-        val fileChooser = FileChooser(applicationContext)
-        fileChooser.openChooseDirectoryDialog(object : DirectoryChooserCallback() {
-            override fun onResult(uri: Uri) {
-                println("treeUri = $uri")
-                // Can be only used using SAF
-                contentResolver.takePersistableUriPermission(uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                val treeDocumentFile = DocumentFile.fromTreeUri(applicationContext, uri)
-
-                dir.setDownloadDirectory(uri)
-                showPopUpMessage("New Download Directory Set")
-                GlobalScope.launch {
-                    dir.createDirectories()
-                }
-            }
-
-            override fun onCancel(reason: String) {
-                println("Canceled by user")
-            }
-        })
+        startActivityForResult(intent, externalSDWriteAccess)
     }
 
     private fun showPopUpMessage(string: String, long: Boolean = false) {
@@ -327,24 +304,19 @@ class MainActivity : ComponentActivity() {
 
             externalSDWriteAccess -> {
                 // Can be only used using SAF
-                /*if (resultCode == RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     val treeUri: Uri? = data?.data
-                    if (treeUri == null){
+                    if (treeUri == null) {
                         showPopUpMessage("Some Error Occurred While Setting New Download Directory")
                     }else {
                         // Persistently save READ & WRITE Access to whole Selected Directory Tree
                         contentResolver.takePersistableUriPermission(treeUri,
                             Intent.FLAG_GRANT_READ_URI_PERMISSION or
                                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                        dir.setDownloadDirectory(com.shabinder.common.models.File(
-                            DocumentFile.fromTreeUri(applicationContext,treeUri)?.createDirectory("SpotiFlyer")!!)
-                        )
+                        dir.setDownloadDirectory(treeUri)
                         showPopUpMessage("New Download Directory Set")
-                        GlobalScope.launch {
-                            dir.createDirectories()
-                        }
                     }
-                }*/
+                }
             }
         }
     }
