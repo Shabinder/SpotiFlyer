@@ -8,7 +8,7 @@ actual interface PlatformActions {
         const val SharedPreferencesKey = "configurations"
     }
 
-    val imageCacheDir: java.io.File
+    val imageCacheDir: String
 
     val sharedPreferences: SharedPreferences?
 
@@ -18,7 +18,7 @@ actual interface PlatformActions {
 }
 
 actual val StubPlatformActions = object: PlatformActions {
-    override val imageCacheDir = java.io.File("/")
+    override val imageCacheDir = ""
 
     override val sharedPreferences: SharedPreferences? = null
 

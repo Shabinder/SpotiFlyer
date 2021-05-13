@@ -18,7 +18,7 @@ package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.Dir
-import com.shabinder.common.di.getNameURL
+import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
@@ -108,14 +108,15 @@ class YoutubeProvider(
                         title = it.title ?: "N/A",
                         artists = listOf(it.author  ?: "N/A"),
                         durationSec = it.lengthSeconds,
-                        albumArtPath = dir.imageCachePath + getNameURL(coverUrl),
+                        albumArtPath = dir.imageCacheDir() + it.videoId + ".jpeg",
                         source = Source.YouTube,
-                        albumArtURL = coverUrl,
+                        albumArtURL = "https://i.ytimg.com/vi/${it.videoId}/hqdefault.jpg",
                         downloaded = if (dir.isPresent(
-                                dir.finalOutputFile(
+                                dir.finalOutputDir(
                                     itemName = it.title ?: "N/A",
                                     type = folderType,
                                     subFolder = subFolder,
+                                    dir.defaultDir()
                                 )
                             )
                         )
@@ -123,7 +124,7 @@ class YoutubeProvider(
                         else {
                             DownloadStatus.NotDownloaded
                         },
-                        outputFilePath = dir.finalOutputPath(it.title ?: "N/A", folderType, subFolder/*,".m4a"*/),
+                        outputFilePath = dir.finalOutputDir(it.title ?: "N/A", folderType, subFolder, dir.defaultDir()/*,".m4a"*/),
                         videoID = it.videoId
                     )
                 }
@@ -161,14 +162,15 @@ class YoutubeProvider(
                         title = name,
                         artists = listOf(detail.author ?: "N/A"),
                         durationSec = detail.lengthSeconds,
-                        albumArtPath = dir.imageCachePath + getNameURL(coverUrl),
+                        albumArtPath = dir.imageCacheDir() + "$searchId.jpeg",
                         source = Source.YouTube,
-                        albumArtURL = coverUrl,
+                        albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
                         downloaded = if (dir.isPresent(
-                                dir.finalOutputFile(
+                                dir.finalOutputDir(
                                     itemName = name,
                                     type = folderType,
                                     subFolder = subFolder,
+                                    defaultDir = dir.defaultDir()
                                 )
                             )
                         )
@@ -176,7 +178,7 @@ class YoutubeProvider(
                         else {
                             DownloadStatus.NotDownloaded
                         },
-                        outputFilePath = dir.finalOutputPath(name, folderType, subFolder /*,".m4a"*/),
+                        outputFilePath = dir.finalOutputDir(name, folderType, subFolder, dir.defaultDir()/*,".m4a"*/),
                         videoID = searchId
                     )
                 )

@@ -20,7 +20,7 @@ import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.TokenStore
 import com.shabinder.common.di.createHttpClient
-import com.shabinder.common.di.getNameURL
+import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.spotify.SpotifyRequests
 import com.shabinder.common.di.spotify.authenticateSpotify
 import com.shabinder.common.models.NativeAtomicReference
@@ -216,28 +216,28 @@ class SpotifyProvider(
     }
 
     private fun List<Track>.toTrackDetailsList(type: String, subFolder: String) = this.map {
-        val albumArtLink = it.album?.images?.firstOrNull()?.url.toString()
         TrackDetails(
             title = it.name.toString(),
             artists = it.artists?.map { artist -> artist?.name.toString() } ?: listOf(),
             durationSec = (it.duration_ms / 1000).toInt(),
-            albumArtPath = dir.imageCachePath + getNameURL(albumArtLink),
+            albumArtPath = dir.imageCacheDir() + (it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg",
             albumName = it.album?.name,
             year = it.album?.release_date,
             comment = "Genres:${it.album?.genres?.joinToString()}",
             trackUrl = it.href,
             downloaded = it.downloaded,
             source = Source.Spotify,
-            albumArtURL = albumArtLink,
-            outputFilePath = dir.finalOutputPath(it.name.toString(), type, subFolder/*,".m4a"*/)
+            albumArtURL = it.album?.images?.firstOrNull()?.url.toString(),
+            outputFilePath = dir.finalOutputDir(it.name.toString(), type, subFolder, dir.defaultDir()/*,".m4a"*/)
         )
     }
     private fun Track.updateStatusIfPresent(folderType: String, subFolder: String) {
         if (dir.isPresent(
-                dir.finalOutputFile(
+                dir.finalOutputDir(
                         name.toString(),
                         folderType,
                         subFolder,
+                        dir.defaultDir()
                     )
             )
         ) { // Download Already Present!!
