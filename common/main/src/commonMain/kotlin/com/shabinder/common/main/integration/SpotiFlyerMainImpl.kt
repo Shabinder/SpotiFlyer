@@ -18,7 +18,6 @@ package com.shabinder.common.main.integration
 
 import co.touchlab.stately.ensureNeverFrozen
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.lifecycle.doOnDestroy
 import com.arkivanov.decompose.value.Value
 import com.shabinder.common.di.Picture
 import com.shabinder.common.di.utils.asValue

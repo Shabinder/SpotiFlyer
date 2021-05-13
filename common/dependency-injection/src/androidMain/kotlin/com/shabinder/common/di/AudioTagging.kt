@@ -99,9 +99,8 @@ fun Mp3File.setId3v1Tags(track: TrackDetails): Mp3File {
 }
 
 @Suppress("BlockingMethodInNonBlockingContext")
-suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails) {
+suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails,tempMp3Path:String) {
     val id3v2Tag = ID3v24Tag().apply {
-
         artist = track.artists.joinToString(", ")
         title = track.title
         album = track.albumName
@@ -118,9 +117,9 @@ suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails) {
         fis.close()
         id3v2Tag.setAlbumImage(bytesArray, "image/jpeg")
         this.id3v2Tag = id3v2Tag
-        saveFile(track.outputFilePath)
+        saveFile(tempMp3Path)
     } catch (e: java.io.FileNotFoundException) {
-        Log.e("Error", "Couldn't Write Cached Mp3 Album Art, error: ${e.stackTrace}")
+        Log.e("Error", "Couldn't Write Cached Mp3 Album Art, Downloading And Trying Again, error: ${e.message}")
         try {
             // Image Still Not Downloaded!
             // Lets Download Now and Write it into Album Art
@@ -130,7 +129,7 @@ suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails) {
                     is DownloadResult.Success -> {
                         id3v2Tag.setAlbumImage(it.byteArray, "image/jpeg")
                         this.id3v2Tag = id3v2Tag
-                        saveFile(track.outputFilePath)
+                        saveFile(tempMp3Path)
                     }
                     is DownloadResult.Progress -> {} // Nothing for Now , no progress bar to show
                 }
@@ -143,6 +142,7 @@ suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails) {
 }
 
 fun Mp3File.saveFile(filePath: String) {
+    Log.d("Mp3 File Save",filePath)
     save(filePath.substringBeforeLast('.') + ".new.mp3")
     val m4aFile = File(filePath)
     m4aFile.delete()

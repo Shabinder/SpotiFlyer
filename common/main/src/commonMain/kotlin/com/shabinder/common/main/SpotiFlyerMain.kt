@@ -25,7 +25,6 @@ import com.shabinder.common.main.integration.SpotiFlyerMainImpl
 import com.shabinder.common.models.Consumer
 import com.shabinder.common.models.DownloadRecord
 import com.shabinder.database.Database
-import kotlinx.coroutines.flow.Flow
 
 interface SpotiFlyerMain {
 

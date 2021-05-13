@@ -45,5 +45,11 @@ kotlin {
                 implementation("co.touchlab:stately-iso-collections:$statelyIsoVersion")
             }
         }
+        androidMain {
+            dependencies {
+                api("com.github.K1rakishou:Fuck-Storage-Access-Framework:v1.1")
+                api("androidx.documentfile:documentfile:1.0.1")
+            }
+        }
     }
 }

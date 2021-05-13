@@ -32,12 +32,12 @@ data class TrackDetails(
     var comment: String? = null,
     var lyrics: String? = null,
     var trackUrl: String? = null,
-    var albumArtPath: String,
+    var albumArtPath: String, // UriString in Android
     var albumArtURL: String,
     var source: Source,
     val progress: Int = 2,
     val downloaded: DownloadStatus = DownloadStatus.NotDownloaded,
-    var outputFilePath: String,
+    var outputFilePath: String, // UriString in Android
     var videoID: String? = null,
 ) : Parcelable
 

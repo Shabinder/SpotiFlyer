@@ -17,14 +17,10 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
-import co.touchlab.stately.ensureNeverFrozen
-import co.touchlab.stately.freeze
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.TokenStore
 import com.shabinder.common.di.createHttpClient
-import com.shabinder.common.di.finalOutputDir
-import com.shabinder.common.di.kotlinxSerializer
-import com.shabinder.common.di.ktorHttpClient
+import com.shabinder.common.di.getNameURL
 import com.shabinder.common.di.spotify.SpotifyRequests
 import com.shabinder.common.di.spotify.authenticateSpotify
 import com.shabinder.common.models.NativeAtomicReference
@@ -35,12 +31,8 @@ import com.shabinder.common.models.spotify.Image
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.models.spotify.Track
 import io.ktor.client.HttpClient
-import io.ktor.client.features.auth.*
-import io.ktor.client.features.auth.providers.*
 import io.ktor.client.features.defaultRequest
-import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.header
-import kotlin.native.concurrent.SharedImmutable
 
 class SpotifyProvider(
     private val tokenStore: TokenStore,
@@ -224,28 +216,28 @@ class SpotifyProvider(
     }
 
     private fun List<Track>.toTrackDetailsList(type: String, subFolder: String) = this.map {
+        val albumArtLink = it.album?.images?.firstOrNull()?.url.toString()
         TrackDetails(
             title = it.name.toString(),
             artists = it.artists?.map { artist -> artist?.name.toString() } ?: listOf(),
             durationSec = (it.duration_ms / 1000).toInt(),
-            albumArtPath = dir.imageCacheDir() + (it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg",
+            albumArtPath = dir.imageCachePath + getNameURL(albumArtLink),
             albumName = it.album?.name,
             year = it.album?.release_date,
             comment = "Genres:${it.album?.genres?.joinToString()}",
             trackUrl = it.href,
             downloaded = it.downloaded,
             source = Source.Spotify,
-            albumArtURL = it.album?.images?.firstOrNull()?.url.toString(),
-            outputFilePath = dir.finalOutputDir(it.name.toString(), type, subFolder, dir.defaultDir()/*,".m4a"*/)
+            albumArtURL = albumArtLink,
+            outputFilePath = dir.finalOutputPath(it.name.toString(), type, subFolder/*,".m4a"*/)
         )
     }
     private fun Track.updateStatusIfPresent(folderType: String, subFolder: String) {
         if (dir.isPresent(
-                dir.finalOutputDir(
+                dir.finalOutputFile(
                         name.toString(),
                         folderType,
                         subFolder,
-                        dir.defaultDir()
                     )
             )
         ) { // Download Already Present!!
