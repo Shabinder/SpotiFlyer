@@ -41,7 +41,7 @@ import java.net.URL
 actual class Dir actual constructor(
     private val logger: Kermit,
     private val settings: Settings,
-    private val spotiFlyerDatabase: SpotiFlyerDatabase,
+    spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     companion object {
         const val DirKey = "downloadDir"
@@ -91,7 +91,7 @@ actual class Dir actual constructor(
             * */
             if(!songFile.exists()) {
                 /*Make intermediate Dirs if they don't exist yet*/
-                songFile.parentFile.mkdirs()
+                songFile.parentFile?.mkdirs()
             }
 
             if(mp3ByteArray.isNotEmpty()) songFile.writeBytes(mp3ByteArray)

@@ -31,6 +31,8 @@ interface SpotiFlyerMain {
 
     val models: Value<State>
 
+    val analytics: Analytics
+
     /*
     * We Intend to Move to List Screen
     * Note: Implementation in Root
@@ -57,6 +59,11 @@ interface SpotiFlyerMain {
         val storeFactory: StoreFactory
         val database: Database?
         val dir: Dir
+        val mainAnalytics: Analytics
+    }
+
+    interface Analytics {
+        fun donationDialogVisit()
     }
 
     sealed class Output {

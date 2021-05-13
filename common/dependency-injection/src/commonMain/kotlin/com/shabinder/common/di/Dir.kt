@@ -18,7 +18,6 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import com.russhwolf.settings.Settings
-import com.russhwolf.settings.SettingsListener
 import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult

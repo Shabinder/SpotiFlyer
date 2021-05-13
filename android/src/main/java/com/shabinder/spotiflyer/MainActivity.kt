@@ -56,21 +56,21 @@ import com.shabinder.common.models.Actions
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.PlatformActions.Companion.SharedPreferencesKey
+import com.shabinder.common.models.Status
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.methods
 import com.shabinder.common.root.SpotiFlyerRoot
+import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.uikit.*
-import com.shabinder.spotiflyer.utils.*
-import com.shabinder.common.models.Status
-import com.shabinder.common.models.methods
 import com.shabinder.spotiflyer.ui.NetworkDialog
 import com.shabinder.spotiflyer.ui.PermissionDialog
+import com.shabinder.spotiflyer.utils.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.android.ext.android.inject
+import org.matomo.sdk.extra.TrackHelper
 import java.io.File
-
-const val disableDozeCode = 1223
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
@@ -85,6 +85,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var updateUIReceiver: BroadcastReceiver
     private lateinit var queryReceiver: BroadcastReceiver
     private val internetAvailability by lazy { ConnectionLiveData(applicationContext) }
+    private val tracker get() = (application as App).tracker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,7 +119,8 @@ class MainActivity : ComponentActivity() {
                         PermissionDialog(
                             permissionGranted.value,
                             { requestStoragePermission() },
-                            { disableDozeMode(disableDozeCode) }
+                            { disableDozeMode(disableDozeCode) },
+                            dir::enableAnalytics
                         )
                     }
                 }
@@ -130,6 +132,10 @@ class MainActivity : ComponentActivity() {
     private fun initialise() {
         checkIfLatestVersion()
         handleIntentFromExternalActivity()
+        if(dir.isAnalyticsEnabled){
+            // Download/App Install Event
+            TrackHelper.track().download().with(tracker)
+        }
     }
 
     @Composable
@@ -379,5 +385,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    companion object {
+        const val disableDozeCode = 1223
     }
 }

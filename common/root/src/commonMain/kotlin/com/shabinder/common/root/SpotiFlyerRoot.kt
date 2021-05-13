@@ -54,6 +54,14 @@ interface SpotiFlyerRoot {
         val directories: Dir
         val downloadProgressReport: MutableSharedFlow<HashMap<String, DownloadStatus>>
         val actions:Actions
+        val analytics: Analytics
+    }
+
+    interface Analytics {
+        fun appLaunchEvent()
+        fun homeScreenVisit()
+        fun listScreenVisit()
+        fun donationDialogVisit()
     }
 }
 
