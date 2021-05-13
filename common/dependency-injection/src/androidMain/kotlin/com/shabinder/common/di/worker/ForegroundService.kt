@@ -288,8 +288,8 @@ class ForegroundService : Service(), CoroutineScope {
             messageList = mutableListOf("Cleaning And Exiting", "", "", "", "")
             downloadService.close()
             updateNotification()
-            dir.defaultDir().documentFile?.let { cleanFiles(it,dir.fileManager,logger) }
-            cleanFiles(File(dir.imageCachePath + "Tracks/"),logger)
+            cleanFiles(File(dir.defaultDir()),logger)
+            // TODO cleanFiles(File(dir.imageCacheDir()))
             messageList = mutableListOf("", "", "", "", "")
             releaseWakeLock()
             serviceJob.cancel()
