@@ -18,10 +18,10 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import com.russhwolf.settings.Settings
-import com.russhwolf.settings.SettingsListener
 import com.shabinder.common.database.SpotiFlyerDatabase
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult
+import com.shabinder.common.models.File
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
 import io.ktor.client.request.*
@@ -38,17 +38,27 @@ expect class Dir (
     spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     val db: Database?
-    fun isPresent(path: String): Boolean
-    fun fileSeparator(): String
-    fun defaultDir(): String
-    fun imageCacheDir(): String
-    fun createDirectory(dirPath: String)
-    fun setDownloadDirectory(newBasePath:String)
+    val isAnalyticsEnabled:Boolean
+    fun enableAnalytics()
+    fun isPresent(file: File): Boolean
+    //fun fileSeparator(): String
+    fun defaultDir(): File
+    fun imageCacheDir(): File
+    val imageCachePath: String
+
+    /*
+    * on Android dirPath represents Directory Name
+    * */
+    fun createDirectory(dirPath: File , subDirectory:String? = null)
+
+    fun setDownloadDirectory(newBasePath:File)
     suspend fun cacheImage(image: Any, path: String) // in Android = ImageBitmap, Desktop = BufferedImage
     suspend fun loadImage(url: String): Picture
     suspend fun clearCache()
     suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, trackDetails: TrackDetails,postProcess:(track: TrackDetails)->Unit = {})
-    fun addToLibrary(path: String)
+    fun addToLibrary(file: File)
+    fun finalOutputFile(itemName: String, type: String, subFolder: String, extension: String = ".mp3"): File
+    fun finalOutputPath(itemName: String, type: String, subFolder: String, extension: String = ".mp3"): String
 }
 
 suspend fun downloadFile(url: String): Flow<DownloadResult> {
@@ -92,8 +102,9 @@ suspend fun downloadByteArray(
     return response
 }
 
+// Function to get cache Image Name
 fun getNameURL(url: String): String {
-    return url.substring(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1, url.length).replace('/', '_')
+    return url.substring(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1, url.length).replace('/', '_') + ".jpeg"
 }
 
 /*
@@ -102,13 +113,13 @@ fun getNameURL(url: String): String {
 fun Dir.createDirectories() {
     createDirectory(defaultDir())
     createDirectory(imageCacheDir())
-    createDirectory(defaultDir() + "Tracks/")
-    createDirectory(defaultDir() + "Albums/")
-    createDirectory(defaultDir() + "Playlists/")
-    createDirectory(defaultDir() + "YT_Downloads/")
+    createDirectory(defaultDir(),"Tracks/")
+    createDirectory(defaultDir(),"Albums/")
+    createDirectory(defaultDir(),"Playlists/")
+    createDirectory(defaultDir(),"YT_Downloads/")
 }
 
-fun Dir.finalOutputDir(itemName: String, type: String, subFolder: String, defaultDir: String, extension: String = ".mp3"): String =
+/*fun Dir.finalOutputDir(itemName: String, type: String, subFolder: String, defaultDir: String, extension: String = ".mp3"): String =
     defaultDir + removeIllegalChars(type) + this.fileSeparator() +
         if (subFolder.isEmpty())"" else { removeIllegalChars(subFolder) + this.fileSeparator() } +
-        removeIllegalChars(itemName) + extension
+        removeIllegalChars(itemName) + extension*/

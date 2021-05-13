@@ -1,5 +1,6 @@
 package com.shabinder.common.di
 
+import com.shabinder.common.di.providers.getData
 import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult

@@ -21,7 +21,6 @@ import platform.Foundation.sendSynchronousRequest
 import platform.Foundation.writeToFile
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
-import java.lang.System
 
 actual class Dir actual constructor(
     val logger: Kermit,
@@ -30,6 +29,13 @@ actual class Dir actual constructor(
 ) {
     companion object {
         const val DirKey = "downloadDir"
+        const val AnalyticsKey = "analytics"
+    }
+
+    actual val isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
+
+    actual fun enableAnalytics() {
+        settings.putBoolean(AnalyticsKey,true)
     }
 
     actual fun isPresent(path: String): Boolean = NSFileManager.defaultManager.fileExistsAtPath(path)

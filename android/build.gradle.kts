@@ -120,12 +120,6 @@ dependencies {
     implementation(MVIKotlin.mvikotlinLogging)
     implementation(MVIKotlin.mvikotlinTimeTravel)
 
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:27.1.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
-    implementation("com.google.firebase:firebase-perf-ktx")
-
     // Extras
     Extras.Android.apply {
         implementation(Acra.notification)
@@ -134,8 +128,8 @@ dependencies {
         implementation(matomo)
     }
 
+    implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("dev.icerock.moko:parcelize:0.6.1")
-    implementation("com.github.shabinder:storage-chooser:2.0.4.45")
     implementation("com.google.accompanist:accompanist-insets:0.9.1")
 
     // Test

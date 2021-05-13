@@ -90,6 +90,7 @@ fun removeIllegalChars(fileName: String): String {
         name = fileName.replace(c, '_')
     }
     name = name.replace("\\s".toRegex(), "_")
+    name = name.replace("/".toRegex(), "_")
     name = name.replace("\\)".toRegex(), "")
     name = name.replace("\\(".toRegex(), "")
     name = name.replace("\\[".toRegex(), "")

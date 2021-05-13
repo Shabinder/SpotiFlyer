@@ -14,9 +14,11 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.common.di
+package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
+import com.shabinder.common.di.Dir
+import com.shabinder.common.di.getNameURL
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
@@ -106,15 +108,14 @@ class YoutubeProvider(
                         title = it.title ?: "N/A",
                         artists = listOf(it.author  ?: "N/A"),
                         durationSec = it.lengthSeconds,
-                        albumArtPath = dir.imageCacheDir() + it.videoId + ".jpeg",
+                        albumArtPath = dir.imageCachePath + getNameURL(coverUrl),
                         source = Source.YouTube,
-                        albumArtURL = "https://i.ytimg.com/vi/${it.videoId}/hqdefault.jpg",
+                        albumArtURL = coverUrl,
                         downloaded = if (dir.isPresent(
-                                dir.finalOutputDir(
+                                dir.finalOutputFile(
                                     itemName = it.title ?: "N/A",
                                     type = folderType,
                                     subFolder = subFolder,
-                                    dir.defaultDir()
                                 )
                             )
                         )
@@ -122,7 +123,7 @@ class YoutubeProvider(
                         else {
                             DownloadStatus.NotDownloaded
                         },
-                        outputFilePath = dir.finalOutputDir(it.title ?: "N/A", folderType, subFolder, dir.defaultDir()/*,".m4a"*/),
+                        outputFilePath = dir.finalOutputPath(it.title ?: "N/A", folderType, subFolder/*,".m4a"*/),
                         videoID = it.videoId
                     )
                 }
@@ -160,15 +161,14 @@ class YoutubeProvider(
                         title = name,
                         artists = listOf(detail.author ?: "N/A"),
                         durationSec = detail.lengthSeconds,
-                        albumArtPath = dir.imageCacheDir() + "$searchId.jpeg",
+                        albumArtPath = dir.imageCachePath + getNameURL(coverUrl),
                         source = Source.YouTube,
-                        albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
+                        albumArtURL = coverUrl,
                         downloaded = if (dir.isPresent(
-                                dir.finalOutputDir(
+                                dir.finalOutputFile(
                                     itemName = name,
                                     type = folderType,
                                     subFolder = subFolder,
-                                    defaultDir = dir.defaultDir()
                                 )
                             )
                         )
@@ -176,7 +176,7 @@ class YoutubeProvider(
                         else {
                             DownloadStatus.NotDownloaded
                         },
-                        outputFilePath = dir.finalOutputDir(name, folderType, subFolder, dir.defaultDir()/*,".m4a"*/),
+                        outputFilePath = dir.finalOutputPath(name, folderType, subFolder /*,".m4a"*/),
                         videoID = searchId
                     )
                 )

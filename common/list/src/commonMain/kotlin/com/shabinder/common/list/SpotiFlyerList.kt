@@ -65,6 +65,11 @@ interface SpotiFlyerList {
         val link: String
         val listOutput: Consumer<Output>
         val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>
+        val listAnalytics: Analytics
+    }
+
+    interface Analytics {
+
     }
 
     sealed class Output {

@@ -25,11 +25,12 @@ import com.shabinder.common.main.integration.SpotiFlyerMainImpl
 import com.shabinder.common.models.Consumer
 import com.shabinder.common.models.DownloadRecord
 import com.shabinder.database.Database
-import kotlinx.coroutines.flow.Flow
 
 interface SpotiFlyerMain {
 
     val models: Value<State>
+
+    val analytics: Analytics
 
     /*
     * We Intend to Move to List Screen
@@ -57,6 +58,11 @@ interface SpotiFlyerMain {
         val storeFactory: StoreFactory
         val database: Database?
         val dir: Dir
+        val mainAnalytics: Analytics
+    }
+
+    interface Analytics {
+        fun donationDialogVisit()
     }
 
     sealed class Output {

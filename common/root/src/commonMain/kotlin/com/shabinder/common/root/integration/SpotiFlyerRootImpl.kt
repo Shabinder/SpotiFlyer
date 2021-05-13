@@ -37,6 +37,7 @@ import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.Consumer
 import com.shabinder.common.models.methods
 import com.shabinder.common.root.SpotiFlyerRoot
+import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
@@ -49,7 +50,8 @@ internal class SpotiFlyerRootImpl(
     componentContext: ComponentContext,
     private val main: (ComponentContext, output:Consumer<SpotiFlyerMain.Output>)->SpotiFlyerMain,
     private val list: (ComponentContext, link:String, output:Consumer<SpotiFlyerList.Output>)->SpotiFlyerList,
-    private val actions: Actions
+    private val actions: Actions,
+    private val analytics: Analytics
 ) : SpotiFlyerRoot, ComponentContext by componentContext {
 
     constructor(
@@ -72,7 +74,8 @@ internal class SpotiFlyerRootImpl(
                 dependencies
             )
         },
-        actions = dependencies.actions.freeze()
+        actions = dependencies.actions.freeze(),
+        analytics = dependencies.analytics
     ) {
         instanceKeeper.ensureNeverFrozen()
         methods.value = dependencies.actions.freeze()
@@ -113,16 +116,23 @@ internal class SpotiFlyerRootImpl(
 
     private fun onMainOutput(output: SpotiFlyerMain.Output) =
         when (output) {
-            is SpotiFlyerMain.Output.Search -> router.push(Configuration.List(link = output.link))
+            is SpotiFlyerMain.Output.Search -> {
+                router.push(Configuration.List(link = output.link))
+                analytics.listScreenVisit()
+            }
         }
 
     private fun onListOutput(output: SpotiFlyerList.Output): Unit =
         when (output) {
-            is SpotiFlyerList.Output.Finished -> router.pop()
+            is SpotiFlyerList.Output.Finished -> {
+                router.pop()
+                analytics.homeScreenVisit()
+            }
         }
 
     private fun authenticateSpotify(spotifyProvider: SpotifyProvider, override:Boolean){
         GlobalScope.launch(Dispatchers.Default) {
+            analytics.appLaunchEvent()
             /*Authenticate Spotify Client*/
             spotifyProvider.authenticateSpotifyClient(override)
         }
@@ -143,6 +153,9 @@ private fun spotiFlyerMain(componentContext: ComponentContext, output: Consumer<
         dependencies = object : SpotiFlyerMain.Dependencies, Dependencies by dependencies {
             override val mainOutput: Consumer<SpotiFlyerMain.Output> = output
             override val dir: Dir = directories
+            override val mainAnalytics = object : SpotiFlyerMain.Analytics {
+                override fun donationDialogVisit() = analytics.donationDialogVisit()
+            }
         }
     )
 
@@ -155,5 +168,6 @@ private fun spotiFlyerList(componentContext: ComponentContext, link: String, out
             override val link: String = link
             override val listOutput: Consumer<SpotiFlyerList.Output> = output
             override val downloadProgressFlow = downloadProgressReport
+            override val listAnalytics = object : SpotiFlyerList.Analytics {}
         }
     )

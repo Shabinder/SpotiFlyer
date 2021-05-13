@@ -45,6 +45,13 @@ actual class Dir actual constructor(
 ) {
     companion object {
         const val DirKey = "downloadDir"
+        const val AnalyticsKey = "analytics"
+    }
+
+    actual val isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
+
+    actual fun enableAnalytics() {
+        settings.putBoolean(AnalyticsKey,true)
     }
 
     init {

@@ -39,13 +39,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.lifecycleScope
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
-import com.codekidlabs.storagechooser.R
-import com.codekidlabs.storagechooser.StorageChooser
+import com.github.k1rakishou.fsaf.FileChooser
+import com.github.k1rakishou.fsaf.FileManager
+import com.github.k1rakishou.fsaf.callback.directory.DirectoryChooserCallback
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsHeight
@@ -56,21 +58,22 @@ import com.shabinder.common.models.Actions
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.PlatformActions.Companion.SharedPreferencesKey
+import com.shabinder.common.models.SpotiFlyerBaseDir
+import com.shabinder.common.models.Status
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.methods
 import com.shabinder.common.root.SpotiFlyerRoot
+import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.uikit.*
-import com.shabinder.spotiflyer.utils.*
-import com.shabinder.common.models.Status
-import com.shabinder.common.models.methods
 import com.shabinder.spotiflyer.ui.NetworkDialog
 import com.shabinder.spotiflyer.ui.PermissionDialog
+import com.shabinder.spotiflyer.utils.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.android.ext.android.inject
+import org.matomo.sdk.extra.TrackHelper
 import java.io.File
-
-const val disableDozeCode = 1223
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
@@ -85,6 +88,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var updateUIReceiver: BroadcastReceiver
     private lateinit var queryReceiver: BroadcastReceiver
     private val internetAvailability by lazy { ConnectionLiveData(applicationContext) }
+    private val tracker get() = (application as App).tracker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,7 +122,8 @@ class MainActivity : ComponentActivity() {
                         PermissionDialog(
                             permissionGranted.value,
                             { requestStoragePermission() },
-                            { disableDozeMode(disableDozeCode) }
+                            { disableDozeMode(disableDozeCode) },
+                            dir::enableAnalytics
                         )
                     }
                 }
@@ -130,6 +135,10 @@ class MainActivity : ComponentActivity() {
     private fun initialise() {
         checkIfLatestVersion()
         handleIntentFromExternalActivity()
+        if(dir.isAnalyticsEnabled){
+            // Download/App Install Event
+            TrackHelper.track().download().with(tracker)
+        }
     }
 
     @Composable
@@ -139,38 +148,34 @@ class MainActivity : ComponentActivity() {
 
     @Suppress("DEPRECATION")
     private fun setUpOnPrefClickListener() {
-        // Initialize Builder
-        val chooser = StorageChooser.Builder()
-            .withActivity(this)
-            .withFragmentManager(fragmentManager)
-            .withMemoryBar(true)
-            .setTheme(StorageChooser.Theme(applicationContext).apply {
-                scheme = applicationContext.resources.getIntArray(R.array.default_dark)
-            })
-            .setDialogTitle("Set Download Directory")
-            .allowCustomPath(true)
-            .setType(StorageChooser.DIRECTORY_CHOOSER)
-            .build()
-
-        // get path that the user has chosen
-        chooser.setOnSelectListener { path ->
-            Log.d("Setting Base Path", path)
-            val f = File(path)
-            if (f.canWrite()) {
-                // hell yeah :)
-                dir.setDownloadDirectory(path)
-                showPopUpMessage(
-                    "Download Directory Set to:\n${dir.defaultDir()} "
-                )
-            }else{
-                showPopUpMessage(
-                    "NO WRITE ACCESS on \n$path ,\nReverting Back to Previous"
-                )
-            }
+        /*Get User Permission to access External SD*//*
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
         }
+        startActivityForResult(intent, externalSDWriteAccess)*/
+        val fileChooser = FileChooser(applicationContext)
+        fileChooser.openChooseDirectoryDialog(object : DirectoryChooserCallback() {
+            override fun onResult(uri: Uri) {
+                println("treeUri = $uri")
+                // Can be only used using SAF
+                contentResolver.takePersistableUriPermission(uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                val treeDocumentFile = DocumentFile.fromTreeUri(applicationContext, uri)
 
-        // Show dialog whenever you want by
-        chooser.show()
+                dir.setDownloadDirectory(uri)
+                showPopUpMessage("New Download Directory Set")
+                GlobalScope.launch {
+                    dir.createDirectories()
+                }
+            }
+
+            override fun onCancel(reason: String) {
+                println("Canceled by user")
+            }
+        })
     }
 
     private fun showPopUpMessage(string: String, long: Boolean = false) {
@@ -193,12 +198,13 @@ class MainActivity : ComponentActivity() {
                 override val storeFactory = LoggingStoreFactory(DefaultStoreFactory)
                 override val database = this@MainActivity.dir.db
                 override val fetchPlatformQueryResult = this@MainActivity.fetcher
+                @SuppressLint("StaticFieldLeak")
                 override val directories: Dir = this@MainActivity.dir
                 override val downloadProgressReport: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
                 override val actions = object: Actions {
 
                     override val platformActions = object : PlatformActions {
-                        override val imageCacheDir: String = applicationContext.cacheDir.absolutePath + File.separator
+                        override val imageCacheDir: File = applicationContext.cacheDir
                         override val sharedPreferences = applicationContext.getSharedPreferences(SharedPreferencesKey,
                             MODE_PRIVATE
                         )
@@ -264,6 +270,37 @@ class MainActivity : ComponentActivity() {
 
                     override val isInternetAvailable get()  = internetAvailability.value ?: true
                 }
+                override val analytics = object: Analytics {
+                    override fun appLaunchEvent() {
+                        TrackHelper.track()
+                            .event("events","App_Launch")
+                            .name("App Launch").with(tracker)
+                    }
+
+                    override fun homeScreenVisit() {
+                        if(dir.isAnalyticsEnabled){
+                            // HomeScreen Visit Event
+                            TrackHelper.track().screen("/main_activity/home_screen")
+                                .title("HomeScreen").with(tracker)
+                        }
+                    }
+
+                    override fun listScreenVisit() {
+                        if(dir.isAnalyticsEnabled){
+                            // ListScreen Visit Event
+                            TrackHelper.track().screen("/main_activity/list_screen")
+                                .title("ListScreen").with(tracker)
+                        }
+                    }
+
+                    override fun donationDialogVisit() {
+                        if (dir.isAnalyticsEnabled) {
+                            // Donation Dialog Open Event
+                            TrackHelper.track().screen("/main_activity/donation_dialog")
+                                .title("DonationDialog").with(tracker)
+                        }
+                    }
+                }
             }
         )
 
@@ -271,18 +308,43 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("ObsoleteSdkInt")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == disableDozeCode) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val pm =
-                    getSystemService(Context.POWER_SERVICE) as PowerManager
-                val isIgnoringBatteryOptimizations =
-                    pm.isIgnoringBatteryOptimizations(packageName)
-                if (isIgnoringBatteryOptimizations) {
-                    // Ignoring battery optimization
-                    permissionGranted.value = true
-                } else {
-                    disableDozeMode(disableDozeCode)//Again Ask For Permission!!
+        when(requestCode) {
+            disableDozeCode -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    val pm =
+                        getSystemService(Context.POWER_SERVICE) as PowerManager
+                    val isIgnoringBatteryOptimizations =
+                        pm.isIgnoringBatteryOptimizations(packageName)
+                    if (isIgnoringBatteryOptimizations) {
+                        // Already Ignoring battery optimization
+                        permissionGranted.value = true
+                    } else {
+                        //Again Ask For Permission!!
+                        disableDozeMode(disableDozeCode)
+                    }
                 }
+            }
+
+            externalSDWriteAccess -> {
+                // Can be only used using SAF
+                /*if (resultCode == RESULT_OK) {
+                    val treeUri: Uri? = data?.data
+                    if (treeUri == null){
+                        showPopUpMessage("Some Error Occurred While Setting New Download Directory")
+                    }else {
+                        // Persistently save READ & WRITE Access to whole Selected Directory Tree
+                        contentResolver.takePersistableUriPermission(treeUri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                        dir.setDownloadDirectory(com.shabinder.common.models.File(
+                            DocumentFile.fromTreeUri(applicationContext,treeUri)?.createDirectory("SpotiFlyer")!!)
+                        )
+                        showPopUpMessage("New Download Directory Set")
+                        GlobalScope.launch {
+                            dir.createDirectories()
+                        }
+                    }
+                }*/
             }
         }
     }
@@ -379,5 +441,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    companion object {
+        const val disableDozeCode = 1223
+        const val externalSDWriteAccess = 1224
     }
 }

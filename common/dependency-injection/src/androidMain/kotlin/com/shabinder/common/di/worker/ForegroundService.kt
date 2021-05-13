@@ -38,7 +38,10 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import co.touchlab.kermit.Kermit
+import com.github.k1rakishou.fsaf.FileManager
+import com.github.k1rakishou.fsaf.file.AbstractFile
 import com.shabinder.common.di.*
+import com.shabinder.common.di.providers.getData
 import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
@@ -47,6 +50,7 @@ import com.shabinder.downloader.models.formats.Format
 import com.shabinder.common.models.Status
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collect
@@ -337,34 +341,14 @@ class ForegroundService : Service(), CoroutineScope {
         service.createNotificationChannel(channel)
     }
 
-    /**
-     * Cleaning All Residual Files except Mp3 Files
-     **/
-    private fun cleanFiles(dir: File) {
-        logger.d(tag) { "Starting Cleaning in ${dir.path} " }
-        val fList = dir.listFiles()
-        fList?.let {
-            for (file in fList) {
-                if (file.isDirectory) {
-                    cleanFiles(file)
-                } else if (file.isFile) {
-                    if (file.path.toString().substringAfterLast(".") != "mp3") {
-                        logger.d(tag) { "Cleaning ${file.path}" }
-                        file.delete()
-                    }
-                }
-            }
-        }
-    }
-
     private fun killService() {
         launch {
             logger.d(tag) { "Killing Self" }
             messageList = mutableListOf("Cleaning And Exiting", "", "", "", "")
             downloadService.close()
             updateNotification()
-            cleanFiles(File(dir.defaultDir()))
-            // TODO cleanFiles(File(dir.imageCacheDir()))
+            // dir.defaultDir().documentFile?.let { cleanFiles(it,dir.fileManager,logger) }
+            cleanFiles(File(dir.imageCachePath + "Tracks/"),logger)
             messageList = mutableListOf("", "", "", "", "")
             releaseWakeLock()
             serviceJob.cancel()

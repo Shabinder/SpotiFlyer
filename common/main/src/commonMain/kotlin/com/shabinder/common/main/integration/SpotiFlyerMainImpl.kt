@@ -18,7 +18,6 @@ package com.shabinder.common.main.integration
 
 import co.touchlab.stately.ensureNeverFrozen
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.lifecycle.doOnDestroy
 import com.arkivanov.decompose.value.Value
 import com.shabinder.common.di.Picture
 import com.shabinder.common.di.utils.asValue
@@ -40,9 +39,6 @@ internal class SpotiFlyerMainImpl(
 
     init {
         instanceKeeper.ensureNeverFrozen()
-        lifecycle.doOnDestroy {
-            cache.invalidateAll()
-        }
     }
 
     private val store =
@@ -55,10 +51,12 @@ internal class SpotiFlyerMainImpl(
 
     private val cache = Cache.Builder
         .newBuilder()
-        .maximumCacheSize(20)
+        .maximumCacheSize(25)
         .build<String, Picture>()
 
     override val models: Value<State> = store.asValue()
+
+    override val analytics = mainAnalytics
 
     override fun onLinkSearch(link: String) {
         if (methods.value.isInternetAvailable) mainOutput.callback(Output.Search(link = link))

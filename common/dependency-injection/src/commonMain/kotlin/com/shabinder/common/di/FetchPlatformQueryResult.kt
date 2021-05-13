@@ -21,13 +21,10 @@ import com.shabinder.common.di.providers.GaanaProvider
 import com.shabinder.common.di.providers.SpotifyProvider
 import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
+import com.shabinder.common.di.providers.YoutubeProvider
 import com.shabinder.common.models.PlatformQueryResult
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class FetchPlatformQueryResult(
     val gaanaProvider: GaanaProvider,

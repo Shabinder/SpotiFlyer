@@ -29,8 +29,29 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.component.KoinComponent
 import org.koin.core.logger.Level
+import org.matomo.sdk.Matomo
+import org.matomo.sdk.Tracker
+import org.matomo.sdk.TrackerBuilder
+import timber.log.Timber
+import timber.log.Timber.DebugTree
+
 
 class App: Application(), KoinComponent {
+
+    val tracker: Tracker by lazy {
+        TrackerBuilder.createDefault(
+            "https://kind-grasshopper-73.telebit.io/matomo/matomo.php", 1)
+            .build(Matomo.getInstance(this)).apply {
+                if (BuildConfig.DEBUG) {
+                    Timber.plant(DebugTree())
+                    addTrackingCallback {
+                        Timber.d(it.toMap().toString())
+                        it
+                    }
+                }
+            }
+    }
+
     override fun onCreate() {
         super.onCreate()
 

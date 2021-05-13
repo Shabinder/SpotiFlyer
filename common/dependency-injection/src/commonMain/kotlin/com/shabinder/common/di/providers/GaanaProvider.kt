@@ -18,8 +18,8 @@ package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.Dir
-import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.gaana.GaanaRequests
+import com.shabinder.common.di.getNameURL
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
@@ -136,7 +136,7 @@ class GaanaProvider(
             title = it.track_title,
             artists = it.artist.map { artist -> artist?.name.toString() },
             durationSec = it.duration,
-            albumArtPath = dir.imageCacheDir() + (it.artworkLink.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg",
+            albumArtPath = dir.imageCachePath + getNameURL(it.artworkLink),
             albumName = it.album_title,
             year = it.release_date,
             comment = "Genres:${it.genre?.map { genre -> genre?.name }?.reduceOrNull { acc, s -> acc + s }}",
@@ -144,16 +144,15 @@ class GaanaProvider(
             downloaded = it.downloaded ?: DownloadStatus.NotDownloaded,
             source = Source.Gaana,
             albumArtURL = it.artworkLink.replace("http:","https:"),
-            outputFilePath = dir.finalOutputDir(it.track_title, type, subFolder, dir.defaultDir()/*,".m4a"*/)
+            outputFilePath = dir.finalOutputPath(it.track_title, type, subFolder /*,".m4a"*/)
         )
     }
     private fun GaanaTrack.updateStatusIfPresent(folderType: String, subFolder: String) {
         if (dir.isPresent(
-                dir.finalOutputDir(
+                dir.finalOutputFile(
                         track_title,
                         folderType,
                         subFolder,
-                        dir.defaultDir()
                     )
             )
         ) { // Download Already Present!!

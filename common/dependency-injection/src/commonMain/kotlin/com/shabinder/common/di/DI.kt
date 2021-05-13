@@ -17,7 +17,6 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
-import co.touchlab.stately.ensureNeverFrozen
 import com.russhwolf.settings.Settings
 import com.shabinder.common.database.databaseModule
 import com.shabinder.common.database.getLogger
@@ -25,7 +24,7 @@ import com.shabinder.common.di.providers.GaanaProvider
 import com.shabinder.common.di.providers.SpotifyProvider
 import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
-import com.shabinder.common.models.NativeAtomicReference
+import com.shabinder.common.di.providers.YoutubeProvider
 import io.ktor.client.HttpClient
 import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.json.JsonFeature
@@ -87,12 +86,6 @@ fun createHttpClient(enableNetworkLogs: Boolean = false) = HttpClient {
             }
         )
     }*/
-    // Timeout
-    install(HttpTimeout) {
-        // requestTimeoutMillis = 20000L
-        connectTimeoutMillis = 15000L
-        socketTimeoutMillis = 15000L
-    }
     if (enableNetworkLogs) {
         install(Logging) {
             logger = Logger.DEFAULT

@@ -102,7 +102,7 @@ fun SpotiFlyerMainContent(component: SpotiFlyerMain) {
         )
 
         when (model.selectedCategory) {
-            HomeCategory.About -> AboutColumn()
+            HomeCategory.About -> AboutColumn { component.analytics.donationDialogVisit() }
             HomeCategory.History -> HistoryColumn(
                 model.records.sortedByDescending { it.id },
                 component::loadImage,
@@ -221,7 +221,10 @@ fun SearchPanel(
 }
 
 @Composable
-fun AboutColumn(modifier: Modifier = Modifier) {
+fun AboutColumn(
+    modifier: Modifier = Modifier,
+    donationDialogOpenEvent:() -> Unit
+) {
 
     Box {
         val stateVertical = rememberScrollState(0)
@@ -331,14 +334,18 @@ fun AboutColumn(modifier: Modifier = Modifier) {
                     var isDonationDialogVisible by remember { mutableStateOf(false) }
 
                     DonationDialog(
-                        isDonationDialogVisible
-                    ) {
-                        isDonationDialogVisible = false
-                    }
+                        isDonationDialogVisible,
+                        onDismiss = {
+                            isDonationDialogVisible = false
+                        }
+                    )
 
                     Row(
                         modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                            .clickable(onClick = { isDonationDialogVisible = true }),
+                            .clickable(onClick = {
+                                isDonationDialogVisible = true
+                                donationDialogOpenEvent()
+                            }),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(Icons.Rounded.CardGiftcard, "Support Developer")
