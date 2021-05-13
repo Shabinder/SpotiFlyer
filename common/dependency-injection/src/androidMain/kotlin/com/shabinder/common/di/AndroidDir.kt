@@ -38,6 +38,11 @@ import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
+/*
+* Ignore Deprecation
+*  Deprecation is only a Suggestion P-)
+* */
+@Suppress("DEPRECATION")
 actual class Dir actual constructor(
     private val logger: Kermit,
     private val settings: Settings,
@@ -45,6 +50,16 @@ actual class Dir actual constructor(
 ) {
     companion object {
         const val DirKey = "downloadDir"
+        const val AnalyticsKey = "analytics"
+    }
+    /*
+    * Do we have Analytics Permission?
+    *   -   Defaults to `False`
+    * */
+    actual val isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
+
+    actual fun enableAnalytics() {
+        settings.putBoolean(AnalyticsKey,true)
     }
 
     actual fun setDownloadDirectory(newBasePath:String) = settings.putString(DirKey,newBasePath)
@@ -74,6 +89,7 @@ actual class Dir actual constructor(
         }
     }
 
+    @Suppress("unused")
     actual suspend fun clearCache(): Unit = withContext(dispatcherIO) {
         File(imageCacheDir()).deleteRecursively()
     }
@@ -93,8 +109,8 @@ actual class Dir actual constructor(
                 /*Make intermediate Dirs if they don't exist yet*/
                 songFile.parentFile?.mkdirs()
             }
-
-            if(mp3ByteArray.isNotEmpty()) songFile.writeBytes(mp3ByteArray)
+            // Write Bytes to Media File
+            songFile.writeBytes(mp3ByteArray)
 
             when (trackDetails.outputFilePath.substringAfterLast('.')) {
                 ".mp3" -> {
@@ -140,9 +156,6 @@ actual class Dir actual constructor(
                 }
             }
         }catch (e:Exception){
-            withContext(Dispatchers.Main){
-                //Toast.makeText(appContext,"Could Not Create File:\n${songFile.absolutePath}",Toast.LENGTH_SHORT).show()
-            }
             if(songFile.exists()) songFile.delete()
             logger.e { "${songFile.absolutePath} could not be created" }
         }
@@ -167,6 +180,7 @@ actual class Dir actual constructor(
         }
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     actual suspend fun cacheImage(image: Any, path: String):Unit = withContext(dispatcherIO) {
         try {
             FileOutputStream(path).use { out ->
@@ -177,6 +191,7 @@ actual class Dir actual constructor(
         }
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun freshImage(url: String): Bitmap? = withContext(dispatcherIO) {
         try {
             val source = URL(url)

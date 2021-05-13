@@ -270,6 +270,43 @@ class MainActivity : ComponentActivity() {
 
                     override val isInternetAvailable get()  = internetAvailability.value ?: true
                 }
+
+                /*
+                * Analytics Will Only Be Sent if User Granted us the Permission
+                * */
+                override val analytics = object: Analytics {
+                    override fun appLaunchEvent() {
+                        if(dir.isAnalyticsEnabled){
+                            TrackHelper.track()
+                                .event("events","App_Launch")
+                                .name("App Launch").with(tracker)
+                        }
+                    }
+
+                    override fun homeScreenVisit() {
+                        if(dir.isAnalyticsEnabled){
+                            // HomeScreen Visit Event
+                            TrackHelper.track().screen("/main_activity/home_screen")
+                                .title("HomeScreen").with(tracker)
+                        }
+                    }
+
+                    override fun listScreenVisit() {
+                        if(dir.isAnalyticsEnabled){
+                            // ListScreen Visit Event
+                            TrackHelper.track().screen("/main_activity/list_screen")
+                                .title("ListScreen").with(tracker)
+                        }
+                    }
+
+                    override fun donationDialogVisit() {
+                        if (dir.isAnalyticsEnabled) {
+                            // Donation Dialog Open Event
+                            TrackHelper.track().screen("/main_activity/donation_dialog")
+                                .title("DonationDialog").with(tracker)
+                        }
+                    }
+                }
             }
         )
 

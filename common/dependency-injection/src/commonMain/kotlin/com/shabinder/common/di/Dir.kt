@@ -37,6 +37,8 @@ expect class Dir (
     spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     val db: Database?
+    val isAnalyticsEnabled:Boolean
+    fun enableAnalytics()
     fun isPresent(path: String): Boolean
     fun fileSeparator(): String
     fun defaultDir(): String
