@@ -18,8 +18,10 @@ package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.Dir
+import com.shabinder.common.di.currentPlatform
 import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.utils.removeIllegalChars
+import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
@@ -35,7 +37,8 @@ class YoutubeProvider(
     private val logger: Kermit,
     private val dir: Dir,
 ) {
-    val ytDownloader: YoutubeDownloader = YoutubeDownloader()
+    // Youtube Downloader isn't fully compatible with JS Yet
+    val ytDownloader: YoutubeDownloader? = if(currentPlatform == AllPlatforms.Js) null else YoutubeDownloader()
 
     /*
     * YT Album Art Schema
@@ -92,7 +95,7 @@ class YoutubeProvider(
         )
         result.apply {
             try {
-                val playlist = ytDownloader.getPlaylist(searchId)
+                val playlist = ytDownloader?.getPlaylist(searchId) ?: return null
                 val playlistDetails = playlist.details
                 val name = playlistDetails.title
                 subFolder = removeIllegalChars(name)
@@ -151,7 +154,7 @@ class YoutubeProvider(
         ).apply {
             try {
                 logger.i { searchId }
-                val video = ytDownloader.getVideo(searchId)
+                val video = ytDownloader?.getVideo(searchId) ?: return null
                 coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
                 val detail = video.videoDetails
                 val name = detail.title?.replace(detail.author?.toUpperCase() ?: "", "", true)
@@ -193,7 +196,7 @@ class YoutubeProvider(
     }
 }
 
-fun YoutubeVideo.getData(): Format? {
+fun YoutubeVideo.get(): Format? {
     return getAudioWithQuality(AudioQuality.high).getOrNull(0)
         ?: getAudioWithQuality(AudioQuality.medium).getOrNull(0)
         ?: getAudioWithQuality(AudioQuality.low).getOrNull(0)

@@ -31,7 +31,7 @@ object Versions {
     const val koin = "3.0.1"
 
     // Logger
-    const val kermit = "0.1.8"
+    const val kermit = "0.1.9"
 
     // Internet
     const val ktor = "1.5.4"

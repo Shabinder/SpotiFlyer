@@ -16,6 +16,7 @@
 
 package home
 
+import com.arkivanov.decompose.value.Value
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.State
 import extras.RenderableComponent
@@ -55,7 +56,7 @@ class HomeScreen(
         }
     }
 
-    override val stateFlow: Flow<SpotiFlyerMain.State> = model.models
+    override val stateFlow: Value<SpotiFlyerMain.State> = model.models
 
     override fun RBuilder.render() {
         styledDiv{

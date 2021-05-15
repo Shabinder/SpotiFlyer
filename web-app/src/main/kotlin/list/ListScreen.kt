@@ -16,6 +16,7 @@
 
 package list
 
+import com.arkivanov.decompose.value.Value
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.list.SpotiFlyerList.State
 import extras.RenderableComponent
@@ -39,7 +40,7 @@ class ListScreen(
     props: Props<SpotiFlyerList>,
 ) : RenderableComponent<SpotiFlyerList, State>(props,initialState = State()) {
 
-    override val stateFlow: Flow<SpotiFlyerList.State> = model.models
+    override val stateFlow: Value<SpotiFlyerList.State> = model.models
 
     override fun RBuilder.render() {
 

@@ -34,7 +34,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.*
-import com.shabinder.common.di.providers.getData
+import com.shabinder.common.di.providers.get
 import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
@@ -183,7 +183,7 @@ class ForegroundService : Service(), CoroutineScope {
         try {
             val url = fetcher.youtubeMp3.getMp3DownloadLink(videoID)
             if (url == null) {
-                val audioData: Format = ytDownloader.getVideo(videoID).getData() ?: throw Exception("Java YT Dependency Error")
+                val audioData: Format = ytDownloader?.getVideo(videoID)?.get() ?: throw Exception("Java YT Dependency Error")
                 val ytUrl = audioData.url!! //We Will catch NPE
                 enqueueDownload(ytUrl, track)
             } else enqueueDownload(url, track)

@@ -135,5 +135,14 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                         isInternetAccessible()
                     }
             }
+            override val analytics = object: SpotiFlyerRoot.Analytics {
+                override fun appLaunchEvent() {}
+
+                override fun homeScreenVisit() {}
+
+                override fun listScreenVisit() {}
+
+                override fun donationDialogVisit() {}
+            }
         }
     )

@@ -17,7 +17,6 @@
 package com.shabinder.common.di.gaana
 
 import com.shabinder.common.di.currentPlatform
-import com.shabinder.common.di.utils.getData
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.corsProxy
 import com.shabinder.common.models.gaana.GaanaAlbum
@@ -25,7 +24,6 @@ import com.shabinder.common.models.gaana.GaanaArtistDetails
 import com.shabinder.common.models.gaana.GaanaArtistTracks
 import com.shabinder.common.models.gaana.GaanaPlaylist
 import com.shabinder.common.models.gaana.GaanaSong
-import com.shabinder.common.models.methods
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 
@@ -53,7 +51,7 @@ interface GaanaRequests {
         format: String = "JSON",
         limit: Int = 2000
     ): GaanaPlaylist {
-        return httpClient.getData(
+        return httpClient.get(
             "$BASE_URL/?type=$type&subtype=$subtype&seokey=$seokey&token=$TOKEN&format=$format&limit=$limit"
         )
     }
@@ -70,7 +68,7 @@ interface GaanaRequests {
         format: String = "JSON",
         limit: Int = 2000
     ): GaanaAlbum {
-        return httpClient.getData(
+        return httpClient.get(
             "$BASE_URL/?type=$type&subtype=$subtype&seokey=$seokey&token=$TOKEN&format=$format&limit=$limit"
         )
     }
@@ -86,7 +84,7 @@ interface GaanaRequests {
         seokey: String,
         format: String = "JSON",
     ): GaanaSong {
-        return httpClient.getData(
+        return httpClient.get(
             "$BASE_URL/?type=$type&subtype=$subtype&seokey=$seokey&token=$TOKEN&format=$format"
         )
     }
@@ -102,7 +100,7 @@ interface GaanaRequests {
         seokey: String,
         format: String = "JSON",
     ): GaanaArtistDetails {
-        return httpClient.getData(
+        return httpClient.get(
             "$BASE_URL/?type=$type&subtype=$subtype&seokey=$seokey&token=$TOKEN&format=$format"
         )
     }
@@ -119,7 +117,7 @@ interface GaanaRequests {
         format: String = "JSON",
         limit: Int = 50
     ): GaanaArtistTracks {
-        return httpClient.getData(
+        return httpClient.get(
             "$BASE_URL/?type=$type&subtype=$subtype&seokey=$seokey&token=$TOKEN&format=$format&limit=$limit"
         )
     }

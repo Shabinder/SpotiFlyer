@@ -63,7 +63,7 @@ suspend fun downloadTrack(
 
         fetcher.dir.logger.i { "LINK: $videoID -> $link" }
         if (link == null) {
-            link = fetcher.youtubeProvider.ytDownloader.getVideo(videoID).getData()?.url ?: return
+            link = fetcher.youtubeProvider.ytDownloader.getVideo(videoID).get()?.url ?: return
         }
         fetcher.dir.logger.i { "LINK: $videoID -> $link" }
         downloadFile(link).collect {

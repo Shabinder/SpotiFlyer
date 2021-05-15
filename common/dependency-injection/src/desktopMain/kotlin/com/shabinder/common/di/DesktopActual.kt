@@ -17,13 +17,13 @@
 package com.shabinder.common.di
 
 import com.shabinder.common.di.providers.YoutubeMp3
-import com.shabinder.common.di.providers.getData
+import com.shabinder.common.di.providers.get
 import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.downloader.YoutubeDownloader
+import io.github.shabinder.YoutubeDownloader
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -75,7 +75,7 @@ suspend fun downloadTrack(
     youtubeMp3: YoutubeMp3
 ) {
     try {
-        val link = youtubeMp3.getMp3DownloadLink(videoID) ?: ytDownloader.getVideo(videoID).getData()?.url
+        val link = youtubeMp3.getMp3DownloadLink(videoID) ?: ytDownloader.getVideo(videoID).get()?.url
 
         if (link == null) {
             DownloadProgressFlow.emit(

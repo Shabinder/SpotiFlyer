@@ -16,13 +16,14 @@
 
 package com.shabinder.common.di.spotify
 
-import com.shabinder.common.di.kotlinxSerializer
+import com.shabinder.common.di.globalJson
 import com.shabinder.common.models.methods
 import com.shabinder.common.models.spotify.TokenData
 import io.ktor.client.HttpClient
 import io.ktor.client.features.auth.Auth
 import io.ktor.client.features.auth.providers.basic
 import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.post
 import io.ktor.http.Parameters
@@ -53,7 +54,7 @@ private val spotifyAuthClient by lazy {
             }
         }
         install(JsonFeature) {
-            serializer = kotlinxSerializer
+            serializer = KotlinxSerializer(globalJson)
         }
     }
 }

@@ -76,9 +76,8 @@ kotlin {
 
                 // Extras
                 implementation(Extras.kermit)
-                implementation("co.touchlab:stately-common:1.1.6")
+                implementation("co.touchlab:stately-common:1.1.7")
                 implementation("dev.icerock.moko:parcelize:0.6.1")
-                // implementation("io.github.reactivecircus.cache4k:cache4k:0.2.0-SNAPSHOT") // Local Maven
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3-native-mt") {
                     isForce = true

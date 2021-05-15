@@ -23,13 +23,11 @@ import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.shabinder.common.di.DownloadProgressFlow
 import com.shabinder.common.models.Actions
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.database.Database
 import extras.renderableChild
-import kotlinx.coroutines.Dispatchers
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -81,6 +79,23 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
                 override fun writeMp3Tags(trackDetails: TrackDetails) {/*IMPLEMENTED*/}
 
                 override val isInternetAvailable: Boolean = true
+            }
+            override val analytics = object: SpotiFlyerRoot.Analytics{
+                override fun appLaunchEvent() {
+                    // TODO("Not yet implemented")
+                }
+
+                override fun homeScreenVisit() {
+                    // TODO("Not yet implemented")
+                }
+
+                override fun listScreenVisit() {
+                    // TODO("Not yet implemented")
+                }
+
+                override fun donationDialogVisit() {
+                    // TODO("Not yet implemented")
+                }
             }
         }
     )

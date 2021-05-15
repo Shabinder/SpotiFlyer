@@ -28,19 +28,31 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-js"))
-    implementation(Decompose.decompose)
     implementation(Koin.core)
-    implementation(Ktor.clientJs)
+    implementation(Extras.kermit)
+    implementation(Decompose.decompose)
     implementation(MVIKotlin.mvikotlin)
     implementation(MVIKotlin.coroutines)
     implementation(MVIKotlin.mvikotlinMain)
     implementation(MVIKotlin.mvikotlinLogging)
+    implementation(Ktor.auth)
+    implementation(Ktor.clientJs)
+    implementation(Ktor.clientJson)
+    implementation(Ktor.clientCore)
+    implementation(Ktor.clientLogging)
+    implementation(Ktor.clientSerialization)
     implementation(project(":common:root"))
     implementation(project(":common:main"))
     implementation(project(":common:list"))
     implementation(project(":common:database"))
     implementation(project(":common:data-models"))
     implementation(project(":common:dependency-injection"))
+    implementation("co.touchlab:stately-common:1.1.7")
+    implementation("dev.icerock.moko:parcelize:0.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0") {
+//        https://youtrack.jetbrains.com/issue/KTOR-2670
+        isForce = true
+    }
     implementation("org.jetbrains:kotlin-react:17.0.1-pre.148-kotlin-1.4.30")
     implementation("org.jetbrains:kotlin-react-dom:17.0.1-pre.148-kotlin-1.4.30")
     implementation("org.jetbrains:kotlin-styled:1.0.0-pre.115-kotlin-1.4.10")

@@ -16,6 +16,7 @@
 
 package extras
 
+import com.arkivanov.decompose.value.Value
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -36,7 +37,7 @@ abstract class RenderableComponent<
     initialState: S
 ) : RComponent<RenderableComponent.Props<T>, RenderableComponent.State<S>>(props) {
 
-    protected abstract val stateFlow: Flow<S>
+    protected abstract val stateFlow: Value<S>
     protected val model: T get() = props.model
     protected var scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
 
@@ -48,7 +49,7 @@ abstract class RenderableComponent<
         if(!scope.isActive)
             scope = CoroutineScope(Dispatchers.Default)
         scope.launch {
-            stateFlow.collect {
+            stateFlow.subscribe {
                 setState { data = it }
             }
         }

@@ -60,17 +60,15 @@ fun commonModule(enableNetworkLogs: Boolean) = module {
 }
 
 @ThreadLocal
-val kotlinxSerializer = KotlinxSerializer(
-    Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-    }
-)
+val globalJson = Json {
+    isLenient = true
+    ignoreUnknownKeys = true
+}
 
 fun createHttpClient(enableNetworkLogs: Boolean = false) = HttpClient {
     // https://github.com/Kotlin/kotlinx.serialization/issues/1450
     install(JsonFeature) {
-        serializer = KotlinxSerializer()
+        serializer = KotlinxSerializer(globalJson)
     }
     // WorkAround for Freezing
     // Use httpClient.getData / httpClient.postData Extensions

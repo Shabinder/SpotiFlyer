@@ -17,7 +17,6 @@
 package com.shabinder.common.di.spotify
 
 import com.shabinder.common.di.gaana.corsApi
-import com.shabinder.common.di.utils.getData
 import com.shabinder.common.models.NativeAtomicReference
 import com.shabinder.common.models.spotify.Album
 import com.shabinder.common.models.spotify.PagingObjectPlaylistTrack
@@ -25,13 +24,6 @@ import com.shabinder.common.models.spotify.Playlist
 import com.shabinder.common.models.spotify.Track
 import io.ktor.client.HttpClient
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.descriptors.ClassSerialDescriptorBuilder
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 
 private val BASE_URL get() = "${corsApi}https://api.spotify.com/v1"
 
@@ -43,7 +35,7 @@ interface SpotifyRequests {
     suspend fun authenticateSpotifyClient(override: Boolean = false)
 
     suspend fun getPlaylist(playlistID: String): Playlist {
-        return httpClient.getData("$BASE_URL/playlists/$playlistID")
+        return httpClient.get("$BASE_URL/playlists/$playlistID")
     }
 
     suspend fun getPlaylistTracks(
@@ -51,26 +43,26 @@ interface SpotifyRequests {
         offset: Int = 0,
         limit: Int = 100
     ): PagingObjectPlaylistTrack {
-        return httpClient.getData("$BASE_URL/playlists/$playlistID/tracks?offset=$offset&limit=$limit")
+        return httpClient.get("$BASE_URL/playlists/$playlistID/tracks?offset=$offset&limit=$limit")
     }
 
     suspend fun getTrack(id: String?): Track {
-        return httpClient.getData("$BASE_URL/tracks/$id")
+        return httpClient.get("$BASE_URL/tracks/$id")
     }
 
     suspend fun getEpisode(id: String?): Track {
-        return httpClient.getData("$BASE_URL/episodes/$id")
+        return httpClient.get("$BASE_URL/episodes/$id")
     }
 
     suspend fun getShow(id: String?): Track {
-        return httpClient.getData("$BASE_URL/shows/$id")
+        return httpClient.get("$BASE_URL/shows/$id")
     }
 
     suspend fun getAlbum(id: String): Album {
-        return httpClient.getData("$BASE_URL/albums/$id")
+        return httpClient.get("$BASE_URL/albums/$id")
     }
 
     suspend fun getResponse(url: String): String {
-        return httpClient.getData(url)
+        return httpClient.get(url)
     }
 }

@@ -21,6 +21,7 @@ import com.shabinder.common.di.Dir
 import com.shabinder.common.di.TokenStore
 import com.shabinder.common.di.createHttpClient
 import com.shabinder.common.di.finalOutputDir
+import com.shabinder.common.di.globalJson
 import com.shabinder.common.di.spotify.SpotifyRequests
 import com.shabinder.common.di.spotify.authenticateSpotify
 import com.shabinder.common.models.NativeAtomicReference
@@ -32,6 +33,8 @@ import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.models.spotify.Track
 import io.ktor.client.HttpClient
 import io.ktor.client.features.defaultRequest
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.request.header
 
 class SpotifyProvider(
@@ -59,9 +62,9 @@ class SpotifyProvider(
                 defaultRequest {
                     header("Authorization", "Bearer ${token.access_token}")
                 }
-               /*install(JsonFeature)  {
-                    serializer = kotlinxSerializer
-               }*/
+               install(JsonFeature)  {
+                    serializer = KotlinxSerializer(globalJson)
+               }
             }.also { httpClientRef.value = it }
         }
     }

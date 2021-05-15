@@ -18,7 +18,6 @@ package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.gaana.corsApi
-import com.shabinder.common.di.utils.postData
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.YoutubeTrack
 import io.github.shabinder.fuzzywuzzy.diffutils.FuzzySearch
@@ -29,7 +28,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
