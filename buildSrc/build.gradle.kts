@@ -23,7 +23,7 @@ version = "2.1"
 
 repositories {
     google()
-    mavenLocal()
+    // mavenLocal()
     mavenCentral()
     maven(url = "https://jitpack.io")
     maven(url = "https://plugins.gradle.org/m2/")

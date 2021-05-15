@@ -40,7 +40,7 @@ import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.Status
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.downloader.models.formats.Format
+import io.github.shabinder.models.formats.Format
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

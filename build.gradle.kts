@@ -24,7 +24,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        mavenLocal()
+        // mavenLocal()
         maven(url = "https://jitpack.io")
         maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")

@@ -21,7 +21,7 @@ import com.shabinder.common.di.gaana.corsApi
 import com.shabinder.common.di.utils.postData
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.YoutubeTrack
-import com.shabinder.fuzzywuzzy.diffutils.FuzzySearch
+import io.github.shabinder.fuzzywuzzy.diffutils.FuzzySearch
 import io.ktor.client.HttpClient
 import io.ktor.client.request.headers
 import io.ktor.client.request.post

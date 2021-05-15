@@ -24,10 +24,10 @@ import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.spotify.Source
-import com.shabinder.downloader.YoutubeDownloader
-import com.shabinder.downloader.models.YoutubeVideo
-import com.shabinder.downloader.models.formats.Format
-import com.shabinder.downloader.models.quality.AudioQuality
+import io.github.shabinder.YoutubeDownloader
+import io.github.shabinder.models.YoutubeVideo
+import io.github.shabinder.models.formats.Format
+import io.github.shabinder.models.quality.AudioQuality
 import io.ktor.client.HttpClient
 
 class YoutubeProvider(

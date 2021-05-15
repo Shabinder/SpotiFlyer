@@ -34,7 +34,7 @@ object Versions {
     const val kermit = "0.1.8"
 
     // Internet
-    const val ktor = "1.5.3"
+    const val ktor = "1.5.4"
 
     const val kotlinxSerialization = "1.2.0"
 
@@ -135,9 +135,8 @@ object Ktor {
 }
 
 object Extras {
-    //const val youtubeDownloader = "com.github.sealedtx:java-youtube-downloader:2.5.1"
-    const val youtubeDownloader = "com.shabinder.downloader:youtube-api-dl:0.1" //Local Maven
-    const val fuzzyWuzzy = "me.xdrop:fuzzywuzzy:1.3.1"
+    const val youtubeDownloader = "io.github.shabinder:youtube-api-dl:1.0"
+    const val fuzzyWuzzy = "io.github.shabinder:fuzzywuzzy:1.1"
     const val mp3agic = "com.mpatric:mp3agic:0.9.0"
     const val jaudioTagger = "com.github.Shabinder:JAudioTagger-Android:1.0"
     const val kermit = "co.touchlab:kermit:${Versions.kermit}"
