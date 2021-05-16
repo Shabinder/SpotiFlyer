@@ -1,17 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 25.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 1076.1 1080" style="enable-background:new 0 0 1076.1 1080;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#FF0000;}
-	.st1{fill:#FFFFFF;}
-</style>
-<g id="XMLID_167_">
-	<circle id="XMLID_791_" class="st0" cx="540" cy="540" r="495"/>
-	<g id="XMLID_41_">
-		<path id="XMLID_42_" class="st1" d="M540,304c130.2,0,236,105.9,236,236S670.2,776,540,776S304,670.2,304,540S409.8,304,540,304
-			 M540,281.2c-142.9,0-258.8,115.8-258.8,258.8S397.1,798.8,540,798.8S798.8,682.9,798.8,540S682.9,281.2,540,281.2L540,281.2z"/>
-	</g>
-	<polygon id="XMLID_274_" class="st1" points="450,669.4 669.4,534.4 450,410.6 	"/>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="Layer_1" x="0" y="0" version="1.1" viewBox="0 0 1076.1 1080" xml:space="preserve" style="enable-background:new 0 0 1076.1 1080"><style type="text/css">.st0{fill:red}.st1{fill:#fff}</style><g id="XMLID_167_"><circle id="XMLID_791_" cx="540" cy="540" r="495" class="st0"/><g id="XMLID_41_"><path id="XMLID_42_" d="M540,304c130.2,0,236,105.9,236,236S670.2,776,540,776S304,670.2,304,540S409.8,304,540,304 M540,281.2c-142.9,0-258.8,115.8-258.8,258.8S397.1,798.8,540,798.8S798.8,682.9,798.8,540S682.9,281.2,540,281.2L540,281.2z" class="st1"/></g><polygon id="XMLID_274_" points="450 669.4 669.4 534.4 450 410.6" class="st1"/></g></svg>
