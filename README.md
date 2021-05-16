@@ -43,7 +43,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 
 | Platform | Download | Status |
 |----------|----------|--------|
-| Android    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=Android-Apk&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/SpotiFlyer-Android-v2.3.5.apk)| ✅ Stable | 
+| Android    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=Android-Apk&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/3.0.0/SpotiFlyer-v3.0.0.apk)| ✅ Stable | 
 | Windows    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=00A8E8&label=Windows-msi&logo=windows&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/SpotiFlyer-Windows-2.3.5.msi)| ✅ Stable | 
 | MacOS    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=5F85CE&label=MacOS-dmg&logo=apple&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/SpotiFlyer-MacOS-2.3.5.dmg) | ✅ Stable | 
 | MacOS-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=5F85CE&label=MacOS-jar&logo=apple&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/SpotiFlyer-MacOSJAR-2.3.5.jar) | ✅ Stable |
