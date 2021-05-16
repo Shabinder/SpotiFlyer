@@ -38,7 +38,9 @@ expect class Dir (
 ) {
     val db: Database?
     val isAnalyticsEnabled:Boolean
+    val isFirstLaunch:Boolean
     fun enableAnalytics()
+    fun firstLaunchDone()
     fun isPresent(path: String): Boolean
     fun fileSeparator(): String
     fun defaultDir(): String

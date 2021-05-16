@@ -42,47 +42,11 @@ fun PermissionDialog(
     permissionGranted: Boolean,
     requestStoragePermission:() -> Unit,
     disableDozeMode:() -> Unit,
-    enableAnalytics:() -> Unit
 ){
     var askForPermission by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        delay(2000)
+        delay(2600)
         askForPermission = true
-    }
-
-    // Analytics Permission Dialog
-    var askForAnalyticsPermission by remember { mutableStateOf(false) }
-    AnimatedVisibility(askForAnalyticsPermission) {
-        AlertDialog(
-            onDismissRequest = {
-                askForAnalyticsPermission = false
-            },
-            title = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Rounded.Insights,"Analytics",Modifier.size(52.dp))
-                    Spacer(Modifier.padding(horizontal = 4.dp))
-                    Text("Grant Analytics Access",style = SpotiFlyerTypography.h5,textAlign = TextAlign.Center)
-                }
-            },
-            backgroundColor = Color.DarkGray,
-            buttons = {
-                TextButton(
-                    {
-                        askForAnalyticsPermission = false
-                        enableAnalytics()
-                    },
-                    Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp).fillMaxWidth()
-                        .background(colorPrimary, shape = SpotiFlyerShapes.medium)
-                        .padding(horizontal = 8.dp),
-                ) {
-                    Text("Sure!",color = Color.Black,fontSize = 18.sp,textAlign = TextAlign.Center)
-                }
-            },
-            text = {
-                Text("Your Data is Anonymized and will never be shared with any 3rd party service",style = SpotiFlyerTypography.body2,textAlign = TextAlign.Center)
-            },
-            properties = DialogProperties(dismissOnBackPress = true,dismissOnClickOutside = false)
-        )
     }
 
     AnimatedVisibility(
@@ -95,7 +59,6 @@ fun PermissionDialog(
                     {
                         requestStoragePermission()
                         disableDozeMode()
-                        askForAnalyticsPermission = true
                     },
                     Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp).fillMaxWidth()
                         .background(colorPrimary, shape = SpotiFlyerShapes.medium)

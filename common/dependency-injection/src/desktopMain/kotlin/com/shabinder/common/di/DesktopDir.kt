@@ -43,9 +43,17 @@ actual class Dir actual constructor(
     private val settings: Settings,
     private val spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
+
     companion object {
         const val DirKey = "downloadDir"
         const val AnalyticsKey = "analytics"
+        const val firstLaunch = "firstLaunch"
+    }
+
+    actual val isFirstLaunch get() =  settings.getBooleanOrNull(firstLaunch) ?: true
+
+    actual fun firstLaunchDone(){
+        settings.putBoolean(firstLaunch,false)
     }
 
     actual val isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false

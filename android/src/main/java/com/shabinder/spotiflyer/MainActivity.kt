@@ -63,6 +63,7 @@ import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.uikit.*
+import com.shabinder.spotiflyer.ui.AnalyticsDialog
 import com.shabinder.spotiflyer.ui.NetworkDialog
 import com.shabinder.spotiflyer.ui.PermissionDialog
 import com.shabinder.spotiflyer.utils.*
@@ -112,16 +113,32 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        LaunchedEffect(view) {
-                            permissionGranted.value = checkPermissions()
-                        }
                         NetworkDialog(isInternetAvailableState())
+
                         PermissionDialog(
                             permissionGranted.value,
                             { requestStoragePermission() },
                             { disableDozeMode(disableDozeCode) },
-                            dir::enableAnalytics
                         )
+
+                        var askForAnalyticsPermission by remember { mutableStateOf(false) }
+                        AnalyticsDialog(
+                            askForAnalyticsPermission,
+                            dir::enableAnalytics,
+                            dismissDialog = {
+                                askForAnalyticsPermission = false
+                            }
+                        )
+
+                        LaunchedEffect(view) {
+                            permissionGranted.value = checkPermissions()
+                            if(dir.isFirstLaunch) {
+                                delay(2500)
+                                // Ask For Analytics Permission on first Dialog
+                                askForAnalyticsPermission = true
+                                dir.firstLaunchDone()
+                            }
+                        }
                     }
                 }
             }

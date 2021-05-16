@@ -51,7 +51,15 @@ actual class Dir actual constructor(
     companion object {
         const val DirKey = "downloadDir"
         const val AnalyticsKey = "analytics"
+        const val firstLaunch = "firstLaunch"
     }
+
+    actual val isFirstLaunch get() =  settings.getBooleanOrNull(firstLaunch) ?: true
+
+    actual fun firstLaunchDone(){
+        settings.putBoolean(firstLaunch,false)
+    }
+
     /*
     * Do we have Analytics Permission?
     *   -   Defaults to `False`

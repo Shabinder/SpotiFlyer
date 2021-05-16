@@ -1,3 +1,4 @@
  - F-Droid Initial Release.
+ - Size Reduced to 4.9 MB (14% smalled than previous apk).
  - Firebase Analytics/Crashlytics Removed, Self-Hosted Alternatives Used (100% Open Source).
  - Dependencies Updated.
