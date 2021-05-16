@@ -50,6 +50,7 @@ kotlin {
                 implementation(Extras.kermit)
                 implementation("dev.icerock.moko:parcelize:0.6.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3-native-mt") {
+                    @Suppress("DEPRECATION")
                     isForce = true
                 }
             }

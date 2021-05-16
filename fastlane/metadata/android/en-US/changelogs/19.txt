@@ -1,0 +1,3 @@
+ - F-Droid Initial Release.
+ - Firebase Analytics/Crashlytics Removed, Self-Hosted Alternatives Used (100% Open Source).
+ - Dependencies Updated.

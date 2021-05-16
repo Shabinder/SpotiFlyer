@@ -1,0 +1,16 @@
+"SpotiFlyer" is an App(Written in Kotlin), which aims to work as:
+ - Download: Albums, Tracks and Playlists,etc.
+ - Save your Data, by not Streaming your Fav. Songs Online again & again(Just Download Them!).
+ - No ADS!, 100% Open Source.
+ - Works straight out of the box and does not require you to generate or mess with your API keys (already included).
+ - Even a Web-App and Desktop Apps are available, Check Out: https://github.com/Shabinder/SpotiFlyer (Encourage Us by giving us a star here)
+
+Supported Platforms:
+ - Spotify
+ - Gaana
+ - Youtube
+ - Youtube Music
+ - (more coming soon)
+
+Note:
+ - The availability of YouTube Music in your country is IMPORTANT, if it isn't available consider using a VPN.

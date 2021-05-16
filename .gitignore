@@ -7,3 +7,7 @@ build/
 terraform.tfvars
 .terraform/
 /spotiflyer-ios/Pods/
+/fastlane/report.xml
+/fastlane/README.md
+Gemfile
+Gemfile.lock
