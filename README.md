@@ -38,7 +38,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 - Youtube Music
 - _(more coming soon)_
 
-## 📈 Analytics 
+## 📈 This Week's Analytics
 <!--START_SECTION:HTI-->
 ![Today's Analytics](https://hcti.io/v1/image/5af8a892-8417-49a0-8d03-e9ca02e41224)
 <!--END_SECTION:HTI-->
