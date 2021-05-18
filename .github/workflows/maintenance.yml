@@ -3,7 +3,7 @@ name: Maintenance
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/30 * * * *' #every 30 minutes
+    - cron: '*/60 * * * *' #every hour
 
 jobs:
   build:
