@@ -27,11 +27,6 @@ android {
         targetSdkVersion(Versions.targetSdkVersion)
     }
 
-    /*composeOptions {
-        kotlinCompilerExtensionVersion = Versions.compose
-        kotlinCompilerVersion = Versions.kotlinVersion
-    }*/
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

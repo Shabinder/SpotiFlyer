@@ -9,7 +9,7 @@ internal fun updateAnalyticsImage() {
 
     runBlocking {
         val oldGithubFile = GithubService.getGithubFileContent(
-            token = Common.GITHUB_TOKEN,
+            token = Common.GH_TOKEN,
             ownerName = secrets.ownerName,
             repoName = secrets.repoName,
             branchName = secrets.branchName,
@@ -43,7 +43,7 @@ internal fun updateAnalyticsImage() {
         // debug("Updated File Content:\n$updatedContent")
 
         val updationResponse = GithubService.updateGithubFileContent(
-            token = Common.GITHUB_TOKEN,
+            token = Common.GH_TOKEN,
             ownerName = secrets.ownerName,
             repoName = secrets.repoName,
             branchName = secrets.branchName,
