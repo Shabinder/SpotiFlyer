@@ -18,7 +18,7 @@
 
 object Versions {
     // App's Version (To be bumped at each update)
-    const val versionName = "3.0.0"
+    const val versionName = "3.0.1"
 
     // Kotlin
     const val kotlinVersion = "1.4.32"
