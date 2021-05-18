@@ -20,7 +20,6 @@ package com.shabinder.common.uikit
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import com.shabinder.common.di.Picture
 
 @Composable
 expect fun DownloadImageTick()
@@ -69,6 +68,6 @@ expect fun DownloadImageArrow(modifier: Modifier)
 
 @Composable
 expect fun DonationDialog(
-    isVisible:Boolean,
-    onDismiss:()->Unit
+    isVisible: Boolean,
+    onDismiss: () -> Unit
 )

@@ -58,7 +58,5 @@ enum class Status constructor(val value: Int) {
                 else -> NONE
             }
         }
-
     }
-
 }

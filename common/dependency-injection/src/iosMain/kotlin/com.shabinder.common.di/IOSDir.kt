@@ -33,71 +33,71 @@ actual class Dir actual constructor(
         const val firstLaunch = "firstLaunch"
     }
 
-    actual val isFirstLaunch get() =  settings.getBooleanOrNull(firstLaunch) ?: true
+    actual val isFirstLaunch get() = settings.getBooleanOrNull(firstLaunch) ?: true
 
     actual fun firstLaunchDone() {
-        settings.putBoolean(firstLaunch,false)
+        settings.putBoolean(firstLaunch, false)
     }
 
     actual val isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
 
     actual fun enableAnalytics() {
-        settings.putBoolean(AnalyticsKey,true)
+        settings.putBoolean(AnalyticsKey, true)
     }
 
     actual fun isPresent(path: String): Boolean = NSFileManager.defaultManager.fileExistsAtPath(path)
 
     actual fun fileSeparator(): String = "/"
 
-    private val defaultBaseDir = NSFileManager.defaultManager.URLForDirectory(NSMusicDirectory, NSUserDomainMask,null,true,null)!!.path!!
+    private val defaultBaseDir = NSFileManager.defaultManager.URLForDirectory(NSMusicDirectory, NSUserDomainMask, null, true, null)!!.path!!
 
     // TODO Error Handling
     actual fun defaultDir(): String = (settings.getStringOrNull(DirKey) ?: defaultBaseDir) +
-            fileSeparator() + "SpotiFlyer" + fileSeparator()
+        fileSeparator() + "SpotiFlyer" + fileSeparator()
 
-    actual fun setDownloadDirectory(newBasePath:String) = settings.putString(DirKey,newBasePath)
+    actual fun setDownloadDirectory(newBasePath: String) = settings.putString(DirKey, newBasePath)
 
     private val defaultDirURL: NSURL by lazy {
-        val musicDir = NSFileManager.defaultManager.URLForDirectory(NSMusicDirectory, NSUserDomainMask,null,true,null)!!
-        musicDir.URLByAppendingPathComponent("SpotiFlyer",true)!!
+        val musicDir = NSFileManager.defaultManager.URLForDirectory(NSMusicDirectory, NSUserDomainMask, null, true, null)!!
+        musicDir.URLByAppendingPathComponent("SpotiFlyer", true)!!
     }
 
     actual fun imageCacheDir(): String = imageCacheURL.path!! + fileSeparator()
 
     private val imageCacheURL: NSURL by lazy {
-        val cacheDir = NSFileManager.defaultManager.URLForDirectory(NSCachesDirectory, NSUserDomainMask,null,true,null)
-        cacheDir?.URLByAppendingPathComponent("SpotiFlyer",true)!!
+        val cacheDir = NSFileManager.defaultManager.URLForDirectory(NSCachesDirectory, NSUserDomainMask, null, true, null)
+        cacheDir?.URLByAppendingPathComponent("SpotiFlyer", true)!!
     }
 
     actual fun createDirectory(dirPath: String) {
         try {
-            NSFileManager.defaultManager.createDirectoryAtPath(dirPath,true,null,null)
-        } catch (e:Exception) {
+            NSFileManager.defaultManager.createDirectoryAtPath(dirPath, true, null, null)
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     fun createDirectory(dirURL: NSURL) {
         try {
-            NSFileManager.defaultManager.createDirectoryAtURL(dirURL,true,null,null)
-        } catch (e:Exception) {
+            NSFileManager.defaultManager.createDirectoryAtURL(dirURL, true, null, null)
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    actual suspend fun cacheImage(image: Any, path: String): Unit = withContext(dispatcherIO){
+    actual suspend fun cacheImage(image: Any, path: String): Unit = withContext(dispatcherIO) {
         try {
             (image as? UIImage)?.let {
                 // We Will Be Using JPEG as default format everywhere
-                UIImageJPEGRepresentation(it,1.0)
-                    ?.writeToFile(path,true)
+                UIImageJPEGRepresentation(it, 1.0)
+                    ?.writeToFile(path, true)
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    actual suspend fun loadImage(url: String): Picture = withContext(dispatcherIO){
+    actual suspend fun loadImage(url: String): Picture = withContext(dispatcherIO) {
         try {
             val cachePath = imageCacheURL.URLByAppendingPathComponent(getNameURL(url))
             Picture(image = cachePath?.path?.let { loadCachedImage(it) } ?: loadFreshImage(url))
@@ -110,24 +110,24 @@ actual class Dir actual constructor(
     private fun loadCachedImage(filePath: String): UIImage? {
         return try {
             UIImage.imageWithContentsOfFile(filePath)
-        }catch (e:Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             null
         }
     }
 
-    private suspend fun loadFreshImage(url: String):UIImage? = withContext(dispatcherIO){
+    private suspend fun loadFreshImage(url: String): UIImage? = withContext(dispatcherIO) {
         try {
             val nsURL = NSURL(string = url)
-            val data = NSURLConnection.sendSynchronousRequest(NSURLRequest.requestWithURL(nsURL),null,null)
+            val data = NSURLConnection.sendSynchronousRequest(NSURLRequest.requestWithURL(nsURL), null, null)
             if (data != null) {
                 UIImage.imageWithData(data)?.also {
                     GlobalScope.launch {
                         cacheImage(it, imageCacheDir() + getNameURL(url))
                     }
                 }
-            }else null
-        }catch (e: Exception) {
+            } else null
+        } catch (e: Exception) {
             e.printStackTrace()
             null
         }
@@ -136,7 +136,8 @@ actual class Dir actual constructor(
     actual suspend fun clearCache(): Unit = withContext(dispatcherIO) {
         try {
             val fileManager = NSFileManager.defaultManager
-            val paths = fileManager.contentsOfDirectoryAtURL(imageCacheURL,
+            val paths = fileManager.contentsOfDirectoryAtURL(
+                imageCacheURL,
                 null,
                 NSDirectoryEnumerationSkipsHiddenFiles,
                 null
@@ -144,20 +145,19 @@ actual class Dir actual constructor(
             paths?.forEach {
                 (it as? NSURL)?.let { nsURL ->
                     // Lets Remove Cached File
-                    fileManager.removeItemAtURL(nsURL,null)
+                    fileManager.removeItemAtURL(nsURL, null)
                 }
             }
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
-
     }
 
     actual suspend fun saveFileWithMetadata(
         mp3ByteArray: ByteArray,
         trackDetails: TrackDetails,
-        postProcess:(track: TrackDetails)->Unit
-    ) : Unit = withContext(dispatcherIO) {
+        postProcess: (track: TrackDetails) -> Unit
+    ): Unit = withContext(dispatcherIO) {
         try {
             if (mp3ByteArray.isNotEmpty()) {
                 mp3ByteArray.toNSData().writeToFile(
@@ -167,9 +167,9 @@ actual class Dir actual constructor(
             }
             when (trackDetails.outputFilePath.substringAfterLast('.')) {
                 ".mp3" -> {
-                    if(!isPresent(trackDetails.albumArtPath)) {
+                    if (!isPresent(trackDetails.albumArtPath)) {
                         val imageData = downloadByteArray(
-                           trackDetails.albumArtURL
+                            trackDetails.albumArtURL
                         )?.toNSData()
                         if (imageData != null) {
                             UIImage.imageWithData(imageData)?.also {
@@ -186,7 +186,7 @@ actual class Dir actual constructor(
                 )*/
                 }
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

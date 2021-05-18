@@ -34,7 +34,7 @@ suspend fun authenticateSpotify(): TokenData? {
         if (methods.value.isInternetAvailable) spotifyAuthClient.post("https://accounts.spotify.com/api/token") {
             body = FormDataContent(Parameters.build { append("grant_type", "client_credentials") })
         } else null
-    }catch (e:Exception) {
+    } catch (e: Exception) {
         e.printStackTrace()
         null
     }

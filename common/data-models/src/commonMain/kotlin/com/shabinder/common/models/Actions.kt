@@ -41,8 +41,7 @@ interface Actions {
     fun writeMp3Tags(trackDetails: TrackDetails)
 }
 
-
-private fun stubActions(): Actions = object :Actions {
+private fun stubActions(): Actions = object : Actions {
     override val platformActions = StubPlatformActions
     override fun showPopUpMessage(string: String, long: Boolean) {}
     override fun setDownloadDirectoryAction() {}

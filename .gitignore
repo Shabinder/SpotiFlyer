@@ -11,3 +11,4 @@ terraform.tfvars
 /fastlane/README.md
 Gemfile
 Gemfile.lock
+/maintenance-tasks/build/

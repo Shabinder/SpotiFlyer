@@ -26,9 +26,9 @@ import com.shabinder.common.models.methods
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 actual fun DonationDialog(
-    isVisible:Boolean,
-    onDismiss:()->Unit
-){
+    isVisible: Boolean,
+    onDismiss: () -> Unit
+) {
     AnimatedVisibility(
         isVisible
     ) {
@@ -72,10 +72,12 @@ actual fun DonationDialog(
                     }
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(top = 6.dp)
-                            .clickable(onClick = {
-                                onDismiss()
-                                methods.value.giveDonation()
-                            }),
+                            .clickable(
+                                onClick = {
+                                    onDismiss()
+                                    methods.value.giveDonation()
+                                }
+                            ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(RazorPay(), "Indian Rupee Logo", Modifier.size(32.dp), tint = Color(0xFFCCCCCC))

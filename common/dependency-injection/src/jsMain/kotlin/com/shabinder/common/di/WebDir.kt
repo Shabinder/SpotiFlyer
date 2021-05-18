@@ -43,19 +43,19 @@ actual class Dir actual constructor(
         const val firstLaunch = "firstLaunch"
     }
 
-    actual val isFirstLaunch get() =  settings.getBooleanOrNull(firstLaunch) ?: true
+    actual val isFirstLaunch get() = settings.getBooleanOrNull(firstLaunch) ?: true
 
     actual fun firstLaunchDone() {
-        settings.putBoolean(firstLaunch,false)
+        settings.putBoolean(firstLaunch, false)
     }
 
     actual val isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
 
     actual fun enableAnalytics() {
-        settings.putBoolean(AnalyticsKey,true)
+        settings.putBoolean(AnalyticsKey, true)
     }
 
-    actual fun setDownloadDirectory(newBasePath:String) = settings.putString(DirKey,newBasePath)
+    actual fun setDownloadDirectory(newBasePath: String) = settings.putString(DirKey, newBasePath)
 
     /*init {
         createDirectories()
@@ -84,7 +84,7 @@ actual class Dir actual constructor(
     actual suspend fun saveFileWithMetadata(
         mp3ByteArray: ByteArray,
         trackDetails: TrackDetails,
-        postProcess:(track: TrackDetails)->Unit
+        postProcess: (track: TrackDetails) -> Unit
     ) {
         val writer = ID3Writer(mp3ByteArray.toArrayBuffer())
         val albumArt = downloadFile(corsApi + trackDetails.albumArtURL)

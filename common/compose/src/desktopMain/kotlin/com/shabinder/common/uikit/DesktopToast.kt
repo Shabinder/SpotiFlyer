@@ -26,16 +26,13 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,7 +54,7 @@ actual fun Toast(
     val state = flow.collectAsState("")
     val message = state.value
 
-    AnimatedVisibility (
+    AnimatedVisibility(
         visible = message != "",
         enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 }),
         exit = slideOutHorizontally(targetOffsetX = { it / 4 }) + fadeOut()
@@ -67,12 +64,12 @@ actual fun Toast(
             contentAlignment = Alignment.BottomEnd
         ) {
             Surface(
-                modifier = Modifier.sizeIn(maxWidth = 250.dp,maxHeight = 80.dp),
+                modifier = Modifier.sizeIn(maxWidth = 250.dp, maxHeight = 80.dp),
                 color = Color(23, 23, 23),
                 shape = RoundedCornerShape(8.dp),
                 border = BorderStroke(1.dp, colorOffWhite)
             ) {
-                Box(contentAlignment = Alignment.Center,modifier = Modifier.fillMaxSize()){
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     Text(
                         text = message,
                         color = Color(210, 210, 210),

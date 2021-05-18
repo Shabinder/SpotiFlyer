@@ -10,37 +10,24 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.CardGiftcard
-import androidx.compose.material.icons.rounded.Share
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.shabinder.common.models.methods
-import com.shabinder.common.uikit.PaypalLogo
-import com.shabinder.common.uikit.RazorPay
-import com.shabinder.common.uikit.SpotiFlyerShapes
-import com.shabinder.common.uikit.SpotiFlyerTypography
-import com.shabinder.common.uikit.colorAccent
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 actual fun DonationDialog(
-    isVisible:Boolean,
-    onDismiss:()->Unit
-){
+    isVisible: Boolean,
+    onDismiss: () -> Unit
+) {
     AnimatedVisibility(
         isVisible
     ) {
@@ -84,10 +71,12 @@ actual fun DonationDialog(
                     }
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(top = 6.dp)
-                            .clickable(onClick = {
-                                onDismiss()
-                                methods.value.giveDonation()
-                            }),
+                            .clickable(
+                                onClick = {
+                                    onDismiss()
+                                    methods.value.giveDonation()
+                                }
+                            ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(RazorPay(), "Indian Rupee Logo", Modifier.size(32.dp), tint = Color(0xFFCCCCCC))

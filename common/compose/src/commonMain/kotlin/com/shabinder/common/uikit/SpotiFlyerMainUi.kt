@@ -223,7 +223,7 @@ fun SearchPanel(
 @Composable
 fun AboutColumn(
     modifier: Modifier = Modifier,
-    donationDialogOpenEvent:() -> Unit
+    donationDialogOpenEvent: () -> Unit
 ) {
 
     Box {
@@ -342,10 +342,12 @@ fun AboutColumn(
 
                     Row(
                         modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
-                            .clickable(onClick = {
-                                isDonationDialogVisible = true
-                                donationDialogOpenEvent()
-                            }),
+                            .clickable(
+                                onClick = {
+                                    isDonationDialogVisible = true
+                                    donationDialogOpenEvent()
+                                }
+                            ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(Icons.Rounded.CardGiftcard, "Support Developer")
@@ -357,7 +359,7 @@ fun AboutColumn(
                             )
                             Text(
                                 text = "If you think I deserve to get paid for my work, you can support me here.",
-                                //text = "SpotiFlyer will always be, Free and Open-Source. You can however show us that you care by sending a small donation.",
+                                // text = "SpotiFlyer will always be, Free and Open-Source. You can however show us that you care by sending a small donation.",
                                 style = SpotiFlyerTypography.subtitle2
                             )
                         }

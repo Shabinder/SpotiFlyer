@@ -24,7 +24,10 @@ import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
 import android.net.NetworkRequest
 import android.util.Log
 import androidx.lifecycle.LiveData
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.lang.Exception
 import java.net.InetSocketAddress
@@ -104,7 +107,7 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
      * If successful, that means we have internet.
      */
     object DoesNetworkHaveInternet {
-        suspend fun execute(network: Network): Boolean  = withContext(Dispatchers.IO) {
+        suspend fun execute(network: Network): Boolean = withContext(Dispatchers.IO) {
             try {
                 Log.d(TAG, "PINGING google.")
                 val socket = network.socketFactory.createSocket() ?: throw IOException("Socket is null.")
@@ -112,7 +115,7 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
                 socket.close()
                 Log.d(TAG, "PING success.")
                 true
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
                 // Handle VPN Connection / Google DNS Blocked Cases
                 isInternetAccessible()

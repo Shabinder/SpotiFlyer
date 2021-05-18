@@ -38,7 +38,7 @@ class YoutubeProvider(
     private val dir: Dir,
 ) {
     // Youtube Downloader isn't fully compatible with JS Yet
-    val ytDownloader: YoutubeDownloader? = if(currentPlatform == AllPlatforms.Js) null else YoutubeDownloader()
+    val ytDownloader: YoutubeDownloader? = if (currentPlatform == AllPlatforms.Js) null else YoutubeDownloader()
 
     /*
     * YT Album Art Schema
@@ -102,25 +102,25 @@ class YoutubeProvider(
                 val videos = playlist.videos
 
                 coverUrl = "https://i.ytimg.com/vi/${
-                    videos.firstOrNull()?.videoId
+                videos.firstOrNull()?.videoId
                 }/hqdefault.jpg"
                 title = name
 
                 trackList = videos.map {
                     TrackDetails(
                         title = it.title ?: "N/A",
-                        artists = listOf(it.author  ?: "N/A"),
+                        artists = listOf(it.author ?: "N/A"),
                         durationSec = it.lengthSeconds,
                         albumArtPath = dir.imageCacheDir() + it.videoId + ".jpeg",
                         source = Source.YouTube,
                         albumArtURL = "https://i.ytimg.com/vi/${it.videoId}/hqdefault.jpg",
                         downloaded = if (dir.isPresent(
                                 dir.finalOutputDir(
-                                    itemName = it.title ?: "N/A",
-                                    type = folderType,
-                                    subFolder = subFolder,
-                                    dir.defaultDir()
-                                )
+                                        itemName = it.title ?: "N/A",
+                                        type = folderType,
+                                        subFolder = subFolder,
+                                        dir.defaultDir()
+                                    )
                             )
                         )
                             DownloadStatus.Downloaded
@@ -170,11 +170,11 @@ class YoutubeProvider(
                         albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
                         downloaded = if (dir.isPresent(
                                 dir.finalOutputDir(
-                                    itemName = name,
-                                    type = folderType,
-                                    subFolder = subFolder,
-                                    defaultDir = dir.defaultDir()
-                                )
+                                        itemName = name,
+                                        type = folderType,
+                                        subFolder = subFolder,
+                                        defaultDir = dir.defaultDir()
+                                    )
                             )
                         )
                             DownloadStatus.Downloaded

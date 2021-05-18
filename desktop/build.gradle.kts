@@ -28,7 +28,7 @@ version = Versions.versionName
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "14"
+            kotlinOptions.jvmTarget = "1.8"
         }
     }
 

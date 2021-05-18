@@ -54,10 +54,10 @@ actual class Dir actual constructor(
         const val firstLaunch = "firstLaunch"
     }
 
-    actual val isFirstLaunch get() =  settings.getBooleanOrNull(firstLaunch) ?: true
+    actual val isFirstLaunch get() = settings.getBooleanOrNull(firstLaunch) ?: true
 
-    actual fun firstLaunchDone(){
-        settings.putBoolean(firstLaunch,false)
+    actual fun firstLaunchDone() {
+        settings.putBoolean(firstLaunch, false)
     }
 
     /*
@@ -67,10 +67,10 @@ actual class Dir actual constructor(
     actual val isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
 
     actual fun enableAnalytics() {
-        settings.putBoolean(AnalyticsKey,true)
+        settings.putBoolean(AnalyticsKey, true)
     }
 
-    actual fun setDownloadDirectory(newBasePath:String) = settings.putString(DirKey,newBasePath)
+    actual fun setDownloadDirectory(newBasePath: String) = settings.putString(DirKey, newBasePath)
 
     @Suppress("DEPRECATION")
     private val defaultBaseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).toString()
@@ -81,7 +81,7 @@ actual class Dir actual constructor(
 
     // fun call in order to always access Updated Value
     actual fun defaultDir(): String = (settings.getStringOrNull(DirKey) ?: defaultBaseDir) +
-            File.separator + "SpotiFlyer" + File.separator
+        File.separator + "SpotiFlyer" + File.separator
 
     actual fun isPresent(path: String): Boolean = File(path).exists()
 
@@ -106,14 +106,14 @@ actual class Dir actual constructor(
     actual suspend fun saveFileWithMetadata(
         mp3ByteArray: ByteArray,
         trackDetails: TrackDetails,
-        postProcess:(track: TrackDetails)->Unit
-    )  = withContext(dispatcherIO) {
+        postProcess: (track: TrackDetails) -> Unit
+    ) = withContext(dispatcherIO) {
         val songFile = File(trackDetails.outputFilePath)
         try {
             /*
             * Check , if Fetch was Used, File is saved Already, else write byteArray we Received
             * */
-            if(!songFile.exists()) {
+            if (!songFile.exists()) {
                 /*Make intermediate Dirs if they don't exist yet*/
                 songFile.parentFile?.mkdirs()
             }
@@ -163,15 +163,15 @@ actual class Dir actual constructor(
                     } catch (e: Exception) { e.printStackTrace() }
                 }
             }
-        }catch (e:Exception){
-            if(songFile.exists()) songFile.delete()
+        } catch (e: Exception) {
+            if (songFile.exists()) songFile.delete()
             logger.e { "${songFile.absolutePath} could not be created" }
         }
     }
 
     actual fun addToLibrary(path: String) = methods.value.platformActions.addToLibrary(path)
 
-    actual suspend fun loadImage(url: String): Picture = withContext(dispatcherIO){
+    actual suspend fun loadImage(url: String): Picture = withContext(dispatcherIO) {
         val cachePath = imageCacheDir() + getNameURL(url)
         Picture(image = (loadCachedImage(cachePath) ?: freshImage(url))?.asImageBitmap())
     }
@@ -189,7 +189,7 @@ actual class Dir actual constructor(
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    actual suspend fun cacheImage(image: Any, path: String):Unit = withContext(dispatcherIO) {
+    actual suspend fun cacheImage(image: Any, path: String): Unit = withContext(dispatcherIO) {
         try {
             FileOutputStream(path).use { out ->
                 (image as? Bitmap)?.compress(Bitmap.CompressFormat.JPEG, 100, out)

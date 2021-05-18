@@ -38,17 +38,17 @@ fun org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer.generateFramewor
 kotlin {
 
     /*IOS Target Can be only built on Mac*/
-    if(HostOS.isMac) {
+    if (HostOS.isMac) {
         val sdkName: String? = System.getenv("SDK_NAME")
         val isiOSDevice = sdkName.orEmpty().startsWith("iphoneos")
         if (isiOSDevice) {
-            iosArm64("ios"){
+            iosArm64("ios") {
                 binaries {
                     generateFramework()
                 }
             }
         } else {
-            iosX64("ios"){
+            iosX64("ios") {
                 binaries {
                     generateFramework()
                 }
@@ -68,7 +68,7 @@ kotlin {
             }
         }
     }
-    if(HostOS.isMac){
+    if (HostOS.isMac) {
         /*Required to Export `packForXcode`*/
         sourceSets {
             named("iosMain") {
@@ -88,7 +88,7 @@ kotlin {
 }
 
 val packForXcode by tasks.creating(Sync::class) {
-    if(HostOS.isMac){
+    if (HostOS.isMac) {
         group = "build"
         val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
         val targetName = "ios"

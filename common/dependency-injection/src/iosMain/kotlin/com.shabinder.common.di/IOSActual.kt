@@ -1,6 +1,6 @@
 package com.shabinder.common.di
 
-import com.shabinder.common.di.providers.getData
+import com.shabinder.common.di.providers.get
 import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
@@ -30,7 +30,7 @@ actual suspend fun downloadTracks(
         Downloader.execute {
             if (!track.videoID.isNullOrBlank()) { // Video ID already known!
                 dir.logger.i { "VideoID:  ${track.title} -> ${track.videoID}" }
-                downloadTrack(track.videoID!!, track, dir::saveFileWithMetadata,fetcher)
+                downloadTrack(track.videoID!!, track, dir::saveFileWithMetadata, fetcher)
             } else {
                 val searchQuery = "${track.title} - ${track.artists.joinToString(",")}"
                 val videoId = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery, track)
@@ -42,7 +42,7 @@ actual suspend fun downloadTracks(
                         ) { hashMapOf() }.apply { set(track.title, DownloadStatus.Failed) }
                     )
                 } else { // Found Youtube Video ID
-                    downloadTrack(videoId, track, dir::saveFileWithMetadata,fetcher)
+                    downloadTrack(videoId, track, dir::saveFileWithMetadata, fetcher)
                 }
             }
         }
@@ -63,7 +63,7 @@ suspend fun downloadTrack(
 
         fetcher.dir.logger.i { "LINK: $videoID -> $link" }
         if (link == null) {
-            link = fetcher.youtubeProvider.ytDownloader.getVideo(videoID).get()?.url ?: return
+            link = fetcher.youtubeProvider.ytDownloader?.getVideo(videoID)?.get()?.url ?: return
         }
         fetcher.dir.logger.i { "LINK: $videoID -> $link" }
         downloadFile(link).collect {
@@ -81,7 +81,7 @@ suspend fun downloadTrack(
                     DownloadProgressFlow.replayCache.getOrElse(
                         0
                     ) { hashMapOf() }.toMutableMap().apply {
-                        set(trackDetails.title,DownloadStatus.Downloading(it.progress))
+                        set(trackDetails.title, DownloadStatus.Downloading(it.progress))
                     }
                 }
                 is DownloadResult.Success -> { // Todo clear map

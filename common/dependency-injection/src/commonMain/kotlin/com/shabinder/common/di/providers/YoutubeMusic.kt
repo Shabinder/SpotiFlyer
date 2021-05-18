@@ -54,7 +54,7 @@ class YoutubeMusic constructor(
                 trackArtists = trackDetails.artists,
                 trackDurationSec = trackDetails.durationSec
             ).keys.firstOrNull()
-        } catch (e:Exception) {
+        } catch (e: Exception) {
             // All Internet/Client Related Errors
             e.printStackTrace()
             null

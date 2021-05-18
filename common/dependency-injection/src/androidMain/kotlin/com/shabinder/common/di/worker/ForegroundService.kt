@@ -33,7 +33,10 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.di.*
+import com.shabinder.common.di.Dir
+import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.di.R
+import com.shabinder.common.di.downloadFile
 import com.shabinder.common.di.providers.get
 import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.DownloadResult
@@ -120,7 +123,8 @@ class ForegroundService : Service(), CoroutineScope {
 
             val downloadObjects: ArrayList<TrackDetails>? = (
                 it.getParcelableArrayListExtra("object") ?: it.extras?.getParcelableArrayList(
-                    "object")
+                    "object"
+                )
                 )
 
             downloadObjects?.let { list ->
@@ -184,7 +188,7 @@ class ForegroundService : Service(), CoroutineScope {
             val url = fetcher.youtubeMp3.getMp3DownloadLink(videoID)
             if (url == null) {
                 val audioData: Format = ytDownloader?.getVideo(videoID)?.get() ?: throw Exception("Java YT Dependency Error")
-                val ytUrl = audioData.url!! //We Will catch NPE
+                val ytUrl = audioData.url!! // We Will catch NPE
                 enqueueDownload(ytUrl, track)
             } else enqueueDownload(url, track)
         } catch (e: Exception) {
@@ -210,7 +214,7 @@ class ForegroundService : Service(), CoroutineScope {
                         removeFromNotification("Downloading ${track.title}")
                         failed++
                         updateNotification()
-                        sendTrackBroadcast(Status.FAILED.name,track)
+                        sendTrackBroadcast(Status.FAILED.name, track)
                     }
                 }
 
@@ -229,7 +233,7 @@ class ForegroundService : Service(), CoroutineScope {
                 is DownloadResult.Success -> {
                     try {
                         // Save File and Embed Metadata
-                        val job = launch(Dispatchers.Default) { dir.saveFileWithMetadata(it.byteArray, track){} }
+                        val job = launch(Dispatchers.Default) { dir.saveFileWithMetadata(it.byteArray, track) {} }
                         allTracksStatus[track.title] = DownloadStatus.Converting
                         sendTrackBroadcast("Converting", track)
                         addToNotification("Processing ${track.title}")
@@ -288,7 +292,7 @@ class ForegroundService : Service(), CoroutineScope {
             messageList = mutableListOf("Cleaning And Exiting", "", "", "", "")
             downloadService.close()
             updateNotification()
-            cleanFiles(File(dir.defaultDir()),logger)
+            cleanFiles(File(dir.defaultDir()), logger)
             // TODO cleanFiles(File(dir.imageCacheDir()))
             messageList = mutableListOf("", "", "", "", "")
             releaseWakeLock()

@@ -59,7 +59,7 @@ actual suspend fun downloadTracks(
                         ) { hashMapOf() }.apply { set(it.title, DownloadStatus.Failed) }
                     )
                 } else { // Found Youtube Video ID
-                    downloadTrack(videoId, it, dir::saveFileWithMetadata,fetcher.youtubeMp3)
+                    downloadTrack(videoId, it, dir::saveFileWithMetadata, fetcher.youtubeMp3)
                 }
             }
         }
@@ -102,7 +102,7 @@ suspend fun downloadTrack(
                     )
                 }
                 is DownloadResult.Success -> { // Todo clear map
-                    saveFileWithMetaData(it.byteArray, trackDetails){}
+                    saveFileWithMetaData(it.byteArray, trackDetails) {}
                     DownloadProgressFlow.emit(
                         DownloadProgressFlow.replayCache.getOrElse(
                             0

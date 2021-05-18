@@ -50,16 +50,16 @@ actual class Dir actual constructor(
         const val firstLaunch = "firstLaunch"
     }
 
-    actual val isFirstLaunch get() =  settings.getBooleanOrNull(firstLaunch) ?: true
+    actual val isFirstLaunch get() = settings.getBooleanOrNull(firstLaunch) ?: true
 
-    actual fun firstLaunchDone(){
-        settings.putBoolean(firstLaunch,false)
+    actual fun firstLaunchDone() {
+        settings.putBoolean(firstLaunch, false)
     }
 
     actual val isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
 
     actual fun enableAnalytics() {
-        settings.putBoolean(AnalyticsKey,true)
+        settings.putBoolean(AnalyticsKey, true)
     }
 
     init {
@@ -76,7 +76,7 @@ actual class Dir actual constructor(
     actual fun defaultDir(): String = (settings.getStringOrNull(DirKey) ?: defaultBaseDir) + fileSeparator() +
         "SpotiFlyer" + fileSeparator()
 
-    actual fun setDownloadDirectory(newBasePath:String) = settings.putString(DirKey,newBasePath)
+    actual fun setDownloadDirectory(newBasePath: String) = settings.putString(DirKey, newBasePath)
 
     actual fun isPresent(path: String): Boolean = File(path).exists()
 
@@ -110,19 +110,19 @@ actual class Dir actual constructor(
     actual suspend fun saveFileWithMetadata(
         mp3ByteArray: ByteArray,
         trackDetails: TrackDetails,
-        postProcess:(track: TrackDetails)->Unit
+        postProcess: (track: TrackDetails) -> Unit
     ) {
         val songFile = File(trackDetails.outputFilePath)
         try {
             /*
             * Check , if Fetch was Used, File is saved Already, else write byteArray we Received
             * */
-            if(!songFile.exists()) {
+            if (!songFile.exists()) {
                 /*Make intermediate Dirs if they don't exist yet*/
                 songFile.parentFile.mkdirs()
             }
 
-            if(mp3ByteArray.isNotEmpty()) songFile.writeBytes(mp3ByteArray)
+            if (mp3ByteArray.isNotEmpty()) songFile.writeBytes(mp3ByteArray)
 
             when (trackDetails.outputFilePath.substringAfterLast('.')) {
                 ".mp3" -> {
@@ -167,11 +167,11 @@ actual class Dir actual constructor(
                     } catch (e: Exception) { e.printStackTrace() }
                 }
             }
-        }catch (e:Exception){
-            withContext(Dispatchers.Main){
-                //Toast.makeText(appContext,"Could Not Create File:\n${songFile.absolutePath}",Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                // Toast.makeText(appContext,"Could Not Create File:\n${songFile.absolutePath}",Toast.LENGTH_SHORT).show()
             }
-            if(songFile.exists()) songFile.delete()
+            if (songFile.exists()) songFile.delete()
             logger.e { "${songFile.absolutePath} could not be created" }
         }
     }

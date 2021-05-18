@@ -16,21 +16,16 @@
 
 package com.shabinder.common.di.utils
 
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
-import kotlin.native.concurrent.SharedImmutable
 import kotlin.native.concurrent.ThreadLocal
 
 @ThreadLocal
-val json by lazy { Json {
-    isLenient = true
-    ignoreUnknownKeys = true
-} }
+val json by lazy {
+    Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+    }
+}
 
 /**
  * Removing Illegal Chars from File Name

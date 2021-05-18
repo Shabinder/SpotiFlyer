@@ -36,7 +36,7 @@ object Versions {
     // Internet
     const val ktor = "1.5.4"
 
-    const val kotlinxSerialization = "1.2.0"
+    const val kotlinxSerialization = "1.2.1"
 
     // Database
     const val sqlDelight = "1.5.0"
@@ -158,7 +158,7 @@ object JetpackDataStore {
 }
 
 object Serialization {
-    val core = "org.jetbrains.kotlinx:kotlinx-serialization-core:${Versions.kotlinxSerialization}"
+    val json = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinxSerialization}"
 }
 
 object SqlDelight {

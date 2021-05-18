@@ -20,7 +20,6 @@ import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.models.methods
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -75,7 +74,7 @@ suspend fun downloadTrack(videoID: String, track: TrackDetails, fetcher: FetchPl
             when (it) {
                 is DownloadResult.Success -> {
                     println("Download Completed")
-                    dir.saveFileWithMetadata(it.byteArray, track){}
+                    dir.saveFileWithMetadata(it.byteArray, track) {}
                 }
                 is DownloadResult.Error -> {
                     allTracksStatus[track.title] = DownloadStatus.Failed

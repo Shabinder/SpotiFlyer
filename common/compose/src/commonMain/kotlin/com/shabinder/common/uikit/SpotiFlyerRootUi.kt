@@ -37,15 +37,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -110,7 +111,7 @@ fun SpotiFlyerRootContent(component: SpotiFlyerRoot, modifier: Modifier = Modifi
 }
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier, alpha: Float,topPadding: Dp = 0.dp, component: SpotiFlyerRoot) {
+fun MainScreen(modifier: Modifier = Modifier, alpha: Float, topPadding: Dp = 0.dp, component: SpotiFlyerRoot) {
 
     val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.65f)
 
@@ -128,7 +129,7 @@ fun MainScreen(modifier: Modifier = Modifier, alpha: Float,topPadding: Dp = 0.dp
         val callBacks = component.callBacks
         AppBar(
             backgroundColor = appBarColor,
-            onBackPressed = callBacks::popBackToHomeScreen ,
+            onBackPressed = callBacks::popBackToHomeScreen,
             setDownloadDirectory = callBacks::setDownloadDirectory,
             isBackButtonVisible = activeComponent.value.activeChild.instance is Child.List,
             modifier = Modifier.fillMaxWidth()
@@ -150,8 +151,8 @@ fun MainScreen(modifier: Modifier = Modifier, alpha: Float,topPadding: Dp = 0.dp
 @Composable
 fun AppBar(
     backgroundColor: Color,
-    onBackPressed:()->Unit,
-    setDownloadDirectory:()->Unit,
+    onBackPressed: () -> Unit,
+    setDownloadDirectory: () -> Unit,
     isBackButtonVisible: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -181,11 +182,11 @@ fun AppBar(
             }
         },
         actions = {
-                IconButton(
-                    onClick = { setDownloadDirectory() }
-                ) {
-                    Icon(Icons.Filled.Settings,"Preferences", tint = Color.Gray)
-                }
+            IconButton(
+                onClick = { setDownloadDirectory() }
+            ) {
+                Icon(Icons.Filled.Settings, "Preferences", tint = Color.Gray)
+            }
         },
         modifier = modifier,
         elevation = 0.dp

@@ -31,9 +31,8 @@ repositories {
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:4.2.0")
+    implementation("com.android.tools.build:gradle:4.0.2")
     implementation("org.jlleitschuh.gradle:ktlint-gradle:${Versions.ktLint}")
-    //implementation("io.github.gradle-nexus.publish-plugin:1.1.0")
     implementation(JetBrains.Compose.gradlePlugin)
     implementation(JetBrains.Kotlin.gradlePlugin)
     implementation(JetBrains.Kotlin.serialization)

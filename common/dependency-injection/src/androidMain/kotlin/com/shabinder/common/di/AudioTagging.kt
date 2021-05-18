@@ -17,13 +17,13 @@
 package com.shabinder.common.di
 
 import android.util.Log
-import com.shabinder.common.models.TrackDetails
-import java.io.File
 import com.mpatric.mp3agic.ID3v1Tag
 import com.mpatric.mp3agic.ID3v24Tag
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.common.models.DownloadResult
+import com.shabinder.common.models.TrackDetails
 import kotlinx.coroutines.flow.collect
+import java.io.File
 import java.io.FileInputStream
 
 fun Mp3File.removeAllTags(): Mp3File {

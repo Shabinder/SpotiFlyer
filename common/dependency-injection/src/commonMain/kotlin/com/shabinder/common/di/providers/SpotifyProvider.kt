@@ -62,9 +62,9 @@ class SpotifyProvider(
                 defaultRequest {
                     header("Authorization", "Bearer ${token.access_token}")
                 }
-               install(JsonFeature)  {
+                install(JsonFeature) {
                     serializer = KotlinxSerializer(globalJson)
-               }
+                }
             }.also { httpClientRef.value = it }
         }
     }
@@ -98,7 +98,7 @@ class SpotifyProvider(
                 type,
                 link
             )
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             // Try Reinitialising Client // Handle 401 Token Expiry ,etc Exceptions
             authenticateSpotifyClient(true)
@@ -108,7 +108,7 @@ class SpotifyProvider(
                     type,
                     link
                 )
-            } catch (e:Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
                 null
             }

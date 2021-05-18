@@ -48,8 +48,8 @@ import kotlinx.coroutines.launch
 
 internal class SpotiFlyerRootImpl(
     componentContext: ComponentContext,
-    private val main: (ComponentContext, output:Consumer<SpotiFlyerMain.Output>)->SpotiFlyerMain,
-    private val list: (ComponentContext, link:String, output:Consumer<SpotiFlyerList.Output>)->SpotiFlyerList,
+    private val main: (ComponentContext, output: Consumer<SpotiFlyerMain.Output>) -> SpotiFlyerMain,
+    private val list: (ComponentContext, link: String, output: Consumer<SpotiFlyerList.Output>) -> SpotiFlyerList,
     private val actions: Actions,
     private val analytics: Analytics
 ) : SpotiFlyerRoot, ComponentContext by componentContext {
@@ -57,9 +57,9 @@ internal class SpotiFlyerRootImpl(
     constructor(
         componentContext: ComponentContext,
         dependencies: Dependencies,
-    ):this(
+    ) : this(
         componentContext = componentContext,
-        main = { childContext,output ->
+        main = { childContext, output ->
             spotiFlyerMain(
                 childContext,
                 output,
@@ -104,7 +104,7 @@ internal class SpotiFlyerRootImpl(
                 it !is Configuration.Main
             }
         }
-        override fun showToast(text:String) { toastState.value = text }
+        override fun showToast(text: String) { toastState.value = text }
         override fun setDownloadDirectory() { actions.setDownloadDirectoryAction() }
     }
 
@@ -130,7 +130,7 @@ internal class SpotiFlyerRootImpl(
             }
         }
 
-    private fun authenticateSpotify(spotifyProvider: SpotifyProvider, override:Boolean){
+    private fun authenticateSpotify(spotifyProvider: SpotifyProvider, override: Boolean) {
         GlobalScope.launch(Dispatchers.Default) {
             analytics.appLaunchEvent()
             /*Authenticate Spotify Client*/
@@ -147,7 +147,7 @@ internal class SpotiFlyerRootImpl(
     }
 }
 
-private fun spotiFlyerMain(componentContext: ComponentContext, output: Consumer<SpotiFlyerMain.Output> ,dependencies: Dependencies): SpotiFlyerMain =
+private fun spotiFlyerMain(componentContext: ComponentContext, output: Consumer<SpotiFlyerMain.Output>, dependencies: Dependencies): SpotiFlyerMain =
     SpotiFlyerMain(
         componentContext = componentContext,
         dependencies = object : SpotiFlyerMain.Dependencies, Dependencies by dependencies {

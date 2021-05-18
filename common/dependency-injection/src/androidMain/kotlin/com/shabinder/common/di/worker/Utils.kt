@@ -8,7 +8,7 @@ import java.io.File
 /**
  * Cleaning All Residual Files except Mp3 Files
  **/
-fun cleanFiles(dir: File,logger: Kermit) {
+fun cleanFiles(dir: File, logger: Kermit) {
     try {
         logger.d("File Cleaning") { "Starting Cleaning in ${dir.path} " }
         val fList = dir.listFiles()
@@ -24,12 +24,12 @@ fun cleanFiles(dir: File,logger: Kermit) {
                 }
             }
         }
-    } catch (e:Exception) { e.printStackTrace() }
+    } catch (e: Exception) { e.printStackTrace() }
 }
 /**
  * Cleaning All Residual Files except Mp3 Files
  **/
-fun cleanFiles(directory: AbstractFile,fm: FileManager,logger: Kermit) {
+fun cleanFiles(directory: AbstractFile, fm: FileManager, logger: Kermit) {
     try {
         logger.d("Files Cleaning") { "Starting Cleaning in ${directory.getFullPath()} " }
         val fList = fm.listFiles(directory)
@@ -37,14 +37,13 @@ fun cleanFiles(directory: AbstractFile,fm: FileManager,logger: Kermit) {
             if (fm.isDirectory(file)) {
                 cleanFiles(file, fm, logger)
             } else if (fm.isFile(file)) {
-                if (file.getFullPath().substringAfterLast(".") != "mp3"
-                    ||
+                if (file.getFullPath().substringAfterLast(".") != "mp3" ||
                     fm.getLength(file) == 0L
-                    ) {
+                ) {
                     logger.d("Files Cleaning") { "Cleaning ${file.getFullPath()}" }
                     fm.delete(file)
                 }
             }
         }
-    } catch (e:Exception) { e.printStackTrace() }
+    } catch (e: Exception) { e.printStackTrace() }
 }

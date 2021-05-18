@@ -185,7 +185,7 @@ internal class RealCache<Key : Any, Value : Any>(
      */
     private fun CacheEntry<Key, Value>.isExpired(): Boolean {
         return expiresAfterAccess && (accessTimeMark.get() + expireAfterAccessDuration).hasPassedNow() ||
-                expiresAfterWrite && (writeTimeMark.get() + expireAfterWriteDuration).hasPassedNow()
+            expiresAfterWrite && (writeTimeMark.get() + expireAfterWriteDuration).hasPassedNow()
     }
 
     /**

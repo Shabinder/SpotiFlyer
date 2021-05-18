@@ -23,14 +23,14 @@ import com.shabinder.common.models.spotify.PagingObjectPlaylistTrack
 import com.shabinder.common.models.spotify.Playlist
 import com.shabinder.common.models.spotify.Track
 import io.ktor.client.HttpClient
-import io.ktor.client.request.*
+import io.ktor.client.request.get
 
 private val BASE_URL get() = "${corsApi}https://api.spotify.com/v1"
 
 interface SpotifyRequests {
 
     val httpClientRef: NativeAtomicReference<HttpClient>
-    val httpClient:HttpClient get() = httpClientRef.value
+    val httpClient: HttpClient get() = httpClientRef.value
 
     suspend fun authenticateSpotifyClient(override: Boolean = false)
 

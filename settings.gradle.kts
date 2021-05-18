@@ -28,5 +28,6 @@ include(
     ":fuzzywuzzy:app",
     ":android",
     ":desktop",
-    ":web-app"
+    ":web-app",
+    ":maintenance-tasks"
 )

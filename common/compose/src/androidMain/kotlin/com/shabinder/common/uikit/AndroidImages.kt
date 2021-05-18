@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import com.shabinder.common.database.R
 import kotlinx.coroutines.flow.MutableStateFlow
 
-
 actual fun montserratFont() = FontFamily(
     Font(R.font.montserrat_light, FontWeight.Light),
     Font(R.font.montserrat_regular, FontWeight.Normal),

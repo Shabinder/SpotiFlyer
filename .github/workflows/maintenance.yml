@@ -1,0 +1,35 @@
+name: Maintenance
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *' #every 30 minutes
+
+jobs:
+  build:
+    name: Test and Build
+    runs-on: ubuntu-latest
+    steps:
+
+      # Setup Java environment for the next steps
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v2.3.1
+
+      # Run Maintenance Tasks
+      - name: Android App
+        run: ./gradlew :maintenance-tasks:run
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          OWNER_NAME: 'Shabinder'
+          REPO_NAME: 'SpotiFlyer'
+          BRANCH_NAME: 'main'
+          FILE_PATH: 'README.md'
+          IMAGE_DESCRIPTION: 'Analytics'
+          COMMIT_MESSAGE: 'Analytics Updated'
+          TAG_NAME: 'HTI'

@@ -19,6 +19,7 @@ package com.shabinder.common.main.integration
 import co.touchlab.stately.ensureNeverFrozen
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
+import com.shabinder.common.caching.Cache
 import com.shabinder.common.di.Picture
 import com.shabinder.common.di.utils.asValue
 import com.shabinder.common.main.SpotiFlyerMain
@@ -30,7 +31,6 @@ import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
 import com.shabinder.common.main.store.SpotiFlyerMainStoreProvider
 import com.shabinder.common.main.store.getStore
 import com.shabinder.common.models.methods
-import com.shabinder.common.caching.Cache
 
 internal class SpotiFlyerMainImpl(
     componentContext: ComponentContext,

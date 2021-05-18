@@ -18,8 +18,7 @@ package com.shabinder.common.di
 
 import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.models.methods
-import io.ktor.client.request.*
+import io.ktor.client.request.head
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,7 +29,6 @@ expect suspend fun downloadTracks(
     fetcher: FetchPlatformQueryResult,
     dir: Dir
 )
-
 
 // IO-Dispatcher
 @SharedImmutable

@@ -22,7 +22,6 @@ package com.shabinder.common.di.utils
 // Gist: https://gist.github.com/fluidsonic/ba32de21c156bbe8424c8d5fc20dcd8e
 
 import com.shabinder.common.di.dispatcherIO
-import com.shabinder.common.models.methods
 import io.ktor.utils.io.core.Closeable
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CancellationException

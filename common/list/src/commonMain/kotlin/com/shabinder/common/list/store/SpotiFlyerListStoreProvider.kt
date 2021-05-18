@@ -24,7 +24,6 @@ import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.shabinder.common.database.getLogger
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
-import com.shabinder.common.di.dispatcherIO
 import com.shabinder.common.di.downloadTracks
 import com.shabinder.common.list.SpotiFlyerList.State
 import com.shabinder.common.list.store.SpotiFlyerListStore.Intent
@@ -34,7 +33,6 @@ import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.withContext
 
 internal class SpotiFlyerListStoreProvider(
     private val dir: Dir,
@@ -80,14 +78,14 @@ internal class SpotiFlyerListStoreProvider(
                 is Intent.SearchLink -> {
                     try {
                         val result = fetchQuery.query(link)
-                        if( result != null) {
+                        if (result != null) {
                             result.trackList = result.trackList.toMutableList()
                             dispatch((Result.ResultFetched(result, result.trackList.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0) { hashMapOf() }))))
                             executeIntent(Intent.RefreshTracksStatuses, getState)
                         } else {
                             throw Exception("An Error Occurred, Check your Link / Connection")
                         }
-                    } catch (e:Exception) {
+                    } catch (e: Exception) {
                         e.printStackTrace()
                         dispatch(Result.ErrorOccurred(e))
                     }
@@ -100,7 +98,6 @@ internal class SpotiFlyerListStoreProvider(
                         it
                     }
                     dispatch(Result.UpdateTrackList(list.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0) { hashMapOf() })))
-
 
                     val finalList =
                         intent.trackList.filter { it.downloaded == DownloadStatus.NotDownloaded }

@@ -23,7 +23,8 @@ import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
-import io.ktor.client.request.*
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.get
 import io.ktor.client.statement.HttpStatement
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
@@ -31,14 +32,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt
 
-expect class Dir (
+expect class Dir(
     logger: Kermit,
     settings: Settings,
     spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     val db: Database?
-    val isAnalyticsEnabled:Boolean
-    val isFirstLaunch:Boolean
+    val isAnalyticsEnabled: Boolean
+    val isFirstLaunch: Boolean
     fun enableAnalytics()
     fun firstLaunchDone()
     fun isPresent(path: String): Boolean
@@ -46,11 +47,11 @@ expect class Dir (
     fun defaultDir(): String
     fun imageCacheDir(): String
     fun createDirectory(dirPath: String)
-    fun setDownloadDirectory(newBasePath:String)
+    fun setDownloadDirectory(newBasePath: String)
     suspend fun cacheImage(image: Any, path: String) // in Android = ImageBitmap, Desktop = BufferedImage
     suspend fun loadImage(url: String): Picture
     suspend fun clearCache()
-    suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, trackDetails: TrackDetails,postProcess:(track: TrackDetails)->Unit = {})
+    suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, trackDetails: TrackDetails, postProcess: (track: TrackDetails) -> Unit = {})
     fun addToLibrary(path: String)
 }
 
@@ -74,7 +75,7 @@ suspend fun downloadFile(url: String): Flow<DownloadResult> {
                 emit(DownloadResult.Error("File not downloaded"))
             }
             client.close()
-        } catch (e:Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             emit(DownloadResult.Error(e.message ?: "File not downloaded"))
         }
@@ -83,12 +84,12 @@ suspend fun downloadFile(url: String): Flow<DownloadResult> {
 
 suspend fun downloadByteArray(
     url: String,
-    httpBuilder: HttpRequestBuilder.()->Unit = {}
+    httpBuilder: HttpRequestBuilder.() -> Unit = {}
 ): ByteArray? {
     val client = createHttpClient()
     val response = try {
-        client.get<ByteArray>(url,httpBuilder)
-    } catch (e: Exception){
+        client.get<ByteArray>(url, httpBuilder)
+    } catch (e: Exception) {
         return null
     }
     client.close()

@@ -68,9 +68,7 @@ interface SpotiFlyerList {
         val listAnalytics: Analytics
     }
 
-    interface Analytics {
-
-    }
+    interface Analytics
 
     sealed class Output {
         object Finished : Output()
