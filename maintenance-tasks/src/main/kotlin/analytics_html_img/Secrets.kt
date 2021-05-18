@@ -12,16 +12,18 @@ internal data class Secrets(
     val imageDescription: String,
     val commitMessage: String,
     val tagName: String
-)
-
-internal fun initSecrets() = Secrets(
-    githubToken = "GH_TOKEN".byProperty,
-    ownerName = "OWNER_NAME".byProperty,
-    repoName = "REPO_NAME".byProperty,
-    branchName = "BRANCH_NAME".byOptionalProperty ?: "main",
-    filePath = "FILE_PATH".byOptionalProperty ?: "README.md",
-    imageDescription = "IMAGE_DESCRIPTION".byOptionalProperty ?: "IMAGE",
-    commitMessage = "COMMIT_MESSAGE".byOptionalProperty ?: "HTML-TO-IMAGE Update",
-    tagName = "TAG_NAME".byOptionalProperty ?: "HTI"
-    // hctiKey = "HCTI_KEY".analytics_html_img.getByProperty
-)
+) {
+    companion object {
+        fun initSecrets() = Secrets(
+            githubToken = "GH_TOKEN".byProperty,
+            ownerName = "OWNER_NAME".byProperty,
+            repoName = "REPO_NAME".byProperty,
+            branchName = "BRANCH_NAME".byOptionalProperty ?: "main",
+            filePath = "FILE_PATH".byOptionalProperty ?: "README.md",
+            imageDescription = "IMAGE_DESCRIPTION".byOptionalProperty ?: "IMAGE",
+            commitMessage = "COMMIT_MESSAGE".byOptionalProperty ?: "HTML-TO-IMAGE Update",
+            tagName = "TAG_NAME".byOptionalProperty ?: "HTI"
+            // hctiKey = "HCTI_KEY".analytics_html_img.getByProperty
+        )
+    }
+}

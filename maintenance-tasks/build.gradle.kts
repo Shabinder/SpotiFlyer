@@ -13,7 +13,8 @@ repositories {
 }
 
 application {
-    mainClassName = "MainKt"
+    mainClass.set("MainKt")
+    applicationName = "maintenance"
 }
 
 dependencies {

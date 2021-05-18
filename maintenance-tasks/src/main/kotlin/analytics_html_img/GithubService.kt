@@ -1,8 +1,5 @@
 package analytics_html_img
 
-import io.ktor.client.HttpClient
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.headers
@@ -16,17 +13,6 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
-
-internal val client = HttpClient {
-    install(JsonFeature) {
-        serializer = KotlinxSerializer(
-            Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-            }
-        )
-    }
-}
 
 internal object GithubService {
     private const val baseURL = Common.GITHUB_API
