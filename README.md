@@ -40,7 +40,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 
 ## 📈 This Week's Analytics
 <!--START_SECTION:HTI-->
-![Today's Analytics](https://hcti.io/v1/image/7ccd085a-7340-4fe8-a835-1891be472ca1)
+![Today's Analytics](https://hcti.io/v1/image/a859004e-9983-4a49-87de-7b587ce0bfb0)
 <!--END_SECTION:HTI-->
 
 ## 💻 Install 
