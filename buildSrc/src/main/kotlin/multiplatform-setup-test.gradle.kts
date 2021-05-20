@@ -54,19 +54,19 @@ kotlin {
     sourceSets {
         named("commonTest") {
             dependencies {
-                implementation(JetBrains.Kotlin.testCommon)
-                implementation(JetBrains.Kotlin.testAnnotationsCommon)
+                //implementation(JetBrains.Kotlin.testCommon)
+                //implementation(JetBrains.Kotlin.testAnnotationsCommon)
             }
         }
 
         named("androidTest") {
             dependencies {
-                implementation(JetBrains.Kotlin.testJunit)
+                //implementation(JetBrains.Kotlin.testJunit)
             }
         }
         named("desktopTest") {
             dependencies {
-                implementation(JetBrains.Kotlin.testJunit)
+                //implementation(JetBrains.Kotlin.testJunit)
             }
         }
         named("jsTest") {

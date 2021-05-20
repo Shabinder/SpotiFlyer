@@ -38,24 +38,5 @@ kotlin {
                 implementation(Decompose.extensionsCompose)
             }
         }
-
-        // Testing Source-sets
-        named("commonTest") {
-            dependencies {
-                implementation(JetBrains.Kotlin.testCommon)
-                implementation(JetBrains.Kotlin.testAnnotationsCommon)
-            }
-        }
-
-        named("androidTest") {
-            dependencies {
-                implementation(JetBrains.Kotlin.testJunit)
-            }
-        }
-        named("desktopTest") {
-            dependencies {
-                implementation(JetBrains.Kotlin.testJunit)
-            }
-        }
     }
 }

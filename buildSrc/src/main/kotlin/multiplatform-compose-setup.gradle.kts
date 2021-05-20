@@ -22,17 +22,6 @@ plugins {
     id("ktlint-setup")
 }
 
-android {
-    configurations {
-        create("androidTestApi")
-        create("androidTestDebugApi")
-        create("androidTestReleaseApi")
-        create("testApi")
-        create("testDebugApi")
-        create("testReleaseApi")
-    }
-}
-
 kotlin {
     jvm("desktop").compilations.all {
         kotlinOptions {

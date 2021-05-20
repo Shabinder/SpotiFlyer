@@ -35,9 +35,6 @@ allprojects {
             useIR = true
         }
     }
-    tasks.withType<org.gradle.jvm.tasks.Jar> {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    }
     afterEvaluate {
         project.extensions.findByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()?.let { kmpExt ->
             kmpExt.sourceSets.removeAll { it.name == "androidAndroidTestRelease" }
