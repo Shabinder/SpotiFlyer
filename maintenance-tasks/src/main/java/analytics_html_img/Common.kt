@@ -3,6 +3,7 @@
 package analytics_html_img
 
 import io.ktor.client.HttpClient
+import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import kotlinx.serialization.json.Json
@@ -14,6 +15,7 @@ internal object Common {
     const val USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:88.0) Gecko/20100101 Firefox/88.0"
 }
 internal val client = HttpClient {
+    install(HttpTimeout)
     install(JsonFeature) {
         serializer = KotlinxSerializer(
             Json {
