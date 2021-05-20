@@ -35,4 +35,9 @@ allprojects {
             useIR = true
         }
     }
+    afterEvaluate {
+        project.extensions.findByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()?.let { kmpExt ->
+            kmpExt.sourceSets.removeAll { it.name == "androidAndroidTestRelease" }
+        }
+    }
 }

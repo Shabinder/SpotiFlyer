@@ -26,7 +26,7 @@ import com.shabinder.common.uikit.SpotiFlyerShapes
 import com.shabinder.common.uikit.SpotiFlyerTypography
 import com.shabinder.common.uikit.colorPrimary
 
-@OptIn(ExperimentalAnimationApi::class)
+@ExperimentalAnimationApi
 @Composable
 fun AnalyticsDialog(
     isVisible:Boolean,

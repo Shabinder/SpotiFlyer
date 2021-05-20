@@ -15,8 +15,9 @@
  */
 
 plugins {
-    id("multiplatform-setup")
     id("android-setup")
+    id("multiplatform-setup")
+    id("multiplatform-setup-test")
     id("kotlin-parcelize")
     kotlin("plugin.serialization")
 }
@@ -46,10 +47,7 @@ kotlin {
             }
         }
         androidMain {
-            dependencies {
-                api("com.github.K1rakishou:Fuck-Storage-Access-Framework:v1.1")
-                api("androidx.documentfile:documentfile:1.0.1")
-            }
+            dependencies {}
         }
     }
 }

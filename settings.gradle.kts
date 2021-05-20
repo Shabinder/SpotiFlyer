@@ -15,7 +15,6 @@
  */
 
 rootProject.name = "spotiflyer"
-enableFeaturePreview("GRADLE_METADATA")
 
 include(
     ":common:database",
@@ -25,7 +24,6 @@ include(
     ":common:list",
     ":common:data-models",
     ":common:dependency-injection",
-    ":fuzzywuzzy:app",
     ":android",
     ":desktop",
     ":web-app",

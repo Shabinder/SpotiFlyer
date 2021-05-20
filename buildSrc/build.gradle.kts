@@ -19,7 +19,6 @@ plugins {
 }
 
 group = "com.shabinder"
-version = "2.1"
 
 repositories {
     google()
@@ -31,16 +30,12 @@ repositories {
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:4.0.2")
+    implementation("com.android.tools.build:gradle:7.1.0-alpha01")
     implementation("org.jlleitschuh.gradle:ktlint-gradle:${Versions.ktLint}")
     implementation(JetBrains.Compose.gradlePlugin)
     implementation(JetBrains.Kotlin.gradlePlugin)
     implementation(JetBrains.Kotlin.serialization)
     implementation(SqlDelight.gradlePlugin)
-}
-
-kotlinDslPluginOptions {
-    experimentalWarning.set(false)
 }
 
 kotlin {

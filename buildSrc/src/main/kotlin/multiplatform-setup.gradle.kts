@@ -22,8 +22,18 @@ plugins {
     id("kotlin-parcelize")
 }
 
-kotlin {
+android {
+    configurations {
+        create("androidTestApi")
+        create("androidTestDebugApi")
+        create("androidTestReleaseApi")
+        create("testApi")
+        create("testDebugApi")
+        create("testReleaseApi")
+    }
+}
 
+kotlin {
     /*IOS Target Can be only built on Mac*/
     if(HostOS.isMac){
         val sdkName: String? = System.getenv("SDK_NAME")
@@ -45,7 +55,7 @@ kotlin {
             useIR = true
         }
     }
-    js() {
+    js {
         /*
         * TODO Enable JS IR Compiler
         *  waiting for Decompose & MVI Kotlin to support same

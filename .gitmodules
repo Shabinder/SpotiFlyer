@@ -1,0 +1,3 @@
+[submodule "spotiflyer-ios"]
+	path = spotiflyer-ios
+	url = https://github.com/Shabinder/spotiflyer-ios

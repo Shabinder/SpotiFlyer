@@ -128,7 +128,7 @@ fun HomeTabBar(
 
     TabRow(
         selectedTabIndex = selectedIndex,
-        indicator = indicator as @Composable (List<TabPosition>) -> Unit,
+        indicator = indicator,
         modifier = modifier,
     ) {
         categories.forEachIndexed { index, category ->

@@ -22,6 +22,17 @@ plugins {
     id("ktlint-setup")
 }
 
+android {
+    configurations {
+        create("androidTestApi")
+        create("androidTestDebugApi")
+        create("androidTestReleaseApi")
+        create("testApi")
+        create("testDebugApi")
+        create("testReleaseApi")
+    }
+}
+
 kotlin {
     jvm("desktop").compilations.all {
         kotlinOptions {
@@ -55,14 +66,12 @@ kotlin {
                 }
             }
         }
-
         named("androidMain") {
             dependencies {
-                implementation("androidx.appcompat:appcompat:1.2.0")
+                implementation("androidx.appcompat:appcompat:1.3.0")
                 implementation(Androidx.core)
             }
         }
-
         named("desktopMain") {
             dependencies {
                 implementation(compose.desktop.common)

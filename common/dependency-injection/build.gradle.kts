@@ -17,8 +17,9 @@
 import org.jetbrains.compose.compose
 
 plugins {
-    id("multiplatform-setup")
     id("android-setup")
+    id("multiplatform-setup")
+    id("multiplatform-setup-test")
     kotlin("plugin.serialization")
 }
 

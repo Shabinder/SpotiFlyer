@@ -17,12 +17,15 @@
 import org.jetbrains.compose.compose
 
 plugins {
-    id("multiplatform-compose-setup")
     id("android-setup")
+    id("multiplatform-compose-setup")
 }
 
 kotlin {
     sourceSets {
+        all {
+            languageSettings.useExperimentalAnnotation("androidx.compose.animation")
+        }
         commonMain {
             dependencies {
                 implementation(compose.materialIconsExtended)
@@ -33,6 +36,25 @@ kotlin {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:dependency-injection"))
                 implementation(Decompose.extensionsCompose)
+            }
+        }
+
+        // Testing Source-sets
+        named("commonTest") {
+            dependencies {
+                implementation(JetBrains.Kotlin.testCommon)
+                implementation(JetBrains.Kotlin.testAnnotationsCommon)
+            }
+        }
+
+        named("androidTest") {
+            dependencies {
+                implementation(JetBrains.Kotlin.testJunit)
+            }
+        }
+        named("desktopTest") {
+            dependencies {
+                implementation(JetBrains.Kotlin.testJunit)
             }
         }
     }

@@ -88,7 +88,7 @@ fun SpotiFlyerListContent(
                     item {
                         CoverImage(result.title, result.coverUrl, component::loadImage)
                     }
-                    itemsIndexed(model.trackList) { index, item ->
+                    itemsIndexed(model.trackList) { _, item ->
                         TrackCard(
                             track = item,
                             downloadTrack = { component.onDownloadClicked(item) },
