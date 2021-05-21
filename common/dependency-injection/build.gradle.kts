@@ -32,7 +32,7 @@ kotlin {
                 implementation(project(":common:database"))
                 implementation("org.jetbrains.kotlinx:atomicfu:0.16.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.0")
-                implementation("com.russhwolf:multiplatform-settings-no-arg:0.7.6")
+                implementation("com.russhwolf:multiplatform-settings-no-arg:0.7.7")
                 implementation(Extras.youtubeDownloader)
                 implementation(Extras.fuzzyWuzzy)
                 implementation(MVIKotlin.rx)
