@@ -60,7 +60,7 @@ dependencies {
 }
 
 kotlin {
-    js() {
+    js {
         //useCommonJs()
         browser {
             webpackTask {
