@@ -21,11 +21,13 @@ import com.russhwolf.settings.Settings
 import com.shabinder.common.database.databaseModule
 import com.shabinder.common.database.getLogger
 import com.shabinder.common.di.providers.GaanaProvider
+import com.shabinder.common.di.providers.SaavnProvider
 import com.shabinder.common.di.providers.SpotifyProvider
 import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
 import com.shabinder.common.di.providers.YoutubeProvider
 import io.ktor.client.HttpClient
+import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.features.logging.DEFAULT
@@ -57,9 +59,10 @@ fun commonModule(enableNetworkLogs: Boolean) = module {
     single { YoutubeMusic(get(), get()) }
     single { SpotifyProvider(get(), get(), get()) }
     single { GaanaProvider(get(), get(), get()) }
+    single { SaavnProvider(get(), get(), get()) }
     single { YoutubeProvider(get(), get(), get()) }
     single { YoutubeMp3(get(), get(), get()) }
-    single { FetchPlatformQueryResult(get(), get(), get(), get(), get(), get()) }
+    single { FetchPlatformQueryResult(get(), get(), get(), get(), get(), get(), get()) }
 }
 
 @ThreadLocal
@@ -73,6 +76,7 @@ fun createHttpClient(enableNetworkLogs: Boolean = false) = HttpClient {
     install(JsonFeature) {
         serializer = KotlinxSerializer(globalJson)
     }
+    install(HttpTimeout)
     // WorkAround for Freezing
     // Use httpClient.getData / httpClient.postData Extensions
     /*install(JsonFeature) {

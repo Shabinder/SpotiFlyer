@@ -5,6 +5,7 @@ import io.ktor.util.decodeBase64Bytes
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -17,7 +18,7 @@ import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.DESKeySpec
 
-internal fun JsonObject.formatData(
+internal suspend fun JsonObject.formatData(
     includeLyrics: Boolean = false
 ): JsonObject {
     return buildJsonObject {
@@ -27,7 +28,21 @@ internal fun JsonObject.formatData(
             if (it.value is JsonPrimitive && it.value.jsonPrimitive.isString) {
                 put(it.key, it.value.jsonPrimitive.content.format())
             } else {
-                put(it.key, it.value)
+                // Format Songs Nested Collection Too
+                if (it.key == "songs" && it.value is JsonArray) {
+                    put(
+                        it.key,
+                        buildJsonArray {
+                            getJsonArray("songs")?.forEach { song ->
+                                (song as? JsonObject)?.formatData(includeLyrics)?.let { formattedSong ->
+                                    add(formattedSong)
+                                }
+                            }
+                        }
+                    )
+                } else {
+                    put(it.key, it.value)
+                }
             }
         }
 
@@ -41,7 +56,7 @@ internal fun JsonObject.formatData(
             // Add Media URL to JSON Object
             put("media_url", url)
         } catch (e: Exception) {
-            e.printStackTrace()
+            // e.printStackTrace()
             // DECRYPT Encrypted Media URL
             getString("encrypted_media_url")?.let {
                 put("media_url", decryptURL(it))
@@ -51,13 +66,29 @@ internal fun JsonObject.formatData(
                 put("media_url", getString("media_url")?.replace("_320.mp4", "_160.mp4"))
             }
         }
+        // Increase Image Resolution
+        put(
+            "image",
+            getString("image")
+                ?.replace("150x150", "500x500")
+                ?.replace("50x50", "500x500")
+        )
 
-        put("image", getString("image")?.replace("150x150", "500x500"))
+        // Fetch Lyrics if Requested
+        // Lyrics is HTML Based
+        if (includeLyrics) {
+            if (getBoolean("has_lyrics") == true) {
+                put("lyrics", getString("id")?.let { object : JioSaavnRequests {}.getLyrics(it) })
+            } else {
+                put("lyrics", "")
+            }
+        }
     }
 }
 
+@Suppress("GetInstance")
 @OptIn(InternalAPI::class)
-fun decryptURL(url: String): String {
+suspend fun decryptURL(url: String): String {
     val dks = DESKeySpec("38346591".toByteArray())
     val keyFactory = SecretKeyFactory.getInstance("DES")
     val key: SecretKey = keyFactory.generateSecret(dks)
@@ -76,6 +107,7 @@ internal fun String.format(): String {
         .replace("&quot;", "'")
         .replace("&amp;", "&")
         .replace("&#039;", "'")
+        .replace("&copy;", "©")
 }
 
 fun JsonObject.getString(key: String): String? = this[key]?.jsonPrimitive?.content

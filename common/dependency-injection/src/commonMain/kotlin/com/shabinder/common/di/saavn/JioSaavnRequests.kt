@@ -1,13 +1,18 @@
-package jiosaavn
+package com.shabinder.common.di.saavn
 
-import analytics_html_img.client
+import com.shabinder.common.di.globalJson
+import com.shabinder.common.models.saavn.SaavnAlbum
+import com.shabinder.common.models.saavn.SaavnPlaylist
+import com.shabinder.common.models.saavn.SaavnSearchResult
+import com.shabinder.common.models.saavn.SaavnSong
+import io.github.shabinder.utils.getBoolean
+import io.github.shabinder.utils.getJsonArray
+import io.github.shabinder.utils.getJsonObject
+import io.github.shabinder.utils.getString
+import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
 import io.ktor.http.Parameters
-import jiosaavn.models.SaavnAlbum
-import jiosaavn.models.SaavnPlaylist
-import jiosaavn.models.SaavnSearchResult
-import jiosaavn.models.SaavnSong
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -17,12 +22,9 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
-val serializer = Json {
-    ignoreUnknownKeys = true
-    isLenient = true
-}
-
 interface JioSaavnRequests {
+
+    val httpClient: HttpClient
 
     suspend fun searchForSong(
         query: String,
@@ -34,16 +36,16 @@ interface JioSaavnRequests {
 
         val searchURL = search_base_url + query
         val results = mutableListOf<SaavnSearchResult>()
-        (serializer.parseToJsonElement(client.get(searchURL)) as JsonObject).getJsonObject("songs").getJsonArray("data")?.forEach {
+        (globalJson.parseToJsonElement(httpClient.get(searchURL)) as JsonObject).getJsonObject("songs").getJsonArray("data")?.forEach {
             (it as? JsonObject)?.formatData()?.let { jsonObject ->
-                results.add(serializer.decodeFromJsonElement(SaavnSearchResult.serializer(), jsonObject))
+                results.add(globalJson.decodeFromJsonElement(SaavnSearchResult.serializer(), jsonObject))
             }
         }
         return results
     }
 
     suspend fun getLyrics(ID: String): String? {
-        return (Json.parseToJsonElement(client.get(lyrics_base_url + ID)) as JsonObject)
+        return (Json.parseToJsonElement(httpClient.get(lyrics_base_url + ID)) as JsonObject)
             .getString("lyrics")
     }
 
@@ -52,15 +54,15 @@ interface JioSaavnRequests {
         fetchLyrics: Boolean = false
     ): SaavnSong {
         val id = getSongID(URL)
-        val data = ((serializer.parseToJsonElement(client.get(song_details_base_url + id)) as JsonObject)[id] as JsonObject)
+        val data = ((globalJson.parseToJsonElement(httpClient.get(song_details_base_url + id)) as JsonObject)[id] as JsonObject)
             .formatData(fetchLyrics)
-        return serializer.decodeFromJsonElement(SaavnSong.serializer(), data)
+        return globalJson.decodeFromJsonElement(SaavnSong.serializer(), data)
     }
 
     private suspend fun getSongID(
         URL: String,
     ): String {
-        val res = client.get<String>(URL) {
+        val res = httpClient.get<String>(URL) {
             body = FormDataContent(
                 Parameters.build {
                     append("bitrate", "320")
@@ -79,9 +81,9 @@ interface JioSaavnRequests {
         includeLyrics: Boolean = false
     ): SaavnPlaylist? {
         return try {
-            serializer.decodeFromJsonElement(
+            globalJson.decodeFromJsonElement(
                 SaavnPlaylist.serializer(),
-                (serializer.parseToJsonElement(client.get(playlist_details_base_url + getPlaylistID(URL))) as JsonObject)
+                (globalJson.parseToJsonElement(httpClient.get(playlist_details_base_url + getPlaylistID(URL))) as JsonObject)
                     .formatData(includeLyrics)
             )
         } catch (e: Exception) {
@@ -93,7 +95,7 @@ interface JioSaavnRequests {
     private suspend fun getPlaylistID(
         URL: String
     ): String {
-        val res = client.get<String>(URL)
+        val res = httpClient.get<String>(URL)
         return try {
             res.split("\"type\":\"playlist\",\"id\":\"")[1].split('"')[0]
         } catch (e: IndexOutOfBoundsException) {
@@ -106,9 +108,9 @@ interface JioSaavnRequests {
         includeLyrics: Boolean = false
     ): SaavnAlbum? {
         return try {
-            serializer.decodeFromJsonElement(
+            globalJson.decodeFromJsonElement(
                 SaavnAlbum.serializer(),
-                (serializer.parseToJsonElement(client.get(album_details_base_url + getAlbumID(URL))) as JsonObject)
+                (globalJson.parseToJsonElement(httpClient.get(album_details_base_url + getAlbumID(URL))) as JsonObject)
                     .formatData(includeLyrics)
             )
         } catch (e: Exception) {
@@ -120,7 +122,7 @@ interface JioSaavnRequests {
     private suspend fun getAlbumID(
         URL: String
     ): String {
-        val res = client.get<String>(URL)
+        val res = httpClient.get<String>(URL)
         return try {
             res.split("\"album_id\":\"")[1].split('"')[0]
         } catch (e: IndexOutOfBoundsException) {

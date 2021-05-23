@@ -20,4 +20,5 @@ enum class Source {
     Spotify,
     YouTube,
     Gaana,
+    JioSaavn
 }

@@ -76,7 +76,6 @@ class GaanaProvider(
                     getGaanaSong(seokey = link).tracks.firstOrNull()?.also {
                         folderType = "Tracks"
                         subFolder = ""
-                        it.updateStatusIfPresent(folderType, subFolder)
                         trackList = listOf(it).toTrackDetailsList(folderType, subFolder)
                         title = it.track_title
                         coverUrl = it.artworkLink.replace("http:", "https:")
@@ -86,9 +85,6 @@ class GaanaProvider(
                     getGaanaAlbum(seokey = link).also {
                         folderType = "Albums"
                         subFolder = link
-                        it.tracks?.forEach { track ->
-                            track.updateStatusIfPresent(folderType, subFolder)
-                        }
                         trackList = it.tracks?.toTrackDetailsList(folderType, subFolder) ?: emptyList()
                         title = link
                         coverUrl = it.custom_artworks.size_480p.replace("http:", "https:")
@@ -98,9 +94,6 @@ class GaanaProvider(
                     getGaanaPlaylist(seokey = link).also {
                         folderType = "Playlists"
                         subFolder = link
-                        it.tracks.forEach { track ->
-                            track.updateStatusIfPresent(folderType, subFolder)
-                        }
                         trackList = it.tracks.toTrackDetailsList(folderType, subFolder)
                         title = link
                         // coverUrl.value = "TODO"
@@ -117,9 +110,6 @@ class GaanaProvider(
                             coverUrl = it.artworkLink?.replace("http:", "https:") ?: gaanaPlaceholderImageUrl
                         }
                     getGaanaArtistTracks(seokey = link).also {
-                        it.tracks?.forEach { track ->
-                            track.updateStatusIfPresent(folderType, subFolder)
-                        }
                         trackList = it.tracks?.toTrackDetailsList(folderType, subFolder) ?: emptyList()
                     }
                 }
@@ -141,14 +131,14 @@ class GaanaProvider(
             year = it.release_date,
             comment = "Genres:${it.genre?.map { genre -> genre?.name }?.reduceOrNull { acc, s -> acc + s }}",
             trackUrl = it.lyrics_url,
-            downloaded = it.downloaded ?: DownloadStatus.NotDownloaded,
+            downloaded = it.updateStatusIfPresent(type, subFolder),
             source = Source.Gaana,
             albumArtURL = it.artworkLink.replace("http:", "https:"),
             outputFilePath = dir.finalOutputDir(it.track_title, type, subFolder, dir.defaultDir()/*,".m4a"*/)
         )
     }
-    private fun GaanaTrack.updateStatusIfPresent(folderType: String, subFolder: String) {
-        if (dir.isPresent(
+    private fun GaanaTrack.updateStatusIfPresent(folderType: String, subFolder: String): DownloadStatus {
+        return if (dir.isPresent(
                 dir.finalOutputDir(
                         track_title,
                         folderType,
@@ -157,7 +147,9 @@ class GaanaProvider(
                     )
             )
         ) { // Download Already Present!!
-            downloaded = DownloadStatus.Downloaded
-        }
+            DownloadStatus.Downloaded.also {
+                downloaded = it
+            }
+        } else downloaded ?: DownloadStatus.NotDownloaded
     }
 }

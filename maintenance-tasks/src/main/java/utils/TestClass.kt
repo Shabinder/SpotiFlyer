@@ -1,14 +1,14 @@
 package utils
 
 import jiosaavn.JioSaavnRequests
+import jiosaavn.models.SaavnPlaylist
 import kotlinx.coroutines.runBlocking
 
 // Test Class- at development Time
 fun main() = runBlocking {
     val jioSaavnClient = object : JioSaavnRequests {}
-    val resp = jioSaavnClient.getSongID(
-        queryURL = "https://www.jiosaavn.com/song/nadiyon-paar-let-the-music-play-again-from-roohi/KAM0bj1AAn4"
+    val resp: SaavnPlaylist? = jioSaavnClient.getPlaylist(
+        URL = "https://www.jiosaavn.com/featured/hindi_chartbusters/u-75xwHI4ks_"
     )
-
-    debug(jioSaavnClient.getSong(resp.toString()).toString())
+    println(resp)
 }

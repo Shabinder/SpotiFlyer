@@ -24,11 +24,13 @@ import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.globalJson
 import com.shabinder.common.di.spotify.SpotifyRequests
 import com.shabinder.common.di.spotify.authenticateSpotify
+import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.NativeAtomicReference
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.spotify.Album
 import com.shabinder.common.models.spotify.Image
+import com.shabinder.common.models.spotify.PlaylistTrack
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.models.spotify.Track
 import io.ktor.client.HttpClient
@@ -42,15 +44,6 @@ class SpotifyProvider(
     private val logger: Kermit,
     private val dir: Dir,
 ) : SpotifyRequests {
-
-   /* init {
-        logger.d { "Creating Spotify Provider" }
-        GlobalScope.launch(Dispatchers.Default) {
-            if (currentPlatform is AllPlatforms.Js) {
-                authenticateSpotifyClient(override = true)
-            } else authenticateSpotifyClient()
-        }
-    }*/
 
     override suspend fun authenticateSpotifyClient(override: Boolean) {
         val token = if (override) authenticateSpotify() else tokenStore.getToken()
@@ -133,7 +126,6 @@ class SpotifyProvider(
                     getTrack(link).also {
                         folderType = "Tracks"
                         subFolder = ""
-                        it.updateStatusIfPresent(folderType, subFolder)
                         trackList = listOf(it).toTrackDetailsList(folderType, subFolder)
                         title = it.name.toString()
                         coverUrl = it.album?.images?.elementAtOrNull(0)?.url.toString()
@@ -145,7 +137,6 @@ class SpotifyProvider(
                     folderType = "Albums"
                     subFolder = albumObject.name.toString()
                     albumObject.tracks?.items?.forEach {
-                        it.updateStatusIfPresent(folderType, subFolder)
                         it.album = Album(
                             images = listOf(
                                 Image(
@@ -170,25 +161,25 @@ class SpotifyProvider(
                     val playlistObject = getPlaylist(link)
                     folderType = "Playlists"
                     subFolder = playlistObject.name.toString()
-                    val tempTrackList = mutableListOf<Track>()
-                    // log("Tracks Fetched", playlistObject.tracks?.items?.size.toString())
-                    playlistObject.tracks?.items?.forEach {
-                        it.track?.let { it1 ->
-                            it1.updateStatusIfPresent(folderType, subFolder)
-                            tempTrackList.add(it1)
+                    val tempTrackList = mutableListOf<Track>().apply {
+                        // Add Fetched Tracks
+                        playlistObject.tracks?.items?.mapNotNull(PlaylistTrack::track)?.let {
+                            addAll(it)
                         }
                     }
-                    var moreTracksAvailable = !playlistObject.tracks?.next.isNullOrBlank()
 
+                    // Check For More Tracks If available
+                    var moreTracksAvailable = !playlistObject.tracks?.next.isNullOrBlank()
                     while (moreTracksAvailable) {
-                        // Check For More Tracks If available
+                        // Fetch Remaining Tracks
                         val moreTracks =
                             getPlaylistTracks(link, offset = tempTrackList.size)
-                        moreTracks.items?.forEach {
-                            it.track?.let { it1 -> tempTrackList.add(it1) }
+                        moreTracks.items?.mapNotNull(PlaylistTrack::track)?.let { remTracks ->
+                            tempTrackList.addAll(remTracks)
                         }
                         moreTracksAvailable = !moreTracks.next.isNullOrBlank()
                     }
+
                     // log("Total Tracks Fetched", tempTrackList.size.toString())
                     trackList = tempTrackList.toTrackDetailsList(folderType, subFolder)
                     title = playlistObject.name.toString()
@@ -228,14 +219,14 @@ class SpotifyProvider(
             year = it.album?.release_date,
             comment = "Genres:${it.album?.genres?.joinToString()}",
             trackUrl = it.href,
-            downloaded = it.downloaded,
+            downloaded = it.updateStatusIfPresent(type, subFolder),
             source = Source.Spotify,
             albumArtURL = it.album?.images?.firstOrNull()?.url.toString(),
             outputFilePath = dir.finalOutputDir(it.name.toString(), type, subFolder, dir.defaultDir()/*,".m4a"*/)
         )
     }
-    private fun Track.updateStatusIfPresent(folderType: String, subFolder: String) {
-        if (dir.isPresent(
+    private fun Track.updateStatusIfPresent(folderType: String, subFolder: String): DownloadStatus {
+        return if (dir.isPresent(
                 dir.finalOutputDir(
                         name.toString(),
                         folderType,
@@ -244,7 +235,9 @@ class SpotifyProvider(
                     )
             )
         ) { // Download Already Present!!
-            downloaded = com.shabinder.common.models.DownloadStatus.Downloaded
-        }
+            DownloadStatus.Downloaded.also {
+                downloaded = it
+            }
+        } else downloaded
     }
 }

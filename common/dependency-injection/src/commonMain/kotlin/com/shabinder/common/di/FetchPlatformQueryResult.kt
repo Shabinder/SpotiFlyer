@@ -18,6 +18,7 @@ package com.shabinder.common.di
 
 import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.di.providers.GaanaProvider
+import com.shabinder.common.di.providers.SaavnProvider
 import com.shabinder.common.di.providers.SpotifyProvider
 import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
@@ -30,6 +31,7 @@ class FetchPlatformQueryResult(
     val gaanaProvider: GaanaProvider,
     val spotifyProvider: SpotifyProvider,
     val youtubeProvider: YoutubeProvider,
+    val saavnProvider: SaavnProvider,
     val youtubeMusic: YoutubeMusic,
     val youtubeMp3: YoutubeMp3,
     val dir: Dir
@@ -46,6 +48,10 @@ class FetchPlatformQueryResult(
             // YOUTUBE
             link.contains("youtube.com", true) || link.contains("youtu.be", true) ->
                 youtubeProvider.query(link)
+
+            // Jio Saavn
+            link.contains("saavn", true) ->
+                saavnProvider.query(link)
 
             // GAANA
             link.contains("gaana", true) ->
