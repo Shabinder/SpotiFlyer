@@ -8,8 +8,10 @@ import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.saavn.SaavnSearchResult
 import com.shabinder.common.models.saavn.SaavnSong
 import com.shabinder.common.models.spotify.Source
+import io.github.shabinder.fuzzywuzzy.diffutils.FuzzySearch
 import io.ktor.client.HttpClient
 
 class SaavnProvider(
@@ -75,14 +77,76 @@ class SaavnProvider(
             year = it.year,
             comment = it.copyright_text,
             trackUrl = it.perma_url,
+            videoID = it.id,
+            downloadLink = it.media_url, // Downloadable Link
             downloaded = it.updateStatusIfPresent(type, subFolder),
             albumArtURL = it.image.replace("http:", "https:"),
             lyrics = it.lyrics ?: it.lyrics_snippet,
-            videoID = it.media_url, // Downloadable Link
             source = Source.JioSaavn,
             outputFilePath = dir.finalOutputDir(it.song, type, subFolder, dir.defaultDir(), /*".m4a"*/)
         )
     }
+
+    private fun sortByBestMatch(
+        tracks: List<SaavnSearchResult>,
+        trackName: String,
+        trackArtists: List<String>,
+    ): Map<String, Float> {
+
+        /*
+        * "linksWithMatchValue" is map with Saavn VideoID and its rating/match with 100 as Max Value
+        **/
+        val linksWithMatchValue = mutableMapOf<String, Float>()
+
+        for (result in tracks) {
+            var hasCommonWord = false
+
+            val resultName = result.title.toLowerCase().replace("/", " ")
+            val trackNameWords = trackName.toLowerCase().split(" ")
+
+            for (nameWord in trackNameWords) {
+                if (nameWord.isNotBlank() && FuzzySearch.partialRatio(nameWord, resultName) > 85) hasCommonWord = true
+            }
+
+            // Skip this Result if No Word is Common in Name
+            if (!hasCommonWord) {
+                // log("Saavn Removing", result.toString())
+                continue
+            }
+
+            // Find artist match
+            // Will Be Using Fuzzy Search Because YT Spelling might be mucked up
+            // match  = (no of artist names in result) / (no. of artist names on spotify) * 100
+            var artistMatchNumber = 0F
+
+            // String Containing All Artist Names from JioSaavn Search Result
+            val artistListString = mutableSetOf<String>().apply {
+                result.more_info?.singers?.split(",")?.let { addAll(it) }
+                result.more_info?.primary_artists?.toLowerCase()?.split(",")?.let { addAll(it) }
+            }.joinToString(" , ")
+
+            for (artist in trackArtists) {
+                if (FuzzySearch.partialRatio(artist.toLowerCase(), artistListString) > 85)
+                    artistMatchNumber++
+            }
+
+            if (artistMatchNumber == 0F) {
+                // logger.d{ "Saavn Removing:   $result" }
+                continue
+            }
+
+            val artistMatch: Float = (artistMatchNumber / trackArtists.size.toFloat()) * 100F
+            val nameMatch: Float = FuzzySearch.partialRatio(resultName, trackName).toFloat() / 100F
+
+            val avgMatch = (artistMatch + nameMatch) / 2
+
+            linksWithMatchValue[result.id] = avgMatch
+        }
+        return linksWithMatchValue.toList().sortedByDescending { it.second }.toMap().also {
+            logger.d("Saavn Search") { "Match Found for $trackName - ${!it.isNullOrEmpty()}" }
+        }
+    }
+
     private fun SaavnSong.updateStatusIfPresent(folderType: String, subFolder: String): DownloadStatus {
         return if (dir.isPresent(
                 dir.finalOutputDir(

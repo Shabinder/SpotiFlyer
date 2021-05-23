@@ -1,6 +1,5 @@
 package com.shabinder.common.di.saavn
 
-import android.annotation.SuppressLint
 import io.ktor.util.InternalAPI
 import io.ktor.util.decodeBase64Bytes
 import java.security.SecureRandom
@@ -9,7 +8,7 @@ import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.DESKeySpec
 
-@SuppressLint("GetInstance")
+@Suppress("GetInstance")
 @OptIn(InternalAPI::class)
 actual suspend fun decryptURL(url: String): String {
     val dks = DESKeySpec("38346591".toByteArray())

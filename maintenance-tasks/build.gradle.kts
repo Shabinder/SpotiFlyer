@@ -18,6 +18,7 @@ application {
 }
 
 dependencies {
+    implementation(Extras.fuzzyWuzzy)
     implementation("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlinVersion}")
     implementation("io.ktor:ktor-client-core:1.5.4")
     implementation("io.ktor:ktor-client-apache:1.5.4")

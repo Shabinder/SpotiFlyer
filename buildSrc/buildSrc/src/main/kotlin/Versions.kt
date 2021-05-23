@@ -28,7 +28,7 @@ object Versions {
     const val ktLint = "10.0.0"
     
     // DI
-    const val koin = "3.0.1"
+    const val koin = "3.0.2"
 
     // Logger
     const val kermit = "0.1.9"
@@ -62,10 +62,10 @@ object Koin {
     val core = "io.insert-koin:koin-core:${Versions.koin}"
     val test = "io.insert-koin:koin-test:${Versions.koin}"
     val android = "io.insert-koin:koin-android:${Versions.koin}"
-    val compose = "io.insert-koin:koin-androidx-compose:${Versions.koin}"
+    val compose = "io.insert-koin:koin-androidx-compose:3.0.1"
 }
 object Androidx {
-    const val androidxActivity = "androidx.activity:activity-compose:1.3.0-alpha02"
+    const val androidxActivity = "androidx.activity:activity-compose:1.3.0-alpha07"
     const val core = "androidx.core:core-ktx:1.3.2"
     const val palette = "androidx.palette:palette-ktx:1.0.0"
     const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutinesVersion}"

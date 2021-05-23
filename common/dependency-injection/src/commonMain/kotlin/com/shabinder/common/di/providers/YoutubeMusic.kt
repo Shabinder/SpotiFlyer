@@ -37,14 +37,15 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 import kotlin.math.absoluteValue
-
-private const val apiKey = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30"
-
 class YoutubeMusic constructor(
     private val logger: Kermit,
     private val httpClient: HttpClient,
 ) {
-    private val tag = "YT Music"
+
+    companion object {
+        const val apiKey = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30"
+        const val tag = "YT Music"
+    }
 
     suspend fun getYTIDBestMatch(query: String, trackDetails: TrackDetails): String? {
         return try {
@@ -213,11 +214,11 @@ class YoutubeMusic constructor(
         trackName: String,
         trackArtists: List<String>,
         trackDurationSec: Int,
-    ): Map<String, Int> {
+    ): Map<String, Float> {
         /*
         * "linksWithMatchValue" is map with Youtube VideoID and its rating/match with 100 as Max Value
         **/
-        val linksWithMatchValue = mutableMapOf<String, Int>()
+        val linksWithMatchValue = mutableMapOf<String, Float>()
 
         for (result in ytTracks) {
 
@@ -241,7 +242,7 @@ class YoutubeMusic constructor(
             // Find artist match
             // Will Be Using Fuzzy Search Because YT Spelling might be mucked up
             // match  = (no of artist names in result) / (no. of artist names on spotify) * 100
-            var artistMatchNumber = 0
+            var artistMatchNumber = 0F
 
             if (result.type == "Song") {
                 for (artist in trackArtists) {
@@ -255,26 +256,26 @@ class YoutubeMusic constructor(
                 }
             }
 
-            if (artistMatchNumber == 0) {
+            if (artistMatchNumber == 0F) {
                 // logger.d{ "YT Api Removing:   $result" }
                 continue
             }
 
-            val artistMatch = (artistMatchNumber / trackArtists.size) * 100
+            val artistMatch = (artistMatchNumber / trackArtists.size.toFloat()) * 100F
 
             // Duration Match
             /*! time match = 100 - (delta(duration)**2 / original duration * 100)
             ! difference in song duration (delta) is usually of the magnitude of a few
             ! seconds, we need to amplify the delta if it is to have any meaningful impact
             ! wen we calculate the avg match value*/
-            val difference = result.duration?.split(":")?.get(0)?.toInt()?.times(60)
-                ?.plus(result.duration?.split(":")?.get(1)?.toInt() ?: 0)
-                ?.minus(trackDurationSec)?.absoluteValue ?: 0
-            val nonMatchValue: Float = ((difference * difference).toFloat() / trackDurationSec.toFloat())
-            val durationMatch = 100 - (nonMatchValue * 100)
+            val difference: Float = result.duration?.split(":")?.get(0)?.toFloat()?.times(60)
+                ?.plus(result.duration?.split(":")?.get(1)?.toFloat() ?: 0F)
+                ?.minus(trackDurationSec)?.absoluteValue ?: 0F
+            val nonMatchValue: Float = ((difference * difference) / trackDurationSec.toFloat())
+            val durationMatch: Float = 100 - (nonMatchValue * 100F)
 
-            val avgMatch = (artistMatch + durationMatch) / 2
-            linksWithMatchValue[result.videoId.toString()] = avgMatch.toInt()
+            val avgMatch: Float = (artistMatch + durationMatch) / 2F
+            linksWithMatchValue[result.videoId.toString()] = avgMatch
         }
         // logger.d("YT Api Result"){"$trackName - $linksWithMatchValue"}
         return linksWithMatchValue.toList().sortedByDescending { it.second }.toMap().also {
