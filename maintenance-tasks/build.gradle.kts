@@ -22,6 +22,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlinVersion}")
     implementation("io.ktor:ktor-client-core:1.5.4")
     implementation("io.ktor:ktor-client-apache:1.5.4")
+    implementation("io.ktor:ktor-client-logging:1.5.4")
+    implementation(Ktor.slf4j)
     implementation("io.ktor:ktor-client-serialization:1.5.4")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
     // testDeps

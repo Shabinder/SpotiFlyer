@@ -56,6 +56,14 @@ interface JioSaavnRequests {
             .formatData(fetchLyrics)
         return serializer.decodeFromJsonElement(SaavnSong.serializer(), data)
     }
+    suspend fun getSongFromID(
+        ID: String,
+        fetchLyrics: Boolean = false
+    ): SaavnSong {
+        val data = ((serializer.parseToJsonElement(client.get(song_details_base_url + ID)) as JsonObject)[ID] as JsonObject)
+            .formatData(fetchLyrics)
+        return serializer.decodeFromJsonElement(SaavnSong.serializer(), data)
+    }
 
     private suspend fun getSongID(
         URL: String,

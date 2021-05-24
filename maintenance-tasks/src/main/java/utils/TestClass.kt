@@ -1,24 +1,33 @@
 package utils
 
+import audio_conversion.AudioToMp3
 import io.github.shabinder.fuzzywuzzy.diffutils.FuzzySearch
-import jiosaavn.JioSaavnRequests
 import jiosaavn.models.SaavnSearchResult
 import kotlinx.coroutines.runBlocking
 
 // Test Class- at development Time
 fun main(): Unit = runBlocking {
-    val jioSaavnClient = object : JioSaavnRequests {}
+    /*val jioSaavnClient = object : JioSaavnRequests {}
     val resp = jioSaavnClient.searchForSong(
-        query = "Filhall"
+        query = "Ye Faasla"
     )
     println(resp.joinToString("\n"))
 
     val matches = sortByBestMatch(
         tracks = resp,
-        trackName = "Filhall",
-        trackArtists = listOf("B.Praak", "Nupur Sanon")
+        trackName = "Ye Faasla",
+        trackArtists = listOf("Shaan", "Hardy")
     )
     debug(matches.toString())
+
+    val link = matches.keys.firstOrNull()?.let {
+        jioSaavnClient.getSongFromID(it).media_url
+    }
+    debug(link.toString())*/
+    val link = "https://aac.saavncdn.com/787/956c23404206e8f4822827eff5da61a0_320.mp4"
+    val audioConverter = object : AudioToMp3 {}
+    val mp3Link = audioConverter.convertToMp3(link.toString())
+    debug(mp3Link.toString())
 }
 
 private fun sortByBestMatch(

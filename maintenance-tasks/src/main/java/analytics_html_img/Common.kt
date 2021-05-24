@@ -6,6 +6,10 @@ import io.ktor.client.HttpClient
 import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
+import io.ktor.client.features.logging.DEFAULT
+import io.ktor.client.features.logging.LogLevel
+import io.ktor.client.features.logging.Logger
+import io.ktor.client.features.logging.Logging
 import kotlinx.serialization.json.Json
 
 internal object Common {
@@ -23,6 +27,10 @@ internal val client = HttpClient {
                 isLenient = true
             }
         )
+    }
+    install(Logging) {
+        logger = Logger.DEFAULT
+        level = LogLevel.INFO
     }
 }
 internal data class GithubFileContent(
