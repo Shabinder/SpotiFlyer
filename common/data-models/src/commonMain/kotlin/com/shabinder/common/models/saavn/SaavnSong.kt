@@ -7,7 +7,7 @@ import kotlinx.serialization.json.JsonNames
 
 @Serializable
 data class SaavnSong @OptIn(ExperimentalSerializationApi::class) constructor(
-    @JsonNames("320kbps") val is320kbps: Boolean = false,
+    @JsonNames("320kbps") val is320Kbps: Boolean,
     val album: String,
     val album_url: String? = null,
     val albumid: String? = null,
@@ -23,8 +23,8 @@ data class SaavnSong @OptIn(ExperimentalSerializationApi::class) constructor(
     val label: String? = null,
     val label_url: String? = null,
     val language: String,
-    val lyrics: String? = null,
     val lyrics_snippet: String? = null,
+    val lyrics: String? = null,
     val media_preview_url: String? = null,
     val media_url: String? = null, // Downloadable M4A Link
     val music: String,

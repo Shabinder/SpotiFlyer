@@ -42,50 +42,32 @@ actual suspend fun downloadTracks(
     fetcher: FetchPlatformQueryResult,
     dir: Dir
 ) {
-    list.forEach {
+    list.forEach { track ->
         withContext(dispatcherIO) {
-            allTracksStatus[it.title] = DownloadStatus.Queued
-            if (!it.videoID.isNullOrBlank()) { // Video ID already known!
-                downloadTrack(it.videoID!!, it, fetcher, dir)
-            } else {
-                val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
-                val videoID = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery, it)
-                println(videoID + " : " + it.title)
-                if (videoID.isNullOrBlank()) {
-                    allTracksStatus[it.title] = DownloadStatus.Failed
+            allTracksStatus[track.title] = DownloadStatus.Queued
+            val url = fetcher.findMp3DownloadLink(track)
+            if (!url.isNullOrBlank()) { // Successfully Grabbed Mp3 URL
+                downloadFile(url).collect {
+                    when (it) {
+                        is DownloadResult.Success -> {
+                            println("Download Completed")
+                            dir.saveFileWithMetadata(it.byteArray, track) {}
+                        }
+                        is DownloadResult.Error -> {
+                            allTracksStatus[track.title] = DownloadStatus.Failed
+                            println("Download Error: ${track.title}")
+                        }
+                        is DownloadResult.Progress -> {
+                            allTracksStatus[track.title] = DownloadStatus.Downloading(it.progress)
+                            println("Download Progress: ${it.progress}  : ${track.title}")
+                        }
+                    }
                     DownloadProgressFlow.emit(allTracksStatus)
-                } else { // Found Youtube Video ID
-                    downloadTrack(videoID, it, fetcher, dir)
                 }
+            } else {
+                allTracksStatus[track.title] = DownloadStatus.Failed
+                DownloadProgressFlow.emit(allTracksStatus)
             }
-            DownloadProgressFlow.emit(allTracksStatus)
-        }
-    }
-}
-
-suspend fun downloadTrack(videoID: String, track: TrackDetails, fetcher: FetchPlatformQueryResult, dir: Dir) {
-    val url = fetcher.youtubeMp3.getMp3DownloadLink(videoID)
-    if (url == null) {
-        allTracksStatus[track.title] = DownloadStatus.Failed
-        DownloadProgressFlow.emit(allTracksStatus)
-        println("No URL to Download")
-    } else {
-        downloadFile(url).collect {
-            when (it) {
-                is DownloadResult.Success -> {
-                    println("Download Completed")
-                    dir.saveFileWithMetadata(it.byteArray, track) {}
-                }
-                is DownloadResult.Error -> {
-                    allTracksStatus[track.title] = DownloadStatus.Failed
-                    println("Download Error: ${track.title}")
-                }
-                is DownloadResult.Progress -> {
-                    allTracksStatus[track.title] = DownloadStatus.Downloading(it.progress)
-                    println("Download Progress: ${it.progress}  : ${track.title}")
-                }
-            }
-            DownloadProgressFlow.emit(allTracksStatus)
         }
     }
 }

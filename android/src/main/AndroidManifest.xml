@@ -71,11 +71,6 @@
             </intent-filter>
         </activity>
 
-        <meta-data
-            android:name="com.razorpay.ApiKey"
-            android:value="rzp_live_3ZQeoFYOxjmXye"
-            />
-
         <service android:name="com.shabinder.common.di.worker.ForegroundService"/>
     </application>
 </manifest>

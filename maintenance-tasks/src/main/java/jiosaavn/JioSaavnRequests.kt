@@ -1,6 +1,8 @@
 package jiosaavn
 
 import analytics_html_img.client
+import audio_conversion.AudioToMp3
+import io.github.shabinder.fuzzywuzzy.diffutils.FuzzySearch
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
 import io.ktor.http.Parameters
@@ -16,6 +18,7 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import utils.debug
 
 val serializer = Json {
     ignoreUnknownKeys = true
@@ -24,9 +27,22 @@ val serializer = Json {
 
 interface JioSaavnRequests {
 
+    suspend fun findSongDownloadURL(
+        trackName: String,
+        trackArtists: List<String>,
+    ): String? {
+        val songs = searchForSong(trackName)
+        val bestMatches = sortByBestMatch(songs, trackName, trackArtists)
+        val m4aLink = bestMatches.keys.firstOrNull()?.let {
+            getSongFromID(it).media_url
+        }
+        val mp3Link = m4aLink?.let { AudioToMp3.convertToMp3(it) }
+        return mp3Link
+    }
+
     suspend fun searchForSong(
         query: String,
-        includeLyrics: Boolean = true
+        includeLyrics: Boolean = false
     ): List<SaavnSearchResult> {
         /*if (query.startsWith("http") && query.contains("saavn.com")) {
             return listOf(getSong(query))
@@ -201,6 +217,64 @@ interface JioSaavnRequests {
                     put("lyrics", "")
                 }
             }
+        }
+    }
+
+    fun sortByBestMatch(
+        tracks: List<SaavnSearchResult>,
+        trackName: String,
+        trackArtists: List<String>,
+    ): Map<String, Float> {
+
+        /*
+        * "linksWithMatchValue" is map with Saavn VideoID and its rating/match with 100 as Max Value
+        **/
+        val linksWithMatchValue = mutableMapOf<String, Float>()
+
+        for (result in tracks) {
+            var hasCommonWord = false
+
+            val resultName = result.title.toLowerCase().replace("/", " ")
+            val trackNameWords = trackName.toLowerCase().split(" ")
+
+            for (nameWord in trackNameWords) {
+                if (nameWord.isNotBlank() && FuzzySearch.partialRatio(nameWord, resultName) > 85) hasCommonWord = true
+            }
+
+            // Skip this Result if No Word is Common in Name
+            if (!hasCommonWord) {
+                debug("Saavn Removing Common Word:  ", result.toString())
+                continue
+            }
+
+            // Find artist match
+            // Will Be Using Fuzzy Search Because YT Spelling might be mucked up
+            // match  = (no of artist names in result) / (no. of artist names on spotify) * 100
+            var artistMatchNumber = 0
+
+            // String Containing All Artist Names from JioSaavn Search Result
+            val artistListString = mutableSetOf<String>().apply {
+                result.more_info?.singers?.split(",")?.let { addAll(it) }
+                result.more_info?.primary_artists?.toLowerCase()?.split(",")?.let { addAll(it) }
+            }.joinToString(" , ")
+
+            for (artist in trackArtists) {
+                if (FuzzySearch.partialRatio(artist.toLowerCase(), artistListString) > 85)
+                    artistMatchNumber++
+            }
+
+            if (artistMatchNumber == 0) {
+                debug("Artist Match Saavn Removing:   $result")
+                continue
+            }
+            val artistMatch: Float = (artistMatchNumber.toFloat() / trackArtists.size) * 100
+            val nameMatch: Float = FuzzySearch.partialRatio(resultName, trackName).toFloat() / 100
+            val avgMatch = (artistMatch + nameMatch) / 2
+
+            linksWithMatchValue[result.id] = avgMatch
+        }
+        return linksWithMatchValue.toList().sortedByDescending { it.second }.toMap().also {
+            debug("Match Found for $trackName - ${!it.isNullOrEmpty()}")
         }
     }
 

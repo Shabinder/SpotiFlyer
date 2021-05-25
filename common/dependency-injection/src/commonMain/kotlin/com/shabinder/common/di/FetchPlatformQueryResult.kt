@@ -17,23 +17,28 @@
 package com.shabinder.common.di
 
 import com.shabinder.common.database.DownloadRecordDatabaseQueries
+import com.shabinder.common.di.audioToMp3.AudioToMp3
 import com.shabinder.common.di.providers.GaanaProvider
 import com.shabinder.common.di.providers.SaavnProvider
 import com.shabinder.common.di.providers.SpotifyProvider
 import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
 import com.shabinder.common.di.providers.YoutubeProvider
+import com.shabinder.common.di.providers.get
 import com.shabinder.common.models.PlatformQueryResult
+import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.spotify.Source
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class FetchPlatformQueryResult(
-    val gaanaProvider: GaanaProvider,
+    private val gaanaProvider: GaanaProvider,
     val spotifyProvider: SpotifyProvider,
     val youtubeProvider: YoutubeProvider,
-    val saavnProvider: SaavnProvider,
+    private val saavnProvider: SaavnProvider,
     val youtubeMusic: YoutubeMusic,
     val youtubeMp3: YoutubeMp3,
+    val audioToMp3: AudioToMp3,
     val dir: Dir
 ) {
     private val db: DownloadRecordDatabaseQueries?
@@ -69,6 +74,40 @@ class FetchPlatformQueryResult(
         }
         return result
     }
+
+    // 1) Try Finding on JioSaavn (better quality upto 320KBPS)
+    // 2) If Not found try finding on Youtube Music
+    suspend fun findMp3DownloadLink(
+        track: TrackDetails
+    ): String? =
+        if (track.videoID != null) {
+            // We Already have VideoID
+            when (track.source) {
+                Source.JioSaavn -> {
+                    saavnProvider.getSongFromID(track.videoID!!).media_url?.let { m4aLink ->
+                        audioToMp3.convertToMp3(m4aLink)
+                    }
+                }
+                Source.YouTube -> {
+                    youtubeMp3.getMp3DownloadLink(track.videoID!!)
+                        ?: youtubeProvider.ytDownloader?.getVideo(track.videoID!!)?.get()?.url?.let { m4aLink ->
+                            audioToMp3.convertToMp3(m4aLink)
+                        }
+                }
+                else -> {
+                    null/* Do Nothing, We should never reach here for now*/
+                }
+            }
+        } else {
+            // First Try Getting A Link From JioSaavn
+            saavnProvider.findSongDownloadURL(
+                trackName = track.title,
+                trackArtists = track.artists
+            )
+                // Lets Try Fetching Now From Youtube Music
+                ?: youtubeMusic.findSongDownloadURL(track)
+        }
+
     private fun addToDatabaseAsync(link: String, result: PlatformQueryResult) {
         GlobalScope.launch(dispatcherIO) {
             db?.add(

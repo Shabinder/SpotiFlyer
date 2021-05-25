@@ -17,6 +17,7 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
+import com.shabinder.common.di.audioToMp3.AudioToMp3
 import com.shabinder.common.di.gaana.corsApi
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.YoutubeTrack
@@ -37,9 +38,13 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 import kotlin.math.absoluteValue
+
 class YoutubeMusic constructor(
     private val logger: Kermit,
     private val httpClient: HttpClient,
+    private val youtubeMp3: YoutubeMp3,
+    private val youtubeProvider: YoutubeProvider,
+    private val audioToMp3: AudioToMp3
 ) {
 
     companion object {
@@ -47,10 +52,25 @@ class YoutubeMusic constructor(
         const val tag = "YT Music"
     }
 
-    suspend fun getYTIDBestMatch(query: String, trackDetails: TrackDetails): String? {
+    suspend fun findSongDownloadURL(
+        trackDetails: TrackDetails
+    ): String? {
+        val bestMatchVideoID = getYTIDBestMatch(trackDetails)
+        return bestMatchVideoID?.let { videoID ->
+            youtubeMp3.getMp3DownloadLink(videoID) ?: youtubeProvider.ytDownloader?.getVideo(videoID)?.get()?.url?.let { m4aLink ->
+                audioToMp3.convertToMp3(
+                    m4aLink
+                )
+            }
+        }
+    }
+
+    suspend fun getYTIDBestMatch(
+        trackDetails: TrackDetails
+    ): String? {
         return try {
             sortByBestMatch(
-                getYTTracks(query),
+                getYTTracks("${trackDetails.title} - ${trackDetails.artists.joinToString(",")}"),
                 trackName = trackDetails.title,
                 trackArtists = trackDetails.artists,
                 trackDurationSec = trackDetails.durationSec

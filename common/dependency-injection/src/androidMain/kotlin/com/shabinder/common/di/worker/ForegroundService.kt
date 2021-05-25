@@ -37,13 +37,11 @@ import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.R
 import com.shabinder.common.di.downloadFile
-import com.shabinder.common.di.providers.get
 import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.Status
 import com.shabinder.common.models.TrackDetails
-import io.github.shabinder.models.formats.Format
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -163,38 +161,17 @@ class ForegroundService : Service(), CoroutineScope {
         trackList.forEach {
             launch(Dispatchers.IO) {
                 downloadService.execute {
-                    if (!it.videoID.isNullOrBlank()) { // Video ID already known!
-                        downloadTrack(it.videoID!!, it)
+                    val url = fetcher.findMp3DownloadLink(it)
+                    if (!url.isNullOrBlank()) { // Successfully Grabbed Mp3 URL
+                        enqueueDownload(url, it)
                     } else {
-                        val searchQuery = "${it.title} - ${it.artists.joinToString(",")}"
-                        val videoID = fetcher.youtubeMusic.getYTIDBestMatch(searchQuery, it)
-                        logger.d("Service VideoID") { videoID ?: "Not Found" }
-                        if (videoID.isNullOrBlank()) {
-                            sendTrackBroadcast(Status.FAILED.name, it)
-                            failed++
-                            updateNotification()
-                            allTracksStatus[it.title] = DownloadStatus.Failed
-                        } else { // Found Youtube Video ID
-                            downloadTrack(videoID, it)
-                        }
+                        sendTrackBroadcast(Status.FAILED.name, it)
+                        failed++
+                        updateNotification()
+                        allTracksStatus[it.title] = DownloadStatus.Failed
                     }
                 }
             }
-        }
-    }
-
-    private suspend fun downloadTrack(videoID: String, track: TrackDetails) {
-        try {
-            val url = fetcher.youtubeMp3.getMp3DownloadLink(videoID)
-            if (url == null) {
-                val audioData: Format = ytDownloader?.getVideo(videoID)?.get() ?: throw Exception("Java YT Dependency Error")
-                val ytUrl = audioData.url!! // We Will catch NPE
-                enqueueDownload(ytUrl, track)
-            } else enqueueDownload(url, track)
-        } catch (e: Exception) {
-            logger.d("Service YT Error") { e.message.toString() }
-            sendTrackBroadcast(Status.FAILED.name, track)
-            allTracksStatus[track.title] = DownloadStatus.Failed
         }
     }
 

@@ -1,6 +1,8 @@
-package audio_conversion
+package com.shabinder.common.di.audioToMp3
 
-import analytics_html_img.client
+import co.touchlab.kermit.Kermit
+import com.shabinder.common.models.AudioQuality
+import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
@@ -9,9 +11,23 @@ import io.ktor.client.request.headers
 import io.ktor.client.statement.HttpStatement
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.delay
-import utils.debug
 
-object AudioToMp3 {
+interface AudioToMp3 {
+
+    val client: HttpClient
+    val logger: Kermit
+
+    companion object {
+        operator fun invoke(
+            client: HttpClient,
+            logger: Kermit
+        ): AudioToMp3 {
+            return object : AudioToMp3 {
+                override val client: HttpClient = client
+                override val logger: Kermit = logger
+            }
+        }
+    }
 
     suspend fun convertToMp3(
         URL: String,
@@ -34,7 +50,7 @@ object AudioToMp3 {
                 ""
             }
             retryCount--
-            debug("Job Status", jobStatus)
+            logger.i("Job Status") { jobStatus }
             if (!jobStatus.contains("d")) delay(400) // Add Delay , to give Server Time to process audio
         } while (!jobStatus.contains("d", true) && retryCount != 0)
 
@@ -51,7 +67,7 @@ object AudioToMp3 {
     private suspend fun convertRequest(
         URL: String,
         host: String? = null,
-        audioQuality: AudioQuality = AudioQuality.`320KBPS`,
+        audioQuality: AudioQuality = AudioQuality.KBPS160,
     ): String {
         val activeHost = host ?: getHost()
         val res = client.submitFormWithBinaryData<String>(
@@ -66,12 +82,12 @@ object AudioToMp3 {
             }
         ) {
             headers {
-                header("Host", activeHost.getHostDomain().also { debug(it) })
+                header("Host", activeHost.getHostDomain().also { logger.i("AudioToMp3 Host") { it } })
                 header("Origin", "https://www.onlineconverter.com")
                 header("Referer", "https://www.onlineconverter.com/")
             }
         }.run {
-            debug(this)
+            logger.d { this }
             dropLast(3) // last 3 are useless unicode char
         }
 
@@ -80,7 +96,7 @@ object AudioToMp3 {
                 header("Host", "www.onlineconverter.com")
             }
         }.execute()
-        debug("Schedule Job ${job.status.isSuccess()}")
+        logger.i("Schedule Conversion Job") { job.status.isSuccess().toString() }
         return res
     }
 
@@ -91,7 +107,7 @@ object AudioToMp3 {
             headers {
                 header("Host", "www.onlineconverter.com")
             }
-        }.also { debug("Active Host", it) }
+        }.also { logger.i("Active Host") { it } }
     }
     // Extract full Domain from URL
     // ex - hostveryfast.onlineconverter.com

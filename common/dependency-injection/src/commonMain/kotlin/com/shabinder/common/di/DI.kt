@@ -20,6 +20,7 @@ import co.touchlab.kermit.Kermit
 import com.russhwolf.settings.Settings
 import com.shabinder.common.database.databaseModule
 import com.shabinder.common.database.getLogger
+import com.shabinder.common.di.audioToMp3.AudioToMp3
 import com.shabinder.common.di.providers.GaanaProvider
 import com.shabinder.common.di.providers.SaavnProvider
 import com.shabinder.common.di.providers.SpotifyProvider
@@ -56,13 +57,14 @@ fun commonModule(enableNetworkLogs: Boolean) = module {
     single { Settings() }
     single { Kermit(getLogger()) }
     single { TokenStore(get(), get()) }
-    single { YoutubeMusic(get(), get()) }
+    single { AudioToMp3(get(), get()) }
     single { SpotifyProvider(get(), get(), get()) }
     single { GaanaProvider(get(), get(), get()) }
-    single { SaavnProvider(get(), get(), get()) }
+    single { SaavnProvider(get(), get(), get(), get()) }
     single { YoutubeProvider(get(), get(), get()) }
     single { YoutubeMp3(get(), get(), get()) }
-    single { FetchPlatformQueryResult(get(), get(), get(), get(), get(), get(), get()) }
+    single { YoutubeMusic(get(), get(), get(), get(), get()) }
+    single { FetchPlatformQueryResult(get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
 @ThreadLocal
