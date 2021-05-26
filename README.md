@@ -52,7 +52,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 | MacOS    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=5F85CE&label=MacOS-dmg&logo=apple&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/SpotiFlyer-MacOS-2.3.5.dmg) | ✅ Stable | 
 | MacOS-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=5F85CE&label=MacOS-jar&logo=apple&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/SpotiFlyer-MacOSJAR-2.3.5.jar) | ✅ Stable |
 | Linux-DEB    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=D0074E&label=Linux-deb&logo=debian&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/spotiflyer_2.3.5-LinuxDeb.deb)| ✅ Stable |
-| Linux-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=EBA201&label=Linux-jar&logo=linux&style=for-the-badge)](https://github.com/theapache64/stackzy/releases/latest)| ✅ Stable | 
+| Linux-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=EBA201&label=Linux-jar&logo=linux&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v2.3.5/SpotiFlyer-linux-x64-2.3.5.jar)| ✅ Stable | 
 | Web    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=FF7139&label=SpotiFlyer&logo=firefox&style=for-the-badge)](https://shabinder.github.io/SpotiFlyer/) | ✅ Beta | 
 
 - To run the `jar` version, you need Java 15 or above.
