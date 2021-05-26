@@ -4,15 +4,19 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +30,8 @@ import com.shabinder.common.models.methods
 @Composable
 actual fun DonationDialog(
     isVisible: Boolean,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onSnooze: () -> Unit
 ) {
     AnimatedVisibility(
         isVisible
@@ -39,7 +44,7 @@ actual fun DonationDialog(
             ) {
                 Column(Modifier.padding(16.dp)) {
                     Text(
-                        "Support Us",
+                        "We Need Your Support!",
                         style = SpotiFlyerTypography.h5,
                         textAlign = TextAlign.Center,
                         color = colorAccent,
@@ -51,12 +56,35 @@ actual fun DonationDialog(
                         modifier = Modifier.fillMaxWidth().clickable(
                             onClick = {
                                 onDismiss()
+                                methods.value.openPlatform("", "https://opencollective.com/spotiflyer/donate")
+                            }
+                        )
+                            .padding(vertical = 6.dp)
+                    ) {
+                        Icon(OpenCollectiveLogo(), "Open Collective Logo", Modifier.size(24.dp), tint = Color(0xFFCCCCCC))
+                        Spacer(modifier = Modifier.padding(start = 16.dp))
+                        Column {
+                            Text(
+                                text = "Open Collective",
+                                style = SpotiFlyerTypography.h6
+                            )
+                            Text(
+                                text = "Worldwide Donations",
+                                style = SpotiFlyerTypography.subtitle2
+                            )
+                        }
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth().clickable(
+                            onClick = {
+                                onDismiss()
                                 methods.value.openPlatform("", "https://www.paypal.com/paypalme/shabinder")
                             }
                         )
                             .padding(vertical = 6.dp)
                     ) {
-                        Icon(PaypalLogo(), "Paypal Logo", tint = Color(0xFFCCCCCC))
+                        Icon(PaypalLogo(), "Paypal Logo", Modifier.size(24.dp), tint = Color(0xFFCCCCCC))
                         Spacer(modifier = Modifier.padding(start = 16.dp))
                         Column {
                             Text(
@@ -79,7 +107,7 @@ actual fun DonationDialog(
                             ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(RazorPay(), "Indian Rupee Logo", Modifier.size(32.dp), tint = Color(0xFFCCCCCC))
+                        Icon(RazorPay(), "Indian Rupee Logo", Modifier.size(24.dp), tint = Color(0xFFCCCCCC))
                         Spacer(modifier = Modifier.padding(start = 16.dp))
                         Column {
                             Text(
@@ -92,39 +120,21 @@ actual fun DonationDialog(
                             )
                         }
                     }
+                    Spacer(modifier = Modifier.padding(vertical = 16.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth()
+                    ) {
+                        OutlinedButton(onClick = onSnooze) {
+                            Text("Dismiss.")
+                        }
+                        TextButton(onClick = onDismiss, colors = ButtonDefaults.buttonColors()) {
+                            Text("Remind Later!")
+                        }
+                    }
                 }
             }
         }
-
-        /*AlertDialog(
-            buttons = {
-                *//*    TextButton({
-                        //Retry Network Connection
-                    },
-                        Modifier.padding(bottom = 16.dp,start = 16.dp,end = 16.dp).fillMaxWidth().background(Color(0xFFFC5C7D),shape = RoundedCornerShape(size = 8.dp)).padding(horizontal = 8.dp),
-                    ){
-                        Text("Retry",color = Color.Black,fontSize = 18.sp,textAlign = TextAlign.Center)
-                        Icon(Icons.Rounded.SyncProblem,"Check Network Connection Again")
-                    }
-                *//*},
-            *//*title = {
-                    Column {
-                        Text(
-                            "Support Us",
-                            style = SpotiFlyerTypography.h5,
-                            textAlign = TextAlign.Center,
-                            color = colorAccent,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Spacer(modifier = Modifier.padding(vertical = 16.dp))
-                    }
-            },*//*
-            backgroundColor = Color.DarkGray,
-            text = {
-
-            }
-            ,shape = SpotiFlyerShapes.medium,
-            onDismissRequest = onDismiss
-        )*/
     }
 }

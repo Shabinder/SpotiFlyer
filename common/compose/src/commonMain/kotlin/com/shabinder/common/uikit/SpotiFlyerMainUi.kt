@@ -256,7 +256,16 @@ fun AboutColumn(
                             "Open Gaana",
                             tint = Color.Unspecified,
                             modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                                onClick = { methods.value.openPlatform("com.gaana", "http://gaana.com") }
+                                onClick = { methods.value.openPlatform("com.gaana", "https://www.gaana.com") }
+                            )
+                        )
+                        Spacer(modifier = modifier.padding(start = 16.dp))
+                        Icon(
+                            SaavnLogo(),
+                            "Open Jio Saavn",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.clickable(
+                                onClick = { methods.value.openPlatform("com.jio.media.jiobeats", "https://www.jiosaavn.com/") }
                             )
                         )
                         Spacer(modifier = modifier.padding(start = 16.dp))
@@ -265,7 +274,7 @@ fun AboutColumn(
                             "Open Youtube",
                             tint = Color.Unspecified,
                             modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
-                                onClick = { methods.value.openPlatform("com.google.android.youtube", "http://m.youtube.com") }
+                                onClick = { methods.value.openPlatform("com.google.android.youtube", "https://m.youtube.com") }
                             )
                         )
                         Spacer(modifier = modifier.padding(start = 12.dp))
@@ -299,7 +308,7 @@ fun AboutColumn(
                         )
                             .padding(vertical = 6.dp)
                     ) {
-                        Icon(GithubLogo(), "Open Project Repo", tint = Color(0xFFCCCCCC))
+                        Icon(GithubLogo(), "Open Project Repo", Modifier.size(32.dp), tint = Color(0xFFCCCCCC))
                         Spacer(modifier = Modifier.padding(start = 16.dp))
                         Column {
                             Text(
@@ -337,6 +346,9 @@ fun AboutColumn(
                         isDonationDialogVisible,
                         onDismiss = {
                             isDonationDialogVisible = false
+                        },
+                        onSnooze = {
+                            isDonationDialogVisible = false
                         }
                     )
 
@@ -350,7 +362,7 @@ fun AboutColumn(
                             ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Rounded.CardGiftcard, "Support Developer")
+                        Icon(Icons.Rounded.CardGiftcard, "Support Developer", Modifier.size(32.dp))
                         Spacer(modifier = Modifier.padding(start = 16.dp))
                         Column {
                             Text(
@@ -373,7 +385,7 @@ fun AboutColumn(
                             ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Rounded.Share, "Share SpotiFlyer App")
+                        Icon(Icons.Rounded.Share, "Share SpotiFlyer App", Modifier.size(32.dp))
                         Spacer(modifier = Modifier.padding(start = 16.dp))
                         Column {
                             Text(
@@ -455,7 +467,7 @@ fun DownloadRecordItem(
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(end = 8.dp)) {
         ImageLoad(
             item.coverUrl,
-            loadImage,
+            { loadImage(item.coverUrl) },
             "Album Art",
             modifier = Modifier.height(70.dp).width(70.dp).clip(SpotiFlyerShapes.medium)
         )

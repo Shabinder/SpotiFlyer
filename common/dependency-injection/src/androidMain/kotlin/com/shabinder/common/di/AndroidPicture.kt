@@ -16,8 +16,67 @@
 
 package com.shabinder.common.di
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 
 actual data class Picture(
     var image: ImageBitmap?
 )
+fun getMemoryEfficientBitmap(
+    input: ByteArray,
+    reqWidth: Int,
+    reqHeight: Int,
+    offset: Int = 0,
+    size: Int = input.size
+): Bitmap? {
+    return BitmapFactory.Options().run {
+        inJustDecodeBounds = true
+        BitmapFactory.decodeByteArray(input, offset, size, this)
+
+        // Calculate inSampleSize
+        inSampleSize = calculateInSampleSize(this, reqWidth, reqHeight)
+
+        // Decode bitmap with inSampleSize set
+        inJustDecodeBounds = false
+        // Return Mem. Efficient Bitmap
+        BitmapFactory.decodeByteArray(input, offset, size, this)
+    }
+}
+fun getMemoryEfficientBitmap(
+    filePath: String,
+    reqWidth: Int,
+    reqHeight: Int,
+): Bitmap? {
+    return BitmapFactory.Options().run {
+        inJustDecodeBounds = true
+        BitmapFactory.decodeFile(filePath, this)
+
+        // Calculate inSampleSize
+        inSampleSize = calculateInSampleSize(this, reqWidth, reqHeight)
+
+        // Decode bitmap with inSampleSize set
+        inJustDecodeBounds = false
+
+        BitmapFactory.decodeFile(filePath, this)
+    }
+}
+fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+    // Raw height and width of image
+    val (height: Int, width: Int) = options.run { outHeight to outWidth }
+    var inSampleSize = 1
+
+    if (height > reqHeight || width > reqWidth) {
+
+        val halfHeight: Int = height / 2
+        val halfWidth: Int = width / 2
+
+        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+        // height and width larger than the requested height and width.
+        while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+            inSampleSize *= 2
+        }
+    }
+
+    return inSampleSize
+}

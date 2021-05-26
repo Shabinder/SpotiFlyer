@@ -24,17 +24,15 @@ import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
 import com.russhwolf.settings.Settings
 import com.shabinder.common.database.SpotiFlyerDatabase
+import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
 import com.shabinder.database.Database
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -45,33 +43,9 @@ import java.net.URL
 @Suppress("DEPRECATION")
 actual class Dir actual constructor(
     private val logger: Kermit,
-    private val settings: Settings,
+    settingsPref: Settings,
     spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
-    companion object {
-        const val DirKey = "downloadDir"
-        const val AnalyticsKey = "analytics"
-        const val firstLaunch = "firstLaunch"
-    }
-
-    actual val isFirstLaunch get() = settings.getBooleanOrNull(firstLaunch) ?: true
-
-    actual fun firstLaunchDone() {
-        settings.putBoolean(firstLaunch, false)
-    }
-
-    /*
-    * Do we have Analytics Permission?
-    *   -   Defaults to `False`
-    * */
-    actual val isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
-
-    actual fun enableAnalytics() {
-        settings.putBoolean(AnalyticsKey, true)
-    }
-
-    actual fun setDownloadDirectory(newBasePath: String) = settings.putString(DirKey, newBasePath)
-
     @Suppress("DEPRECATION")
     private val defaultBaseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).toString()
 
@@ -171,18 +145,15 @@ actual class Dir actual constructor(
 
     actual fun addToLibrary(path: String) = methods.value.platformActions.addToLibrary(path)
 
-    actual suspend fun loadImage(url: String): Picture = withContext(dispatcherIO) {
+    actual suspend fun loadImage(url: String, reqWidth: Int, reqHeight: Int): Picture = withContext(dispatcherIO) {
         val cachePath = imageCacheDir() + getNameURL(url)
-        Picture(image = (loadCachedImage(cachePath) ?: freshImage(url))?.asImageBitmap())
+        Picture(image = (loadCachedImage(cachePath, reqWidth, reqHeight) ?: freshImage(url, reqWidth, reqHeight))?.asImageBitmap())
     }
 
-    private fun loadCachedImage(cachePath: String): Bitmap? {
+    private fun loadCachedImage(cachePath: String, reqWidth: Int, reqHeight: Int): Bitmap? {
         return try {
-            BitmapFactory.decodeFile(cachePath)
+            getMemoryEfficientBitmap(cachePath, reqWidth, reqHeight)
         } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        } catch (e: OutOfMemoryError) {
             e.printStackTrace()
             null
         }
@@ -200,27 +171,36 @@ actual class Dir actual constructor(
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun freshImage(url: String): Bitmap? = withContext(dispatcherIO) {
+    private suspend fun freshImage(url: String, reqWidth: Int, reqHeight: Int): Bitmap? = withContext(dispatcherIO) {
         try {
             val source = URL(url)
             val connection: HttpURLConnection = source.openConnection() as HttpURLConnection
             connection.connectTimeout = 5000
             connection.connect()
 
-            val input: InputStream = connection.inputStream
-            val result: Bitmap? = BitmapFactory.decodeStream(input)
+            val input: ByteArray = connection.inputStream.readBytes()
 
-            if (result != null) {
-                GlobalScope.launch(Dispatchers.IO) {
-                    cacheImage(result, imageCacheDir() + getNameURL(url))
-                }
-                result
-            } else null
+            // Get Memory Efficient Bitmap
+            val bitmap: Bitmap? = getMemoryEfficientBitmap(input, reqWidth, reqHeight)
+
+            parallelExecutor.execute {
+                // Decode and Cache Full Sized Image in Background
+                cacheImage(BitmapFactory.decodeByteArray(input, 0, input.size), imageCacheDir() + getNameURL(url))
+            }
+            bitmap // return Memory Efficient Bitmap
         } catch (e: Exception) {
             e.printStackTrace()
             null
         }
     }
 
+    /*
+    * Parallel Executor with 4 concurrent operation at a time.
+    *   -   We will use this to queue up operations and decode Full Sized Images
+    *   -   Will Decode Only 4 at a time , to avoid going into `Out of Memory`
+    * */
+    private val parallelExecutor = ParallelExecutor(Dispatchers.IO)
+
     actual val db: Database? = spotiFlyerDatabase.instance
+    actual val settings: Settings = settingsPref
 }

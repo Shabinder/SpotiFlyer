@@ -100,8 +100,10 @@ internal class SpotiFlyerRootImpl(
     override val callBacks = object : SpotiFlyerRootCallBacks {
         override fun searchLink(link: String) = onMainOutput(SpotiFlyerMain.Output.Search(link))
         override fun popBackToHomeScreen() {
-            router.popWhile {
-                it !is Configuration.Main
+            if (router.state.value.activeChild.instance is Child.List && router.state.value.backStack.isNotEmpty()) {
+                router.popWhile {
+                    it !is Configuration.Main
+                }
             }
         }
         override fun showToast(text: String) { toastState.value = text }
@@ -125,7 +127,9 @@ internal class SpotiFlyerRootImpl(
     private fun onListOutput(output: SpotiFlyerList.Output): Unit =
         when (output) {
             is SpotiFlyerList.Output.Finished -> {
-                router.pop()
+                if (router.state.value.activeChild.instance is Child.List && router.state.value.backStack.isNotEmpty()) {
+                    router.pop()
+                }
                 analytics.homeScreenVisit()
             }
         }

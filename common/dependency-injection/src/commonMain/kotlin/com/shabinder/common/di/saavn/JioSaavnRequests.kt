@@ -13,9 +13,7 @@ import io.github.shabinder.utils.getJsonArray
 import io.github.shabinder.utils.getJsonObject
 import io.github.shabinder.utils.getString
 import io.ktor.client.HttpClient
-import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
-import io.ktor.http.Parameters
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -88,13 +86,7 @@ interface JioSaavnRequests {
     private suspend fun getSongID(
         URL: String,
     ): String {
-        val res = httpClient.get<String>(URL) {
-            body = FormDataContent(
-                Parameters.build {
-                    append("bitrate", "320")
-                }
-            )
-        }
+        val res = httpClient.get<String>(URL)
         return try {
             res.split("\"song\":{\"type\":\"")[1].split("\",\"image\":")[0].split("\"id\":\"").last()
         } catch (e: IndexOutOfBoundsException) {

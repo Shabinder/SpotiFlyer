@@ -27,7 +27,8 @@ import com.shabinder.common.models.methods
 @Composable
 actual fun DonationDialog(
     isVisible: Boolean,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onSnooze: () -> Unit
 ) {
     AnimatedVisibility(
         isVisible

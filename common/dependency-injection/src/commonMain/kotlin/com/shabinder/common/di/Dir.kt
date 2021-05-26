@@ -32,27 +32,70 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt
 
+const val DirKey = "downloadDir"
+const val AnalyticsKey = "analytics"
+const val FirstLaunch = "firstLaunch"
+const val DonationInterval = "donationInterval"
+
 expect class Dir(
     logger: Kermit,
-    settings: Settings,
+    settingsPref: Settings,
     spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     val db: Database?
-    val isAnalyticsEnabled: Boolean
-    val isFirstLaunch: Boolean
-    fun enableAnalytics()
-    fun firstLaunchDone()
+    val settings: Settings
     fun isPresent(path: String): Boolean
     fun fileSeparator(): String
     fun defaultDir(): String
     fun imageCacheDir(): String
     fun createDirectory(dirPath: String)
-    fun setDownloadDirectory(newBasePath: String)
     suspend fun cacheImage(image: Any, path: String) // in Android = ImageBitmap, Desktop = BufferedImage
-    suspend fun loadImage(url: String): Picture
+    suspend fun loadImage(url: String, reqWidth: Int = 150, reqHeight: Int = 150): Picture
     suspend fun clearCache()
     suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, trackDetails: TrackDetails, postProcess: (track: TrackDetails) -> Unit = {})
     fun addToLibrary(path: String)
+}
+
+/*
+* Do we have Analytics Permission?
+*   -   Defaults to `False`
+* */
+val Dir.isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
+fun Dir.enableAnalytics() = settings.putBoolean(AnalyticsKey, true)
+
+fun Dir.setDownloadDirectory(newBasePath: String) = settings.putString(DirKey, newBasePath)
+
+val Dir.getDonationOffset: Int get() = (settings.getIntOrNull(DonationInterval) ?: 3).also {
+    // Min. Donation Asking Interval is `3`
+    if (it < 3) setDonationOffset(3) else setDonationOffset(it - 1)
+}
+fun Dir.setDonationOffset(offset: Int = 5) = settings.putInt(DonationInterval, offset)
+
+val Dir.isFirstLaunch get() = settings.getBooleanOrNull(FirstLaunch) ?: true
+fun Dir.firstLaunchDone() {
+    settings.putBoolean(FirstLaunch, false)
+}
+
+/*
+* Call this function at startup!
+* */
+fun Dir.createDirectories() {
+    createDirectory(defaultDir())
+    createDirectory(imageCacheDir())
+    createDirectory(defaultDir() + "Tracks/")
+    createDirectory(defaultDir() + "Albums/")
+    createDirectory(defaultDir() + "Playlists/")
+    createDirectory(defaultDir() + "YT_Downloads/")
+}
+
+fun Dir.finalOutputDir(itemName: String, type: String, subFolder: String, defaultDir: String, extension: String = ".mp3"): String =
+    defaultDir + removeIllegalChars(type) + this.fileSeparator() +
+        if (subFolder.isEmpty())"" else { removeIllegalChars(subFolder) + this.fileSeparator() } +
+        removeIllegalChars(itemName) + extension
+/*DIR Specific Operation End*/
+
+fun getNameURL(url: String): String {
+    return url.substring(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1, url.length).replace('/', '_')
 }
 
 suspend fun downloadFile(url: String): Flow<DownloadResult> {
@@ -95,24 +138,3 @@ suspend fun downloadByteArray(
     client.close()
     return response
 }
-
-fun getNameURL(url: String): String {
-    return url.substring(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1, url.length).replace('/', '_')
-}
-
-/*
-* Call this function at startup!
-* */
-fun Dir.createDirectories() {
-    createDirectory(defaultDir())
-    createDirectory(imageCacheDir())
-    createDirectory(defaultDir() + "Tracks/")
-    createDirectory(defaultDir() + "Albums/")
-    createDirectory(defaultDir() + "Playlists/")
-    createDirectory(defaultDir() + "YT_Downloads/")
-}
-
-fun Dir.finalOutputDir(itemName: String, type: String, subFolder: String, defaultDir: String, extension: String = ".mp3"): String =
-    defaultDir + removeIllegalChars(type) + this.fileSeparator() +
-        if (subFolder.isEmpty())"" else { removeIllegalChars(subFolder) + this.fileSeparator() } +
-        removeIllegalChars(itemName) + extension

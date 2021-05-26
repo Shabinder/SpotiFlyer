@@ -40,27 +40,9 @@ import javax.imageio.ImageIO
 
 actual class Dir actual constructor(
     private val logger: Kermit,
-    private val settings: Settings,
-    private val spotiFlyerDatabase: SpotiFlyerDatabase,
+    settingsPref: Settings,
+    spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
-
-    companion object {
-        const val DirKey = "downloadDir"
-        const val AnalyticsKey = "analytics"
-        const val firstLaunch = "firstLaunch"
-    }
-
-    actual val isFirstLaunch get() = settings.getBooleanOrNull(firstLaunch) ?: true
-
-    actual fun firstLaunchDone() {
-        settings.putBoolean(firstLaunch, false)
-    }
-
-    actual val isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
-
-    actual fun enableAnalytics() {
-        settings.putBoolean(AnalyticsKey, true)
-    }
 
     init {
         createDirectories()
@@ -75,8 +57,6 @@ actual class Dir actual constructor(
 
     actual fun defaultDir(): String = (settings.getStringOrNull(DirKey) ?: defaultBaseDir) + fileSeparator() +
         "SpotiFlyer" + fileSeparator()
-
-    actual fun setDownloadDirectory(newBasePath: String) = settings.putString(DirKey, newBasePath)
 
     actual fun isPresent(path: String): Boolean = File(path).exists()
 
@@ -177,14 +157,14 @@ actual class Dir actual constructor(
     }
     actual fun addToLibrary(path: String) {}
 
-    actual suspend fun loadImage(url: String): Picture {
+    actual suspend fun loadImage(url: String, reqWidth: Int, reqHeight: Int): Picture {
         val cachePath = imageCacheDir() + getNameURL(url)
-        var picture: ImageBitmap? = loadCachedImage(cachePath)
-        if (picture == null) picture = freshImage(url)
+        var picture: ImageBitmap? = loadCachedImage(cachePath, reqWidth, reqHeight)
+        if (picture == null) picture = freshImage(url, reqWidth, reqHeight)
         return Picture(image = picture)
     }
 
-    private fun loadCachedImage(cachePath: String): ImageBitmap? {
+    private fun loadCachedImage(cachePath: String, reqWidth: Int, reqHeight: Int): ImageBitmap? {
         return try {
             ImageIO.read(File(cachePath))?.toImageBitmap()
         } catch (e: Exception) {
@@ -194,7 +174,7 @@ actual class Dir actual constructor(
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun freshImage(url: String): ImageBitmap? {
+    private suspend fun freshImage(url: String, reqWidth: Int, reqHeight: Int): ImageBitmap? {
         return withContext(Dispatchers.IO) {
             try {
                 val source = URL(url)
@@ -218,7 +198,8 @@ actual class Dir actual constructor(
         }
     }
 
-    actual val db: Database? get() = spotiFlyerDatabase.instance
+    actual val db: Database? = spotiFlyerDatabase.instance
+    actual val settings: Settings = settingsPref
 }
 
 fun BufferedImage.toImageBitmap() = Image.makeFromEncoded(

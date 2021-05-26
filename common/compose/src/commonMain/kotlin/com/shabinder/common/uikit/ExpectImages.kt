@@ -40,6 +40,9 @@ expect fun SpotiFlyerLogo(): Painter
 expect fun SpotifyLogo(): Painter
 
 @Composable
+expect fun SaavnLogo(): Painter
+
+@Composable
 expect fun YoutubeLogo(): Painter
 
 @Composable
@@ -53,6 +56,9 @@ expect fun GithubLogo(): Painter
 
 @Composable
 expect fun PaypalLogo(): Painter
+
+@Composable
+expect fun OpenCollectiveLogo(): Painter
 
 @Composable
 expect fun RazorPay(): Painter
@@ -69,5 +75,6 @@ expect fun DownloadImageArrow(modifier: Modifier)
 @Composable
 expect fun DonationDialog(
     isVisible: Boolean,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onSnooze: () -> Unit
 )

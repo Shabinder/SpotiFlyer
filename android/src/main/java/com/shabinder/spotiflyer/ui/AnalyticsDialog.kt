@@ -41,7 +41,7 @@ fun AnalyticsDialog(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Rounded.Insights,"Analytics", Modifier.size(52.dp))
                     Spacer(Modifier.padding(horizontal = 4.dp))
-                    Text("Grant Analytics Access",style = SpotiFlyerTypography.h5,textAlign = TextAlign.Center)
+                    Text("Grant Analytics",style = SpotiFlyerTypography.h5,textAlign = TextAlign.Center)
                 }
             },
             backgroundColor = Color.DarkGray,

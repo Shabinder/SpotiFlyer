@@ -51,12 +51,17 @@ interface SpotiFlyerList {
     /*
     * Load Image from cache/Internet and cache it
     * */
-    suspend fun loadImage(url: String): Picture
+    suspend fun loadImage(url: String, isCover: Boolean = false): Picture
 
     /*
     * Sync Tracks Statuses
     * */
     fun onRefreshTracksStatuses()
+
+    /*
+    * Snooze Donation Dialog
+    * */
+    fun snoozeDonationDialog()
 
     interface Dependencies {
         val storeFactory: StoreFactory
@@ -78,7 +83,8 @@ interface SpotiFlyerList {
         val queryResult: PlatformQueryResult? = null,
         val link: String = "",
         val trackList: List<TrackDetails> = emptyList(),
-        val errorOccurred: Exception? = null
+        val errorOccurred: Exception? = null,
+        val askForDonation: Boolean = false,
     )
 }
 

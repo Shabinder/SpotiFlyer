@@ -83,6 +83,9 @@ actual fun HeartIcon() = painterResource(R.drawable.ic_heart)
 actual fun SpotifyLogo() = painterResource(R.drawable.ic_spotify_logo)
 
 @Composable
+actual fun SaavnLogo() = painterResource(R.drawable.ic_jio_saavn_logo)
+
+@Composable
 actual fun GaanaLogo() = painterResource(R.drawable.ic_gaana)
 
 @Composable
@@ -96,6 +99,9 @@ actual fun GithubLogo() = painterResource(R.drawable.ic_github)
 
 @Composable
 actual fun PaypalLogo() = painterResource(R.drawable.ic_paypal_logo)
+
+@Composable
+actual fun OpenCollectiveLogo() = painterResource(R.drawable.ic_opencollective_icon)
 
 @Composable
 actual fun RazorPay() = painterResource(R.drawable.ic_indian_rupee)

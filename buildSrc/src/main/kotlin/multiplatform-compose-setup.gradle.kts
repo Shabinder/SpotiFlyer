@@ -43,9 +43,11 @@ kotlin {
                 implementation(MVIKotlin.coroutines)
                 implementation(MVIKotlin.mvikotlin)
 
+                implementation(compose.ui)
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
+                implementation(compose.animation)
 
                 implementation(Extras.kermit)
                 implementation("dev.icerock.moko:parcelize:0.6.1")

@@ -85,6 +85,9 @@ actual fun HeartIcon() = rememberVectorPainter(vectorXmlResource("drawable/ic_he
 actual fun SpotifyLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_spotify_logo.xml")) as Painter
 
 @Composable
+actual fun SaavnLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_jio_saavn_logo.xml")) as Painter
+
+@Composable
 actual fun YoutubeLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_youtube.xml")) as Painter
 
 @Composable
@@ -98,6 +101,9 @@ actual fun GithubLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_g
 
 @Composable
 actual fun PaypalLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_paypal_logo.xml")) as Painter
+
+@Composable
+actual fun OpenCollectiveLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_opencollective_icon")) as Painter
 
 @Composable
 actual fun RazorPay() = rememberVectorPainter(vectorXmlResource("drawable/ic_indian_rupee.xml")) as Painter

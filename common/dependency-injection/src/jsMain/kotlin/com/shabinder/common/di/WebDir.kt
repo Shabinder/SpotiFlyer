@@ -34,29 +34,9 @@ import org.w3c.dom.ImageBitmap
 
 actual class Dir actual constructor(
     private val logger: Kermit,
-    private val settings: Settings,
-    private val spotiFlyerDatabase: SpotiFlyerDatabase,
+    settingsPref: Settings,
+    spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
-    companion object {
-        const val DirKey = "downloadDir"
-        const val AnalyticsKey = "analytics"
-        const val firstLaunch = "firstLaunch"
-    }
-
-    actual val isFirstLaunch get() = settings.getBooleanOrNull(firstLaunch) ?: true
-
-    actual fun firstLaunchDone() {
-        settings.putBoolean(firstLaunch, false)
-    }
-
-    actual val isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
-
-    actual fun enableAnalytics() {
-        settings.putBoolean(AnalyticsKey, true)
-    }
-
-    actual fun setDownloadDirectory(newBasePath: String) = settings.putString(DirKey, newBasePath)
-
     /*init {
         createDirectories()
     }*/
@@ -127,7 +107,7 @@ actual class Dir actual constructor(
 
     actual fun addToLibrary(path: String) {}
 
-    actual suspend fun loadImage(url: String): Picture {
+    actual suspend fun loadImage(url: String, reqWidth: Int, reqHeight: Int): Picture {
         return Picture(url)
     }
 
@@ -135,7 +115,8 @@ actual class Dir actual constructor(
 
     private suspend fun freshImage(url: String): ImageBitmap? = null
 
-    actual val db: Database? get() = spotiFlyerDatabase.instance
+    actual val db: Database? = spotiFlyerDatabase.instance
+    actual val settings: Settings = settingsPref
 }
 
 fun ByteArray.toArrayBuffer(): ArrayBuffer {

@@ -32,6 +32,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -39,6 +40,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,6 +58,7 @@ import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SpotiFlyerListContent(
     component: SpotiFlyerList,
@@ -68,7 +73,6 @@ fun SpotiFlyerListContent(
             component.onBackPressed()
         }
     }
-
     Box(modifier = modifier.fillMaxSize()) {
         val result = model.queryResult
         if (result == null) {
@@ -92,16 +96,34 @@ fun SpotiFlyerListContent(
                         TrackCard(
                             track = item,
                             downloadTrack = { component.onDownloadClicked(item) },
-                            loadImage = component::loadImage
+                            loadImage = { component.loadImage(item.albumArtURL) }
                         )
                     }
                 },
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
             )
-
+            // Donation Dialog Visibility
+            var visibilty by remember { mutableStateOf(false) }
+            DonationDialog(
+                isVisible = visibilty,
+                onDismiss = {
+                    visibilty = false
+                },
+                onSnooze = {
+                    visibilty = false
+                    component.snoozeDonationDialog()
+                }
+            )
             DownloadAllButton(
-                onClick = { component.onDownloadAllClicked(model.trackList) },
+                onClick = {
+                    component.onDownloadAllClicked(model.trackList)
+                    // Check If we are allowed to show donation Dialog
+                    if (model.askForDonation) {
+                        // Show Donation Dialog
+                        visibilty = true
+                    }
+                },
                 modifier = Modifier.padding(bottom = 24.dp).align(Alignment.BottomCenter)
             )
 
@@ -121,12 +143,12 @@ fun SpotiFlyerListContent(
 fun TrackCard(
     track: TrackDetails,
     downloadTrack: () -> Unit,
-    loadImage: suspend (String) -> Picture
+    loadImage: suspend () -> Picture
 ) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
         ImageLoad(
             track.albumArtURL,
-            loadImage,
+            { loadImage() },
             "Album Art",
             modifier = Modifier
                 .width(70.dp)
@@ -177,7 +199,7 @@ fun TrackCard(
 fun CoverImage(
     title: String,
     coverURL: String,
-    loadImage: suspend (String) -> Picture,
+    loadImage: suspend (URL: String, isCover: Boolean) -> Picture,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -186,7 +208,7 @@ fun CoverImage(
     ) {
         ImageLoad(
             coverURL,
-            loadImage,
+            { loadImage(coverURL, true) },
             "Cover Image",
             modifier = Modifier
                 .padding(12.dp)

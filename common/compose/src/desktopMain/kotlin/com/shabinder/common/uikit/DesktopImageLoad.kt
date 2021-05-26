@@ -18,22 +18,19 @@ import kotlinx.coroutines.withContext
 @Composable
 actual fun ImageLoad(
     link: String,
-    loader: suspend (String) -> Picture,
+    loader: suspend () -> Picture,
     desc: String,
     modifier: Modifier,
     // placeholder: ImageVector
 ) {
     var pic by remember(link) { mutableStateOf<ImageBitmap?>(null) }
-
     LaunchedEffect(link) {
         withContext(dispatcherIO) {
-            pic = loader(link).image
+            pic = loader().image
         }
     }
 
     Crossfade(pic) {
-        if (it == null) {
-            Image(PlaceHolderImage(), desc, modifier, contentScale = ContentScale.Crop)
-        } else Image(it, desc, modifier, contentScale = ContentScale.Crop)
+        if (it == null) Image(PlaceHolderImage(), desc, modifier, contentScale = ContentScale.Crop) else Image(it, desc, modifier, contentScale = ContentScale.Crop)
     }
 }

@@ -24,26 +24,9 @@ import platform.UIKit.UIImageJPEGRepresentation
 
 actual class Dir actual constructor(
     val logger: Kermit,
-    private val settings: Settings,
-    private val spotiFlyerDatabase: SpotiFlyerDatabase,
+    settingsPref: Settings,
+    spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
-    companion object {
-        const val DirKey = "downloadDir"
-        const val AnalyticsKey = "analytics"
-        const val firstLaunch = "firstLaunch"
-    }
-
-    actual val isFirstLaunch get() = settings.getBooleanOrNull(firstLaunch) ?: true
-
-    actual fun firstLaunchDone() {
-        settings.putBoolean(firstLaunch, false)
-    }
-
-    actual val isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
-
-    actual fun enableAnalytics() {
-        settings.putBoolean(AnalyticsKey, true)
-    }
 
     actual fun isPresent(path: String): Boolean = NSFileManager.defaultManager.fileExistsAtPath(path)
 
@@ -54,8 +37,6 @@ actual class Dir actual constructor(
     // TODO Error Handling
     actual fun defaultDir(): String = (settings.getStringOrNull(DirKey) ?: defaultBaseDir) +
         fileSeparator() + "SpotiFlyer" + fileSeparator()
-
-    actual fun setDownloadDirectory(newBasePath: String) = settings.putString(DirKey, newBasePath)
 
     private val defaultDirURL: NSURL by lazy {
         val musicDir = NSFileManager.defaultManager.URLForDirectory(NSMusicDirectory, NSUserDomainMask, null, true, null)!!
@@ -97,7 +78,7 @@ actual class Dir actual constructor(
         }
     }
 
-    actual suspend fun loadImage(url: String): Picture = withContext(dispatcherIO) {
+    actual suspend fun loadImage(url: String, reqWidth: Int, reqHeight: Int): Picture = withContext(dispatcherIO) {
         try {
             val cachePath = imageCacheURL.URLByAppendingPathComponent(getNameURL(url))
             Picture(image = cachePath?.path?.let { loadCachedImage(it) } ?: loadFreshImage(url))
@@ -107,7 +88,7 @@ actual class Dir actual constructor(
         }
     }
 
-    private fun loadCachedImage(filePath: String): UIImage? {
+    private fun loadCachedImage(filePath: String, reqWidth: Int = 150, reqHeight: Int = 150): UIImage? {
         return try {
             UIImage.imageWithContentsOfFile(filePath)
         } catch (e: Exception) {
@@ -116,7 +97,7 @@ actual class Dir actual constructor(
         }
     }
 
-    private suspend fun loadFreshImage(url: String): UIImage? = withContext(dispatcherIO) {
+    private suspend fun loadFreshImage(url: String, reqWidth: Int = 150, reqHeight: Int = 150): UIImage? = withContext(dispatcherIO) {
         try {
             val nsURL = NSURL(string = url)
             val data = NSURLConnection.sendSynchronousRequest(NSURLRequest.requestWithURL(nsURL), null, null)
@@ -195,5 +176,6 @@ actual class Dir actual constructor(
         // TODO
     }
 
+    actual val settings: Settings = settingsPref
     actual val db: Database? = spotiFlyerDatabase.instance
 }

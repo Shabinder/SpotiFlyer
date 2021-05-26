@@ -73,7 +73,7 @@ internal class SpotiFlyerMainImpl(
 
     override suspend fun loadImage(url: String): Picture {
         return cache.get(url) {
-            dir.loadImage(url)
+            dir.loadImage(url, 150, 150)
         }
     }
 }

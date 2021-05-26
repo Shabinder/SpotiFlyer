@@ -21,6 +21,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.shabinder.common.caching.Cache
 import com.shabinder.common.di.Picture
+import com.shabinder.common.di.setDonationOffset
 import com.shabinder.common.di.utils.asValue
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.list.SpotiFlyerList.Dependencies
@@ -52,7 +53,7 @@ internal class SpotiFlyerListImpl(
 
     private val cache = Cache.Builder
         .newBuilder()
-        .maximumCacheSize(150)
+        .maximumCacheSize(75)
         .build<String, Picture>()
 
     override val models: Value<State> = store.asValue()
@@ -73,9 +74,14 @@ internal class SpotiFlyerListImpl(
         store.accept(Intent.RefreshTracksStatuses)
     }
 
-    override suspend fun loadImage(url: String): Picture {
+    override fun snoozeDonationDialog() {
+        dir.setDonationOffset(offset = 10)
+    }
+
+    override suspend fun loadImage(url: String, isCover: Boolean): Picture {
         return cache.get(url) {
-            dir.loadImage(url)
+            if (isCover) dir.loadImage(url, 350, 350)
+            else dir.loadImage(url, 150, 150)
         }
     }
 }

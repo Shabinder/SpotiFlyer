@@ -22,6 +22,7 @@
     <queries>
         <package android:name="com.gaana" />
         <package android:name="com.spotify.music" />
+        <package android:name="com.jio.media.jiobeats" />
         <package android:name="com.google.android.youtube" />
         <package android:name="com.google.android.apps.youtube.music" />
     </queries>
