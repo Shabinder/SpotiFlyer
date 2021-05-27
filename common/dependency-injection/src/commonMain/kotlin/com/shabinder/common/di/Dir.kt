@@ -56,10 +56,6 @@ expect class Dir(
     fun addToLibrary(path: String)
 }
 
-/*
-* Do we have Analytics Permission?
-*   -   Defaults to `False`
-* */
 val Dir.isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
 fun Dir.enableAnalytics() = settings.putBoolean(AnalyticsKey, true)
 

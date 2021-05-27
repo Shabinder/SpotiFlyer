@@ -16,7 +16,7 @@ data class SaavnSong @OptIn(ExperimentalSerializationApi::class) constructor(
     val duration: String,
     val encrypted_media_path: String,
     val encrypted_media_url: String,
-    val explicit_content: Int = 0,
+//    val explicit_content: Int = 0,
     val has_lyrics: Boolean = false,
     val id: String,
     val image: String,
@@ -31,7 +31,7 @@ data class SaavnSong @OptIn(ExperimentalSerializationApi::class) constructor(
     val music_id: String,
     val origin: String? = null,
     val perma_url: String? = null,
-    val play_count: Int = 0,
+//    val play_count: Int = 0,
     val primary_artists: String,
     val primary_artists_id: String,
     val release_date: String, // Format - 2021-05-04
