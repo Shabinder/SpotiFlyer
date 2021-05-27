@@ -90,6 +90,16 @@ To check if YouTube Music is available in your country, visit [YouTube Music](ht
 
 I am hosting a **server for WEB APP on my own personal device** , so expect some downtimes, If you have a **server** available and would like to share , open an issue or ping me wherever you can get a hold of me.
 
+
+### Permissions Info:
+ - **NETWORK**- *(INTERNET, ACCESS_NETWORK_STATE, ACCESS_WIFI_STATE)*: to access the online streaming services, and Confirm Network Connectivity.
+ - **STORAGE**- *READ_STORAGE_PERMISSION, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, MANAGE_EXTERNAL_STORAGE)*: to save Downloaded Media Files.
+ - **QUERY_ALL_PACKAGES**- in order to check if Youtube Music, Spotify, Gaana, JioSaavn, etc apps are installed and if they are, user can directly open them.
+ - **REQUEST_IGNORE_BATTERY_OPTIMIZATIONS**: User Allows App to Run in Background at runtime in Permission Dialog.
+ - **Wake Lock**: Don't let Wifi/Internet Sleep in screen off / dozing state when Songs are being downloaded.
+ - **Foreground Service**: Service responsible to download and save songs to storage even after app is exited/background. 
+ - **NOTE**: Analytics and Crashlytics are **OPT-IN** *(Disabled by Default)* and are **Self-Hosted**.
+
 License
 ![GPL-License](https://img.shields.io/github/license/Shabinder/SpotiFlyer?style=flat-square)
 ----
