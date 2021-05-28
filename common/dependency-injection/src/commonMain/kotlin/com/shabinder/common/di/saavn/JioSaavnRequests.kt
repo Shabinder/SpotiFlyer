@@ -13,6 +13,7 @@ import io.github.shabinder.utils.getJsonArray
 import io.github.shabinder.utils.getJsonObject
 import io.github.shabinder.utils.getString
 import io.ktor.client.HttpClient
+import io.ktor.client.features.ServerResponseException
 import io.ktor.client.request.get
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -52,17 +53,21 @@ interface JioSaavnRequests {
 
         val searchURL = search_base_url + query
         val results = mutableListOf<SaavnSearchResult>()
-        (globalJson.parseToJsonElement(httpClient.get(searchURL)) as JsonObject).getJsonObject("songs").getJsonArray("data")?.forEach {
-            (it as? JsonObject)?.formatData()?.let { jsonObject ->
-                results.add(globalJson.decodeFromJsonElement(SaavnSearchResult.serializer(), jsonObject))
+        try {
+            (globalJson.parseToJsonElement(httpClient.get(searchURL)) as JsonObject).getJsonObject("songs").getJsonArray("data")?.forEach {
+                (it as? JsonObject)?.formatData()?.let { jsonObject ->
+                    results.add(globalJson.decodeFromJsonElement(SaavnSearchResult.serializer(), jsonObject))
+                }
             }
-        }
+        }catch (e: ServerResponseException) {}
         return results
     }
 
     suspend fun getLyrics(ID: String): String? {
-        return (Json.parseToJsonElement(httpClient.get(lyrics_base_url + ID)) as JsonObject)
-            .getString("lyrics")
+        return try {
+            (Json.parseToJsonElement(httpClient.get(lyrics_base_url + ID)) as JsonObject)
+                .getString("lyrics")
+        }catch (e:Exception) { null }
     }
 
     suspend fun getSong(
@@ -74,6 +79,7 @@ interface JioSaavnRequests {
             .formatData(fetchLyrics)
         return globalJson.decodeFromJsonElement(SaavnSong.serializer(), data)
     }
+
     suspend fun getSongFromID(
         ID: String,
         fetchLyrics: Boolean = false
