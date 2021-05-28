@@ -41,7 +41,7 @@ expect val currentPlatform: AllPlatforms
 suspend fun isInternetAccessible(): Boolean {
     return withContext(dispatcherIO) {
         try {
-            ktorHttpClient.head<String>("https://google.com")
+            ktorHttpClient.head<String>("https://open.spotify.com/")
             true
         } catch (e: Exception) {
             e.printStackTrace()

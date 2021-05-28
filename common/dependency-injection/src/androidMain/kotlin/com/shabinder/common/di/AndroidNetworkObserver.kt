@@ -31,6 +31,8 @@ import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.lang.Exception
 import java.net.InetSocketAddress
+import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 const val TAG = "C-Manager"
 
@@ -103,17 +105,16 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
     }
 
     /**
-     * Send a ping to googles primary DNS.
+     * Try Establishing an Actual Internet Connection.
      * If successful, that means we have internet.
      */
     object DoesNetworkHaveInternet {
         suspend fun execute(network: Network): Boolean = withContext(Dispatchers.IO) {
             try {
-                Log.d(TAG, "PINGING google.")
-                val socket = network.socketFactory.createSocket() ?: throw IOException("Socket is null.")
-                socket.connect(InetSocketAddress("8.8.8.8", 53), 1500)
-                socket.close()
-                Log.d(TAG, "PING success.")
+                val url = URL("https://open.spotify.com/")
+                val connection = network.openConnection(url) as HttpsURLConnection
+                connection.connect()
+                connection.disconnect()
                 true
             } catch (e: Exception) {
                 e.printStackTrace()
