@@ -45,7 +45,8 @@ internal class SpotiFlyerMainImpl(
         instanceKeeper.getStore {
             SpotiFlyerMainStoreProvider(
                 storeFactory = storeFactory,
-                database = database
+                database = database,
+                dir = dir
             ).provide()
         }
 
@@ -69,6 +70,10 @@ internal class SpotiFlyerMainImpl(
 
     override fun selectCategory(category: HomeCategory) {
         store.accept(Intent.SelectCategory(category))
+    }
+
+    override fun toggleAnalytics(enabled: Boolean) {
+        store.accept(Intent.ToggleAnalytics(enabled))
     }
 
     override suspend fun loadImage(url: String): Picture {

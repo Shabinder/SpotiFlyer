@@ -57,7 +57,7 @@ expect class Dir(
 }
 
 val Dir.isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
-fun Dir.enableAnalytics() = settings.putBoolean(AnalyticsKey, true)
+fun Dir.toggleAnalytics(enabled: Boolean) = settings.putBoolean(AnalyticsKey, enabled)
 
 fun Dir.setDownloadDirectory(newBasePath: String) = settings.putString(DirKey, newBasePath)
 

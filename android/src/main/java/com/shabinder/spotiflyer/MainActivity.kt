@@ -125,7 +125,7 @@ class MainActivity : ComponentActivity() {
                         AnalyticsDialog(
                             askForAnalyticsPermission,
                             enableAnalytics = {
-                                dir.enableAnalytics()
+                                dir.toggleAnalytics(true)
                                 dir.firstLaunchDone()
                             },
                             dismissDialog = {

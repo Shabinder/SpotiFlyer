@@ -25,6 +25,7 @@ internal interface SpotiFlyerMainStore : Store<Intent, SpotiFlyerMain.State, Not
         data class OpenPlatform(val platformID: String, val platformLink: String) : Intent()
         data class SetLink(val link: String) : Intent()
         data class SelectCategory(val category: SpotiFlyerMain.HomeCategory) : Intent()
+        data class ToggleAnalytics(val enabled: Boolean) : Intent()
         object GiveDonation : Intent()
         object ShareApp : Intent()
     }

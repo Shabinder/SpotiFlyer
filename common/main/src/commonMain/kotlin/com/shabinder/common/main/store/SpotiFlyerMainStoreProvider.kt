@@ -21,6 +21,9 @@ import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
+import com.shabinder.common.di.Dir
+import com.shabinder.common.di.isAnalyticsEnabled
+import com.shabinder.common.di.toggleAnalytics
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.State
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
@@ -36,7 +39,8 @@ import kotlinx.coroutines.flow.map
 
 internal class SpotiFlyerMainStoreProvider(
     private val storeFactory: StoreFactory,
-    private val database: Database?
+    private val dir: Dir,
+    database: Database?
 ) {
 
     fun provide(): SpotiFlyerMainStore =
@@ -67,10 +71,12 @@ internal class SpotiFlyerMainStoreProvider(
         data class ItemsLoaded(val items: List<DownloadRecord>) : Result()
         data class CategoryChanged(val category: SpotiFlyerMain.HomeCategory) : Result()
         data class LinkChanged(val link: String) : Result()
+        data class ToggleAnalytics(val isEnabled: Boolean) : Result()
     }
 
     private inner class ExecutorImpl : SuspendExecutor<Intent, Unit, State, Result, Nothing>() {
         override suspend fun executeAction(action: Unit, getState: () -> State) {
+            dispatch(Result.ToggleAnalytics(dir.isAnalyticsEnabled))
             updates?.collect {
                 dispatch(Result.ItemsLoaded(it))
             }
@@ -83,6 +89,10 @@ internal class SpotiFlyerMainStoreProvider(
                 is Intent.ShareApp -> methods.value.shareApp()
                 is Intent.SetLink -> dispatch(Result.LinkChanged(link = intent.link))
                 is Intent.SelectCategory -> dispatch(Result.CategoryChanged(intent.category))
+                is Intent.ToggleAnalytics -> {
+                    dispatch(Result.ToggleAnalytics(intent.enabled))
+                    dir.toggleAnalytics(intent.enabled)
+                }
             }
         }
     }
@@ -93,6 +103,7 @@ internal class SpotiFlyerMainStoreProvider(
                 is Result.ItemsLoaded -> copy(records = result.items)
                 is Result.LinkChanged -> copy(link = result.link)
                 is Result.CategoryChanged -> copy(selectedCategory = result.category)
+                is Result.ToggleAnalytics -> copy(isAnalyticsEnabled = result.isEnabled)
             }
     }
 }

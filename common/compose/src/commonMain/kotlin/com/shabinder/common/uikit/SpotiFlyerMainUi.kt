@@ -46,6 +46,8 @@ import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Tab
 import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
@@ -59,6 +61,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.CardGiftcard
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Flag
+import androidx.compose.material.icons.rounded.Insights
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -102,7 +105,11 @@ fun SpotiFlyerMainContent(component: SpotiFlyerMain) {
         )
 
         when (model.selectedCategory) {
-            HomeCategory.About -> AboutColumn { component.analytics.donationDialogVisit() }
+            HomeCategory.About -> AboutColumn(
+                analyticsEnabled = model.isAnalyticsEnabled,
+                donationDialogOpenEvent = { component.analytics.donationDialogVisit() },
+                toggleAnalytics = component::toggleAnalytics
+            )
             HomeCategory.History -> HistoryColumn(
                 model.records.sortedByDescending { it.id },
                 component::loadImage,
@@ -223,7 +230,9 @@ fun SearchPanel(
 @Composable
 fun AboutColumn(
     modifier: Modifier = Modifier,
-    donationDialogOpenEvent: () -> Unit
+    analyticsEnabled:Boolean,
+    donationDialogOpenEvent: () -> Unit,
+    toggleAnalytics: (enabled: Boolean) -> Unit
 ) {
 
     Box {
@@ -397,6 +406,35 @@ fun AboutColumn(
                                 style = SpotiFlyerTypography.subtitle2
                             )
                         }
+                    }
+                    Row(
+                        modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
+                            .clickable(
+                                onClick = {
+                                    toggleAnalytics(!analyticsEnabled)
+                                }
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Rounded.Insights, "Analytics Status", Modifier.size(32.dp))
+                        Spacer(modifier = Modifier.padding(start = 16.dp))
+                        Column(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "Analytics",
+                                style = SpotiFlyerTypography.h6
+                            )
+                            Text(
+                                text = "Your Data is Anonymized and never shared with 3rd party service",
+                                style = SpotiFlyerTypography.subtitle2
+                            )
+                        }
+                        Switch(
+                            checked = analyticsEnabled,
+                            onCheckedChange = null,
+                            colors = SwitchDefaults.colors(uncheckedThumbColor = colorOffWhite)
+                        )
                     }
                 }
             }

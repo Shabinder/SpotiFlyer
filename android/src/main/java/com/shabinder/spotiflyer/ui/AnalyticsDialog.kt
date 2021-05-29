@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
@@ -42,31 +44,38 @@ fun AnalyticsDialog(
         AlertDialog(
             onDismissRequest = dismissDialog,
             title = {
-                Row(verticalAlignment = Alignment.CenterVertically,horizontalArrangement = Arrangement.SpaceBetween) {
-                    Icon(Icons.Rounded.Insights,"Analytics", Modifier.size(32.dp))
+                Row(verticalAlignment = Alignment.CenterVertically,horizontalArrangement = Arrangement.SpaceEvenly) {
+                    Icon(Icons.Rounded.Insights,"Analytics", Modifier.size(42.dp))
                     Spacer(Modifier.padding(horizontal = 8.dp))
                     Text("Grant Analytics",style = SpotiFlyerTypography.h5,textAlign = TextAlign.Center)
-                    Spacer(Modifier.padding(horizontal = 8.dp))
-                    Column {
-                        Icon(Icons.Rounded.Close,"Decline Analytics", Modifier.size(24.dp).clickable {
-                            dismissDialog()
-                        })
-                        Spacer(Modifier.padding(vertical = 8.dp))
-                    }
                 }
             },
             backgroundColor = Color.DarkGray,
             buttons = {
-                TextButton(
-                    {
-                        dismissDialog()
-                        enableAnalytics()
-                    },
-                    Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp).fillMaxWidth()
-                        .background(colorPrimary, shape = SpotiFlyerShapes.medium)
-                        .padding(horizontal = 8.dp),
-                ) {
-                    Text("Sure!",color = Color.Black,fontSize = 18.sp,textAlign = TextAlign.Center)
+                Column {
+                    OutlinedButton(
+                        onClick = dismissDialog,
+                        Modifier.padding(horizontal = 8.dp).fillMaxWidth()
+                            .background(Color.DarkGray, shape = SpotiFlyerShapes.medium)
+                            .padding(horizontal = 8.dp),
+                        shape = SpotiFlyerShapes.medium,
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF303030))
+                    ) {
+                        Text("Nope",color = colorPrimary,fontSize = 18.sp,textAlign = TextAlign.Center)
+                    }
+                    Spacer(Modifier.padding(vertical = 4.dp))
+                    TextButton(
+                        onClick = {
+                            dismissDialog()
+                            enableAnalytics()
+                        },
+                        Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp).fillMaxWidth()
+                            .background(colorPrimary, shape = SpotiFlyerShapes.medium)
+                            .padding(horizontal = 8.dp),
+                        shape = SpotiFlyerShapes.medium
+                    ) {
+                        Text("Sure",color = Color.Black,fontSize = 18.sp,textAlign = TextAlign.Center)
+                    }
                 }
             },
             text = {

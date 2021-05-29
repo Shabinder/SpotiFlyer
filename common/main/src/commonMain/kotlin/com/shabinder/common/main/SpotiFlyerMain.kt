@@ -49,6 +49,11 @@ interface SpotiFlyerMain {
     fun selectCategory(category: HomeCategory)
 
     /*
+    * change TabBar Selected Category
+    * */
+    fun toggleAnalytics(enabled: Boolean)
+
+    /*
     * Load Image from cache/Internet and cache it
     * */
     suspend fun loadImage(url: String): Picture
@@ -72,7 +77,8 @@ interface SpotiFlyerMain {
     data class State(
         val records: List<DownloadRecord> = emptyList(),
         val link: String = "",
-        val selectedCategory: HomeCategory = HomeCategory.About
+        val selectedCategory: HomeCategory = HomeCategory.About,
+        val isAnalyticsEnabled: Boolean = false
     )
 
     enum class HomeCategory {
