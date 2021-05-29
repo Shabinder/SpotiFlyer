@@ -3,6 +3,9 @@ package com.shabinder.spotiflyer.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +16,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Insights
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,10 +42,17 @@ fun AnalyticsDialog(
         AlertDialog(
             onDismissRequest = dismissDialog,
             title = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Rounded.Insights,"Analytics", Modifier.size(52.dp))
-                    Spacer(Modifier.padding(horizontal = 4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically,horizontalArrangement = Arrangement.SpaceBetween) {
+                    Icon(Icons.Rounded.Insights,"Analytics", Modifier.size(32.dp))
+                    Spacer(Modifier.padding(horizontal = 8.dp))
                     Text("Grant Analytics",style = SpotiFlyerTypography.h5,textAlign = TextAlign.Center)
+                    Spacer(Modifier.padding(horizontal = 8.dp))
+                    Column {
+                        Icon(Icons.Rounded.Close,"Decline Analytics", Modifier.size(24.dp).clickable {
+                            dismissDialog()
+                        })
+                        Spacer(Modifier.padding(vertical = 8.dp))
+                    }
                 }
             },
             backgroundColor = Color.DarkGray,
@@ -61,7 +72,7 @@ fun AnalyticsDialog(
             text = {
                 Text("Your Data is Anonymized and will never be shared with any 3rd party service",style = SpotiFlyerTypography.body2,textAlign = TextAlign.Center)
             },
-            properties = DialogProperties(dismissOnBackPress = true,dismissOnClickOutside = false)
+            properties = DialogProperties(dismissOnBackPress = false,dismissOnClickOutside = false)
         )
     }   
 }

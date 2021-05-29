@@ -124,9 +124,13 @@ class MainActivity : ComponentActivity() {
                         var askForAnalyticsPermission by remember { mutableStateOf(false) }
                         AnalyticsDialog(
                             askForAnalyticsPermission,
-                            dir::enableAnalytics,
+                            enableAnalytics = {
+                                dir.enableAnalytics()
+                                dir.firstLaunchDone()
+                            },
                             dismissDialog = {
                                 askForAnalyticsPermission = false
+                                dir.firstLaunchDone()
                             }
                         )
 
@@ -136,7 +140,6 @@ class MainActivity : ComponentActivity() {
                                 delay(2500)
                                 // Ask For Analytics Permission on first Dialog
                                 askForAnalyticsPermission = true
-                                dir.firstLaunchDone()
                             }
                         }
                     }
@@ -147,12 +150,20 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun initialise() {
-        checkIfLatestVersion()
-        handleIntentFromExternalActivity()
-        if(dir.isAnalyticsEnabled){
-            // Download/App Install Event
+        val isGithubRelease = checkAppSignature(this).also {
+            Log.i("SpotiFlyer Github Rel.:",it.toString())
+        }
+        /*
+        * Only Send an `Update Notification` on Github Release Builds
+        * and Track Downloads for all other releases like F-Droid,
+        * for `Github Downloads` we will track Downloads using : https://tooomm.github.io/github-release-stats/?username=Shabinder&repository=SpotiFlyer
+        * */
+        if(isGithubRelease) { checkIfLatestVersion() }
+        if(dir.isAnalyticsEnabled && !isGithubRelease) {
+            // Download/App Install Event for F-Droid builds
             TrackHelper.track().download().with(tracker)
         }
+        handleIntentFromExternalActivity()
     }
 
     @Composable

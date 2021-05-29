@@ -35,6 +35,10 @@ import org.matomo.sdk.TrackerBuilder
 
 class App: Application(), KoinComponent {
 
+    companion object {
+        const val SIGNATURE_HEX = "53304f6d75736a2f30484230334c454b714753525763724259444d3d0a"
+    }
+
     val tracker: Tracker by lazy {
         TrackerBuilder.createDefault(
             "https://kind-grasshopper-73.telebit.io/matomo/matomo.php", 1)

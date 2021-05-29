@@ -104,7 +104,7 @@ fun PermissionDialog(
                             )
                         }
                     }
-                    Row(
+                    /*Row(
                         modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -120,7 +120,7 @@ fun PermissionDialog(
                                 style = SpotiFlyerTypography.subtitle2,
                             )
                         }
-                    }
+                    }*/
                 }
             }
         )
