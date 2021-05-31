@@ -76,12 +76,14 @@ fun Dir.firstLaunchDone() {
 * Call this function at startup!
 * */
 fun Dir.createDirectories() {
-    createDirectory(defaultDir())
-    createDirectory(imageCacheDir())
-    createDirectory(defaultDir() + "Tracks/")
-    createDirectory(defaultDir() + "Albums/")
-    createDirectory(defaultDir() + "Playlists/")
-    createDirectory(defaultDir() + "YT_Downloads/")
+    try {
+        createDirectory(defaultDir())
+        createDirectory(imageCacheDir())
+        createDirectory(defaultDir() + "Tracks/")
+        createDirectory(defaultDir() + "Albums/")
+        createDirectory(defaultDir() + "Playlists/")
+        createDirectory(defaultDir() + "YT_Downloads/")
+    } catch (e:Exception){}
 }
 
 fun Dir.finalOutputDir(itemName: String, type: String, subFolder: String, defaultDir: String, extension: String = ".mp3"): String =

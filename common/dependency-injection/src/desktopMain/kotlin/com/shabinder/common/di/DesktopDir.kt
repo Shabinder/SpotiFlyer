@@ -53,7 +53,7 @@ actual class Dir actual constructor(
     actual fun imageCacheDir(): String = System.getProperty("user.home") +
         fileSeparator() + "SpotiFlyer/.images" + fileSeparator()
 
-    private val defaultBaseDir = System.getProperty("user.home")!!
+    private val defaultBaseDir = System.getProperty("user.home")
 
     actual fun defaultDir(): String = (settings.getStringOrNull(DirKey) ?: defaultBaseDir) + fileSeparator() +
         "SpotiFlyer" + fileSeparator()

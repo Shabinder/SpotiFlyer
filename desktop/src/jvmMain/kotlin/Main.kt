@@ -31,8 +31,10 @@ import com.shabinder.common.di.Dir
 import com.shabinder.common.di.DownloadProgressFlow
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.initKoin
+import com.shabinder.common.di.isFirstLaunch
 import com.shabinder.common.di.isInternetAccessible
 import com.shabinder.common.di.setDownloadDirectory
+import com.shabinder.common.di.toggleAnalytics
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails
@@ -44,6 +46,9 @@ import com.shabinder.common.uikit.SpotiFlyerTypography
 import com.shabinder.common.uikit.colorOffWhite
 import com.shabinder.database.Database
 import kotlinx.coroutines.runBlocking
+import org.piwik.java.tracking.PiwikTracker
+import utils.trackAsync
+import utils.trackScreenAsync
 import java.awt.Desktop
 import java.net.URI
 import javax.swing.JFileChooser
@@ -51,11 +56,14 @@ import javax.swing.JFileChooser.APPROVE_OPTION
 
 private val koin = initKoin(enableNetworkLogs = true).koin
 private lateinit var showToast: (String)->Unit
+private lateinit var tracker: PiwikTracker
 
 fun main() {
 
     val lifecycle = LifecycleRegistry()
     lifecycle.resume()
+
+    tracker = PiwikTracker("https://kind-grasshopper-73.telebit.io/matomo/matomo.php")
 
     Window("SpotiFlyer",size = IntSize(450,800)) {
         Surface(
@@ -73,6 +81,8 @@ fun main() {
             }
         }
     }
+    // Download Tracking for Desktop Apps for Now will be measured using `Github Releases`
+    // https://tooomm.github.io/github-release-stats/?username=Shabinder&repository=SpotiFlyer
 }
 
 private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
@@ -137,13 +147,38 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                     }
             }
             override val analytics = object: SpotiFlyerRoot.Analytics {
-                override fun appLaunchEvent() {}
+                override fun appLaunchEvent() {
+                    // Enable Analytics
+                    directories.toggleAnalytics(true)
+                    tracker.trackAsync {
+                        eventName = "App Launch"
+                        eventAction = "App_Launch"
+                    }
+                }
 
-                override fun homeScreenVisit() {}
+                override fun homeScreenVisit() {
+                    tracker.trackScreenAsync(
+                        screenAddress = "/main_activity/home_screen"
+                    ) {
+                        actionName = "HomeScreen"
+                    }
+                }
 
-                override fun listScreenVisit() {}
+                override fun listScreenVisit() {
+                    tracker.trackScreenAsync(
+                        screenAddress = "/main_activity/list_screen"
+                    ) {
+                        actionName = "ListScreen"
+                    }
+                }
 
-                override fun donationDialogVisit() {}
+                override fun donationDialogVisit() {
+                    tracker.trackScreenAsync(
+                        screenAddress = "/main_activity/donation_dialog"
+                    ) {
+                        actionName = "DonationDialog"
+                    }
+                }
             }
         }
     )

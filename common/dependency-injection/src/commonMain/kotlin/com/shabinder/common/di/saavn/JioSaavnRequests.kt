@@ -2,6 +2,7 @@ package com.shabinder.common.di.saavn
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.audioToMp3.AudioToMp3
+import com.shabinder.common.di.gaana.corsApi
 import com.shabinder.common.di.globalJson
 import com.shabinder.common.models.saavn.SaavnAlbum
 import com.shabinder.common.models.saavn.SaavnPlaylist
@@ -282,10 +283,10 @@ interface JioSaavnRequests {
 
     companion object {
         // EndPoints
-        const val search_base_url = "https://www.jiosaavn.com/api.php?__call=autocomplete.get&_format=json&_marker=0&cc=in&includeMetaTags=1&query="
-        const val song_details_base_url = "https://www.jiosaavn.com/api.php?__call=song.getDetails&cc=in&_marker=0%3F_marker%3D0&_format=json&pids="
-        const val album_details_base_url = "https://www.jiosaavn.com/api.php?__call=content.getAlbumDetails&_format=json&cc=in&_marker=0%3F_marker%3D0&albumid="
-        const val playlist_details_base_url = "https://www.jiosaavn.com/api.php?__call=playlist.getDetails&_format=json&cc=in&_marker=0%3F_marker%3D0&listid="
-        const val lyrics_base_url = "https://www.jiosaavn.com/api.php?__call=lyrics.getLyrics&ctx=web6dot0&api_version=4&_format=json&_marker=0%3F_marker%3D0&lyrics_id="
+        val search_base_url = "${corsApi}https://www.jiosaavn.com/api.php?__call=autocomplete.get&_format=json&_marker=0&cc=in&includeMetaTags=1&query="
+        val song_details_base_url = "${corsApi}https://www.jiosaavn.com/api.php?__call=song.getDetails&cc=in&_marker=0%3F_marker%3D0&_format=json&pids="
+        val album_details_base_url = "${corsApi}https://www.jiosaavn.com/api.php?__call=content.getAlbumDetails&_format=json&cc=in&_marker=0%3F_marker%3D0&albumid="
+        val playlist_details_base_url = "${corsApi}https://www.jiosaavn.com/api.php?__call=playlist.getDetails&_format=json&cc=in&_marker=0%3F_marker%3D0&listid="
+        val lyrics_base_url = "${corsApi}https://www.jiosaavn.com/api.php?__call=lyrics.getLyrics&ctx=web6dot0&api_version=4&_format=json&_marker=0%3F_marker%3D0&lyrics_id="
     }
 }

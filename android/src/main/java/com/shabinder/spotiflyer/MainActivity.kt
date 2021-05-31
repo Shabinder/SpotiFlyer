@@ -79,8 +79,7 @@ class MainActivity : ComponentActivity() {
     private val fetcher: FetchPlatformQueryResult by inject()
     private val dir: Dir by inject()
     private lateinit var root: SpotiFlyerRoot
-    private val callBacks: SpotiFlyerRootCallBacks
-        get() = root.callBacks
+    private val callBacks: SpotiFlyerRootCallBacks get() = root.callBacks
     private val trackStatusFlow = MutableSharedFlow<HashMap<String, DownloadStatus>>(1)
     private var permissionGranted = mutableStateOf(true)
     private lateinit var updateUIReceiver: BroadcastReceiver

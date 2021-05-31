@@ -18,10 +18,8 @@ package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.Dir
-import com.shabinder.common.di.currentPlatform
 import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.utils.removeIllegalChars
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
@@ -37,8 +35,10 @@ class YoutubeProvider(
     private val logger: Kermit,
     private val dir: Dir,
 ) {
-    // Youtube Downloader isn't fully compatible with JS Yet
-    val ytDownloader: YoutubeDownloader? = if (currentPlatform == AllPlatforms.Js) null else YoutubeDownloader()
+    val ytDownloader: YoutubeDownloader = YoutubeDownloader(
+        enableCORSProxy = true,
+        CORSProxyAddress = "https://kind-grasshopper-73.telebit.io/cors/"
+    )
 
     /*
     * YT Album Art Schema
@@ -95,7 +95,7 @@ class YoutubeProvider(
         )
         result.apply {
             try {
-                val playlist = ytDownloader?.getPlaylist(searchId) ?: return null
+                val playlist = ytDownloader.getPlaylist(searchId)
                 val playlistDetails = playlist.details
                 val name = playlistDetails.title
                 subFolder = removeIllegalChars(name)
@@ -154,7 +154,7 @@ class YoutubeProvider(
         ).apply {
             try {
                 logger.i { searchId }
-                val video = ytDownloader?.getVideo(searchId) ?: return null
+                val video = ytDownloader.getVideo(searchId)
                 coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
                 val detail = video.videoDetails
                 val name = detail.title?.replace(detail.author?.toUpperCase() ?: "", "", true)

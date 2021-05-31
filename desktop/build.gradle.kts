@@ -52,6 +52,9 @@ kotlin {
 
                 // Koin
                 implementation(Koin.core)
+
+                // Matomo
+                implementation("org.piwik.java.tracking:matomo-java-tracker:1.6")
             }
         }
         val jvmTest by getting
