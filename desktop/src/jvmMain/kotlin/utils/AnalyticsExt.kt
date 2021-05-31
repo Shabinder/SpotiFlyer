@@ -23,7 +23,7 @@ fun PiwikTracker.trackScreenAsync(
 ) {
     val req = PiwikRequest(
         1,
-        URL("https://com.shabinder.spotiflyer/" + screenAddress.removeSurrounding("/"))
+        URL("https://com.shabinder.spotiflyer$screenAddress")
     ).apply { requestBuilder() }
     // Send Request
     sendRequestAsync(req)

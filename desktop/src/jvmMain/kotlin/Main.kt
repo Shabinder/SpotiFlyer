@@ -30,6 +30,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.DownloadProgressFlow
 import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.di.firstLaunchDone
 import com.shabinder.common.di.initKoin
 import com.shabinder.common.di.isFirstLaunch
 import com.shabinder.common.di.isInternetAccessible
@@ -56,14 +57,14 @@ import javax.swing.JFileChooser.APPROVE_OPTION
 
 private val koin = initKoin(enableNetworkLogs = true).koin
 private lateinit var showToast: (String)->Unit
-private lateinit var tracker: PiwikTracker
+private val tracker: PiwikTracker by lazy {
+    PiwikTracker("https://kind-grasshopper-73.telebit.io/matomo/matomo.php")
+}
 
 fun main() {
 
     val lifecycle = LifecycleRegistry()
     lifecycle.resume()
-
-    tracker = PiwikTracker("https://kind-grasshopper-73.telebit.io/matomo/matomo.php")
 
     Window("SpotiFlyer",size = IntSize(450,800)) {
         Surface(
@@ -148,11 +149,15 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
             }
             override val analytics = object: SpotiFlyerRoot.Analytics {
                 override fun appLaunchEvent() {
-                    // Enable Analytics
-                    directories.toggleAnalytics(true)
+                    if(directories.isFirstLaunch) {
+                        // Enable Analytics on First Launch
+                        directories.toggleAnalytics(true)
+                        directories.firstLaunchDone()
+                    }
                     tracker.trackAsync {
                         eventName = "App Launch"
                         eventAction = "App_Launch"
+                        eventCategory = "events"
                     }
                 }
 
