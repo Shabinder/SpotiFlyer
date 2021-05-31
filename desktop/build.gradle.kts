@@ -80,7 +80,7 @@ compose.desktop {
             windows {
                 iconFile.set(iconsRoot.resolve("spotiflyer.ico"))
                 // Wondering what the heck is this? See : https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html
-                upgradeUuid = "4bf735db-f7ff-48e6-8903-3efe83f817bc"
+                upgradeUuid = "7385a3f7-2dc7-41e4-900e-bc8e2bee48b0"
                 menuGroup = packageName
             }
             linux {
