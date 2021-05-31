@@ -6,7 +6,7 @@
 <a href="https://github.com/Shabinder/SpotiFlyer"><img src="https://github.com/Shabinder/SpotiFlyer/blob/Compose/art/SpotiFlyer.svg" align="left" height="80" width="80" ></a>
 
 # SpotiFlyer
-- **Kotlin Multiplatform** Music Downloader ,supports **Spotify, Youtube, Gaana**.
+- **Kotlin Multiplatform** Music Downloader ,supports **Spotify, Youtube, Gaana, Jio-Saavn**.
 
 Supports- Playlist, Albums, Tracks. _(If You know Any Source for Episodes/Podcasts create an Issue sharing It.)_
 
@@ -36,6 +36,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 - Gaana
 - Youtube
 - Youtube Music
+- Jio-Saavn
 - _(more coming soon)_
 
 ## 📈 This Week's Analytics
