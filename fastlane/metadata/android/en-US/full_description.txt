@@ -10,6 +10,7 @@ Supported Platforms:
  - Gaana
  - Youtube
  - Youtube Music
+ - Jio-Saavn
  - (more coming soon)
 
 Note:
