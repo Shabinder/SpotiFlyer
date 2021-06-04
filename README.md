@@ -39,7 +39,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 - Jio-Saavn
 - _(more coming soon)_
 
-## 📈 This Week's Analytics
+## 📈 Analytics
 <!--START_SECTION:HTI-->
 ![Today's Analytics](https://hcti.io/v1/image/48eb3c9b-10ee-42bf-b29f-9d92dc154b9e)
 <!--END_SECTION:HTI-->
