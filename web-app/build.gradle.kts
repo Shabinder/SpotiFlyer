@@ -50,7 +50,7 @@ dependencies {
     implementation("co.touchlab:stately-common:1.1.7")
     implementation("dev.icerock.moko:parcelize:0.6.1")
     // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0") {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1") {
     //  https://youtrack.jetbrains.com/issue/KTOR-2670
         isForce = true
     }
