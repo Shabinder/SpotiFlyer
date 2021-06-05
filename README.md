@@ -39,32 +39,16 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 - Jio-Saavn
 - _(more coming soon)_
 
-<p float="left">
- 
                         
- <!--START_SECTION:DCI-->
-<a href="https://github.com/Shabinder/SpotiFlyer/releases/latest">
-   <img src="https://hcti.io/v1/image/d9de997c-5821-40ee-94fa-9d7922b2dbeb" 
-     height="125" width="280" alt="Total Downloads">
-</a>
+<!--START_SECTION:DCI-->
+<a href="https://github.com/Shabinder/SpotiFlyer/releases/latest"><img src="https://hcti.io/v1/image/94f72402-038e-40f2-94aa-0f7ed3f18085" height="125" width="280" alt="Total Downloads"></a>
 <!--END_SECTION:DCI-->
-        
-
-<a href="https://f-droid.org/packages/com.shabinder.spotiflyer">
-    <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-    alt="Get it on F-Droid"
-    height="110">
-</a>
- 
-</p>
-
-
 
 
 ## 📈 Analytics _(Per Day)_
 
 <!--START_SECTION:HTI-->
-![Today's Analytics](https://hcti.io/v1/image/e9dcf3e5-2fed-4d06-aca1-e9c39fa74a8a)
+![Today's Analytics](https://hcti.io/v1/image/58bf4b1b-e2fa-4e2d-8e87-2fa7d9983e26)
 <!--END_SECTION:HTI-->
         
 
@@ -84,6 +68,12 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 - MacOs DMG is not notarized and signed using a certificate , so Use jar in mac for now.
 
 <!-- [![Latest Download](https://img.shields.io/github/downloads/Shabinder/SpotiFlyer/total?style=for-the-badge&color=17B2E7)](https://github.com/Shabinder/SpotiFlyer/releases/latest) -->
+
+<a href="https://f-droid.org/packages/com.shabinder.spotiflyer">
+    <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+    alt="Get it on F-Droid"
+    height="110">
+</a>
 
 ### Want to Contribute 🙋‍♂️?
 Want to contribute? Great!
