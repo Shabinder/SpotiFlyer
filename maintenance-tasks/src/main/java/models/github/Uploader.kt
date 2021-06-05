@@ -1,5 +1,8 @@
 package models.github
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Uploader(
     val avatar_url: String,
     val events_url: String,

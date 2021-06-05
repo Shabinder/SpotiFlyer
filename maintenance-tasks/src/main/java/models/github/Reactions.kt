@@ -1,7 +1,9 @@
 package models.github
 
 import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Reactions(
     @JsonNames("+1") val upVotes: Int = 0,
     @JsonNames("-1") val downVotes: Int = 0,
