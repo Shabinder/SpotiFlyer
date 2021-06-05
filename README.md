@@ -42,14 +42,12 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 <p float="left">
  
                         
-            <!--START_SECTION:DCI-->
-                    
-       <a href="https://github.com/Shabinder/SpotiFlyer/releases/latest">
-          <img src="https://hcti.io/v1/image/bbb3f7dc-8b2f-4207-8d9e-b83f25c0a6f6" 
-            height="125" width="280" alt="Total Downloads">
-       </a>
-        
-            <!--END_SECTION:DCI-->
+<!--START_SECTION:DCI-->
+<a href="https://github.com/Shabinder/SpotiFlyer/releases/latest">
+  <img src="https://hcti.io/v1/image/bbb3f7dc-8b2f-4207-8d9e-b83f25c0a6f6" 
+    height="125" width="280" alt="Total Downloads">
+</a>
+<!--END_SECTION:DCI-->
         
 
 <a href="https://f-droid.org/packages/com.shabinder.spotiflyer">
@@ -65,10 +63,9 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 
 ## 📈 Analytics _(Per Day)_
 
-
-            <!--START_SECTION:HTI-->
-                    ![Today's Analytics](https://hcti.io/v1/image/91344216-9f0b-4bad-ba09-45cc984f35c3)
-            <!--END_SECTION:HTI-->
+<!--START_SECTION:HTI-->
+![Today's Analytics](https://hcti.io/v1/image/91344216-9f0b-4bad-ba09-45cc984f35c3)
+<!--END_SECTION:HTI-->
         
 
 ## 💻 Install 
