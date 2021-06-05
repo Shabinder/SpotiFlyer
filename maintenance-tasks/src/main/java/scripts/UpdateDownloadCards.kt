@@ -25,7 +25,7 @@ internal suspend fun updateDownloadCards(
 
         for(release in allReleases){
             release.assets.forEach {
-                debug("${it.name}: ${release.tag_name}" ,"Downloads: ${it.download_count}")
+                //debug("${it.name}: ${release.tag_name}" ,"Downloads: ${it.download_count}")
                 totalCount += it.download_count
             }
         }
@@ -39,10 +39,10 @@ internal suspend fun updateDownloadCards(
     return getUpdatedContent(
         oldContent,
         """
-        <a href="https://github.com/Shabinder/SpotiFlyer/releases/latest">
-        <img src="${getDownloadCard(totalDownloads)}" 
-         height="125" width="280" alt="Total Downloads">
-        </a>
+       <a href="https://github.com/Shabinder/SpotiFlyer/releases/latest">
+          <img src="${getDownloadCard(totalDownloads)}" 
+            height="125" width="280" alt="Total Downloads">
+       </a>
         """.trimIndent(),
         secrets.tagName
     )
@@ -176,6 +176,7 @@ val downloadCardCSS =
 
         .contact-wrapper a {
           display: block;
+          white-space: nowrap;
           text-decoration: none;
         }
 
