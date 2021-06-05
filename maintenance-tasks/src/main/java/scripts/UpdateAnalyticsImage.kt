@@ -54,12 +54,13 @@ internal suspend fun getAnalyticsImage(): String {
             }
         }
         contentLength = req.headers["Content-Length"]?.toLong() ?: 0
-        debug(contentLength.toString())
+        debug("Content Length for Analytics Image",contentLength.toString())
 
         if(retryCount-- == 0){
             // FAIL Gracefully
             throw(RETRY_LIMIT_EXHAUSTED())
         }
     }while (contentLength<1_20_000)
+
     return analyticsImage
 }

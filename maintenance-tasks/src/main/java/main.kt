@@ -20,16 +20,24 @@ fun main(args: Array<String>) {
         var updatedGithubContent: String = githubFileContent.decryptedContent
 
         // TASK -> Update Analytics Image in Readme
-        updatedGithubContent = updateAnalyticsImage(
-            updatedGithubContent,
-            secrets
-        )
+        try {
+            updatedGithubContent = updateAnalyticsImage(
+                updatedGithubContent,
+                secrets
+            )
+        } catch (e:Exception) {
+            debug("Analytics Image Updation Failed",e.message.toString())
+        }
 
         // TASK -> Update Total Downloads Card
-        updatedGithubContent = updateDownloadCards(
-            updatedGithubContent,
-            secrets.copy(tagName = "DCI")
-        )
+        try {
+            updatedGithubContent = updateDownloadCards(
+                updatedGithubContent,
+                secrets.copy(tagName = "DCI")
+            )
+        } catch (e:Exception) {
+            debug("Download Card Updation Failed",e.message.toString())
+        }
 
         // Write New Updated README.md
         GithubService.updateGithubFileContent(
