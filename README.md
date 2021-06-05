@@ -42,14 +42,12 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 <p float="left">
  
                         
-     <!--START_SECTION:DCI-->
-     
+ <!--START_SECTION:DCI-->
 <a href="https://github.com/Shabinder/SpotiFlyer/releases/latest">
    <img src="https://hcti.io/v1/image/d9de997c-5821-40ee-94fa-9d7922b2dbeb" 
      height="125" width="280" alt="Total Downloads">
 </a>
- 
-     <!--END_SECTION:DCI-->
+<!--END_SECTION:DCI-->
         
 
 <a href="https://f-droid.org/packages/com.shabinder.spotiflyer">
