@@ -43,7 +43,7 @@ internal suspend fun updateDownloadCards(
           <img src="${getDownloadCard(totalDownloads)}" 
             height="125" width="280" alt="Total Downloads">
        </a>
-        """.trimIndent(),
+        """,
         secrets.tagName
     )
 }

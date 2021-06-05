@@ -24,7 +24,7 @@ private fun getReplacementText(
 ): String {
     return """
             ${Common.START_SECTION(tagName)}
-            $newInsertionText
+                    $newInsertionText
             ${Common.END_SECTION(tagName)}
-        """.trimIndent()
+        """
 }
