@@ -41,10 +41,10 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 
 <p float="left">
  
-            <!--START_SECTION:DCI-->
+                        <!--START_SECTION:DCI-->
             <a href="https://github.com/Shabinder/SpotiFlyer/releases/latest">
-<img src="https://hcti.io/v1/image/651614d3-9d60-449e-a330-f8e84d5ef926" 
- height="125" width="280" alt="Total Downloads">
+   <img src="https://hcti.io/v1/image/bdc92ef0-7174-4249-bece-824d8730f20e" 
+     height="125" width="280" alt="Total Downloads">
 </a>
             <!--END_SECTION:DCI-->
 
@@ -62,7 +62,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 ## 📈 Analytics _(Per Day)_
 
 <!--START_SECTION:HTI-->
-![Today's Analytics](https://hcti.io/v1/image/eb5339dc-71fc-4c53-8178-6ada1257b5f3)
+![Today's Analytics](https://hcti.io/v1/image/9ecfec63-e7cd-4377-99db-df8738358527)
 <!--END_SECTION:HTI-->
 
 ## 💻 Install 
@@ -80,7 +80,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 - To run the `jar` version, you need JAVA installed.
 - MacOs DMG is not notarized and signed using a certificate , so Use jar in mac for now.
 
-[![Latest Download](https://img.shields.io/github/downloads/Shabinder/SpotiFlyer/total?style=for-the-badge&color=17B2E7)](https://github.com/Shabinder/SpotiFlyer/releases/latest)
+<!-- [![Latest Download](https://img.shields.io/github/downloads/Shabinder/SpotiFlyer/total?style=for-the-badge&color=17B2E7)](https://github.com/Shabinder/SpotiFlyer/releases/latest) -->
 
 ### Want to Contribute 🙋‍♂️?
 Want to contribute? Great!
