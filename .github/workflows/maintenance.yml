@@ -31,5 +31,5 @@ jobs:
           BRANCH_NAME: 'main'
           FILE_PATH: 'README.md'
           IMAGE_DESCRIPTION: 'Analytics'
-          COMMIT_MESSAGE: 'Analytics Updated'
+          COMMIT_MESSAGE: 'Analytics & Download Card Updated'
           TAG_NAME: 'HTI'
