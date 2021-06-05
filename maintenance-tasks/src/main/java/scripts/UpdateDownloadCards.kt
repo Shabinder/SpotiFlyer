@@ -4,6 +4,7 @@ import common.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import models.matomo.MatomoDownloads
 import utils.RETRY_LIMIT_EXHAUSTED
 import utils.debug
 
@@ -17,7 +18,7 @@ internal suspend fun updateDownloadCards(
         fileName = "README.md"
     ).decryptedContent
 
-    val totalDownloads:Int = GithubService.getGithubRepoReleasesInfo(
+    var totalDownloads:Int = GithubService.getGithubRepoReleasesInfo(
         secrets.ownerName,
         secrets.repoName
     ).let { allReleases ->
@@ -35,13 +36,14 @@ internal suspend fun updateDownloadCards(
         return@let totalCount
     }
 
+    // Add Matomo Downloads
+    client.get<MatomoDownloads>("https://kind-grasshopper-73.telebit.io/matomo/?module=API&method=Actions.getDownloads&idSite=1&period=year&date=today&format=JSON&token_auth=anonymous").forEach {
+        totalDownloads += it.nb_hits
+    }
 
     return getUpdatedContent(
         oldContent,
-        """
-        <a href="https://github.com/Shabinder/SpotiFlyer/releases/latest">
-          <img src="${getDownloadCard(totalDownloads)}" height="125" width="280" alt="Total Downloads">
-        </a>""".trim().trimIndent(),
+        """<a href="https://github.com/Shabinder/SpotiFlyer/releases/latest"><img src="${getDownloadCard(totalDownloads)}" height="125" width="280" alt="Total Downloads"></a>""",
         secrets.tagName
     )
 }
