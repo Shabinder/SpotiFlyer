@@ -23,16 +23,8 @@ plugins {
 }
 
 kotlin {
-    jvm("desktop").compilations.all {
-        kotlinOptions {
-            useIR = true
-        }
-    }
-    android().compilations.all {
-        kotlinOptions {
-            useIR = true
-        }
-    }
+    jvm("desktop")
+    android()
     sourceSets {
         named("commonMain") {
             dependencies {
@@ -51,7 +43,7 @@ kotlin {
 
                 implementation(Extras.kermit)
                 implementation("dev.icerock.moko:parcelize:0.6.1")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3-native-mt") {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt") {
                     @Suppress("DEPRECATION")
                     isForce = true
                 }
@@ -68,9 +60,5 @@ kotlin {
                 implementation(compose.desktop.common)
             }
         }
-    }
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
     }
 }

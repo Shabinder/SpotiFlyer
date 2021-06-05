@@ -22,7 +22,7 @@ object Versions {
     const val versionCode = 20
 
     // Kotlin
-    const val kotlinVersion = "1.4.32"
+    const val kotlinVersion = "1.5.10"
     const val coroutinesVersion = "1.4.2"
 
     // Code Formatting
@@ -51,6 +51,7 @@ object Versions {
     const val targetSdkVersion = 29
     const val androidLifecycle = "2.3.0"
 }
+
 object HostOS {
     // Host OS Properties
     private val hostOs = System.getProperty("os.name")
@@ -58,12 +59,14 @@ object HostOS {
     val isMac = hostOs.startsWith("Mac",true)
     val isLinux = hostOs.startsWith("Linux",true)
 }
+
 object Koin {
     val core = "io.insert-koin:koin-core:${Versions.koin}"
     val test = "io.insert-koin:koin-test:${Versions.koin}"
     val android = "io.insert-koin:koin-android:${Versions.koin}"
     val compose = "io.insert-koin:koin-androidx-compose:3.0.1"
 }
+
 object Androidx {
     const val androidxActivity = "androidx.activity:activity-compose:1.3.0-alpha07"
     const val core = "androidx.core:core-ktx:1.3.2"
@@ -83,6 +86,7 @@ object Androidx {
         const val runtimeLiveData = "androidx.compose.runtime:runtime-livedata:${Versions.compose}"
     }*/
 }
+
 object JetBrains {
     object Kotlin {
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}"
@@ -94,17 +98,19 @@ object JetBrains {
 
     object Compose {
         // __LATEST_COMPOSE_RELEASE_VERSION__
-        const val VERSION = "0.4.0-build188"
+        const val VERSION = "0.4.0"
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
     }
 }
+
 object Decompose {
-    private const val VERSION = "0.2.3"
+    private const val VERSION = "0.2.6"
     const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
     const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
     const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"
     const val extensionsCompose = "com.arkivanov.decompose:extensions-compose-jetbrains:$VERSION"
 }
+
 object MVIKotlin {
     private const val VERSION = "2.0.3"
     const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
@@ -118,6 +124,7 @@ object MVIKotlin {
     const val mvikotlinTimeTravel = "com.arkivanov.mvikotlin:mvikotlin-timetravel:$VERSION"
     const val mvikotlinExtensionsReaktive = "com.arkivanov.mvikotlin:mvikotlin-extensions-reaktive:$VERSION"
 }
+
 object Ktor {
     val clientCore = "io.ktor:ktor-client-core:${Versions.ktor}"
     val clientJson = "io.ktor:ktor-client-json:${Versions.ktor}"

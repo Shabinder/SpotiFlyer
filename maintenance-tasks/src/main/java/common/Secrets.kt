@@ -1,4 +1,4 @@
-package analytics_html_img
+package common
 
 import utils.byOptionalProperty
 import utils.byProperty

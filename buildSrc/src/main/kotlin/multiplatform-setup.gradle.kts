@@ -34,24 +34,12 @@ kotlin {
         }
     }
 
-    jvm("desktop").compilations.all {
-        kotlinOptions {
-            useIR = true
-        }
-    }
-    android().compilations.all {
-        kotlinOptions {
-            useIR = true
-        }
-    }
-    js {
-        /*
-        * TODO Enable JS IR Compiler
-        *  waiting for Decompose & MVI Kotlin to support same
-        * */
+    jvm("desktop")
+    android()
+
+    js(/*BOTH*/) {
         browser()
         // nodejs()
-        binaries.executable()
     }
 
     sourceSets {
@@ -75,10 +63,10 @@ kotlin {
 
                 // Extras
                 implementation(Extras.kermit)
+                implementation(Serialization.json)
                 implementation("co.touchlab:stately-common:1.1.7")
                 implementation("dev.icerock.moko:parcelize:0.6.1")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3-native-mt") {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt") {
                     @Suppress("DEPRECATION")
                     isForce = true
                 }
@@ -87,7 +75,7 @@ kotlin {
 
         named("androidMain") {
             dependencies {
-                implementation("androidx.appcompat:appcompat:1.2.0")
+                implementation("androidx.appcompat:appcompat:1.3.0")
                 implementation(Androidx.core)
                 implementation(compose.runtime)
                 implementation(compose.material)
@@ -126,9 +114,5 @@ kotlin {
                 }
             }
         }
-    }
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
     }
 }

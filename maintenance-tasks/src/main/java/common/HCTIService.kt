@@ -1,4 +1,4 @@
-package analytics_html_img
+package common
 
 import io.ktor.client.request.header
 import io.ktor.client.request.headers

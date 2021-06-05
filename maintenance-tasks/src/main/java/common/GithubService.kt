@@ -1,4 +1,4 @@
-package analytics_html_img
+package common
 
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -8,14 +8,37 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.util.InternalAPI
 import io.ktor.util.encodeBase64
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import models.github.GithubFileContent
+import models.github.GithubReleasesInfo
 
 internal object GithubService {
+
     private const val baseURL = Common.GITHUB_API
+
+
+    suspend fun getGithubRepoReleasesInfo(
+        ownerName: String,
+        repoName: String,
+    ): GithubReleasesInfo {
+        return client.get<GithubReleasesInfo>("$baseURL/repos/$ownerName/$repoName/releases")
+    }
+
+    suspend fun getGithubFileContent(
+        secrets: Secrets,
+        fileName: String = "README.md"
+    ): GithubFileContent {
+        return getGithubFileContent(
+            token = secrets.githubToken,
+            ownerName = secrets.ownerName,
+            repoName = secrets.repoName,
+            branchName = secrets.branchName,
+            fileName = fileName
+        )
+    }
 
     suspend fun getGithubFileContent(
         token: String,

@@ -31,25 +31,12 @@ kotlin {
         }
     }
 
-    jvm("desktop").compilations.all {
-        kotlinOptions {
-            useIR = true
-        }
-    }
-    android().compilations.all {
-        kotlinOptions {
-            useIR = true
-        }
-    }
+    jvm("desktop")
+    android()
 
-    js {
-        /*
-        * TODO Enable JS IR Compiler
-        *  waiting for Decompose & MVI Kotlin to support same
-        * */
+    js(/*BOTH*/) {
         browser()
         // nodejs()
-        binaries.executable()
     }
     sourceSets {
         named("commonTest") {
@@ -72,9 +59,5 @@ kotlin {
         named("jsTest") {
             dependencies {}
         }
-    }
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
     }
 }
