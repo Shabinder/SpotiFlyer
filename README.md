@@ -39,7 +39,27 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 - Jio-Saavn
 - _(more coming soon)_
 
+<p float="left">
+ 
+<!--START_SECTION:DCI-->
+<a href="https://github.com/Shabinder/SpotiFlyer/releases/latest">
+ <img src="https://hcti.io/v1/image/cfd0161b-fccd-4258-bac7-6ab5310030b7" align="centre" height="125" width="280" alt="Total Downloads">
+ </a>
+<!--END_SECTION:DCI-->
+
+<a href="https://f-droid.org/packages/com.shabinder.spotiflyer">
+    <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+    alt="Get it on F-Droid"
+    height="110">
+</a>
+ 
+</p>
+
+
+
+
 ## 📈 Analytics _(Per Day)_
+
 <!--START_SECTION:HTI-->
 ![Today's Analytics](https://hcti.io/v1/image/48eb3c9b-10ee-42bf-b29f-9d92dc154b9e)
 <!--END_SECTION:HTI-->
@@ -82,8 +102,7 @@ Have any questions, doubts or want to present your opinions, views? You're alway
  - Write **Tests**.
  - Support for Podcasts/Episodes and Shows.
  - Preference Screen.
- - Another Source for Music in addition to youtube.
- - Build a Media Player into this app. _SEE: #113 _
+ - Build a Media Player into this app. [#113](https://github.com/Shabinder/SpotiFlyer/issues/113) 
  
 ### Note
 The availability of YouTube Music in your country is important for this app to work since we use YouTube Music to filter out our search results.
