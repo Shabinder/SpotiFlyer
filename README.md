@@ -13,7 +13,7 @@ Supports- Playlist, Albums, Tracks. _(If You know Any Source for Episodes/Podcas
  **Currently running on:**
  - [Android (Jetpack Compose)](https://github.com/Shabinder/SpotiFlyer#-install) 
  - [Desktop (Compose for Desktop) <sup>β</sup>](https://github.com/Shabinder/SpotiFlyer#-install)
- - [Web (Kotlin/JS + React Wrapper) <sup>β</sup>](http://shabinder.github.io/SpotiFlyer/)
+ - [Web (Kotlin/JS + React Wrapper) <sup>β</sup>](https://spotiflyer.ml/web/)
  - [_(WIP)_ IOS SOON (SWIFTUI)](https://github.com/Shabinder/spotiflyer-ios)
 
 <!--[![Build Status](https://github.com/Shabinder/SpotiFlyer/blob/master/app/build_passing.svg)](https://github.com/Shabinder/SpotiFlyer/releases)
