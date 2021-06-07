@@ -129,7 +129,7 @@ dependencies {
     }
 
     //implementation("com.jakewharton.timber:timber:4.7.1")
-    implementation("dev.icerock.moko:parcelize:0.6.1")
+    implementation("dev.icerock.moko:parcelize:0.7.0")
     implementation("com.github.shabinder:storage-chooser:2.0.4.45")
     implementation("com.google.accompanist:accompanist-insets:0.11.1")
 
