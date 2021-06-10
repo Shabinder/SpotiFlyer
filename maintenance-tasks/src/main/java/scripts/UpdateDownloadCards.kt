@@ -37,7 +37,7 @@ internal suspend fun updateDownloadCards(
     }
 
     // Add Matomo Downloads
-    client.get<MatomoDownloads>("https://kind-grasshopper-73.telebit.io/matomo/?module=API&method=Actions.getDownloads&idSite=1&period=year&date=today&format=JSON&token_auth=anonymous").forEach {
+    client.get<MatomoDownloads>("https://spotiflyer.ml/matomo/?module=API&method=Actions.getDownloads&idSite=1&period=year&date=today&format=JSON&token_auth=anonymous").forEach {
         totalDownloads += it.nb_hits
     }
 
