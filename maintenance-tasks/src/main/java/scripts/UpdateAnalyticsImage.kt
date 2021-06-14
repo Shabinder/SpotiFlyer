@@ -43,7 +43,7 @@ internal suspend fun getAnalyticsImage(): String {
         * */
         val randomID = (1..100000).random()
         analyticsImage = HCTIService.getImageURLFromURL(
-            url = "https://spotiflyer.ml/matomo/index.php?module=Widgetize&action=iframe&containerId=VisitOverviewWithGraph&disableLink=0&widget=1&moduleToWidgetize=CoreHome&actionToWidgetize=renderWidgetContainer&idSite=1&period=day&date=yesterday&disableLink=1&widget=$randomID",
+            url = "https://matomo.spotiflyer.ml/index.php?module=Widgetize&action=iframe&containerId=VisitOverviewWithGraph&disableLink=0&widget=1&moduleToWidgetize=CoreHome&actionToWidgetize=renderWidgetContainer&idSite=1&period=day&date=yesterday&disableLink=1&widget=$randomID",
             delayInMilliSeconds = 5000
         )
 
