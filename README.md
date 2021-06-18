@@ -13,7 +13,7 @@ Supports- Playlist, Albums, Tracks. _(If You know Any Source for Episodes/Podcas
  **Currently running on:**
  - [Android (Jetpack Compose)](https://github.com/Shabinder/SpotiFlyer#-install) 
  - [Desktop (Compose for Desktop) <sup>β</sup>](https://github.com/Shabinder/SpotiFlyer#-install)
- - [Web (Kotlin/JS + React Wrapper) <sup>β</sup>](http://shabinder.github.io/SpotiFlyer/)
+ - [Web (Kotlin/JS + React Wrapper) <sup>β</sup>](https://spotiflyer.ml/web/)
  - [_(WIP)_ IOS SOON (SWIFTUI)](https://github.com/Shabinder/spotiflyer-ios)
 
 <!--[![Build Status](https://github.com/Shabinder/SpotiFlyer/blob/master/app/build_passing.svg)](https://github.com/Shabinder/SpotiFlyer/releases)
@@ -41,15 +41,9 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 
                         
 <!--START_SECTION:DCI-->
-<a href="https://github.com/Shabinder/SpotiFlyer/releases/latest"><img src="https://hcti.io/v1/image/94f72402-038e-40f2-94aa-0f7ed3f18085" height="125" width="280" alt="Total Downloads"></a>
+<a href="https://github.com/Shabinder/SpotiFlyer/releases/latest"><img src="https://hcti.io/v1/image/bd25a7e0-3b56-4739-8153-f24e35f375ee" height="125" width="280" alt="Total Downloads"></a>
 <!--END_SECTION:DCI-->
 
-
-## 📈 Analytics _(Per Day)_
-
-<!--START_SECTION:HTI-->
-![Today's Analytics](https://hcti.io/v1/image/58bf4b1b-e2fa-4e2d-8e87-2fa7d9983e26)
-<!--END_SECTION:HTI-->
         
 
 ## 💻 Install 
