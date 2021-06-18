@@ -23,13 +23,13 @@ object Versions {
 
     // Kotlin
     const val kotlinVersion = "1.5.10"
-    const val coroutinesVersion = "1.4.2"
+    const val coroutinesVersion = "1.5.0"
 
     // Code Formatting
-    const val ktLint = "10.0.0"
+    const val ktLint = "10.1.0"
 
     // DI
-    const val koin = "3.0.2"
+    const val koin = "3.1.0"
 
     // Logger
     const val kermit = "0.1.9"
@@ -43,7 +43,7 @@ object Versions {
     const val sqlDelight = "1.5.0"
 
     const val sqliteJdbcDriver = "3.34.0"
-    const val slf4j = "1.7.30"
+    const val slf4j = "1.7.31"
 
     // Android
     const val minSdkVersion = 21
@@ -64,12 +64,12 @@ object Koin {
     val core = "io.insert-koin:koin-core:${Versions.koin}"
     val test = "io.insert-koin:koin-test:${Versions.koin}"
     val android = "io.insert-koin:koin-android:${Versions.koin}"
-    val compose = "io.insert-koin:koin-androidx-compose:3.0.1"
+    val compose = "io.insert-koin:koin-androidx-compose:${Versions.koin}"
 }
 
 object Androidx {
-    const val androidxActivity = "androidx.activity:activity-compose:1.3.0-alpha07"
-    const val core = "androidx.core:core-ktx:1.3.2"
+    const val androidxActivity = "androidx.activity:activity-compose:1.3.0-beta02"
+    const val core = "androidx.core:core-ktx:1.5.0"
     const val palette = "androidx.palette:palette-ktx:1.0.0"
     const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutinesVersion}"
 
@@ -112,7 +112,7 @@ object Decompose {
 }
 
 object MVIKotlin {
-    private const val VERSION = "2.0.3"
+    private const val VERSION = "2.0.4"
     const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
     const val mvikotlin = "com.arkivanov.mvikotlin:mvikotlin:$VERSION"
     const val mvikotlinMain = "com.arkivanov.mvikotlin:mvikotlin-main:$VERSION"
@@ -150,7 +150,7 @@ object Extras {
     object Android {
         object Acra {
             // Self Hosted Crashlytics (FOSS)
-            private const val VERSION = "5.8.1-beta11"
+            private const val VERSION = "5.8.3"
             val http = "ch.acra:acra-http:$VERSION"
             val notification = "ch.acra:acra-notification:$VERSION"
         }
@@ -158,10 +158,6 @@ object Extras {
         val matomo = "org.matomo.sdk:tracker:4.1.2"
         val appUpdator = "com.github.amitbd1508:AppUpdater:4.1.0"
     }
-}
-
-object JetpackDataStore {
-    val dep = "androidx.datastore:datastore-preferences-core:1.0.0-alpha05"
 }
 
 object Serialization {

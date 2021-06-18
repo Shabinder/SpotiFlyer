@@ -77,7 +77,7 @@ fun main() {
                 typography = SpotiFlyerTypography,
                 shapes = SpotiFlyerShapes
             ) {
-                val root = SpotiFlyerRootContent(rememberRootComponent(factory = ::spotiFlyerRoot))
+                val root: SpotiFlyerRoot = SpotiFlyerRootContent(rememberRootComponent(factory = ::spotiFlyerRoot))
                 showToast =  root.callBacks::showToast
             }
         }
@@ -95,7 +95,7 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
             override val directories: Dir = koin.get()
             override val database: Database? = directories.db
             override val downloadProgressReport = DownloadProgressFlow
-            override val actions = object: Actions {
+            override val actions: Actions = object: Actions {
                 override val platformActions = object : PlatformActions {}
 
                 override fun showPopUpMessage(string: String, long: Boolean) {
