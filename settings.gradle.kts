@@ -27,5 +27,6 @@ include(
     ":android",
     ":desktop",
     ":web-app",
+    ":console-app",
     ":maintenance-tasks"
 )

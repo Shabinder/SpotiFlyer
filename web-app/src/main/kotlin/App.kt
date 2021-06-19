@@ -42,7 +42,6 @@ fun RBuilder.App(attrs: AppProps.() -> Unit): ReactElement {
     }
 }
 
-
 @Suppress("EXPERIMENTAL_IS_NOT_ENABLED", "NON_EXPORTABLE_TYPE")
 @OptIn(ExperimentalJsExport::class)
 @JsExport
@@ -51,6 +50,10 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
     private val lifecycle = LifecycleRegistry()
     private val ctx = DefaultComponentContext(lifecycle = lifecycle)
     private val dependencies = props.dependencies
+
+    override fun RBuilder.render() {
+        renderableChild(RootR::class, root)
+    }
 
     private val root = SpotiFlyerRoot(ctx,
         object : SpotiFlyerRoot.Dependencies {
@@ -106,9 +109,5 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
 
     override fun componentWillUnmount() {
         lifecycle.destroy()
-    }
-
-    override fun RBuilder.render() {
-        renderableChild(RootR::class, root)
     }
 }
