@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 interface SpotiFlyerList {
 
-    val models: Value<State>
+    val model: Value<State>
 
     /*
     * Download All Tracks(after filtering already Downloaded)

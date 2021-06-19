@@ -56,7 +56,7 @@ internal class SpotiFlyerListImpl(
         .maximumCacheSize(75)
         .build<String, Picture>()
 
-    override val models: Value<State> = store.asValue()
+    override val model: Value<State> = store.asValue()
 
     override fun onDownloadAllClicked(trackList: List<TrackDetails>) {
         store.accept(Intent.StartDownloadAll(trackList))

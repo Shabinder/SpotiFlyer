@@ -37,7 +37,7 @@ kotlin {
     jvm("desktop")
     android()
 
-    js(/*BOTH*/) {
+    js(BOTH) {
         browser()
         // nodejs()
     }
@@ -65,7 +65,7 @@ kotlin {
                 implementation(Extras.kermit)
                 implementation(Serialization.json)
                 implementation("co.touchlab:stately-common:1.1.7")
-                implementation("dev.icerock.moko:parcelize:0.6.1")
+                implementation("dev.icerock.moko:parcelize:0.7.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt") {
                     @Suppress("DEPRECATION")
                     isForce = true
@@ -102,9 +102,9 @@ kotlin {
         named("jsMain") {
             dependencies {
                 implementation(Ktor.clientJs)
-                implementation("org.jetbrains:kotlin-react:17.0.1-pre.148-kotlin-1.4.30")
-                implementation("org.jetbrains:kotlin-styled:1.0.0-pre.115-kotlin-1.4.10")
-                implementation("org.jetbrains:kotlin-react-dom:17.0.1-pre.148-kotlin-1.4.30")
+                implementation("org.jetbrains.kotlin-wrappers:kotlin-react:17.0.2-pre.213-kotlin-1.5.10")
+                implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:17.0.2-pre.213-kotlin-1.5.10")
+                implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:5.3.0-pre.213-kotlin-1.5.10")
             }
         }
         if(HostOS.isMac){

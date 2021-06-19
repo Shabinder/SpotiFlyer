@@ -16,26 +16,11 @@
 
 package list
 
-import kotlinx.css.Align
-import kotlinx.css.Display
-import kotlinx.css.JustifyContent
-import kotlinx.css.WhiteSpace
-import kotlinx.css.alignItems
-import kotlinx.css.display
-import kotlinx.css.fontSize
-import kotlinx.css.height
-import kotlinx.css.justifyContent
-import kotlinx.css.px
-import kotlinx.css.whiteSpace
+import kotlinx.css.*
 import kotlinx.html.id
 import kotlinx.html.js.onClickFunction
-import react.RBuilder
-import react.RProps
-import react.ReactElement
-import react.child
-import react.functionalComponent
-import react.useEffect
-import react.useState
+import react.*
+import react.dom.attrs
 import styled.css
 import styled.styledDiv
 import styled.styledH5

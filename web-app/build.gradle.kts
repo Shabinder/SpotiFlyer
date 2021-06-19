@@ -35,12 +35,6 @@ dependencies {
     implementation(MVIKotlin.coroutines)
     implementation(MVIKotlin.mvikotlinMain)
     implementation(MVIKotlin.mvikotlinLogging)
-    implementation(Ktor.auth)
-    implementation(Ktor.clientJs)
-    implementation(Ktor.clientJson)
-    implementation(Ktor.clientCore)
-    implementation(Ktor.clientLogging)
-    implementation(Ktor.clientSerialization)
     implementation(project(":common:root"))
     implementation(project(":common:main"))
     implementation(project(":common:list"))
@@ -48,20 +42,23 @@ dependencies {
     implementation(project(":common:data-models"))
     implementation(project(":common:dependency-injection"))
     implementation("co.touchlab:stately-common:1.1.7")
-    implementation("dev.icerock.moko:parcelize:0.6.1")
+    implementation("dev.icerock.moko:parcelize:0.7.0")
     // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0") {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1") {
     //  https://youtrack.jetbrains.com/issue/KTOR-2670
         isForce = true
     }
-    implementation("org.jetbrains:kotlin-react:17.0.1-pre.148-kotlin-1.4.30")
-    implementation("org.jetbrains:kotlin-react-dom:17.0.1-pre.148-kotlin-1.4.30")
-    implementation("org.jetbrains:kotlin-styled:1.0.0-pre.115-kotlin-1.4.10")
-    implementation("org.jetbrains:kotlin-react-router-dom:5.2.0-pre.148-kotlin-1.4.30")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt") {
+        @Suppress("DEPRECATION")
+        isForce = true
+    }
+    implementation("org.jetbrains.kotlin-wrappers:kotlin-react:17.0.2-pre.213-kotlin-1.5.10")
+    implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:17.0.2-pre.213-kotlin-1.5.10")
+    implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:5.3.0-pre.213-kotlin-1.5.10")
 }
 
 kotlin {
-    js {
+    js(IR) {
         //useCommonJs()
         browser {
             webpackTask {
@@ -77,5 +74,6 @@ kotlin {
                 }
             }
         }
+        binaries.executable()
     }
 }

@@ -34,7 +34,7 @@ kotlin {
     jvm("desktop")
     android()
 
-    js(/*BOTH*/) {
+    js(BOTH) {
         browser()
         // nodejs()
     }

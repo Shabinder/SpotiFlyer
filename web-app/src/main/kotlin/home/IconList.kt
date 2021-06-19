@@ -17,22 +17,11 @@
 package home
 
 import Styles
-import kotlinx.css.borderRadius
-import kotlinx.css.height
-import kotlinx.css.margin
-import kotlinx.css.px
-import kotlinx.css.width
+import kotlinx.css.*
 import kotlinx.html.id
-import react.RBuilder
-import react.RProps
-import react.ReactElement
-import react.child
-import react.functionalComponent
-import styled.css
-import styled.styledA
-import styled.styledDiv
-import styled.styledForm
-import styled.styledImg
+import react.*
+import react.dom.attrs
+import styled.*
 
 external interface IconListProps : RProps {
     var iconsAndPlatforms: Map<String,String>
@@ -63,7 +52,7 @@ private val iconList = functionalComponent<IconListProps>("IconList") { props ->
             if(icon == firstElem && props.isBadge){
                 //<form><script src="https://checkout.razorpay.com/v1/payment-button.js" data-payment_button_id="pl_GnKuuDBdBu0ank" async> </script> </form>
                 styledForm {
-                    attrs{
+                    attrs {
                         id = "razorpay-form"
                     }
                 }

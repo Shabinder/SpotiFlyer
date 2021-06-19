@@ -16,55 +16,55 @@
 
 package list
 
-import com.arkivanov.decompose.value.Value
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.list.SpotiFlyerList.State
+import extras.Props
+import extras.RStateWrapper
 import extras.RenderableComponent
-import kotlinx.coroutines.flow.Flow
-import kotlinx.css.Color
-import kotlinx.css.Display
-import kotlinx.css.FlexDirection
-import kotlinx.css.color
-import kotlinx.css.display
-import kotlinx.css.flexDirection
-import kotlinx.css.flexGrow
-import kotlinx.css.padding
-import kotlinx.css.px
+import kotlinx.css.*
 import kotlinx.html.id
 import react.RBuilder
+import react.dom.attrs
 import styled.css
 import styled.styledDiv
 import styled.styledSection
 
+
 class ListScreen(
     props: Props<SpotiFlyerList>,
-) : RenderableComponent<SpotiFlyerList, State>(props,initialState = State()) {
-
-    override val stateFlow: Value<SpotiFlyerList.State> = model.models
+) : RenderableComponent<SpotiFlyerList, RStateWrapper<State>>(
+    props,
+    initialState = RStateWrapper(props.component.model.value)
+) {
+    init {
+        component.model.bindToState {
+            model = it
+        }
+    }
 
     override fun RBuilder.render() {
 
-        val result = state.data.queryResult
+        val queryResult = state.model.queryResult
 
         styledSection {
             attrs {
                 id = "list-screen"
             }
 
-            if(result == null) {
+            if(queryResult == null) {
                 LoadingAnim {  }
             }else {
                 CoverImage {
-                    coverImageURL = result.coverUrl
-                    coverName = result.title
+                    coverImageURL = queryResult.coverUrl
+                    coverName = queryResult.title
                 }
 
                 DownloadAllButton {
-                    isActive = state.data.trackList.size > 1
+                    isActive = state.model.trackList.size > 1
                     downloadAll = {
-                        model.onDownloadAllClicked(state.data.trackList)
+                        component.onDownloadAllClicked(state.model.trackList)
                     }
-                    link = state.data.link
+                    link = state.model.link
                 }
 
                 styledDiv {
@@ -74,10 +74,10 @@ class ListScreen(
                         flexDirection = FlexDirection.column
                         color = Color.white
                     }
-                    state.data.trackList.forEachIndexed{ _, trackDetails ->
+                    state.model.trackList.forEachIndexed{ _, trackDetails ->
                         TrackItem {
                             details = trackDetails
-                            downloadTrack = model::onDownloadClicked
+                            downloadTrack = component::onDownloadClicked
                         }
                     }
                 }

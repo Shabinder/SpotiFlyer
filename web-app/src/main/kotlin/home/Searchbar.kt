@@ -25,12 +25,9 @@ import org.w3c.dom.HTMLInputElement
 import react.RBuilder
 import react.RProps
 import react.child
+import react.dom.attrs
 import react.functionalComponent
-import styled.css
-import styled.styledButton
-import styled.styledDiv
-import styled.styledImg
-import styled.styledInput
+import styled.*
 
 external interface SearchbarProps : RProps {
     var link: String
@@ -44,8 +41,6 @@ fun RBuilder.SearchBar(handler:SearchbarProps.() -> Unit) = child(searchbar){
         handler()
     }
 }
-
-
 
 val searchbar = functionalComponent<SearchbarProps>("SearchBar"){ props ->
     styledDiv{

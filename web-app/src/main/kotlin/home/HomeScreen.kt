@@ -16,21 +16,12 @@
 
 package home
 
-import com.arkivanov.decompose.value.Value
 import com.shabinder.common.main.SpotiFlyerMain
-import com.shabinder.common.main.SpotiFlyerMain.State
+import extras.Props
+import extras.RStateWrapper
 import extras.RenderableComponent
 import kotlinx.browser.document
-import kotlinx.coroutines.flow.Flow
-import kotlinx.css.Align
-import kotlinx.css.Display
-import kotlinx.css.FlexDirection
-import kotlinx.css.JustifyContent
-import kotlinx.css.alignItems
-import kotlinx.css.display
-import kotlinx.css.flexDirection
-import kotlinx.css.flexGrow
-import kotlinx.css.justifyContent
+import kotlinx.css.*
 import kotlinx.dom.appendElement
 import react.RBuilder
 import styled.css
@@ -38,12 +29,20 @@ import styled.styledDiv
 
 class HomeScreen(
     props: Props<SpotiFlyerMain>,
-) : RenderableComponent<SpotiFlyerMain, State>(
+) : RenderableComponent<SpotiFlyerMain, RStateWrapper<SpotiFlyerMain.State>>(
     props,
-    initialState = State()
+    initialState = RStateWrapper(props.component.model.value)
 ) {
+
+    init {
+        component.model.bindToState {
+            model = it
+        }
+    }
+
     override fun componentDidMount() {
         super.componentDidMount()
+        // RazorPay Button
         val form = document.getElementById("razorpay-form")!!
         repeat(form.childNodes.length){
             form.childNodes.item(0)?.let { it1 -> form.removeChild(it1) }
@@ -55,8 +54,6 @@ class HomeScreen(
             this.setAttribute("data-payment_button_id", "pl_GnKuuDBdBu0ank")
         }
     }
-
-    override val stateFlow: Value<SpotiFlyerMain.State> = model.models
 
     override fun RBuilder.render() {
         styledDiv{
@@ -73,9 +70,9 @@ class HomeScreen(
             }
 
             SearchBar {
-                link = state.data.link
-                search = model::onLinkSearch
-                onLinkChange = model::onInputLinkChanged
+                link = state.model.link
+                search = component::onLinkSearch
+                onLinkChange = component::onInputLinkChanged
             }
 
             IconList {

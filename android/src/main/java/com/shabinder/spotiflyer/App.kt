@@ -41,7 +41,7 @@ class App: Application(), KoinComponent {
 
     val tracker: Tracker by lazy {
         TrackerBuilder.createDefault(
-            "https://kind-grasshopper-73.telebit.io/matomo/matomo.php", 1)
+            "https://matomo.spotiflyer.ml/matomo.php", 1)
             .build(Matomo.getInstance(this)).apply {
                 if (BuildConfig.DEBUG) {
                     /*Timber.plant(DebugTree())
@@ -85,7 +85,7 @@ class App: Application(), KoinComponent {
             }
             // Send Crash Report to self hosted Acrarium (FOSS)
             httpSender {
-                uri = "https://kind-grasshopper-73.telebit.io/acrarium/report"
+                uri = "https://acrarium.spotiflyer.ml/report"
                 basicAuthLogin = "sDj2xCKQIxw0dujf"
                 basicAuthPassword = "O83du0TsgsDJ69zN"
                 httpMethod = HttpSender.Method.POST

@@ -28,11 +28,7 @@ import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.database.Database
 import extras.renderableChild
-import react.RBuilder
-import react.RComponent
-import react.RProps
-import react.RState
-import react.ReactElement
+import react.*
 import root.RootR
 
 external interface AppProps : RProps {
@@ -46,6 +42,10 @@ fun RBuilder.App(attrs: AppProps.() -> Unit): ReactElement {
     }
 }
 
+
+@Suppress("EXPERIMENTAL_IS_NOT_ENABLED", "NON_EXPORTABLE_TYPE")
+@OptIn(ExperimentalJsExport::class)
+@JsExport
 class App(props: AppProps): RComponent<AppProps, RState>(props) {
 
     private val lifecycle = LifecycleRegistry()

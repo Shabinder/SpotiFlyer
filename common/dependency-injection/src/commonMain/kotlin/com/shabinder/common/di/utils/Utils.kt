@@ -16,6 +16,8 @@
 
 package com.shabinder.common.di.utils
 
+import io.github.shabinder.TargetPlatforms
+import io.github.shabinder.activePlatform
 import kotlinx.serialization.json.Json
 import kotlin.native.concurrent.ThreadLocal
 
@@ -31,6 +33,7 @@ val json by lazy {
  * Removing Illegal Chars from File Name
  * **/
 fun removeIllegalChars(fileName: String): String {
+    if (activePlatform is TargetPlatforms.Js) return fileName
     val illegalCharArray = charArrayOf(
         '/',
         '\n',

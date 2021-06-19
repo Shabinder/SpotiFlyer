@@ -17,53 +17,63 @@
 package extras
 
 import com.arkivanov.decompose.value.Value
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import com.arkivanov.decompose.value.ValueObserver
 import react.RComponent
 import react.RProps
 import react.RState
 import react.setState
 
-abstract class RenderableComponent<
-        T : Any,
-        S : Any
-        >(
+
+@Suppress("EXPERIMENTAL_IS_NOT_ENABLED", "NON_EXPORTABLE_TYPE")
+@OptIn(ExperimentalJsExport::class)
+@JsExport
+abstract class RenderableComponent<T: Any, S: RState>(
     props: Props<T>,
     initialState: S
-) : RComponent<RenderableComponent.Props<T>, RenderableComponent.State<S>>(props) {
+) : RComponent<Props<T>, S>(props) {
 
-    protected abstract val stateFlow: Value<S>
-    protected val model: T get() = props.model
-    protected var scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+    private val subscriptions = ArrayList<Subscription<*>>()
+    protected val component: T get() = props.component
 
     init {
-        state = State(data = initialState)
+        state = initialState
     }
 
     override fun componentDidMount() {
-        if(!scope.isActive)
-            scope = CoroutineScope(Dispatchers.Default)
-        scope.launch {
-            stateFlow.subscribe {
-                setState { data = it }
-            }
-        }
+        subscriptions.forEach { subscribe(it) }
+    }
+
+    private fun <T : Any> subscribe(subscription: Subscription<T>) {
+        subscription.value.subscribe(subscription.observer)
     }
 
     override fun componentWillUnmount() {
-        scope.cancel("Component Unmounted")
+        subscriptions.forEach { unsubscribe(it) }
     }
 
-    interface Props<T : Any> : RProps {
-        var model: T
+    private fun <T : Any> unsubscribe(subscription: Subscription<T>) {
+        subscription.value.unsubscribe(subscription.observer)
     }
 
-    class State<S>(
-        var data: S
-    ):RState
+    protected fun <T : Any> Value<T>.bindToState(buildState: S.(T) -> Unit) {
+        subscriptions += Subscription(this) { data -> setState { buildState(data) } }
+    }
+
+
+
+    protected class Subscription<T : Any>(
+        val value: Value<T>,
+        val observer: ValueObserver<T>
+    )
+}
+
+@Suppress("EXPERIMENTAL_IS_NOT_ENABLED", "NON_EXPORTABLE_TYPE")
+@OptIn(ExperimentalJsExport::class)
+@JsExport
+class RStateWrapper<T>(
+    var model: T
+) : RState
+
+external interface Props<T : Any> : RProps {
+    var component: T
 }

@@ -28,7 +28,7 @@ import io.github.shabinder.YoutubeDownloader
 import io.github.shabinder.models.YoutubeVideo
 import io.github.shabinder.models.formats.Format
 import io.github.shabinder.models.quality.AudioQuality
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 
 class YoutubeProvider(
     private val httpClient: HttpClient,
@@ -37,7 +37,7 @@ class YoutubeProvider(
 ) {
     val ytDownloader: YoutubeDownloader = YoutubeDownloader(
         enableCORSProxy = true,
-        CORSProxyAddress = "https://kind-grasshopper-73.telebit.io/cors/"
+        CORSProxyAddress = "https://cors.spotiflyer.ml/cors/"
     )
 
     /*
@@ -157,7 +157,7 @@ class YoutubeProvider(
                 val video = ytDownloader.getVideo(searchId)
                 coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
                 val detail = video.videoDetails
-                val name = detail.title?.replace(detail.author?.toUpperCase() ?: "", "", true)
+                val name = detail.title?.replace(detail.author?.uppercase() ?: "", "", true)
                     ?: detail.title ?: ""
                 // logger.i{ detail.toString() }
                 trackList = listOf(

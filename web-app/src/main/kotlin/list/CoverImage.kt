@@ -16,24 +16,10 @@
 
 package list
 
-import kotlinx.css.Align
-import kotlinx.css.Display
-import kotlinx.css.FlexDirection
-import kotlinx.css.TextAlign
-import kotlinx.css.alignItems
-import kotlinx.css.display
-import kotlinx.css.flexDirection
-import kotlinx.css.height
-import kotlinx.css.marginTop
-import kotlinx.css.px
-import kotlinx.css.textAlign
-import kotlinx.css.width
+import kotlinx.css.*
 import kotlinx.html.id
-import react.RBuilder
-import react.RProps
-import react.ReactElement
-import react.child
-import react.functionalComponent
+import react.*
+import react.dom.attrs
 import styled.css
 import styled.styledDiv
 import styled.styledH1

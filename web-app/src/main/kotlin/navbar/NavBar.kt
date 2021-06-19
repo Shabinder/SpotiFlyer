@@ -16,33 +16,13 @@
 
 package navbar
 
-import kotlinx.css.Align
-import kotlinx.css.Display
-import kotlinx.css.LinearDimension
-import kotlinx.css.alignItems
-import kotlinx.css.display
-import kotlinx.css.filter
-import kotlinx.css.fontSize
-import kotlinx.css.height
-import kotlinx.css.margin
-import kotlinx.css.marginLeft
-import kotlinx.css.marginRight
-import kotlinx.css.px
-import kotlinx.css.width
+import kotlinx.css.*
 import kotlinx.html.id
 import kotlinx.html.js.onBlurFunction
 import kotlinx.html.js.onClickFunction
-import react.RBuilder
-import react.RProps
-import react.ReactElement
-import react.child
-import react.functionalComponent
-import styled.css
-import styled.styledA
-import styled.styledDiv
-import styled.styledH1
-import styled.styledImg
-import styled.styledNav
+import react.*
+import react.dom.attrs
+import styled.*
 
 @Suppress("FunctionName")
 fun RBuilder.NavBar(handler: NavBarProps.() -> Unit): ReactElement{

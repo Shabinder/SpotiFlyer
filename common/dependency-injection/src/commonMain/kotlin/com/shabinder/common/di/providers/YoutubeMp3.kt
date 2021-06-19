@@ -21,7 +21,7 @@ import com.shabinder.common.di.Dir
 import com.shabinder.common.di.currentPlatform
 import com.shabinder.common.di.youtubeMp3.Yt1sMp3
 import com.shabinder.common.models.AllPlatforms
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 
 class YoutubeMp3(
     override val httpClient: HttpClient,
@@ -33,7 +33,7 @@ class YoutubeMp3(
         getLinkFromYt1sMp3(videoID)?.let {
             logger.i { "Download Link:   $it" }
             if (currentPlatform is AllPlatforms.Js/* && corsProxy !is CorsProxy.PublicProxyWithExtension*/)
-                "https://kind-grasshopper-73.telebit.io/cors/$it"
+                "https://cors.spotiflyer.ml/cors/$it"
             // "https://spotiflyer.azurewebsites.net/$it" // Data OUT Limit issue
             else it
         }

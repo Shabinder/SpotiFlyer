@@ -27,24 +27,12 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponen
 import com.arkivanov.mvikotlin.core.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.core.lifecycle.resume
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.DownloadProgressFlow
-import com.shabinder.common.di.FetchPlatformQueryResult
-import com.shabinder.common.di.firstLaunchDone
-import com.shabinder.common.di.initKoin
-import com.shabinder.common.di.isFirstLaunch
-import com.shabinder.common.di.isInternetAccessible
-import com.shabinder.common.di.setDownloadDirectory
-import com.shabinder.common.di.toggleAnalytics
+import com.shabinder.common.di.*
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
-import com.shabinder.common.uikit.SpotiFlyerColors
-import com.shabinder.common.uikit.SpotiFlyerRootContent
-import com.shabinder.common.uikit.SpotiFlyerShapes
-import com.shabinder.common.uikit.SpotiFlyerTypography
-import com.shabinder.common.uikit.colorOffWhite
+import com.shabinder.common.uikit.*
 import com.shabinder.database.Database
 import kotlinx.coroutines.runBlocking
 import org.piwik.java.tracking.PiwikTracker
@@ -58,7 +46,7 @@ import javax.swing.JFileChooser.APPROVE_OPTION
 private val koin = initKoin(enableNetworkLogs = true).koin
 private lateinit var showToast: (String)->Unit
 private val tracker: PiwikTracker by lazy {
-    PiwikTracker("https://kind-grasshopper-73.telebit.io/matomo/matomo.php")
+    PiwikTracker("https://matomo.spotiflyer.ml/matomo.php")
 }
 
 fun main() {

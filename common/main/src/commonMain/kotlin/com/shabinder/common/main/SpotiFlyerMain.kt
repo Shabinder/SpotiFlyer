@@ -28,7 +28,7 @@ import com.shabinder.database.Database
 
 interface SpotiFlyerMain {
 
-    val models: Value<State>
+    val model: Value<State>
 
     val analytics: Analytics
 
