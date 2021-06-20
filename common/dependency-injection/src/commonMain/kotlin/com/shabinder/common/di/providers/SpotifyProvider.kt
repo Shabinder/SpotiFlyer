@@ -27,17 +27,19 @@ import com.shabinder.common.di.spotify.authenticateSpotify
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.NativeAtomicReference
 import com.shabinder.common.models.PlatformQueryResult
+import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.spotify.Album
 import com.shabinder.common.models.spotify.Image
 import com.shabinder.common.models.spotify.PlaylistTrack
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.models.spotify.Track
-import io.ktor.client.HttpClient
-import io.ktor.client.features.defaultRequest
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
-import io.ktor.client.request.header
+import io.ktor.client.*
+import io.ktor.client.features.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
+import io.ktor.client.request.*
 
 class SpotifyProvider(
     private val tokenStore: TokenStore,
@@ -64,7 +66,7 @@ class SpotifyProvider(
 
     override val httpClientRef = NativeAtomicReference(createHttpClient(true))
 
-    suspend fun query(fullLink: String): PlatformQueryResult? {
+    suspend fun query(fullLink: String): SuspendableEvent<PlatformQueryResult, Throwable> = SuspendableEvent {
 
         var spotifyLink =
             "https://" + fullLink.substringAfterLast("https://").substringBefore(" ").trim()
@@ -78,15 +80,16 @@ class SpotifyProvider(
         val type = spotifyLink.substringBeforeLast('/', "Error").substringAfterLast('/')
 
         if (type == "Error" || link == "Error") {
-            return null
+            throw SpotiFlyerException.LinkInvalid(fullLink)
         }
 
         if (type == "episode" || type == "show") {
-            // TODO Implementation
-            return null
+            throw SpotiFlyerException.FeatureNotImplementedYet(
+                "Support for Spotify's ${type.uppercase()} isn't implemented yet"
+            )
         }
 
-        return try {
+        try {
             spotifySearch(
                 type,
                 link
@@ -95,16 +98,11 @@ class SpotifyProvider(
             e.printStackTrace()
             // Try Reinitialising Client // Handle 401 Token Expiry ,etc Exceptions
             authenticateSpotifyClient(true)
-            // Retry Search
-            try {
-                spotifySearch(
-                    type,
-                    link
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
+
+            spotifySearch(
+                type,
+                link
+            )
         }
     }
 
@@ -112,15 +110,14 @@ class SpotifyProvider(
         type: String,
         link: String
     ): PlatformQueryResult {
-        val result = PlatformQueryResult(
+        return PlatformQueryResult(
             folderType = "",
             subFolder = "",
             title = "",
             coverUrl = "",
             trackList = listOf(),
             Source.Spotify
-        )
-        with(result) {
+        ).apply {
             when (type) {
                 "track" -> {
                     getTrack(link).also {
@@ -190,11 +187,10 @@ class SpotifyProvider(
                 "show" -> { // TODO
                 }
                 else -> {
-                    // TODO Handle Error
+                    throw SpotiFlyerException.LinkInvalid("Provide: Spotify, Type:$type -> Link:$link")
                 }
             }
         }
-        return result
     }
 
     /*

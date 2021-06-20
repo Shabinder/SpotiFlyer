@@ -16,14 +16,16 @@
 
 package com.shabinder.common.di.spotify
 
-import com.shabinder.common.di.gaana.corsApi
 import com.shabinder.common.models.NativeAtomicReference
+import com.shabinder.common.models.corsApi
 import com.shabinder.common.models.spotify.Album
 import com.shabinder.common.models.spotify.PagingObjectPlaylistTrack
 import com.shabinder.common.models.spotify.Playlist
 import com.shabinder.common.models.spotify.Track
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
+import io.github.shabinder.TargetPlatforms
+import io.github.shabinder.activePlatform
+import io.ktor.client.*
+import io.ktor.client.request.*
 
 private val BASE_URL get() = "${corsApi}https://api.spotify.com/v1"
 
@@ -32,7 +34,7 @@ interface SpotifyRequests {
     val httpClientRef: NativeAtomicReference<HttpClient>
     val httpClient: HttpClient get() = httpClientRef.value
 
-    suspend fun authenticateSpotifyClient(override: Boolean = false)
+    suspend fun authenticateSpotifyClient(override: Boolean = activePlatform is TargetPlatforms.Js)
 
     suspend fun getPlaylist(playlistID: String): Playlist {
         return httpClient.get("$BASE_URL/playlists/$playlistID")

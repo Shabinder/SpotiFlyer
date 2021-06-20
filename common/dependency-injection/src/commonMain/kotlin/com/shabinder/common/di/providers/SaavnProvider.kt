@@ -8,10 +8,12 @@ import com.shabinder.common.di.saavn.JioSaavnRequests
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
+import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.saavn.SaavnSong
 import com.shabinder.common.models.spotify.Source
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 
 class SaavnProvider(
     override val httpClient: HttpClient,
@@ -20,16 +22,15 @@ class SaavnProvider(
     private val dir: Dir,
 ) : JioSaavnRequests {
 
-    suspend fun query(fullLink: String): PlatformQueryResult {
-        val result = PlatformQueryResult(
+    suspend fun query(fullLink: String): SuspendableEvent<PlatformQueryResult, Throwable> = SuspendableEvent {
+        PlatformQueryResult(
             folderType = "",
             subFolder = "",
             title = "",
             coverUrl = "",
             trackList = listOf(),
             Source.JioSaavn
-        )
-        with(result) {
+        ).apply {
             when (fullLink.substringAfter("saavn.com/").substringBefore("/")) {
                 "song" -> {
                     getSong(fullLink).let {
@@ -59,12 +60,10 @@ class SaavnProvider(
                     }
                 }
                 else -> {
-                    // Handle Error
+                    throw SpotiFlyerException.LinkInvalid(fullLink)
                 }
             }
         }
-
-        return result
     }
 
     private fun List<SaavnSong>.toTrackDetails(type: String, subFolder: String): List<TrackDetails> = this.map {

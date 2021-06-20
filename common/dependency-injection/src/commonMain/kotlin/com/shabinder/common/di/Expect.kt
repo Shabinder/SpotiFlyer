@@ -16,9 +16,8 @@
 
 package com.shabinder.common.di
 
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.TrackDetails
-import io.ktor.client.request.head
+import io.ktor.client.request.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -33,10 +32,6 @@ expect suspend fun downloadTracks(
 // IO-Dispatcher
 @SharedImmutable
 expect val dispatcherIO: CoroutineDispatcher
-
-// Current Platform Info
-@SharedImmutable
-expect val currentPlatform: AllPlatforms
 
 suspend fun isInternetAccessible(): Boolean {
     return withContext(dispatcherIO) {

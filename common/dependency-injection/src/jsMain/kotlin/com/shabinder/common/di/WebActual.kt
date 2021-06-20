@@ -16,7 +16,6 @@
 
 package com.shabinder.common.di
 
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
@@ -33,9 +32,6 @@ val allTracksStatus: HashMap<String, DownloadStatus> = hashMapOf()
 
 // IO-Dispatcher
 actual val dispatcherIO: CoroutineDispatcher = Dispatchers.Default
-
-// Current Platform Info
-actual val currentPlatform: AllPlatforms = AllPlatforms.Js
 
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,

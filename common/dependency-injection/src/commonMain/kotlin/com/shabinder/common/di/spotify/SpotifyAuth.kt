@@ -19,14 +19,14 @@ package com.shabinder.common.di.spotify
 import com.shabinder.common.di.globalJson
 import com.shabinder.common.models.methods
 import com.shabinder.common.models.spotify.TokenData
-import io.ktor.client.HttpClient
-import io.ktor.client.features.auth.Auth
-import io.ktor.client.features.auth.providers.basic
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
-import io.ktor.client.request.forms.FormDataContent
-import io.ktor.client.request.post
-import io.ktor.http.Parameters
+import io.ktor.client.*
+import io.ktor.client.features.auth.*
+import io.ktor.client.features.auth.providers.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
+import io.ktor.http.*
 import kotlin.native.concurrent.SharedImmutable
 
 suspend fun authenticateSpotify(): TokenData? {
@@ -48,9 +48,10 @@ private val spotifyAuthClient by lazy {
 
         install(Auth) {
             basic {
-                sendWithoutRequest = true
-                username = clientId
-                password = clientSecret
+                sendWithoutRequest { true }
+                credentials {
+                    BasicAuthCredentials(clientId, clientSecret)
+                }
             }
         }
         install(JsonFeature) {

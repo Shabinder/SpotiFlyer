@@ -17,7 +17,6 @@
 package com.shabinder.common.di
 
 import com.shabinder.common.di.utils.ParallelExecutor
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
@@ -33,9 +32,6 @@ val DownloadScope = ParallelExecutor(Dispatchers.IO)
 
 // IO-Dispatcher
 actual val dispatcherIO: CoroutineDispatcher = Dispatchers.IO
-
-// Current Platform Info
-actual val currentPlatform: AllPlatforms = AllPlatforms.Jvm
 
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,

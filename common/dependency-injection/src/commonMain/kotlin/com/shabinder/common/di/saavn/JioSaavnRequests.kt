@@ -2,8 +2,8 @@ package com.shabinder.common.di.saavn
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.audioToMp3.AudioToMp3
-import com.shabinder.common.di.gaana.corsApi
 import com.shabinder.common.di.globalJson
+import com.shabinder.common.models.corsApi
 import com.shabinder.common.models.saavn.SaavnAlbum
 import com.shabinder.common.models.saavn.SaavnPlaylist
 import com.shabinder.common.models.saavn.SaavnSearchResult
@@ -13,9 +13,9 @@ import io.github.shabinder.utils.getBoolean
 import io.github.shabinder.utils.getJsonArray
 import io.github.shabinder.utils.getJsonObject
 import io.github.shabinder.utils.getString
-import io.ktor.client.HttpClient
-import io.ktor.client.features.ServerResponseException
-import io.ktor.client.request.get
+import io.ktor.client.*
+import io.ktor.client.features.*
+import io.ktor.client.request.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -24,6 +24,7 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import kotlin.collections.set
 
 interface JioSaavnRequests {
 
@@ -237,8 +238,8 @@ interface JioSaavnRequests {
         for (result in tracks) {
             var hasCommonWord = false
 
-            val resultName = result.title.toLowerCase().replace("/", " ")
-            val trackNameWords = trackName.toLowerCase().split(" ")
+            val resultName = result.title.lowercase().replace("/", " ")
+            val trackNameWords = trackName.lowercase().split(" ")
 
             for (nameWord in trackNameWords) {
                 if (nameWord.isNotBlank() && FuzzySearch.partialRatio(nameWord, resultName) > 85) hasCommonWord = true
@@ -258,11 +259,11 @@ interface JioSaavnRequests {
             // String Containing All Artist Names from JioSaavn Search Result
             val artistListString = mutableSetOf<String>().apply {
                 result.more_info?.singers?.split(",")?.let { addAll(it) }
-                result.more_info?.primary_artists?.toLowerCase()?.split(",")?.let { addAll(it) }
+                result.more_info?.primary_artists?.lowercase()?.split(",")?.let { addAll(it) }
             }.joinToString(" , ")
 
             for (artist in trackArtists) {
-                if (FuzzySearch.partialRatio(artist.toLowerCase(), artistListString) > 85)
+                if (FuzzySearch.partialRatio(artist.lowercase(), artistListString) > 85)
                     artistMatchNumber++
             }
 

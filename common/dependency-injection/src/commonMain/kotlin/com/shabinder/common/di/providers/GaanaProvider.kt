@@ -22,10 +22,12 @@ import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.gaana.GaanaRequests
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
+import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.gaana.GaanaTrack
 import com.shabinder.common.models.spotify.Source
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 
 class GaanaProvider(
     override val httpClient: HttpClient,
@@ -35,7 +37,7 @@ class GaanaProvider(
 
     private val gaanaPlaceholderImageUrl = "https://a10.gaanacdn.com/images/social/gaana_social.jpg"
 
-    suspend fun query(fullLink: String): PlatformQueryResult? {
+    suspend fun query(fullLink: String): SuspendableEvent<PlatformQueryResult,Throwable> = SuspendableEvent {
         // Link Schema: https://gaana.com/type/link
         val gaanaLink = fullLink.substringAfter("gaana.com/")
 
@@ -44,17 +46,13 @@ class GaanaProvider(
 
         // Error
         if (type == "Error" || link == "Error") {
-            return null
+            throw SpotiFlyerException.LinkInvalid()
         }
-        return try {
-            gaanaSearch(
-                type,
-                link
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
+
+        gaanaSearch(
+            type,
+            link
+        )
     }
 
     private suspend fun gaanaSearch(
@@ -137,6 +135,7 @@ class GaanaProvider(
             outputFilePath = dir.finalOutputDir(it.track_title, type, subFolder, dir.defaultDir()/*,".m4a"*/)
         )
     }
+
     private fun GaanaTrack.updateStatusIfPresent(folderType: String, subFolder: String): DownloadStatus {
         return if (dir.isPresent(
                 dir.finalOutputDir(

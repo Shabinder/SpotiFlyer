@@ -28,12 +28,10 @@ import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
 import com.arkivanov.decompose.value.Value
 import com.shabinder.common.di.Dir
-import com.shabinder.common.di.currentPlatform
 import com.shabinder.common.di.providers.SpotifyProvider
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.models.Actions
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.Consumer
 import com.shabinder.common.models.methods
 import com.shabinder.common.root.SpotiFlyerRoot
@@ -80,10 +78,7 @@ internal class SpotiFlyerRootImpl(
         instanceKeeper.ensureNeverFrozen()
         methods.value = dependencies.actions.freeze()
         /*Authenticate Spotify Client*/
-        authenticateSpotify(
-            dependencies.fetchPlatformQueryResult.spotifyProvider,
-            currentPlatform is AllPlatforms.Js
-        )
+        authenticateSpotify(dependencies.fetchPlatformQueryResult.spotifyProvider)
     }
 
     private val router =
@@ -134,11 +129,11 @@ internal class SpotiFlyerRootImpl(
             }
         }
 
-    private fun authenticateSpotify(spotifyProvider: SpotifyProvider, override: Boolean) {
+    private fun authenticateSpotify(spotifyProvider: SpotifyProvider) {
         GlobalScope.launch(Dispatchers.Default) {
             analytics.appLaunchEvent()
             /*Authenticate Spotify Client*/
-            spotifyProvider.authenticateSpotifyClient(override)
+            spotifyProvider.authenticateSpotifyClient()
         }
     }
 
