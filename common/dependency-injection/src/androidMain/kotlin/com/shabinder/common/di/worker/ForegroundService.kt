@@ -76,7 +76,6 @@ class ForegroundService : Service(), CoroutineScope {
 
     private lateinit var downloadManager: DownloadManager
     private lateinit var downloadService: ParallelExecutor
-    private val ytDownloader get() = fetcher.youtubeProvider.ytDownloader
     private val fetcher: FetchPlatformQueryResult by inject()
     private val logger: Kermit by inject()
     private val dir: Dir by inject()
@@ -161,15 +160,17 @@ class ForegroundService : Service(), CoroutineScope {
         trackList.forEach {
             launch(Dispatchers.IO) {
                 downloadService.execute {
-                    val url = fetcher.findMp3DownloadLink(it)
-                    if (!url.isNullOrBlank()) { // Successfully Grabbed Mp3 URL
-                        enqueueDownload(url, it)
-                    } else {
-                        sendTrackBroadcast(Status.FAILED.name, it)
-                        failed++
-                        updateNotification()
-                        allTracksStatus[it.title] = DownloadStatus.Failed
-                    }
+                    fetcher.findMp3DownloadLink(it).fold(
+                        success = { url ->
+                            enqueueDownload(url, it)
+                        },
+                        failure = { _ ->
+                            sendTrackBroadcast(Status.FAILED.name, it)
+                            failed++
+                            updateNotification()
+                            allTracksStatus[it.title] = DownloadStatus.Failed
+                        }
+                    )
                 }
             }
         }

@@ -4,17 +4,20 @@ import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.audioToMp3.AudioToMp3
 import com.shabinder.common.di.globalJson
 import com.shabinder.common.models.corsApi
+import com.shabinder.common.models.event.coroutines.SuspendableEvent
+import com.shabinder.common.models.event.coroutines.map
+import com.shabinder.common.models.event.coroutines.success
 import com.shabinder.common.models.saavn.SaavnAlbum
 import com.shabinder.common.models.saavn.SaavnPlaylist
 import com.shabinder.common.models.saavn.SaavnSearchResult
 import com.shabinder.common.models.saavn.SaavnSong
+import com.shabinder.common.requireNotNull
 import io.github.shabinder.fuzzywuzzy.diffutils.FuzzySearch
 import io.github.shabinder.utils.getBoolean
 import io.github.shabinder.utils.getJsonArray
 import io.github.shabinder.utils.getJsonObject
 import io.github.shabinder.utils.getString
 import io.ktor.client.*
-import io.ktor.client.features.*
 import io.ktor.client.request.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -32,63 +35,64 @@ interface JioSaavnRequests {
     val httpClient: HttpClient
     val logger: Kermit
 
-    suspend fun findSongDownloadURL(
+    suspend fun findMp3SongDownloadURL(
         trackName: String,
         trackArtists: List<String>,
-    ): String? {
-        val songs = searchForSong(trackName)
+    ): SuspendableEvent<String,Throwable> = searchForSong(trackName).map { songs ->
         val bestMatches = sortByBestMatch(songs, trackName, trackArtists)
-        val m4aLink: String? = bestMatches.keys.firstOrNull()?.let {
-            getSongFromID(it).media_url
+
+        val m4aLink: String by getSongFromID(bestMatches.keys.first()).map { song ->
+            song.media_url.requireNotNull()
         }
-        val mp3Link = m4aLink?.let { audioToMp3.convertToMp3(it) }
-        return mp3Link
+
+        val mp3Link by audioToMp3.convertToMp3(m4aLink)
+
+        mp3Link
     }
 
     suspend fun searchForSong(
         query: String,
         includeLyrics: Boolean = false
-    ): List<SaavnSearchResult> {
-        /*if (query.startsWith("http") && query.contains("saavn.com")) {
-            return listOf(getSong(query))
-        }*/
+    ): SuspendableEvent<List<SaavnSearchResult>,Throwable> = SuspendableEvent {
 
         val searchURL = search_base_url + query
         val results = mutableListOf<SaavnSearchResult>()
-        try {
-            (globalJson.parseToJsonElement(httpClient.get(searchURL)) as JsonObject).getJsonObject("songs").getJsonArray("data")?.forEach {
-                (it as? JsonObject)?.formatData()?.let { jsonObject ->
+
+        (globalJson.parseToJsonElement(httpClient.get(searchURL)) as JsonObject)
+            .getJsonObject("songs")
+            .getJsonArray("data").requireNotNull().forEach {
+                (it as JsonObject).formatData().let { jsonObject ->
                     results.add(globalJson.decodeFromJsonElement(SaavnSearchResult.serializer(), jsonObject))
                 }
-            }
-        }catch (e: ServerResponseException) {}
-        return results
+        }
+
+        results
     }
 
-    suspend fun getLyrics(ID: String): String? {
-        return try {
-            (Json.parseToJsonElement(httpClient.get(lyrics_base_url + ID)) as JsonObject)
-                .getString("lyrics")
-        }catch (e:Exception) { null }
+    suspend fun getLyrics(ID: String): SuspendableEvent<String,Throwable> = SuspendableEvent {
+        (Json.parseToJsonElement(httpClient.get(lyrics_base_url + ID)) as JsonObject)
+            .getString("lyrics").requireNotNull()
     }
 
     suspend fun getSong(
         URL: String,
         fetchLyrics: Boolean = false
-    ): SaavnSong {
+    ): SuspendableEvent<SaavnSong,Throwable> = SuspendableEvent {
         val id = getSongID(URL)
         val data = ((globalJson.parseToJsonElement(httpClient.get(song_details_base_url + id)) as JsonObject)[id] as JsonObject)
             .formatData(fetchLyrics)
-        return globalJson.decodeFromJsonElement(SaavnSong.serializer(), data)
+
+        globalJson.decodeFromJsonElement(SaavnSong.serializer(), data)
     }
 
     suspend fun getSongFromID(
         ID: String,
         fetchLyrics: Boolean = false
-    ): SaavnSong {
+    ): SuspendableEvent<SaavnSong,Throwable> = SuspendableEvent {
         val data = ((globalJson.parseToJsonElement(httpClient.get(song_details_base_url + ID)) as JsonObject)[ID] as JsonObject)
             .formatData(fetchLyrics)
-        return globalJson.decodeFromJsonElement(SaavnSong.serializer(), data)
+
+        globalJson.decodeFromJsonElement(SaavnSong.serializer(), data)
     }
 
     private suspend fun getSongID(
@@ -105,24 +109,19 @@ interface JioSaavnRequests {
     suspend fun getPlaylist(
         URL: String,
         includeLyrics: Boolean = false
-    ): SaavnPlaylist? {
-        return try {
-            globalJson.decodeFromJsonElement(
-                SaavnPlaylist.serializer(),
-                (globalJson.parseToJsonElement(httpClient.get(playlist_details_base_url + getPlaylistID(URL))) as JsonObject)
-                    .formatData(includeLyrics)
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
+    ): SuspendableEvent<SaavnPlaylist,Throwable> = SuspendableEvent {
+        globalJson.decodeFromJsonElement(
+            SaavnPlaylist.serializer(),
+            (globalJson.parseToJsonElement(httpClient.get(playlist_details_base_url + getPlaylistID(URL).value)) as JsonObject)
+                .formatData(includeLyrics)
+        )
     }
 
     private suspend fun getPlaylistID(
         URL: String
-    ): String {
+    ): SuspendableEvent<String,Throwable> = SuspendableEvent {
         val res = httpClient.get<String>(URL)
-        return try {
+        try {
             res.split("\"type\":\"playlist\",\"id\":\"")[1].split('"')[0]
         } catch (e: IndexOutOfBoundsException) {
             res.split("\"page_id\",\"")[1].split("\",\"")[0]
@@ -132,24 +131,19 @@ interface JioSaavnRequests {
     suspend fun getAlbum(
         URL: String,
         includeLyrics: Boolean = false
-    ): SaavnAlbum? {
-        return try {
-            globalJson.decodeFromJsonElement(
-                SaavnAlbum.serializer(),
-                (globalJson.parseToJsonElement(httpClient.get(album_details_base_url + getAlbumID(URL))) as JsonObject)
-                    .formatData(includeLyrics)
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
+    ): SuspendableEvent<SaavnAlbum,Throwable> = SuspendableEvent {
+        globalJson.decodeFromJsonElement(
+            SaavnAlbum.serializer(),
+            (globalJson.parseToJsonElement(httpClient.get(album_details_base_url + getAlbumID(URL).value)) as JsonObject)
+                .formatData(includeLyrics)
+        )
     }
 
     private suspend fun getAlbumID(
         URL: String
-    ): String {
+    ): SuspendableEvent<String,Throwable> = SuspendableEvent {
         val res = httpClient.get<String>(URL)
-        return try {
+        try {
             res.split("\"album_id\":\"")[1].split('"')[0]
         } catch (e: IndexOutOfBoundsException) {
             res.split("\"page_id\",\"")[1].split("\",\"")[0]
@@ -215,8 +209,10 @@ interface JioSaavnRequests {
             // Fetch Lyrics if Requested
             // Lyrics is HTML Based
             if (includeLyrics) {
-                if (getBoolean("has_lyrics") == true) {
-                    put("lyrics", getString("id")?.let { getLyrics(it) })
+                if (getBoolean("has_lyrics") == true && containsKey("id")) {
+                    getLyrics(getString("id").requireNotNull()).success {
+                        put("lyrics", it)
+                    }
                 } else {
                     put("lyrics", "")
                 }

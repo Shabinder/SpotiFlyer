@@ -30,3 +30,11 @@ include(
     ":console-app",
     ":maintenance-tasks"
 )
+
+includeBuild("mosaic") {
+    dependencySubstitution {
+        substitute(module("com.jakewharton.mosaic:mosaic-gradle-plugin")).with(project(":mosaic-gradle-plugin"))
+        substitute(module("com.jakewharton.mosaic:mosaic-runtime")).with(project(":mosaic-runtime"))
+        substitute(module("com.jakewharton.mosaic:compose-compiler")).with(project(":compose:compiler"))
+    }
+}

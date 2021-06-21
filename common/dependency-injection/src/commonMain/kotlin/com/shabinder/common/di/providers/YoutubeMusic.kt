@@ -46,28 +46,29 @@ import kotlin.math.absoluteValue
 class YoutubeMusic constructor(
     private val logger: Kermit,
     private val httpClient: HttpClient,
-    private val youtubeMp3: YoutubeMp3,
     private val youtubeProvider: YoutubeProvider,
+    private val youtubeMp3: YoutubeMp3,
     private val audioToMp3: AudioToMp3
 ) {
-
     companion object {
         const val apiKey = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30"
         const val tag = "YT Music"
     }
 
-    suspend fun findSongDownloadURL(
+    // Get Downloadable Link
+    suspend fun findMp3SongDownloadURLYT(
         trackDetails: TrackDetails
     ): SuspendableEvent<String, Throwable> {
-        val bestMatchVideoID = getYTIDBestMatch(trackDetails)
-        return bestMatchVideoID.flatMap { videoID ->
-            // Get Downloadable Link
+        return getYTIDBestMatch(trackDetails).flatMap { videoID ->
+            // 1 Try getting Link from Yt1s
             youtubeMp3.getMp3DownloadLink(videoID).flatMapError {
-                SuspendableEvent {
-                    youtubeProvider.ytDownloader.getVideo(videoID).get()?.url?.let { m4aLink ->
-                        audioToMp3.convertToMp3(m4aLink)
-                    } ?: throw SpotiFlyerException.YoutubeLinkNotFound(videoID)
-                }
+                // 2 if Yt1s failed , Extract Manually
+                youtubeProvider.ytDownloader.getVideo(videoID).get()?.url?.let { m4aLink ->
+                    audioToMp3.convertToMp3(m4aLink)
+                } ?: throw SpotiFlyerException.YoutubeLinkNotFound(
+                    videoID,
+                    message = "Caught Following Errors While Finding Downloadable Link for $videoID :   \n${it.stackTraceToString()}"
+                )
             }
         }
     }

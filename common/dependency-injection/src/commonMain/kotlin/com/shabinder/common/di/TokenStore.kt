@@ -43,7 +43,7 @@ class TokenStore(
         logger.d { "System Time:${Clock.System.now().epochSeconds} , Token Expiry:${token?.expiry}" }
         if (Clock.System.now().epochSeconds > token?.expiry ?: 0 || token == null) {
             logger.d { "Requesting New Token" }
-            token = authenticateSpotify()
+            token = authenticateSpotify().component1()
             GlobalScope.launch { token?.access_token?.let { save(token) } }
         }
         return token

@@ -83,7 +83,7 @@ interface SpotiFlyerList {
         val queryResult: PlatformQueryResult? = null,
         val link: String = "",
         val trackList: List<TrackDetails> = emptyList(),
-        val errorOccurred: Exception? = null,
+        val errorOccurred: Throwable? = null,
         val askForDonation: Boolean = false,
     )
 }

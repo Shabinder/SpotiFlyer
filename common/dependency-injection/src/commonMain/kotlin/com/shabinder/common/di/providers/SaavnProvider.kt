@@ -33,7 +33,7 @@ class SaavnProvider(
         ).apply {
             when (fullLink.substringAfter("saavn.com/").substringBefore("/")) {
                 "song" -> {
-                    getSong(fullLink).let {
+                    getSong(fullLink).value.let {
                         folderType = "Tracks"
                         subFolder = ""
                         trackList = listOf(it).toTrackDetails(folderType, subFolder)
@@ -42,7 +42,7 @@ class SaavnProvider(
                     }
                 }
                 "album" -> {
-                    getAlbum(fullLink)?.let {
+                    getAlbum(fullLink).value.let {
                         folderType = "Albums"
                         subFolder = removeIllegalChars(it.title)
                         trackList = it.songs.toTrackDetails(folderType, subFolder)
@@ -51,7 +51,7 @@ class SaavnProvider(
                     }
                 }
                 "featured" -> { // Playlist
-                    getPlaylist(fullLink)?.let {
+                    getPlaylist(fullLink).value.let {
                         folderType = "Playlists"
                         subFolder = removeIllegalChars(it.listname)
                         trackList = it.songs.toTrackDetails(folderType, subFolder)

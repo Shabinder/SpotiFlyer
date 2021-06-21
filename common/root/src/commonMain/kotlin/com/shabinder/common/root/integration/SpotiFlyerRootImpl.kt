@@ -28,7 +28,7 @@ import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
 import com.arkivanov.decompose.value.Value
 import com.shabinder.common.di.Dir
-import com.shabinder.common.di.providers.SpotifyProvider
+import com.shabinder.common.di.dispatcherIO
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.models.Actions
@@ -39,7 +39,6 @@ import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -77,8 +76,8 @@ internal class SpotiFlyerRootImpl(
     ) {
         instanceKeeper.ensureNeverFrozen()
         methods.value = dependencies.actions.freeze()
-        /*Authenticate Spotify Client*/
-        authenticateSpotify(dependencies.fetchPlatformQueryResult.spotifyProvider)
+        /*Init App Launch & Authenticate Spotify Client*/
+        initAppLaunchAndAuthenticateSpotify(dependencies.fetchPlatformQueryResult::authenticateSpotifyClient)
     }
 
     private val router =
@@ -129,11 +128,11 @@ internal class SpotiFlyerRootImpl(
             }
         }
 
-    private fun authenticateSpotify(spotifyProvider: SpotifyProvider) {
-        GlobalScope.launch(Dispatchers.Default) {
+    private fun initAppLaunchAndAuthenticateSpotify(authenticator: suspend () -> Unit) {
+        GlobalScope.launch(dispatcherIO) {
             analytics.appLaunchEvent()
             /*Authenticate Spotify Client*/
-            spotifyProvider.authenticateSpotifyClient()
+            authenticator()
         }
     }
 

@@ -1,5 +1,8 @@
 package com.shabinder.common.models.event.coroutines
 
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
+
 inline fun <reified X> SuspendableEvent<*, *>.getAs() = when (this) {
     is SuspendableEvent.Success -> value as? X
     is SuspendableEvent.Failure -> error as? X
@@ -52,16 +55,24 @@ suspend inline fun <V : Any?, U : Any?, E : Throwable> SuspendableEvent<V, E>.fl
 
 suspend inline fun <V : Any?, E : Throwable, E2 : Throwable> SuspendableEvent<V, E>.mapError(
     crossinline transform: suspend (E) -> E2
-) = when (this) {
-    is SuspendableEvent.Success -> SuspendableEvent.Success<V, E2>(value)
-    is SuspendableEvent.Failure -> SuspendableEvent.Failure<V, E2>(transform(error))
+) = try {
+    when (this) {
+        is SuspendableEvent.Success -> SuspendableEvent.Success<V, E2>(value)
+        is SuspendableEvent.Failure -> SuspendableEvent.Failure<V, E2>(transform(error))
+    }
+} catch (ex: Throwable) {
+    SuspendableEvent.error(ex as E)
 }
 
 suspend inline fun <V : Any?, E : Throwable, E2 : Throwable> SuspendableEvent<V, E>.flatMapError(
     crossinline transform: suspend (E) -> SuspendableEvent<V, E2>
-) = when (this) {
-    is SuspendableEvent.Success -> SuspendableEvent.Success(value)
-    is SuspendableEvent.Failure -> transform(error)
+) = try {
+    when (this) {
+        is SuspendableEvent.Success -> SuspendableEvent.Success(value)
+        is SuspendableEvent.Failure -> transform(error)
+    }
+} catch (ex: Throwable) {
+    SuspendableEvent.error(ex as E)
 }
 
 suspend inline fun <V : Any?, E : Throwable> SuspendableEvent<V, E>.any(
@@ -89,7 +100,7 @@ suspend fun <V : Any?, E : Throwable> List<SuspendableEvent<V, E>>.lift(): Suspe
     }
 }
 
-sealed class SuspendableEvent<out V : Any?, out E : Throwable> {
+sealed class SuspendableEvent<out V : Any?, out E : Throwable>: ReadOnlyProperty<Any?,V> {
 
     abstract operator fun component1(): V?
     abstract operator fun component2(): E?
@@ -115,6 +126,8 @@ sealed class SuspendableEvent<out V : Any?, out E : Throwable> {
             if (this === other) return true
             return other is Success<*, *> && value == other.value
         }
+
+        override fun getValue(thisRef: Any?, property: KProperty<*>): V = value
     }
 
     class Failure<out V : Any?, out E : Throwable>(val error: E) : SuspendableEvent<V, E>() {
@@ -133,6 +146,8 @@ sealed class SuspendableEvent<out V : Any?, out E : Throwable> {
             if (this === other) return true
             return other is Failure<*, *> && error == other.error
         }
+
+        override fun getValue(thisRef: Any?, property: KProperty<*>): V = value
     }
 
     companion object {
@@ -143,14 +158,14 @@ sealed class SuspendableEvent<out V : Any?, out E : Throwable> {
             return value?.let { Success<V, Nothing>(it) } ?: error(fail())
         }
 
-        suspend inline fun <V : Any?, E : Throwable> of(crossinline f: suspend () -> V): SuspendableEvent<V, E> = try {
-            Success(f())
+        suspend inline fun <V : Any?, E : Throwable> of(crossinline block: suspend () -> V): SuspendableEvent<V, E> = try {
+            Success(block())
         } catch (ex: Throwable) {
             Failure(ex as E)
         }
 
-        suspend inline operator fun <V : Any?> invoke(crossinline f: suspend () -> V): SuspendableEvent<V, Throwable> = try {
-            Success(f())
+        suspend inline operator fun <V : Any?> invoke(crossinline block: suspend () -> V): SuspendableEvent<V, Throwable> = try {
+            Success(block())
         } catch (ex: Throwable) {
             Failure(ex)
         }

@@ -19,6 +19,8 @@ package com.shabinder.common.di.youtubeMp3
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.models.corsApi
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
+import com.shabinder.common.models.event.coroutines.flatMap
+import com.shabinder.common.models.event.coroutines.map
 import com.shabinder.common.requireNotNull
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -39,12 +41,11 @@ interface Yt1sMp3 {
     /*
     * Downloadable Mp3 Link for YT videoID.
     * */
-    suspend fun getLinkFromYt1sMp3(videoID: String): SuspendableEvent<String,Throwable> = SuspendableEvent {
-        getConvertedMp3Link(
-            videoID,
-            getKey(videoID).value
-        ).value["dlink"].requireNotNull()
-            .jsonPrimitive.content.replace("\"", "")
+    suspend fun getLinkFromYt1sMp3(videoID: String): SuspendableEvent<String,Throwable> = getKey(videoID).flatMap { key ->
+        getConvertedMp3Link(videoID, key).map {
+            it["dlink"].requireNotNull()
+                .jsonPrimitive.content.replace("\"", "")
+        }
     }
 
     /*

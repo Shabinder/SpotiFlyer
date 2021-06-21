@@ -59,7 +59,7 @@ internal class SpotiFlyerListStoreProvider(
         data class ResultFetched(val result: PlatformQueryResult, val trackList: List<TrackDetails>) : Result()
         data class UpdateTrackList(val list: List<TrackDetails>) : Result()
         data class UpdateTrackItem(val item: TrackDetails) : Result()
-        data class ErrorOccurred(val error: Exception) : Result()
+        data class ErrorOccurred(val error: Throwable) : Result()
         data class AskForDonation(val isAllowed: Boolean) : Result()
     }
 
@@ -90,19 +90,17 @@ internal class SpotiFlyerListStoreProvider(
         override suspend fun executeIntent(intent: Intent, getState: () -> State) {
             when (intent) {
                 is Intent.SearchLink -> {
-                    try {
-                        val result = fetchQuery.query(link)
-                        if (result != null) {
+                    val resp = fetchQuery.query(link)
+                    resp.fold(
+                        success = { result ->
                             result.trackList = result.trackList.toMutableList()
                             dispatch((Result.ResultFetched(result, result.trackList.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0) { hashMapOf() }))))
                             executeIntent(Intent.RefreshTracksStatuses, getState)
-                        } else {
-                            throw Exception("An Error Occurred, Check your Link / Connection")
+                        },
+                        failure = {
+                            dispatch(Result.ErrorOccurred(it))
                         }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        dispatch(Result.ErrorOccurred(e))
-                    }
+                    )
                 }
 
                 is Intent.StartDownloadAll -> {

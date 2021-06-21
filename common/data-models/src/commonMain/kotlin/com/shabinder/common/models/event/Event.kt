@@ -1,5 +1,8 @@
 package com.shabinder.common.models.event
 
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
+
 inline fun <reified X> Event<*, *>.getAs() = when (this) {
     is Event.Success -> value as? X
     is Event.Failure -> error as? X
@@ -128,7 +131,7 @@ inline fun <V, E : Throwable> Event<V, E>.unwrapError(success: (V) -> Nothing): 
     apply { component1()?.let(success) }.component2()!!
 
 
-sealed class Event<out V : Any?, out E : Throwable> {
+sealed class Event<out V : Any?, out E : Throwable>: ReadOnlyProperty<Any?, V> {
 
     open operator fun component1(): V? = null
     open operator fun component2(): E? = null
@@ -138,12 +141,10 @@ sealed class Event<out V : Any?, out E : Throwable> {
         is Failure -> failure(this.error)
     }
 
-    abstract fun get(): V
+    abstract val value: V
 
-    class Success<out V : Any?>(val value: V) : Event<V, Nothing>() {
+    class Success<out V : Any?>(override val value: V) : Event<V, Nothing>() {
         override fun component1(): V? = value
-
-        override fun get(): V = value
 
         override fun toString() = "[Success: $value]"
 
@@ -153,12 +154,14 @@ sealed class Event<out V : Any?, out E : Throwable> {
             if (this === other) return true
             return other is Success<*> && value == other.value
         }
+
+        override fun getValue(thisRef: Any?, property: KProperty<*>): V = value
     }
 
     class Failure<out E : Throwable>(val error: E) : Event<Nothing, E>() {
-        override fun component2(): E? = error
+        override fun component2(): E = error
 
-        override fun get() = throw error
+        override val value: Nothing = throw error
 
         fun getThrowable(): E = error
 
@@ -170,6 +173,8 @@ sealed class Event<out V : Any?, out E : Throwable> {
             if (this === other) return true
             return other is Failure<*> && error == other.error
         }
+
+        override fun getValue(thisRef: Any?, property: KProperty<*>): Nothing = value
     }
 
     companion object {

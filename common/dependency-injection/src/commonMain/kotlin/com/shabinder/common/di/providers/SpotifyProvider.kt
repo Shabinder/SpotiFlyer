@@ -48,9 +48,9 @@ class SpotifyProvider(
 ) : SpotifyRequests {
 
     override suspend fun authenticateSpotifyClient(override: Boolean) {
-        val token = if (override) authenticateSpotify() else tokenStore.getToken()
+        val token = if (override) authenticateSpotify().component1() else tokenStore.getToken()
         if (token == null) {
-            logger.d { "Please Check your Network Connection" }
+            logger.d { "Spotify Auth Failed: Please Check your Network Connection" }
         } else {
             logger.d { "Spotify Provider Created with $token" }
             HttpClient {
@@ -183,8 +183,10 @@ class SpotifyProvider(
                     coverUrl = playlistObject.images?.firstOrNull()?.url.toString()
                 }
                 "episode" -> { // TODO
+                    throw SpotiFlyerException.FeatureNotImplementedYet()
                 }
                 "show" -> { // TODO
+                    throw SpotiFlyerException.FeatureNotImplementedYet()
                 }
                 else -> {
                     throw SpotiFlyerException.LinkInvalid("Provide: Spotify, Type:$type -> Link:$link")
