@@ -33,7 +33,7 @@ import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.collect
 
 internal class SpotiFlyerListStoreProvider(
     private val dir: Dir,
@@ -80,7 +80,7 @@ internal class SpotiFlyerListStoreProvider(
                 )
             }
 
-            downloadProgressFlow.collectLatest { map ->
+            downloadProgressFlow.collect { map ->
                 logger.d(map.size.toString(), "ListStore: flow Updated")
                 val updatedTrackList = getState().trackList.updateTracksStatuses(map)
                 if (updatedTrackList.isNotEmpty()) dispatch(Result.UpdateTrackList(updatedTrackList))

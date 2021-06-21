@@ -134,7 +134,7 @@ sealed class SuspendableEvent<out V : Any?, out E : Throwable>: ReadOnlyProperty
         override fun component1(): V? = null
         override fun component2(): E? = error
 
-        override val value: V = throw error
+        override val value: V get() = throw error
 
         fun getThrowable(): E = error
 
@@ -158,7 +158,9 @@ sealed class SuspendableEvent<out V : Any?, out E : Throwable>: ReadOnlyProperty
             return value?.let { Success<V, Nothing>(it) } ?: error(fail())
         }
 
-        suspend inline fun <V : Any?, E : Throwable> of(crossinline block: suspend () -> V): SuspendableEvent<V, E> = try {
+        suspend inline fun <V : Any?, E : Throwable> of(
+            crossinline block: suspend () -> V
+        ): SuspendableEvent<V, E> = try {
             Success(block())
         } catch (ex: Throwable) {
             Failure(ex as E)

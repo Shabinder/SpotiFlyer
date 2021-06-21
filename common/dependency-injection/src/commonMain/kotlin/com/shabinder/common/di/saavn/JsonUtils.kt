@@ -6,7 +6,7 @@ package com.shabinder.common.di.saavn
 fun String.escape(): String {
     val output = StringBuilder()
     for (element in this) {
-        val chx = element.toInt()
+        val chx = element.code
         if (chx != 0) {
             when (element) {
                 '\n' -> {
@@ -76,7 +76,7 @@ fun String.unescape(): String {
                         /*if (!x.isLetterOrDigit()) {
                             throw RuntimeException("Bad character in unicode escape.")
                         }*/
-                        hex.append(x.toLowerCase())
+                        hex.append(x.lowercaseChar())
                     }
                     i += 4 // consume those four digits.
                     val code = hex.toString().toInt(16)

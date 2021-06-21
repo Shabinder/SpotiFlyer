@@ -86,6 +86,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var queryReceiver: BroadcastReceiver
     private val internetAvailability by lazy { ConnectionLiveData(applicationContext) }
     private val tracker get() = (application as App).tracker
+    private val visibleChild get(): SpotiFlyerRoot.Child = root.routerState.value.activeChild.instance
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -149,9 +150,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun initialise() {
-        val isGithubRelease = checkAppSignature(this).also {
-            Log.i("SpotiFlyer Github Rel.:",it.toString())
-        }
+        val isGithubRelease = checkAppSignature(this)
         /*
         * Only Send an `Update Notification` on Github Release Builds
         * and Track Downloads for all other releases like F-Droid,
@@ -168,42 +167,6 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun isInternetAvailableState(): State<Boolean?> {
         return internetAvailability.observeAsState()
-    }
-
-    @Suppress("DEPRECATION")
-    private fun setUpOnPrefClickListener() {
-        // Initialize Builder
-        val chooser = StorageChooser.Builder()
-            .withActivity(this)
-            .withFragmentManager(fragmentManager)
-            .withMemoryBar(true)
-            .setTheme(StorageChooser.Theme(applicationContext).apply {
-                scheme = applicationContext.resources.getIntArray(R.array.default_dark)
-            })
-            .setDialogTitle("Set Download Directory")
-            .allowCustomPath(true)
-            .setType(StorageChooser.DIRECTORY_CHOOSER)
-            .build()
-
-        // get path that the user has chosen
-        chooser.setOnSelectListener { path ->
-            Log.d("Setting Base Path", path)
-            val f = File(path)
-            if (f.canWrite()) {
-                // hell yeah :)
-                dir.setDownloadDirectory(path)
-                showPopUpMessage(
-                    "Download Directory Set to:\n${dir.defaultDir()} "
-                )
-            }else{
-                showPopUpMessage(
-                    "NO WRITE ACCESS on \n$path ,\nReverting Back to Previous"
-                )
-            }
-        }
-
-        // Show dialog whenever you want by
-        chooser.show()
     }
 
     private fun showPopUpMessage(string: String, long: Boolean = false) {
@@ -256,12 +219,7 @@ class MainActivity : ComponentActivity() {
 
                     override fun setDownloadDirectoryAction() = setUpOnPrefClickListener()
 
-                    override fun queryActiveTracks() {
-                        val serviceIntent = Intent(this@MainActivity, ForegroundService::class.java).apply {
-                            action = "query"
-                        }
-                        ContextCompat.startForegroundService(this@MainActivity, serviceIntent)
-                    }
+                    override fun queryActiveTracks() = this@MainActivity.queryActiveTracks()
 
                     override fun giveDonation() {
                         openPlatform("",platformLink = "https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button")
@@ -337,6 +295,48 @@ class MainActivity : ComponentActivity() {
             }
         )
 
+    private fun queryActiveTracks() {
+        val serviceIntent = Intent(this@MainActivity, ForegroundService::class.java).apply {
+            action = "query"
+        }
+        ContextCompat.startForegroundService(this@MainActivity, serviceIntent)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun setUpOnPrefClickListener() {
+        // Initialize Builder
+        val chooser = StorageChooser.Builder()
+            .withActivity(this)
+            .withFragmentManager(fragmentManager)
+            .withMemoryBar(true)
+            .setTheme(StorageChooser.Theme(applicationContext).apply {
+                scheme = applicationContext.resources.getIntArray(R.array.default_dark)
+            })
+            .setDialogTitle("Set Download Directory")
+            .allowCustomPath(true)
+            .setType(StorageChooser.DIRECTORY_CHOOSER)
+            .build()
+
+        // get path that the user has chosen
+        chooser.setOnSelectListener { path ->
+            Log.d("Setting Base Path", path)
+            val f = File(path)
+            if (f.canWrite()) {
+                // hell yeah :)
+                dir.setDownloadDirectory(path)
+                showPopUpMessage(
+                    "Download Directory Set to:\n${dir.defaultDir()} "
+                )
+            }else{
+                showPopUpMessage(
+                    "NO WRITE ACCESS on \n$path ,\nReverting Back to Previous"
+                )
+            }
+        }
+
+        // Show dialog whenever you want by
+        chooser.show()
+    }
 
     @SuppressLint("ObsoleteSdkInt")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -418,6 +418,10 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         initializeBroadcast()
+        if(visibleChild is SpotiFlyerRoot.Child.List) {
+            // Update Track List Statuses when Returning to App
+            queryActiveTracks()
+        }
     }
 
     override fun onPause() {

@@ -161,7 +161,7 @@ sealed class Event<out V : Any?, out E : Throwable>: ReadOnlyProperty<Any?, V> {
     class Failure<out E : Throwable>(val error: E) : Event<Nothing, E>() {
         override fun component2(): E = error
 
-        override val value: Nothing = throw error
+        override val value: Nothing get() = throw error
 
         fun getThrowable(): E = error
 
