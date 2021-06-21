@@ -8,9 +8,9 @@ inline fun <reified X> SuspendableEvent<*, *>.getAs() = when (this) {
     is SuspendableEvent.Failure -> error as? X
 }
 
-suspend inline fun <V : Any?> SuspendableEvent<V, *>.success(crossinline f: suspend (V) -> Unit) = fold(f, {})
+suspend inline fun <V : Any?> SuspendableEvent<V, *>.success(noinline f: suspend (V) -> Unit) = fold(f, {})
 
-suspend inline fun <E : Throwable> SuspendableEvent<*, E>.failure(crossinline f: suspend (E) -> Unit) = fold({}, f)
+suspend inline fun <E : Throwable> SuspendableEvent<*, E>.failure(noinline f: suspend (E) -> Unit) = fold({}, f)
 
 infix fun <V : Any?, E : Throwable> SuspendableEvent<V, E>.or(fallback: V) = when (this) {
     is SuspendableEvent.Success -> this
@@ -105,7 +105,7 @@ sealed class SuspendableEvent<out V : Any?, out E : Throwable>: ReadOnlyProperty
     abstract operator fun component1(): V?
     abstract operator fun component2(): E?
 
-    suspend inline fun <X> fold(crossinline success: suspend (V) -> X, crossinline failure: suspend (E) -> X): X {
+    suspend inline fun <X> fold(noinline success: suspend (V) -> X, noinline failure: suspend (E) -> X): X {
         return when (this) {
             is Success -> success(this.value)
             is Failure -> failure(this.error)
@@ -164,11 +164,9 @@ sealed class SuspendableEvent<out V : Any?, out E : Throwable>: ReadOnlyProperty
             Failure(ex as E)
         }
 
-        suspend inline operator fun <V : Any?> invoke(crossinline block: suspend () -> V): SuspendableEvent<V, Throwable> = try {
-            Success(block())
-        } catch (ex: Throwable) {
-            Failure(ex)
-        }
+        suspend inline operator fun <V : Any?> invoke(
+            crossinline block: suspend () -> V
+        ): SuspendableEvent<V, Throwable> = of(block)
     }
 
 }

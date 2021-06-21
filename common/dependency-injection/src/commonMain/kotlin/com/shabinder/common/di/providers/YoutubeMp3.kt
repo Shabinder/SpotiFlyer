@@ -17,7 +17,6 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.di.audioToMp3.AudioToMp3
 import com.shabinder.common.di.youtubeMp3.Yt1sMp3
 import com.shabinder.common.models.corsApi
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
@@ -30,9 +29,9 @@ interface YoutubeMp3: Yt1sMp3 {
         operator fun invoke(
             client: HttpClient,
             logger: Kermit
-        ): AudioToMp3 {
-            return object : AudioToMp3 {
-                override val client: HttpClient = client
+        ): YoutubeMp3 {
+            return object : YoutubeMp3 {
+                override val httpClient: HttpClient = client
                 override val logger: Kermit = logger
             }
         }
