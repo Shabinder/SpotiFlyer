@@ -4,6 +4,7 @@ sealed class SpotiFlyerException(override val message: String): Exception(messag
 
     data class FeatureNotImplementedYet(override val message: String = "Feature not yet implemented."): SpotiFlyerException(message)
     data class NoInternetException(override val message: String = "Check Your Internet Connection"): SpotiFlyerException(message)
+    data class MP3ConversionFailed(override val message: String = "MP3 Converter unreachable, probably BUSY !"): SpotiFlyerException(message)
 
     data class NoMatchFound(
         val trackName: String? = null,

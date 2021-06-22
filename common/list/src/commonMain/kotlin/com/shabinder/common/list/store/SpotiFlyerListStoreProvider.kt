@@ -21,7 +21,6 @@ import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
-import com.shabinder.common.database.getLogger
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.downloadTracks
@@ -42,8 +41,6 @@ internal class SpotiFlyerListStoreProvider(
     private val link: String,
     private val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>
 ) {
-    val logger = getLogger()
-
     fun provide(): SpotiFlyerListStore =
         object :
             SpotiFlyerListStore,
@@ -70,7 +67,7 @@ internal class SpotiFlyerListStoreProvider(
 
             dir.db?.downloadRecordDatabaseQueries?.getLastInsertId()?.executeAsOneOrNull()?.also {
                 // See if It's Time we can request for support for maintaining this project or not
-                logger.d(message = "Database List Last ID: $it", tag = "Database Last ID")
+                fetchQuery.logger.d(message = { "Database List Last ID: $it" }, tag = "Database Last ID")
                 val offset = dir.getDonationOffset
                 dispatch(
                     Result.AskForSupport(

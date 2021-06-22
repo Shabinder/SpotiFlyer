@@ -2,8 +2,10 @@ package com.shabinder.common.di.audioToMp3
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.models.AudioQuality
+import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import io.ktor.client.*
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
@@ -31,8 +33,9 @@ interface AudioToMp3 {
         URL: String,
         audioQuality: AudioQuality = AudioQuality.getQuality(URL.substringBeforeLast(".").takeLast(3)),
     ): SuspendableEvent<String,Throwable> = SuspendableEvent {
-        val activeHost by getHost() // ex - https://hostveryfast.onlineconverter.com/file/send
-        val jobLink by convertRequest(URL, activeHost, audioQuality) // ex - https://www.onlineconverter.com/convert/309a0f2bbaeb5687b04f96b6d65b47bfdd
+        // Active Host ex - https://hostveryfast.onlineconverter.com/file/send
+        // Convert Job Request ex - https://www.onlineconverter.com/convert/309a0f2bbaeb5687b04f96b6d65b47bfdd
+        var (activeHost,jobLink) = convertRequest(URL, audioQuality).value
 
         // (jobStatus.contains("d")) == COMPLETION
         var jobStatus: String
@@ -44,13 +47,22 @@ interface AudioToMp3 {
                     "${activeHost.removeSuffix("send")}${jobLink.substringAfterLast("/")}"
                 )
             } catch (e: Exception) {
+                if(e is ClientRequestException && e.response.status.value == 404) {
+                    // No Need to Retry, Host/Converter is Busy
+                    throw SpotiFlyerException.MP3ConversionFailed()
+                }
+                // Try Using New Host/Converter
+                convertRequest(URL, audioQuality).value.also {
+                    activeHost = it.first
+                    jobLink = it.second
+                }
                 e.printStackTrace()
                 ""
             }
             retryCount--
             logger.i("Job Status") { jobStatus }
-            if (!jobStatus.contains("d")) delay(400) // Add Delay , to give Server Time to process audio
-        } while (!jobStatus.contains("d", true) && retryCount != 0)
+            if (!jobStatus.contains("d")) delay(600) // Add Delay , to give Server Time to process audio
+        } while (!jobStatus.contains("d", true) && retryCount > 0)
 
         "${activeHost.removeSuffix("send")}${jobLink.substringAfterLast("/")}/download"
     }
@@ -61,11 +73,10 @@ interface AudioToMp3 {
     * */
     private suspend fun convertRequest(
         URL: String,
-        host: String? = null,
         audioQuality: AudioQuality = AudioQuality.KBPS160,
-    ): SuspendableEvent<String,Throwable> = SuspendableEvent {
-        val activeHost = host ?: getHost().value
-        val res = client.submitFormWithBinaryData<String>(
+    ): SuspendableEvent<Pair<String,String>,Throwable> = SuspendableEvent {
+        val activeHost by getHost()
+        val convertJob = client.submitFormWithBinaryData<String>(
             url = activeHost,
             formData = formData {
                 append("class", "audio")
@@ -86,14 +97,14 @@ interface AudioToMp3 {
             dropLast(3) // last 3 are useless unicode char
         }
 
-        val job = client.get<HttpStatement>(res) {
+        val job = client.get<HttpStatement>(convertJob) {
             headers {
                 header("Host", "www.onlineconverter.com")
             }
         }.execute()
         logger.i("Schedule Conversion Job") { job.status.isSuccess().toString() }
 
-        res
+        Pair(activeHost,convertJob)
     }
 
     // Active Host free to process conversion

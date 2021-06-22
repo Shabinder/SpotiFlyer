@@ -42,6 +42,8 @@ import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.event.coroutines.SuspendableEvent
+import com.shabinder.common.models.event.coroutines.failure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -102,10 +104,7 @@ class ForegroundService : Service(), CoroutineScope {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(channelId, "Downloader Service")
         }
-        val intent = Intent(
-            this,
-            ForegroundService::class.java
-        ).apply { action = "kill" }
+        val intent = Intent(this, ForegroundService::class.java).apply { action = "kill" }
         cancelIntent = PendingIntent.getService(this, 0, intent, FLAG_CANCEL_CURRENT)
         downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
     }
@@ -119,17 +118,9 @@ class ForegroundService : Service(), CoroutineScope {
         intent?.let {
             when (it.action) {
                 "kill" -> killService()
-                "query" -> {
-                    val response = Intent().apply {
-                        action = "query_result"
-                        synchronized(trackStatusFlowMap) {
-                            putExtra("tracks", trackStatusFlowMap)
-                        }
-                    }
-                    sendBroadcast(response)
-                }
             }
         }
+
         // Wake locks and misc tasks from here :
         return if (isServiceStarted) {
             // Service Already Started
@@ -160,16 +151,16 @@ class ForegroundService : Service(), CoroutineScope {
 
         trackList.forEach {
             trackStatusFlowMap[it.title] = DownloadStatus.Queued
-            launch(Dispatchers.IO) {
+            launch {
                 downloadService.execute {
                     fetcher.findMp3DownloadLink(it).fold(
                         success = { url ->
                             enqueueDownload(url, it)
                         },
-                        failure = { _ ->
+                        failure = { error ->
                             failed++
                             updateNotification()
-                            trackStatusFlowMap[it.title] = DownloadStatus.Failed
+                            trackStatusFlowMap[it.title] = DownloadStatus.Failed(error)
                         }
                     )
                 }
@@ -180,7 +171,6 @@ class ForegroundService : Service(), CoroutineScope {
     private suspend fun enqueueDownload(url: String, track: TrackDetails) {
         // Initiating Download
         addToNotification("Downloading ${track.title}")
-        logger.d(tag) { "${track.title} Download Started" }
         trackStatusFlowMap[track.title] = DownloadStatus.Downloading()
 
         // Enqueueing Download
@@ -188,26 +178,18 @@ class ForegroundService : Service(), CoroutineScope {
             when (it) {
                 is DownloadResult.Error -> {
                     logger.d(tag) { it.message }
-                    removeFromNotification("Downloading ${track.title}")
                     failed++
-                    updateNotification()
+                    trackStatusFlowMap[track.title] = DownloadStatus.Failed(it.cause ?: Exception(it.message))
+                    removeFromNotification("Downloading ${track.title}")
                 }
 
                 is DownloadResult.Progress -> {
                     trackStatusFlowMap[track.title] = DownloadStatus.Downloading(it.progress)
-                    logger.d(tag) { "${track.title} Progress: ${it.progress} %" }
-
-                    val intent = Intent().apply {
-                        action = "Progress"
-                        putExtra("progress", it.progress)
-                        putExtra("track", track)
-                    }
-                    sendBroadcast(intent)
                 }
 
                 is DownloadResult.Success -> {
                     coroutineScope {
-                        try {
+                        SuspendableEvent {
                             // Save File and Embed Metadata
                             val job = launch(Dispatchers.Default) { dir.saveFileWithMetadata(it.byteArray, track) {} }
 
@@ -223,11 +205,11 @@ class ForegroundService : Service(), CoroutineScope {
                             }
                             logger.d(tag) { "${track.title} Download Completed" }
                             downloaded++
-                        } catch (e: Exception) {
-                            e.printStackTrace()
+                        }.failure { error ->
+                            error.printStackTrace()
                             // Download Failed
-                            logger.d(tag) { "${track.title} Download Failed! Error:Fetch!!!!" }
                             failed++
+                            trackStatusFlowMap[track.title] = DownloadStatus.Failed(error)
                         }
                         removeFromNotification("Downloading ${track.title}")
                     }

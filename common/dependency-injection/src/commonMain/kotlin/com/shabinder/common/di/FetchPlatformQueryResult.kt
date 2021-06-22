@@ -16,6 +16,7 @@
 
 package com.shabinder.common.di
 
+import co.touchlab.kermit.Kermit
 import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.di.audioToMp3.AudioToMp3
 import com.shabinder.common.di.providers.GaanaProvider
@@ -45,7 +46,8 @@ class FetchPlatformQueryResult(
     private val youtubeMusic: YoutubeMusic,
     private val youtubeMp3: YoutubeMp3,
     private val audioToMp3: AudioToMp3,
-    val dir: Dir
+    val dir: Dir,
+    val logger: Kermit
 ) {
     private val db: DownloadRecordDatabaseQueries?
         get() = dir.db?.downloadRecordDatabaseQueries
@@ -120,7 +122,7 @@ class FetchPlatformQueryResult(
             trackName = track.title,
             trackArtists = track.artists
         ).flatMapError { saavnError ->
-            // Lets Try Fetching Now From Youtube Music
+            // Saavn Failed, Lets Try Fetching Now From Youtube Music
             youtubeMusic.findMp3SongDownloadURLYT(track).flatMapError { ytMusicError ->
                 // If Both Failed Bubble the Exception Up with both StackTraces
                 SuspendableEvent.error(
