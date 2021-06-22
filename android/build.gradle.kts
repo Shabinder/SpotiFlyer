@@ -121,13 +121,14 @@ dependencies {
     implementation(MVIKotlin.mvikotlinTimeTravel)
 
     // Extras
-    Extras.Android.apply {
+    with(Extras.Android) {
         implementation(Acra.notification)
         implementation(Acra.http)
         implementation(appUpdator)
         implementation(matomo)
     }
 
+    implementation(Extras.kermit)
     //implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("dev.icerock.moko:parcelize:0.7.0")
     implementation("com.github.shabinder:storage-chooser:2.0.4.45")

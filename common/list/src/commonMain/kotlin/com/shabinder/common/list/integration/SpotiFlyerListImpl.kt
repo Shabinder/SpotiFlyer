@@ -18,6 +18,7 @@ package com.shabinder.common.list.integration
 
 import co.touchlab.stately.ensureNeverFrozen
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.lifecycle.doOnResume
 import com.arkivanov.decompose.value.Value
 import com.shabinder.common.caching.Cache
 import com.shabinder.common.di.Picture
@@ -38,6 +39,9 @@ internal class SpotiFlyerListImpl(
 
     init {
         instanceKeeper.ensureNeverFrozen()
+        lifecycle.doOnResume {
+            onRefreshTracksStatuses()
+        }
     }
 
     private val store =

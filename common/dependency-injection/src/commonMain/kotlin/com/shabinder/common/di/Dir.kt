@@ -23,11 +23,9 @@ import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.get
-import io.ktor.client.statement.HttpStatement
-import io.ktor.http.contentLength
-import io.ktor.http.isSuccess
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt
@@ -105,7 +103,7 @@ suspend fun downloadFile(url: String): Flow<DownloadResult> {
             var offset = 0
             do {
                 // Set Length optimally, after how many kb you want a progress update, now it 0.25mb
-                val currentRead = response.content.readAvailable(data, offset, 250000)
+                val currentRead = response.content.readAvailable(data, offset, 2_50_000)
                 offset += currentRead
                 val progress = (offset * 100f / data.size).roundToInt()
                 emit(DownloadResult.Progress(progress))

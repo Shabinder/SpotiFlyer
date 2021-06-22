@@ -1,22 +1,22 @@
-package com.shabinder.common.di.worker
+package com.shabinder.spotiflyer.service
 
-import co.touchlab.kermit.Kermit
+import android.util.Log
 import java.io.File
 
 /**
  * Cleaning All Residual Files except Mp3 Files
  **/
-fun cleanFiles(dir: File, logger: Kermit) {
+fun cleanFiles(dir: File) {
     try {
-        logger.d("File Cleaning") { "Starting Cleaning in ${dir.path} " }
+        Log.d("File Cleaning","Starting Cleaning in ${dir.path} ")
         val fList = dir.listFiles()
         fList?.let {
             for (file in fList) {
                 if (file.isDirectory) {
-                    cleanFiles(file, logger)
+                    cleanFiles(file)
                 } else if (file.isFile) {
                     if (file.path.toString().substringAfterLast(".") != "mp3") {
-                        logger.d("Files Cleaning") { "Cleaning ${file.path}" }
+                        Log.d("Files Cleaning","Cleaning ${file.path}")
                         file.delete()
                     }
                 }
@@ -24,3 +24,4 @@ fun cleanFiles(dir: File, logger: Kermit) {
         }
     } catch (e: Exception) { e.printStackTrace() }
 }
+

@@ -60,7 +60,7 @@ internal class SpotiFlyerListStoreProvider(
         data class UpdateTrackList(val list: List<TrackDetails>) : Result()
         data class UpdateTrackItem(val item: TrackDetails) : Result()
         data class ErrorOccurred(val error: Throwable) : Result()
-        data class AskForDonation(val isAllowed: Boolean) : Result()
+        data class AskForSupport(val isAllowed: Boolean) : Result()
     }
 
     private inner class ExecutorImpl : SuspendExecutor<Intent, Unit, State, Result, Nothing>() {
@@ -73,7 +73,7 @@ internal class SpotiFlyerListStoreProvider(
                 logger.d(message = "Database List Last ID: $it", tag = "Database Last ID")
                 val offset = dir.getDonationOffset
                 dispatch(
-                    Result.AskForDonation(
+                    Result.AskForSupport(
                         // Every 3rd Interval or After some offset
                         isAllowed = offset < 4 && (it % offset == 0L)
                     )
@@ -81,7 +81,7 @@ internal class SpotiFlyerListStoreProvider(
             }
 
             downloadProgressFlow.collect { map ->
-                logger.d(map.size.toString(), "ListStore: flow Updated")
+                // logger.d(map.size.toString(), "ListStore: flow Updated")
                 val updatedTrackList = getState().trackList.updateTracksStatuses(map)
                 if (updatedTrackList.isNotEmpty()) dispatch(Result.UpdateTrackList(updatedTrackList))
             }
@@ -131,7 +131,7 @@ internal class SpotiFlyerListStoreProvider(
                 is Result.UpdateTrackList -> copy(trackList = result.list)
                 is Result.UpdateTrackItem -> updateTrackItem(result.item)
                 is Result.ErrorOccurred -> copy(errorOccurred = result.error)
-                is Result.AskForDonation -> copy(askForDonation = result.isAllowed)
+                is Result.AskForSupport -> copy(askForDonation = result.isAllowed)
             }
 
         private fun State.updateTrackItem(item: TrackDetails): State {

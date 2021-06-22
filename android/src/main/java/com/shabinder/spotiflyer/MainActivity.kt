@@ -17,15 +17,16 @@
 package com.shabinder.spotiflyer
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.os.PowerManager
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -51,18 +52,17 @@ import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
 import com.shabinder.common.di.*
-import com.shabinder.common.di.worker.ForegroundService
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.PlatformActions.Companion.SharedPreferencesKey
-import com.shabinder.common.models.Status
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.uikit.*
+import com.shabinder.spotiflyer.service.ForegroundService
 import com.shabinder.spotiflyer.ui.AnalyticsDialog
 import com.shabinder.spotiflyer.ui.NetworkDialog
 import com.shabinder.spotiflyer.ui.PermissionDialog
@@ -82,11 +82,15 @@ class MainActivity : ComponentActivity() {
     private val callBacks: SpotiFlyerRootCallBacks get() = root.callBacks
     private val trackStatusFlow = MutableSharedFlow<HashMap<String, DownloadStatus>>(1)
     private var permissionGranted = mutableStateOf(true)
-    private lateinit var updateUIReceiver: BroadcastReceiver
-    private lateinit var queryReceiver: BroadcastReceiver
     private val internetAvailability by lazy { ConnectionLiveData(applicationContext) }
     private val tracker get() = (application as App).tracker
     private val visibleChild get(): SpotiFlyerRoot.Child = root.routerState.value.activeChild.instance
+
+    // Variable for storing instance of our service class
+    var foregroundService: ForegroundService? = null
+
+    // Boolean to check if our activity is bound to service or not
+    var isServiceBound: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -162,7 +166,61 @@ class MainActivity : ComponentActivity() {
             TrackHelper.track().download().with(tracker)
         }
         handleIntentFromExternalActivity()
+
+        initForegroundService()
     }
+
+    /*START: Foreground Service Handlers*/
+    private fun initForegroundService() {
+        // Start and then Bind to the Service
+        ContextCompat.startForegroundService(
+            this@MainActivity,
+            Intent(this, ForegroundService::class.java)
+        )
+        bindService()
+    }
+
+    /**
+     * Interface for getting the instance of binder from our service class
+     * So client can get instance of our service class and can directly communicate with it.
+     */
+    private val serviceConnection = object : ServiceConnection {
+        val tag = "Service Connection"
+
+        override fun onServiceConnected(className: ComponentName, iBinder: IBinder) {
+            Log.d(tag, "connected to service.")
+            // We've bound to MyService, cast the IBinder and get MyBinder instance
+            val binder = iBinder as ForegroundService.DownloadServiceBinder
+            foregroundService = binder.service
+            isServiceBound = true
+            lifecycleScope.launch {
+                foregroundService?.trackStatusFlowMap?.statusFlow?.let {
+                    trackStatusFlow.emitAll(it.conflate())
+                }
+            }
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            Log.d(tag, "disconnected from service.")
+            isServiceBound = false
+        }
+    }
+
+    /*Used to bind to our service class*/
+    private fun bindService() {
+        Intent(this, ForegroundService::class.java).also { intent ->
+            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    /*Used to unbind from our service class*/
+    private fun unbindService() {
+        Intent(this, ForegroundService::class.java).also {
+            unbindService(serviceConnection)
+        }
+    }
+    /*END: Foreground Service Handlers*/
+
 
     @Composable
     private fun isInternetAvailableState(): State<Boolean?> {
@@ -206,12 +264,9 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        override fun sendTracksToService(array: ArrayList<TrackDetails>) {
-                            for (list in array.chunked(50)) {
-                                val serviceIntent = Intent(this@MainActivity, ForegroundService::class.java)
-                                serviceIntent.putParcelableArrayListExtra("object", list as ArrayList)
-                                ContextCompat.startForegroundService(this@MainActivity, serviceIntent)
-                            }
+                        override fun sendTracksToService(array: List<TrackDetails>) {
+                            if (foregroundService == null) initForegroundService()
+                            foregroundService?.downloadAllTracks(array)
                         }
                     }
 
@@ -296,10 +351,16 @@ class MainActivity : ComponentActivity() {
         )
 
     private fun queryActiveTracks() {
-        val serviceIntent = Intent(this@MainActivity, ForegroundService::class.java).apply {
-            action = "query"
+        lifecycleScope.launch {
+            foregroundService?.trackStatusFlowMap?.let { tracksStatus ->
+                trackStatusFlow.emit(tracksStatus)
+            }
         }
-        ContextCompat.startForegroundService(this@MainActivity, serviceIntent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        queryActiveTracks()
     }
 
     @Suppress("DEPRECATION")
@@ -357,80 +418,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /*
-    * Broadcast Handlers
-    * */
-    private fun initializeBroadcast(){
-        val intentFilter = IntentFilter().apply {
-            addAction(Status.QUEUED.name)
-            addAction(Status.FAILED.name)
-            addAction(Status.DOWNLOADING.name)
-            addAction(Status.COMPLETED.name)
-            addAction("Progress")
-            addAction("Converting")
-        }
-        updateUIReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                //Update Flow with latest details
-                if (intent != null) {
-                    val trackDetails = intent.getParcelableExtra<TrackDetails?>("track")
-                    trackDetails?.let { track ->
-                        lifecycleScope.launch {
-                            val latestMap = trackStatusFlow.replayCache.getOrElse(0
-                            ) { hashMapOf() }.apply {
-                                this[track.title] = when (intent.action) {
-                                    Status.QUEUED.name -> DownloadStatus.Queued
-                                    Status.FAILED.name -> DownloadStatus.Failed
-                                    Status.DOWNLOADING.name -> DownloadStatus.Downloading()
-                                    "Progress" ->  DownloadStatus.Downloading(intent.getIntExtra("progress", 0))
-                                    "Converting" -> DownloadStatus.Converting
-                                    Status.COMPLETED.name -> DownloadStatus.Downloaded
-                                    else -> DownloadStatus.NotDownloaded
-                                }
-                            }
-                            trackStatusFlow.emit(latestMap)
-                            Log.i("Track Update",track.title + track.downloaded.toString())
-                        }
-                    }
-                }
-            }
-        }
-        val queryFilter = IntentFilter().apply { addAction("query_result") }
-        queryReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                //UI update here
-                if (intent != null){
-                    @Suppress("UNCHECKED_CAST")
-                    val trackList = intent.getSerializableExtra("tracks") as? HashMap<String, DownloadStatus>?
-                    trackList?.let { list ->
-                        Log.i("Service Response", "${list.size} Tracks Active")
-                        lifecycleScope.launch {
-                            trackStatusFlow.emit(list)
-                        }
-                    }
-                }
-            }
-        }
-        registerReceiver(updateUIReceiver, intentFilter)
-        registerReceiver(queryReceiver, queryFilter)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        initializeBroadcast()
-        if(visibleChild is SpotiFlyerRoot.Child.List) {
-            // Update Track List Statuses when Returning to App
-            queryActiveTracks()
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        unregisterReceiver(updateUIReceiver)
-        unregisterReceiver(queryReceiver)
-    }
-
-
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         handleIntentFromExternalActivity(intent)
@@ -453,6 +440,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService()
     }
 
     companion object {
