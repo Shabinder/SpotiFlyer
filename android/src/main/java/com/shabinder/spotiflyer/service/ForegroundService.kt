@@ -168,7 +168,7 @@ class ForegroundService : LifecycleService() {
 
                 is DownloadResult.Progress -> {
                     trackStatusFlowMap[track.title] = DownloadStatus.Downloading(it.progress)
-                    updateProgressInNotification(Message(track.title,DownloadStatus.Downloading(it.progress)))
+                    // updateProgressInNotification(Message(track.title,DownloadStatus.Downloading(it.progress)))
                 }
 
                 is DownloadResult.Success -> {
