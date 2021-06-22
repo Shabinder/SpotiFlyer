@@ -49,7 +49,7 @@ object Versions {
     const val minSdkVersion = 21
     const val compileSdkVersion = 29
     const val targetSdkVersion = 29
-    const val androidLifecycle = "2.3.0"
+    const val androidxLifecycle = "2.3.1"
 }
 
 object HostOS {

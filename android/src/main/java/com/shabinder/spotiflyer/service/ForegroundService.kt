@@ -17,13 +17,11 @@
 package com.shabinder.spotiflyer.service
 
 import android.annotation.SuppressLint
-import android.app.DownloadManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_CANCEL_CURRENT
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
@@ -31,8 +29,9 @@ import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
@@ -44,23 +43,33 @@ import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.failure
-import kotlinx.coroutines.CoroutineScope
+import com.shabinder.spotiflyer.utils.autoclear.AutoClear
+import com.shabinder.spotiflyer.utils.autoclear.autoClear
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.io.File
-import kotlin.coroutines.CoroutineContext
 
-class ForegroundService : Service(), CoroutineScope {
+class ForegroundService : LifecycleService() {
 
-    private val tag: String = "Foreground Service"
-    private val channelId = "ForegroundDownloaderService"
-    private val notificationId = 101
+    val trackStatusFlowMap by autoClear { TrackStatusFlowMap(MutableSharedFlow(replay = 1),lifecycleScope) }
+    private var downloadService: AutoClear<ParallelExecutor> = autoClear { ParallelExecutor(Dispatchers.IO) }
+    private val fetcher: FetchPlatformQueryResult by inject()
+    private val logger: Kermit by inject()
+    private val dir: Dir by inject()
+
+    private var messageList = MutableList(5) { emptyMessage }
+    private var wakeLock: PowerManager.WakeLock? = null
+    private var isServiceStarted = false
+    private val cancelIntent: PendingIntent by lazy {
+        val intent = Intent(this, ForegroundService::class.java).apply { action = "kill" }
+        PendingIntent.getService(this, 0, intent, FLAG_CANCEL_CURRENT)
+    }
+
+    /* Variables Holding Download State */
     private var total = 0 // Total Downloads Requested
     private var converted = 0 // Total Files Converted
     private var downloaded = 0 // Total Files downloaded
@@ -68,52 +77,27 @@ class ForegroundService : Service(), CoroutineScope {
     private val isFinished get() = converted + failed == total
     private var isSingleDownload = false
 
-    private lateinit var serviceJob: Job
-    override val coroutineContext: CoroutineContext
-        get() = serviceJob + Dispatchers.IO
-
-    val trackStatusFlowMap = TrackStatusFlowMap(MutableSharedFlow(replay = 1),this)
-
-    private var messageList = mutableListOf("", "", "", "", "")
-    private var wakeLock: PowerManager.WakeLock? = null
-    private var isServiceStarted = false
-    private lateinit var cancelIntent: PendingIntent
-
-    private lateinit var downloadManager: DownloadManager
-    private lateinit var downloadService: ParallelExecutor
-    private val fetcher: FetchPlatformQueryResult by inject()
-    private val logger: Kermit by inject()
-    private val dir: Dir by inject()
-
-
     inner class DownloadServiceBinder : Binder() {
-        // Return this instance of MyService so clients can call public methods
-        val service: ForegroundService
-            get() =// Return this instance of Foreground Service so clients can call public methods
-                this@ForegroundService
+        val service get() = this@ForegroundService
     }
     private val myBinder: IBinder = DownloadServiceBinder()
 
-    override fun onBind(intent: Intent): IBinder = myBinder
+    override fun onBind(intent: Intent): IBinder {
+        super.onBind(intent)
+        return myBinder
+    }
 
-    @SuppressLint("UnspecifiedImmutableFlag")
     override fun onCreate() {
         super.onCreate()
-        serviceJob = SupervisorJob()
-        downloadService = ParallelExecutor(Dispatchers.IO)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel(channelId, "Downloader Service")
-        }
-        val intent = Intent(this, ForegroundService::class.java).apply { action = "kill" }
-        cancelIntent = PendingIntent.getService(this, 0, intent, FLAG_CANCEL_CURRENT)
-        downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        createNotificationChannel(CHANNEL_ID, "Downloader Service")
     }
 
     @SuppressLint("WakelockTimeout")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         // Send a notification that service is started
-        Log.i(tag, "Foreground Service Started.")
-        startForeground(notificationId, getNotification())
+        Log.i(TAG, "Foreground Service Started.")
+        startForeground(NOTIFICATION_ID, getNotification())
 
         intent?.let {
             when (it.action) {
@@ -127,7 +111,7 @@ class ForegroundService : Service(), CoroutineScope {
             START_STICKY
         } else {
             isServiceStarted = true
-            Log.i(tag, "Starting the foreground service task")
+            Log.i(TAG, "Starting the foreground service task")
             wakeLock =
                 (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
                     newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "EndlessService::lock").apply {
@@ -142,7 +126,6 @@ class ForegroundService : Service(), CoroutineScope {
      * Function To Download All Tracks Available in a List
      **/
     fun downloadAllTracks(trackList: List<TrackDetails>) {
-
         trackList.size.also { size ->
             total += size
             isSingleDownload = (size == 1)
@@ -151,8 +134,8 @@ class ForegroundService : Service(), CoroutineScope {
 
         trackList.forEach {
             trackStatusFlowMap[it.title] = DownloadStatus.Queued
-            launch {
-                downloadService.execute {
+            lifecycleScope.launch {
+                downloadService.value.execute {
                     fetcher.findMp3DownloadLink(it).fold(
                         success = { url ->
                             enqueueDownload(url, it)
@@ -170,21 +153,22 @@ class ForegroundService : Service(), CoroutineScope {
 
     private suspend fun enqueueDownload(url: String, track: TrackDetails) {
         // Initiating Download
-        addToNotification("Downloading ${track.title}")
+        addToNotification(Message(track.title, DownloadStatus.Downloading()))
         trackStatusFlowMap[track.title] = DownloadStatus.Downloading()
 
         // Enqueueing Download
         downloadFile(url).collect {
             when (it) {
                 is DownloadResult.Error -> {
-                    logger.d(tag) { it.message }
+                    logger.d(TAG) { it.message }
                     failed++
                     trackStatusFlowMap[track.title] = DownloadStatus.Failed(it.cause ?: Exception(it.message))
-                    removeFromNotification("Downloading ${track.title}")
+                    removeFromNotification(Message(track.title, DownloadStatus.Downloading()))
                 }
 
                 is DownloadResult.Progress -> {
                     trackStatusFlowMap[track.title] = DownloadStatus.Downloading(it.progress)
+                    updateProgressInNotification(Message(track.title,DownloadStatus.Downloading(it.progress)))
                 }
 
                 is DownloadResult.Success -> {
@@ -195,15 +179,15 @@ class ForegroundService : Service(), CoroutineScope {
 
                             // Send Converting Status
                             trackStatusFlowMap[track.title] = DownloadStatus.Converting
-                            addToNotification("Processing ${track.title}")
+                            addToNotification(Message(track.title, DownloadStatus.Converting))
 
                             // All Processing Completed for this Track
                             job.invokeOnCompletion {
                                 converted++
                                 trackStatusFlowMap[track.title] = DownloadStatus.Downloaded
-                                removeFromNotification("Processing ${track.title}")
+                                removeFromNotification(Message(track.title, DownloadStatus.Converting))
                             }
-                            logger.d(tag) { "${track.title} Download Completed" }
+                            logger.d(TAG) { "${track.title} Download Completed" }
                             downloaded++
                         }.failure { error ->
                             error.printStackTrace()
@@ -211,7 +195,7 @@ class ForegroundService : Service(), CoroutineScope {
                             failed++
                             trackStatusFlowMap[track.title] = DownloadStatus.Failed(error)
                         }
-                        removeFromNotification("Downloading ${track.title}")
+                        removeFromNotification(Message(track.title, DownloadStatus.Downloading()))
                     }
                 }
             }
@@ -219,7 +203,7 @@ class ForegroundService : Service(), CoroutineScope {
     }
 
     private fun releaseWakeLock() {
-        logger.d(tag) { "Releasing Wake Lock" }
+        logger.d(TAG) { "Releasing Wake Lock" }
         try {
             wakeLock?.let {
                 if (it.isHeld) {
@@ -227,21 +211,22 @@ class ForegroundService : Service(), CoroutineScope {
                 }
             }
         } catch (e: Exception) {
-            logger.d(tag) { "Service stopped without being started: ${e.message}" }
+            logger.d(TAG) { "Service stopped without being started: ${e.message}" }
         }
         isServiceStarted = false
     }
 
     @Suppress("SameParameterValue")
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(channelId: String, channelName: String) {
-        val channel = NotificationChannel(
-            channelId,
-            channelName, NotificationManager.IMPORTANCE_DEFAULT
-        )
-        channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        service.createNotificationChannel(channel)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                channelName, NotificationManager.IMPORTANCE_DEFAULT
+            )
+            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            service.createNotificationChannel(channel)
+        }
     }
 
     /*
@@ -249,16 +234,18 @@ class ForegroundService : Service(), CoroutineScope {
     *  - `Clean Up` and `Stop this Foreground Service`
     * */
     private fun killService() {
-        launch {
-            logger.d(tag) { "Killing Self" }
-            messageList = mutableListOf("Cleaning And Exiting", "", "", "", "")
-            downloadService.close()
+        lifecycleScope.launch {
+            logger.d(TAG) { "Killing Self" }
+            messageList = messageList.getEmpty().apply {
+                set(index = 0, Message("Cleaning And Exiting",DownloadStatus.NotDownloaded))
+            }
+            downloadService.value.close()
+            downloadService.reset()
             updateNotification()
             cleanFiles(File(dir.defaultDir()))
-            // TODO cleanFiles(File(dir.imageCacheDir()))
-            messageList = mutableListOf("", "", "", "", "")
+            // cleanFiles(File(dir.imageCacheDir()))
+            messageList = messageList.getEmpty()
             releaseWakeLock()
-            serviceJob.cancel()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 stopForeground(true)
                 stopSelf()
@@ -270,6 +257,7 @@ class ForegroundService : Service(), CoroutineScope {
 
     override fun onDestroy() {
         super.onDestroy()
+        logger.i(TAG) { "onDestroy, isFinished: $isFinished" }
         if (isFinished) {
             killService()
         }
@@ -277,6 +265,7 @@ class ForegroundService : Service(), CoroutineScope {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
+        logger.i(TAG) { "onTaskRemoved, isFinished: $isFinished" }
         if (isFinished) {
             killService()
         }
@@ -285,30 +274,39 @@ class ForegroundService : Service(), CoroutineScope {
     /*
     * Create A New Notification with all the updated data
     * */
-    private fun getNotification(): Notification = NotificationCompat.Builder(this, channelId).run {
+    private fun getNotification(): Notification = NotificationCompat.Builder(this, CHANNEL_ID).run {
         setSmallIcon(R.drawable.ic_download_arrow)
         setContentTitle("Total: $total  Completed:$converted  Failed:$failed")
         setSilent(true)
+//        val max
+//        val progress = if(total != 0) 0 else (((failed+converted).toDouble() / total.toDouble()).roundToInt())
+        setProgress(total,failed+converted,false)
         setStyle(
             NotificationCompat.InboxStyle().run {
-                addLine(messageList[messageList.size - 1])
-                addLine(messageList[messageList.size - 2])
-                addLine(messageList[messageList.size - 3])
-                addLine(messageList[messageList.size - 4])
-                addLine(messageList[messageList.size - 5])
+                addLine(messageList[messageList.size - 1].asString())
+                addLine(messageList[messageList.size - 2].asString())
+                addLine(messageList[messageList.size - 3].asString())
+                addLine(messageList[messageList.size - 4].asString())
+                addLine(messageList[messageList.size - 5].asString())
             }
         )
         addAction(R.drawable.ic_round_cancel_24, "Exit", cancelIntent)
         build()
     }
 
-    private fun addToNotification(message: String) {
+    private fun addToNotification(message: Message) {
         messageList.add(message)
         updateNotification()
     }
 
-    private fun removeFromNotification(message: String) {
-        messageList.remove(message)
+    private fun removeFromNotification(message: Message) {
+        messageList.removeAll { it.title == message.title }
+        updateNotification()
+    }
+
+    private fun updateProgressInNotification(message: Message) {
+        val index = messageList.indexOfFirst { it.title == message.title }
+        messageList[index] = message
         updateNotification()
     }
 
@@ -318,6 +316,13 @@ class ForegroundService : Service(), CoroutineScope {
     private fun updateNotification() {
         val mNotificationManager: NotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        mNotificationManager.notify(notificationId, getNotification())
+        mNotificationManager.notify(NOTIFICATION_ID, getNotification())
     }
+
+    companion object {
+        private const val TAG: String = "Foreground Service"
+        private const val CHANNEL_ID = "ForegroundDownloaderService"
+        private const val NOTIFICATION_ID = 101
+    }
+
 }

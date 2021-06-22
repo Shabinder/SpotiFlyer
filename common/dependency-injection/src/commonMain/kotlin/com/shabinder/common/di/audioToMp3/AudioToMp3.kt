@@ -47,16 +47,16 @@ interface AudioToMp3 {
                     "${activeHost.removeSuffix("send")}${jobLink.substringAfterLast("/")}"
                 )
             } catch (e: Exception) {
+                e.printStackTrace()
                 if(e is ClientRequestException && e.response.status.value == 404) {
                     // No Need to Retry, Host/Converter is Busy
-                    throw SpotiFlyerException.MP3ConversionFailed()
+                    throw SpotiFlyerException.MP3ConversionFailed(e.message)
                 }
                 // Try Using New Host/Converter
                 convertRequest(URL, audioQuality).value.also {
                     activeHost = it.first
                     jobLink = it.second
                 }
-                e.printStackTrace()
                 ""
             }
             retryCount--

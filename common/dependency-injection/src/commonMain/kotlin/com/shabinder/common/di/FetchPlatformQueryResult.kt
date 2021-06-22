@@ -122,6 +122,7 @@ class FetchPlatformQueryResult(
             trackName = track.title,
             trackArtists = track.artists
         ).flatMapError { saavnError ->
+            logger.e { "Fetching From Saavn Failed: \n${saavnError.stackTraceToString()}" }
             // Saavn Failed, Lets Try Fetching Now From Youtube Music
             youtubeMusic.findMp3SongDownloadURLYT(track).flatMapError { ytMusicError ->
                 // If Both Failed Bubble the Exception Up with both StackTraces
