@@ -55,8 +55,8 @@ import java.io.File
 
 class ForegroundService : LifecycleService() {
 
-    val trackStatusFlowMap by autoClear { TrackStatusFlowMap(MutableSharedFlow(replay = 1),lifecycleScope) }
     private var downloadService: AutoClear<ParallelExecutor> = autoClear { ParallelExecutor(Dispatchers.IO) }
+    val trackStatusFlowMap by autoClear { TrackStatusFlowMap(MutableSharedFlow(replay = 1),lifecycleScope) }
     private val fetcher: FetchPlatformQueryResult by inject()
     private val logger: Kermit by inject()
     private val dir: Dir by inject()
@@ -70,10 +70,10 @@ class ForegroundService : LifecycleService() {
     }
 
     /* Variables Holding Download State */
-    private var total = 0 // Total Downloads Requested
-    private var converted = 0 // Total Files Converted
-    private var downloaded = 0 // Total Files downloaded
-    private var failed = 0 // Total Files failed
+    private var total = 0
+    private var converted = 0
+    private var downloaded = 0
+    private var failed = 0
     private val isFinished get() = converted + failed == total
     private var isSingleDownload = false
 
@@ -97,7 +97,7 @@ class ForegroundService : LifecycleService() {
         super.onStartCommand(intent, flags, startId)
         // Send a notification that service is started
         Log.i(TAG, "Foreground Service Started.")
-        startForeground(NOTIFICATION_ID, getNotification())
+        startForeground(NOTIFICATION_ID, createNotification())
 
         intent?.let {
             when (it.action) {
@@ -250,36 +250,15 @@ class ForegroundService : LifecycleService() {
                 stopForeground(true)
                 stopSelf()
             } else {
-                stopSelf() // System will automatically close it
+                stopSelf()
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        logger.i(TAG) { "onDestroy, isFinished: $isFinished" }
-        if (isFinished) {
-            killService()
-        }
-    }
-
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
-        logger.i(TAG) { "onTaskRemoved, isFinished: $isFinished" }
-        if (isFinished) {
-            killService()
-        }
-    }
-
-    /*
-    * Create A New Notification with all the updated data
-    * */
-    private fun getNotification(): Notification = NotificationCompat.Builder(this, CHANNEL_ID).run {
+    private fun createNotification(): Notification = NotificationCompat.Builder(this, CHANNEL_ID).run {
         setSmallIcon(R.drawable.ic_download_arrow)
         setContentTitle("Total: $total  Completed:$converted  Failed:$failed")
         setSilent(true)
-//        val max
-//        val progress = if(total != 0) 0 else (((failed+converted).toDouble() / total.toDouble()).roundToInt())
         setProgress(total,failed+converted,false)
         setStyle(
             NotificationCompat.InboxStyle().run {
@@ -310,13 +289,20 @@ class ForegroundService : LifecycleService() {
         updateNotification()
     }
 
-    /**
-     * This is the method that can be called to update the Notification
-     */
     private fun updateNotification() {
         val mNotificationManager: NotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        mNotificationManager.notify(NOTIFICATION_ID, getNotification())
+        mNotificationManager.notify(NOTIFICATION_ID, createNotification())
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isFinished) { killService() }
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        if (isFinished) { killService() }
     }
 
     companion object {
@@ -324,5 +310,4 @@ class ForegroundService : LifecycleService() {
         private const val CHANNEL_ID = "ForegroundDownloaderService"
         private const val NOTIFICATION_ID = 101
     }
-
 }
