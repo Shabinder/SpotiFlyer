@@ -22,6 +22,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.shabinder.common.di.DownloadProgressFlow
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails
@@ -58,10 +59,11 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
     private val root = SpotiFlyerRoot(ctx,
         object : SpotiFlyerRoot.Dependencies {
             override val storeFactory: StoreFactory = LoggingStoreFactory(DefaultStoreFactory)
-            override val fetchPlatformQueryResult = dependencies.fetchPlatformQueryResult
-            override val directories = dependencies.directories
-            override val database: Database? = directories.db
-            override val downloadProgressReport = DownloadProgressFlow
+            override val fetchQuery = dependencies.fetchPlatformQueryResult
+            override val dir = dependencies.directories
+            override val preferenceManager: PreferenceManager = dependencies.preferenceManager
+            override val database: Database? = dir.db
+            override val downloadProgressFlow = DownloadProgressFlow
             override val actions = object : Actions {
                 override val platformActions = object : PlatformActions {}
 

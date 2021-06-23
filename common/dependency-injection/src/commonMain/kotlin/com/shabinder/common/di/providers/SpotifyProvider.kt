@@ -22,8 +22,8 @@ import com.shabinder.common.di.TokenStore
 import com.shabinder.common.di.createHttpClient
 import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.globalJson
-import com.shabinder.common.di.spotify.SpotifyRequests
-import com.shabinder.common.di.spotify.authenticateSpotify
+import com.shabinder.common.di.providers.requests.spotify.SpotifyRequests
+import com.shabinder.common.di.providers.requests.spotify.authenticateSpotify
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.NativeAtomicReference
 import com.shabinder.common.models.PlatformQueryResult

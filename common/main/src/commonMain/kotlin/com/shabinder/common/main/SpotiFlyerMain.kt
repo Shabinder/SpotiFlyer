@@ -21,6 +21,7 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.Picture
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.main.integration.SpotiFlyerMainImpl
 import com.shabinder.common.models.Consumer
 import com.shabinder.common.models.DownloadRecord
@@ -63,6 +64,7 @@ interface SpotiFlyerMain {
         val storeFactory: StoreFactory
         val database: Database?
         val dir: Dir
+        val preferenceManager: PreferenceManager
         val mainAnalytics: Analytics
     }
 

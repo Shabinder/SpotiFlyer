@@ -60,6 +60,10 @@ object HostOS {
     val isLinux = hostOs.startsWith("Linux",true)
 }
 
+object MultiPlatformSettings {
+    const val dep = "com.russhwolf:multiplatform-settings-no-arg:0.7.7"
+}
+
 object Koin {
     val core = "io.insert-koin:koin-core:${Versions.koin}"
     val test = "io.insert-koin:koin-test:${Versions.koin}"

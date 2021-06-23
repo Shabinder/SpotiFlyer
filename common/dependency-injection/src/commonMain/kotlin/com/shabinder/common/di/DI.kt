@@ -20,13 +20,8 @@ import co.touchlab.kermit.Kermit
 import com.russhwolf.settings.Settings
 import com.shabinder.common.database.databaseModule
 import com.shabinder.common.database.getLogger
-import com.shabinder.common.di.audioToMp3.AudioToMp3
-import com.shabinder.common.di.providers.GaanaProvider
-import com.shabinder.common.di.providers.SaavnProvider
-import com.shabinder.common.di.providers.SpotifyProvider
-import com.shabinder.common.di.providers.YoutubeMp3
-import com.shabinder.common.di.providers.YoutubeMusic
-import com.shabinder.common.di.providers.YoutubeProvider
+import com.shabinder.common.di.preference.PreferenceManager
+import com.shabinder.common.di.providers.providersModule
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
@@ -42,7 +37,11 @@ import kotlin.native.concurrent.ThreadLocal
 fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclaration = {}) =
     startKoin {
         appDeclaration()
-        modules(commonModule(enableNetworkLogs = enableNetworkLogs), databaseModule())
+        modules(
+            commonModule(enableNetworkLogs = enableNetworkLogs),
+            providersModule(),
+            databaseModule()
+        )
     }
 
 // Called by IOS
@@ -52,16 +51,9 @@ fun commonModule(enableNetworkLogs: Boolean) = module {
     single { createHttpClient(enableNetworkLogs = enableNetworkLogs) }
     single { Dir(get(), get(), get()) }
     single { Settings() }
+    single { PreferenceManager(get()) }
     single { Kermit(getLogger()) }
     single { TokenStore(get(), get()) }
-    single { AudioToMp3(get(), get()) }
-    single { SpotifyProvider(get(), get(), get()) }
-    single { GaanaProvider(get(), get(), get()) }
-    single { SaavnProvider(get(), get(), get(), get()) }
-    single { YoutubeProvider(get(), get(), get()) }
-    single { YoutubeMp3(get(), get()) }
-    single { YoutubeMusic(get(), get(), get(), get(), get()) }
-    single { FetchPlatformQueryResult(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
 @ThreadLocal

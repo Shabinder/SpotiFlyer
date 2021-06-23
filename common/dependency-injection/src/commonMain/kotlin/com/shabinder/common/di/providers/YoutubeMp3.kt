@@ -17,7 +17,7 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.di.youtubeMp3.Yt1sMp3
+import com.shabinder.common.di.providers.requests.youtubeMp3.Yt1sMp3
 import com.shabinder.common.models.corsApi
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.map

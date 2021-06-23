@@ -1,8 +1,8 @@
-package com.shabinder.common.di.saavn
+package com.shabinder.common.di.providers.requests.saavn
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.di.audioToMp3.AudioToMp3
 import com.shabinder.common.di.globalJson
+import com.shabinder.common.di.providers.requests.audioToMp3.AudioToMp3
 import com.shabinder.common.models.corsApi
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.map

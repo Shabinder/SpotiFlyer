@@ -10,6 +10,11 @@ sealed class SpotiFlyerException(override val message: String): Exception(messag
         override val message: String = "MP3 Converter unreachable, probably BUSY ! \nCAUSE:$extraInfo"
     ): SpotiFlyerException(message)
 
+    data class UnknownReason(
+        val exception: Throwable? = null,
+        override val message: String = "Unknown Error"
+    ): SpotiFlyerException(message)
+
     data class NoMatchFound(
         val trackName: String? = null,
         override val message: String = "$trackName : NO Match Found!"

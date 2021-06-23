@@ -17,7 +17,7 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.di.audioToMp3.AudioToMp3
+import com.shabinder.common.di.providers.requests.audioToMp3.AudioToMp3
 import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.YoutubeTrack

@@ -19,7 +19,7 @@ package com.shabinder.common.di.providers
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.finalOutputDir
-import com.shabinder.common.di.gaana.GaanaRequests
+import com.shabinder.common.di.providers.requests.gaana.GaanaRequests
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.SpotiFlyerException

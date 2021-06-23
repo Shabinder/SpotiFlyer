@@ -18,7 +18,6 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.database.DownloadRecordDatabaseQueries
-import com.shabinder.common.di.audioToMp3.AudioToMp3
 import com.shabinder.common.di.providers.GaanaProvider
 import com.shabinder.common.di.providers.SaavnProvider
 import com.shabinder.common.di.providers.SpotifyProvider
@@ -26,6 +25,7 @@ import com.shabinder.common.di.providers.YoutubeMp3
 import com.shabinder.common.di.providers.YoutubeMusic
 import com.shabinder.common.di.providers.YoutubeProvider
 import com.shabinder.common.di.providers.get
+import com.shabinder.common.di.providers.requests.audioToMp3.AudioToMp3
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
@@ -35,6 +35,7 @@ import com.shabinder.common.models.event.coroutines.flatMapError
 import com.shabinder.common.models.event.coroutines.success
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.requireNotNull
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -137,6 +138,7 @@ class FetchPlatformQueryResult(
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun addToDatabaseAsync(link: String, result: PlatformQueryResult) {
         GlobalScope.launch(dispatcherIO) {
             db?.add(

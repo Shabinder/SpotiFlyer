@@ -18,11 +18,12 @@ import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.initKoin
-import react.dom.render
+import com.shabinder.common.di.preference.PreferenceManager
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import react.dom.render
 
 fun main() {
     window.onload = {
@@ -38,10 +39,12 @@ object AppDependencies : KoinComponent {
     val logger: Kermit
     val directories: Dir
     val fetchPlatformQueryResult: FetchPlatformQueryResult
+    val preferenceManager: PreferenceManager
     init {
         initKoin()
         directories = get()
         logger = get()
         fetchPlatformQueryResult = get()
+        preferenceManager = get()
     }
 }

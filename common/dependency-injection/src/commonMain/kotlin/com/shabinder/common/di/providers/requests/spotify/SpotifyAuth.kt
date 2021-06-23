@@ -14,7 +14,7 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.common.di.spotify
+package com.shabinder.common.di.providers.requests.spotify
 
 import com.shabinder.common.di.globalJson
 import com.shabinder.common.models.SpotiFlyerException

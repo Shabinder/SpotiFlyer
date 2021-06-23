@@ -24,7 +24,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.downloadTracks
-import com.shabinder.common.di.getDonationOffset
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.list.SpotiFlyerList.State
 import com.shabinder.common.list.store.SpotiFlyerListStore.Intent
 import com.shabinder.common.models.DownloadStatus
@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.collect
 
 internal class SpotiFlyerListStoreProvider(
     private val dir: Dir,
+    private val preferenceManager: PreferenceManager,
     private val storeFactory: StoreFactory,
     private val fetchQuery: FetchPlatformQueryResult,
     private val link: String,
@@ -68,7 +69,7 @@ internal class SpotiFlyerListStoreProvider(
             dir.db?.downloadRecordDatabaseQueries?.getLastInsertId()?.executeAsOneOrNull()?.also {
                 // See if It's Time we can request for support for maintaining this project or not
                 fetchQuery.logger.d(message = { "Database List Last ID: $it" }, tag = "Database Last ID")
-                val offset = dir.getDonationOffset
+                val offset = preferenceManager.getDonationOffset
                 dispatch(
                     Result.AskForSupport(
                         // Every 3rd Interval or After some offset

@@ -17,8 +17,8 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
-import com.russhwolf.settings.Settings
 import com.shabinder.common.database.SpotiFlyerDatabase
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.TrackDetails
@@ -30,18 +30,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt
 
-const val DirKey = "downloadDir"
-const val AnalyticsKey = "analytics"
-const val FirstLaunch = "firstLaunch"
-const val DonationInterval = "donationInterval"
-
 expect class Dir(
     logger: Kermit,
-    settingsPref: Settings,
+    preferenceManager: PreferenceManager,
     spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     val db: Database?
-    val settings: Settings
     fun isPresent(path: String): Boolean
     fun fileSeparator(): String
     fun defaultDir(): String
@@ -52,22 +46,6 @@ expect class Dir(
     suspend fun clearCache()
     suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, trackDetails: TrackDetails, postProcess: (track: TrackDetails) -> Unit = {})
     fun addToLibrary(path: String)
-}
-
-val Dir.isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
-fun Dir.toggleAnalytics(enabled: Boolean) = settings.putBoolean(AnalyticsKey, enabled)
-
-fun Dir.setDownloadDirectory(newBasePath: String) = settings.putString(DirKey, newBasePath)
-
-val Dir.getDonationOffset: Int get() = (settings.getIntOrNull(DonationInterval) ?: 3).also {
-    // Min. Donation Asking Interval is `3`
-    if (it < 3) setDonationOffset(3) else setDonationOffset(it - 1)
-}
-fun Dir.setDonationOffset(offset: Int = 5) = settings.putInt(DonationInterval, offset)
-
-val Dir.isFirstLaunch get() = settings.getBooleanOrNull(FirstLaunch) ?: true
-fun Dir.firstLaunchDone() {
-    settings.putBoolean(FirstLaunch, false)
 }
 
 /*

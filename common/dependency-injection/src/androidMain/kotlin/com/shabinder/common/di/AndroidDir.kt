@@ -22,8 +22,8 @@ import android.os.Environment
 import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
-import com.russhwolf.settings.Settings
 import com.shabinder.common.database.SpotiFlyerDatabase
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.di.utils.ParallelExecutor
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
@@ -43,7 +43,7 @@ import java.net.URL
 @Suppress("DEPRECATION")
 actual class Dir actual constructor(
     private val logger: Kermit,
-    settingsPref: Settings,
+    private val preferenceManager: PreferenceManager,
     spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     @Suppress("DEPRECATION")
@@ -54,7 +54,7 @@ actual class Dir actual constructor(
     actual fun imageCacheDir(): String = methods.value.platformActions.imageCacheDir
 
     // fun call in order to always access Updated Value
-    actual fun defaultDir(): String = (settings.getStringOrNull(DirKey) ?: defaultBaseDir) +
+    actual fun defaultDir(): String = (preferenceManager.downloadDir ?: defaultBaseDir) +
         File.separator + "SpotiFlyer" + File.separator
 
     actual fun isPresent(path: String): Boolean = File(path).exists()
@@ -202,5 +202,4 @@ actual class Dir actual constructor(
     private val parallelExecutor = ParallelExecutor(Dispatchers.IO)
 
     actual val db: Database? = spotiFlyerDatabase.instance
-    actual val settings: Settings = settingsPref
 }

@@ -14,7 +14,7 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.common.di.gaana
+package com.shabinder.common.di.providers.requests.gaana
 
 import com.shabinder.common.models.corsApi
 import com.shabinder.common.models.gaana.GaanaAlbum

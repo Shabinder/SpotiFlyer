@@ -1,4 +1,4 @@
-package com.shabinder.common.di.saavn
+package com.shabinder.common.di.utils
 
 /*
 * JSON UTILS

@@ -17,13 +17,13 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
-import com.russhwolf.settings.Settings
 import com.shabinder.common.database.SpotiFlyerDatabase
-import com.shabinder.common.di.gaana.corsApi
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.corsApi
 import com.shabinder.database.Database
 import kotlinext.js.Object
 import kotlinext.js.js
@@ -34,7 +34,7 @@ import org.w3c.dom.ImageBitmap
 
 actual class Dir actual constructor(
     private val logger: Kermit,
-    settingsPref: Settings,
+    private val preferenceManager: PreferenceManager,
     spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     /*init {
@@ -116,7 +116,6 @@ actual class Dir actual constructor(
     private suspend fun freshImage(url: String): ImageBitmap? = null
 
     actual val db: Database? = spotiFlyerDatabase.instance
-    actual val settings: Settings = settingsPref
 }
 
 fun ByteArray.toArrayBuffer(): ArrayBuffer {

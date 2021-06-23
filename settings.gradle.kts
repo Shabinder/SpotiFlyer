@@ -22,6 +22,7 @@ include(
     ":common:root",
     ":common:main",
     ":common:list",
+    ":common:preference",
     ":common:data-models",
     ":common:dependency-injection",
     ":android",

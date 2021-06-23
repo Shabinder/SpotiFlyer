@@ -1,4 +1,4 @@
-package com.shabinder.common.di.audioToMp3
+package com.shabinder.common.di.providers.requests.audioToMp3
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.models.AudioQuality

@@ -14,7 +14,7 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.common.di.youtubeMp3
+package com.shabinder.common.di.providers.requests.youtubeMp3
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.models.corsApi

@@ -2,9 +2,9 @@ package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.Dir
-import com.shabinder.common.di.audioToMp3.AudioToMp3
 import com.shabinder.common.di.finalOutputDir
-import com.shabinder.common.di.saavn.JioSaavnRequests
+import com.shabinder.common.di.providers.requests.audioToMp3.AudioToMp3
+import com.shabinder.common.di.providers.requests.saavn.JioSaavnRequests
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult

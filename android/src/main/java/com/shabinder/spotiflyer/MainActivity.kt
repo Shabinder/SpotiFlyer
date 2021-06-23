@@ -52,6 +52,7 @@ import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
 import com.shabinder.common.di.*
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformActions
@@ -78,6 +79,7 @@ class MainActivity : ComponentActivity() {
 
     private val fetcher: FetchPlatformQueryResult by inject()
     private val dir: Dir by inject()
+    private val preferenceManager: PreferenceManager by inject()
     private lateinit var root: SpotiFlyerRoot
     private val callBacks: SpotiFlyerRootCallBacks get() = root.callBacks
     private val trackStatusFlow = MutableSharedFlow<HashMap<String, DownloadStatus>>(1)
@@ -129,18 +131,18 @@ class MainActivity : ComponentActivity() {
                         AnalyticsDialog(
                             askForAnalyticsPermission,
                             enableAnalytics = {
-                                dir.toggleAnalytics(true)
-                                dir.firstLaunchDone()
+                                preferenceManager.toggleAnalytics(true)
+                                preferenceManager.firstLaunchDone()
                             },
                             dismissDialog = {
                                 askForAnalyticsPermission = false
-                                dir.firstLaunchDone()
+                                preferenceManager.firstLaunchDone()
                             }
                         )
 
                         LaunchedEffect(view) {
                             permissionGranted.value = checkPermissions()
-                            if(dir.isFirstLaunch) {
+                            if(preferenceManager.isFirstLaunch) {
                                 delay(2500)
                                 // Ask For Analytics Permission on first Dialog
                                 askForAnalyticsPermission = true
@@ -161,7 +163,7 @@ class MainActivity : ComponentActivity() {
         * for `Github Downloads` we will track Downloads using : https://tooomm.github.io/github-release-stats/?username=Shabinder&repository=SpotiFlyer
         * */
         if(isGithubRelease) { checkIfLatestVersion() }
-        if(dir.isAnalyticsEnabled && !isGithubRelease) {
+        if(preferenceManager.isAnalyticsEnabled && !isGithubRelease) {
             // Download/App Install Event for F-Droid builds
             TrackHelper.track().download().with(tracker)
         }
@@ -246,9 +248,10 @@ class MainActivity : ComponentActivity() {
             dependencies = object : SpotiFlyerRoot.Dependencies{
                 override val storeFactory = LoggingStoreFactory(DefaultStoreFactory)
                 override val database = this@MainActivity.dir.db
-                override val fetchPlatformQueryResult = this@MainActivity.fetcher
-                override val directories: Dir = this@MainActivity.dir
-                override val downloadProgressReport: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
+                override val fetchQuery = this@MainActivity.fetcher
+                override val dir: Dir = this@MainActivity.dir
+                override val preferenceManager = this@MainActivity.preferenceManager
+                override val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
                 override val actions = object: Actions {
 
                     override val platformActions = object : PlatformActions {
@@ -316,7 +319,7 @@ class MainActivity : ComponentActivity() {
                 * */
                 override val analytics = object: Analytics {
                     override fun appLaunchEvent() {
-                        if(dir.isAnalyticsEnabled){
+                        if(preferenceManager.isAnalyticsEnabled){
                             TrackHelper.track()
                                 .event("events","App_Launch")
                                 .name("App Launch").with(tracker)
@@ -324,7 +327,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     override fun homeScreenVisit() {
-                        if(dir.isAnalyticsEnabled){
+                        if(preferenceManager.isAnalyticsEnabled){
                             // HomeScreen Visit Event
                             TrackHelper.track().screen("/main_activity/home_screen")
                                 .title("HomeScreen").with(tracker)
@@ -332,7 +335,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     override fun listScreenVisit() {
-                        if(dir.isAnalyticsEnabled){
+                        if(preferenceManager.isAnalyticsEnabled){
                             // ListScreen Visit Event
                             TrackHelper.track().screen("/main_activity/list_screen")
                                 .title("ListScreen").with(tracker)
@@ -340,7 +343,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     override fun donationDialogVisit() {
-                        if (dir.isAnalyticsEnabled) {
+                        if (preferenceManager.isAnalyticsEnabled) {
                             // Donation Dialog Open Event
                             TrackHelper.track().screen("/main_activity/donation_dialog")
                                 .title("DonationDialog").with(tracker)
@@ -384,7 +387,7 @@ class MainActivity : ComponentActivity() {
             val f = File(path)
             if (f.canWrite()) {
                 // hell yeah :)
-                dir.setDownloadDirectory(path)
+                preferenceManager.setDownloadDirectory(path)
                 showPopUpMessage(
                     "Download Directory Set to:\n${dir.defaultDir()} "
                 )

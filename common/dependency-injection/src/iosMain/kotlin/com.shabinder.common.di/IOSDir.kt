@@ -1,8 +1,8 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
-import com.russhwolf.settings.Settings
 import com.shabinder.common.database.SpotiFlyerDatabase
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
 import kotlinx.coroutines.GlobalScope
@@ -24,7 +24,7 @@ import platform.UIKit.UIImageJPEGRepresentation
 
 actual class Dir actual constructor(
     val logger: Kermit,
-    settingsPref: Settings,
+    private val preferenceManager: PreferenceManager,
     spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
 
@@ -35,7 +35,7 @@ actual class Dir actual constructor(
     private val defaultBaseDir = NSFileManager.defaultManager.URLForDirectory(NSMusicDirectory, NSUserDomainMask, null, true, null)!!.path!!
 
     // TODO Error Handling
-    actual fun defaultDir(): String = (settings.getStringOrNull(DirKey) ?: defaultBaseDir) +
+    actual fun defaultDir(): String = (preferenceManager.downloadDir ?: defaultBaseDir) +
         fileSeparator() + "SpotiFlyer" + fileSeparator()
 
     private val defaultDirURL: NSURL by lazy {
@@ -176,6 +176,5 @@ actual class Dir actual constructor(
         // TODO
     }
 
-    actual val settings: Settings = settingsPref
     actual val db: Database? = spotiFlyerDatabase.instance
 }
