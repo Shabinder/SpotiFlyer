@@ -59,6 +59,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.cros
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child
+import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.splash.Splash
 import com.shabinder.common.uikit.splash.SplashState
 import com.shabinder.common.uikit.utils.verticalGradientScrim
@@ -163,7 +164,7 @@ fun AppBar(
                 AnimatedVisibility(isBackButtonVisible) {
                     Icon(
                         Icons.Rounded.ArrowBackIosNew,
-                        contentDescription = "Back Button",
+                        contentDescription = Strings.backButton(),
                         modifier = Modifier.clickable { onBackPressed() },
                         tint = Color.LightGray
                     )
@@ -171,12 +172,12 @@ fun AppBar(
                 }
                 Image(
                     SpotiFlyerLogo(),
-                    "SpotiFlyer Logo",
+                    Strings.spotiflyerLogo(),
                     Modifier.size(32.dp),
                 )
                 Spacer(Modifier.padding(horizontal = 4.dp))
                 Text(
-                    text = "SpotiFlyer",
+                    text = Strings.title(),
                     style = appNameStyle
                 )
             }
@@ -185,7 +186,7 @@ fun AppBar(
             IconButton(
                 onClick = { setDownloadDirectory() }
             ) {
-                Icon(Icons.Filled.Settings, "Preferences", tint = Color.Gray)
+                Icon(Icons.Filled.Settings, Strings.preferences(), tint = Color.Gray)
             }
         },
         modifier = modifier,

@@ -31,11 +31,12 @@ repositories {
 
 dependencies {
     implementation("com.android.tools.build:gradle:4.1.1")
-    implementation("org.jlleitschuh.gradle:ktlint-gradle:${Versions.ktLint}")
     implementation(JetBrains.Compose.gradlePlugin)
     implementation(JetBrains.Kotlin.gradlePlugin)
     implementation(JetBrains.Kotlin.serialization)
     implementation(SqlDelight.gradlePlugin)
+    implementation("org.jlleitschuh.gradle:ktlint-gradle:${Versions.ktLint}")
+    implementation("de.comahe.i18n4k:i18n4k-gradle-plugin:0.1.1")
 }
 
 kotlin {

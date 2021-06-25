@@ -145,6 +145,10 @@ object Ktor {
     val clientJs = "io.ktor:ktor-client-js:${Versions.ktor}"
 }
 
+object Internationalization {
+    const val dep = "de.comahe.i18n4k:i18n4k-core:0.1.1"
+}
+
 object Extras {
     const val youtubeDownloader = "io.github.shabinder:youtube-api-dl:1.2"
     const val fuzzyWuzzy = "io.github.shabinder:fuzzywuzzy:1.1"
