@@ -14,7 +14,7 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.common.main.integration
+package com.shabinder.common.preference.integration
 
 import co.touchlab.stately.ensureNeverFrozen
 import com.arkivanov.decompose.ComponentContext
@@ -22,20 +22,17 @@ import com.arkivanov.decompose.value.Value
 import com.shabinder.common.caching.Cache
 import com.shabinder.common.di.Picture
 import com.shabinder.common.di.utils.asValue
-import com.shabinder.common.main.SpotiFlyerMain
-import com.shabinder.common.main.SpotiFlyerMain.Dependencies
-import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
-import com.shabinder.common.main.SpotiFlyerMain.Output
-import com.shabinder.common.main.SpotiFlyerMain.State
-import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
-import com.shabinder.common.main.store.SpotiFlyerMainStoreProvider
-import com.shabinder.common.main.store.getStore
-import com.shabinder.common.models.methods
+import com.shabinder.common.preference.SpotiFlyerPreference
+import com.shabinder.common.preference.SpotiFlyerPreference.Dependencies
+import com.shabinder.common.preference.SpotiFlyerPreference.State
+import com.shabinder.common.preference.store.SpotiFlyerPreferenceStore.Intent
+import com.shabinder.common.preference.store.SpotiFlyerPreferenceStoreProvider
+import com.shabinder.common.preference.store.getStore
 
-internal class SpotiFlyerMainImpl(
+internal class SpotiFlyerPreferenceImpl(
     componentContext: ComponentContext,
     dependencies: Dependencies
-) : SpotiFlyerMain, ComponentContext by componentContext, Dependencies by dependencies {
+) : SpotiFlyerPreference, ComponentContext by componentContext, Dependencies by dependencies {
 
     init {
         instanceKeeper.ensureNeverFrozen()
@@ -43,47 +40,32 @@ internal class SpotiFlyerMainImpl(
 
     private val store =
         instanceKeeper.getStore {
-            SpotiFlyerMainStoreProvider(
-                preferenceManager = preferenceManager,
+            SpotiFlyerPreferenceStoreProvider(
                 storeFactory = storeFactory,
-                database = database,
-                dir = dir
+                preferenceManager = preferenceManager
             ).provide()
         }
 
     private val cache = Cache.Builder
         .newBuilder()
-        .maximumCacheSize(25)
+        .maximumCacheSize(10)
         .build<String, Picture>()
 
     override val model: Value<State> = store.asValue()
 
-    override val analytics = mainAnalytics
-
-    override fun onLinkSearch(link: String) {
-        if (methods.value.isInternetAvailable) mainOutput.callback(Output.Search(link = link))
-        else methods.value.showPopUpMessage("Check Network Connection Please")
-    }
-
-    override fun onInputLinkChanged(link: String) {
-        store.accept(Intent.SetLink(link))
-    }
-
-    override fun selectCategory(category: HomeCategory) {
-        store.accept(Intent.SelectCategory(category))
-    }
+    override val analytics = preferenceAnalytics
 
     override fun toggleAnalytics(enabled: Boolean) {
         store.accept(Intent.ToggleAnalytics(enabled))
+    }
+
+    override fun setDownloadDirectory(newBasePath: String) {
+        preferenceManager.setDownloadDirectory(newBasePath)
     }
 
     override suspend fun loadImage(url: String): Picture {
         return cache.get(url) {
             dir.loadImage(url, 150, 150)
         }
-    }
-
-    override fun dismissDonationDialogOffset() {
-        preferenceManager.setDonationOffset()
     }
 }

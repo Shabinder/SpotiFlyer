@@ -40,9 +40,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +54,7 @@ import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
+import com.shabinder.common.uikit.dialogs.DonationDialogComponent
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -104,25 +102,19 @@ fun SpotiFlyerListContent(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
             )
+
             // Donation Dialog Visibility
-            var visibilty by remember { mutableStateOf(false) }
-            DonationDialog(
-                isVisible = visibilty,
-                onDismiss = {
-                    visibilty = false
-                },
-                onSnooze = {
-                    visibilty = false
-                    component.snoozeDonationDialog()
-                }
-            )
+            val (openDonationDialog,dismissDonationDialog,snoozeDonationDialog) = DonationDialogComponent {
+                component.dismissDonationDialogSetOffset()
+            }
+
             DownloadAllButton(
                 onClick = {
                     component.onDownloadAllClicked(model.trackList)
                     // Check If we are allowed to show donation Dialog
                     if (model.askForDonation) {
                         // Show Donation Dialog
-                        visibilty = true
+                        openDonationDialog()
                     }
                 },
                 modifier = Modifier.padding(bottom = 24.dp).align(Alignment.BottomCenter)

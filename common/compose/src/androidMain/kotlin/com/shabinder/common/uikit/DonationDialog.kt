@@ -126,10 +126,10 @@ actual fun DonationDialog(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = Modifier.padding(horizontal = 4.dp).fillMaxWidth()
                     ) {
-                        OutlinedButton(onClick = onSnooze) {
+                        OutlinedButton(onClick = onDismiss) {
                             Text("Dismiss.")
                         }
-                        TextButton(onClick = onDismiss, colors = ButtonDefaults.buttonColors()) {
+                        TextButton(onClick = onSnooze, colors = ButtonDefaults.buttonColors()) {
                             Text("Remind Later!")
                         }
                     }

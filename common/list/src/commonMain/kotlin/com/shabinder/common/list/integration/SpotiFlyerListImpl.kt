@@ -78,7 +78,7 @@ internal class SpotiFlyerListImpl(
         store.accept(Intent.RefreshTracksStatuses)
     }
 
-    override fun snoozeDonationDialog() {
+    override fun dismissDonationDialogSetOffset() {
         preferenceManager.setDonationOffset(offset = 10)
     }
 

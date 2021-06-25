@@ -62,7 +62,7 @@ interface SpotiFlyerList {
     /*
     * Snooze Donation Dialog
     * */
-    fun snoozeDonationDialog()
+    fun dismissDonationDialogSetOffset()
 
     interface Dependencies {
         val storeFactory: StoreFactory

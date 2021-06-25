@@ -56,7 +56,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.animation.child.crossfadeScale
-import com.arkivanov.decompose.extensions.compose.jetbrains.asState
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.uikit.splash.Splash
@@ -125,7 +125,7 @@ fun MainScreen(modifier: Modifier = Modifier, alpha: Float, topPadding: Dp = 0.d
             ).then(modifier)
     ) {
 
-        val activeComponent = component.routerState.asState()
+        val activeComponent = component.routerState.subscribeAsState()
         val callBacks = component.callBacks
         AppBar(
             backgroundColor = appBarColor,

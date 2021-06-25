@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 val colorPrimary = Color(0xFFFC5C7D)
 val colorPrimaryDark = Color(0xFFCE1CFF)
 val colorAccent = Color(0xFF9AB3FF)
+val colorAccentVariant = Color(0xFF3457D5)
 val colorRedError = Color(0xFFFF9494)
 val colorSuccessGreen = Color(0xFF59C351)
 val darkBackgroundColor = Color(0xFF000000)
