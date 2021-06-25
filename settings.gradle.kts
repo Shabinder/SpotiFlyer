@@ -32,7 +32,7 @@ include(
     ":maintenance-tasks"
 )
 
-includeBuild("mosaic") {
+includeBuild("mosaic/mosaic") {
     dependencySubstitution {
         substitute(module("com.jakewharton.mosaic:mosaic-gradle-plugin")).with(project(":mosaic-gradle-plugin"))
         substitute(module("com.jakewharton.mosaic:mosaic-runtime")).with(project(":mosaic-runtime"))
