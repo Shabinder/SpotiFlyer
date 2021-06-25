@@ -73,6 +73,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 Want to contribute? Great!
 All contributions are welcome, from code to documentation to graphics to design suggestions to bug reports. Please use GitHub to its fullest-- contribute Pull Requests, contribute tutorials or other wiki content-- whatever you have to offer, we can use it!
 
+ - For **Translations** , read [Contributing.md](https://github.com/Shabinder/SpotiFlyer/blob/main/CONTRIBUTING.md)
 
 **Please Donate to support me and my work!**
 </br>
