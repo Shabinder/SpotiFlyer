@@ -62,6 +62,7 @@ import com.shabinder.common.models.methods
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
+import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.*
 import com.shabinder.spotiflyer.service.ForegroundService
 import com.shabinder.spotiflyer.ui.AnalyticsDialog
@@ -286,7 +287,7 @@ class MainActivity : ComponentActivity() {
                     override fun shareApp() {
                         val sendIntent: Intent = Intent().apply {
                             action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, "Hey, checkout this excellent Music Downloader http://github.com/Shabinder/SpotiFlyer")
+                            putExtra(Intent.EXTRA_TEXT, Strings.shareMessage())
                             type = "text/plain"
                         }
 
@@ -376,7 +377,7 @@ class MainActivity : ComponentActivity() {
             .setTheme(StorageChooser.Theme(applicationContext).apply {
                 scheme = applicationContext.resources.getIntArray(R.array.default_dark)
             })
-            .setDialogTitle("Set Download Directory")
+            .setDialogTitle(Strings.setDownloadDirectory())
             .allowCustomPath(true)
             .setType(StorageChooser.DIRECTORY_CHOOSER)
             .build()
@@ -388,13 +389,9 @@ class MainActivity : ComponentActivity() {
             if (f.canWrite()) {
                 // hell yeah :)
                 preferenceManager.setDownloadDirectory(path)
-                showPopUpMessage(
-                    "Download Directory Set to:\n${dir.defaultDir()} "
-                )
+                showPopUpMessage(Strings.downloadDirectorySetTo("\n${dir.defaultDir()}"))
             }else{
-                showPopUpMessage(
-                    "NO WRITE ACCESS on \n$path ,\nReverting Back to Previous"
-                )
+                showPopUpMessage(Strings.noWriteAccess("\n$path "))
             }
         }
 

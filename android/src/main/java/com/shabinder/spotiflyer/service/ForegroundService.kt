@@ -240,7 +240,7 @@ class ForegroundService : LifecycleService() {
             messageList = messageList.getEmpty().apply {
                 set(index = 0, Message(Strings.cleaningAndExiting(),DownloadStatus.NotDownloaded))
             }
-            downloadService.value.close()
+            downloadService.getOrNull()?.close()
             downloadService.reset()
             updateNotification()
             cleanFiles(File(dir.defaultDir()))

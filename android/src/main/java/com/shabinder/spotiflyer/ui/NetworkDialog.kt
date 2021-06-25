@@ -16,20 +16,34 @@
 
 package com.shabinder.spotiflyer.ui
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CloudOff
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.SpotiFlyerShapes
 import com.shabinder.common.uikit.SpotiFlyerTypography
 import com.shabinder.common.uikit.colorOffWhite
@@ -62,7 +76,7 @@ fun NetworkDialog(
                         Icon(Icons.Rounded.SyncProblem,"Check Network Connection Again")
                     }
                 */},
-            title = { Text("No Internet Connection!",
+            title = { Text(Strings.noInternetConnection(),
                 style = SpotiFlyerTypography.h5,
                 textAlign = TextAlign.Center) },
             backgroundColor = Color.DarkGray,
@@ -72,11 +86,12 @@ fun NetworkDialog(
                     Row(verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
                     ) {
-                        Image(Icons.Rounded.CloudOff,"No Internet.",Modifier.size(42.dp),colorFilter = ColorFilter.tint(
+                        Image(Icons.Rounded.CloudOff,
+                            Strings.noInternetConnection(),Modifier.size(42.dp),colorFilter = ColorFilter.tint(
                             colorOffWhite))
                         Spacer(modifier = Modifier.padding(start = 16.dp))
                         Text(
-                            text = "Please Check Your Network Connection.",
+                            text = Strings.checkInternetConnection(),
                             style = SpotiFlyerTypography.subtitle1
                         )
                     }

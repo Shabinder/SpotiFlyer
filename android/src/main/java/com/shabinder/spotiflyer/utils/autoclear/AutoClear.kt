@@ -30,6 +30,8 @@ class AutoClear<T : Any?>(
 
     val value: T get() = _value.requireNotNull()
 
+    fun getOrNull(): T? = _value
+
     private val observer: LifecycleAutoInitializer<T?> by lazy {
         when(trigger) {
             TRIGGER.ON_CREATE -> LifecycleCreateAndDestroyObserver(initializer)

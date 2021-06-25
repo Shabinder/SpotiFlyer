@@ -8,13 +8,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Insights
 import androidx.compose.material.icons.rounded.SdStorage
 import androidx.compose.material.icons.rounded.SystemSecurityUpdate
 import androidx.compose.runtime.Composable
@@ -30,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
+import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.SpotiFlyerShapes
 import com.shabinder.common.uikit.SpotiFlyerTypography
 import com.shabinder.common.uikit.colorPrimary
@@ -64,9 +62,9 @@ fun PermissionDialog(
                         .background(colorPrimary, shape = SpotiFlyerShapes.medium)
                         .padding(horizontal = 8.dp),
                 ){
-                    Text("Grant Permissions",color = Color.Black,fontSize = 18.sp,textAlign = TextAlign.Center)
+                    Text(Strings.grantPermissions(),color = Color.Black,fontSize = 18.sp,textAlign = TextAlign.Center)
                 }
-            },title = { Text("Required Permissions:",style = SpotiFlyerTypography.h5,textAlign = TextAlign.Center) },
+            },title = { Text(Strings.requiredPermissions(),style = SpotiFlyerTypography.h5,textAlign = TextAlign.Center) },
             backgroundColor = Color.DarkGray,
             text = {
                 Column{
@@ -74,15 +72,15 @@ fun PermissionDialog(
                     Row(verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
                     ) {
-                        Icon(Icons.Rounded.SdStorage,"Storage Permission.")
+                        Icon(Icons.Rounded.SdStorage,Strings.storagePermission())
                         Spacer(modifier = Modifier.padding(start = 16.dp))
                         Column {
                             Text(
-                                text = "Storage Permission.",
+                                text = Strings.storagePermission(),
                                 style = SpotiFlyerTypography.h6.copy(fontWeight = FontWeight.SemiBold)
                             )
                             Text(
-                                text = "To download your favourite songs to this device.",
+                                text = Strings.storagePermissionReason(),
                                 style = SpotiFlyerTypography.subtitle2,
                             )
                         }
@@ -91,15 +89,15 @@ fun PermissionDialog(
                         modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Rounded.SystemSecurityUpdate,"Allow Background Running")
+                        Icon(Icons.Rounded.SystemSecurityUpdate,Strings.backgroundRunning())
                         Spacer(modifier = Modifier.padding(start = 16.dp))
                         Column {
                             Text(
-                                text = "Background Running.",
+                                text = Strings.backgroundRunning(),
                                 style = SpotiFlyerTypography.h6.copy(fontWeight = FontWeight.SemiBold)
                             )
                             Text(
-                                text = "To download all songs in background without any System Interruptions",
+                                text = Strings.backgroundRunningReason(),
                                 style = SpotiFlyerTypography.subtitle2,
                             )
                         }
