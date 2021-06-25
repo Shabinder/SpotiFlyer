@@ -20,9 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.v1.Dialog
 import com.shabinder.common.models.methods
+import com.shabinder.common.translations.Strings
 
 @OptIn(ExperimentalAnimationApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
 @Composable
@@ -42,7 +42,7 @@ actual fun DonationDialog(
             ) {
                 Column(Modifier.padding(16.dp)) {
                     Text(
-                        "Support Us",
+                        Strings.supportUs(),
                         style = SpotiFlyerTypography.h5,
                         textAlign = TextAlign.Center,
                         color = colorAccent,
@@ -67,7 +67,7 @@ actual fun DonationDialog(
                                 style = SpotiFlyerTypography.h6
                             )
                             Text(
-                                text = "International Donations (Outside India).",
+                                text = Strings.worldWideDonations(),
                                 style = SpotiFlyerTypography.subtitle2
                             )
                         }
@@ -90,7 +90,7 @@ actual fun DonationDialog(
                                 style = SpotiFlyerTypography.h6
                             )
                             Text(
-                                text = "Indian Donations (UPI / PayTM / PhonePe / Cards).",
+                                text = "${Strings.indianDonations()} (UPI / PayTM / PhonePe / Cards).",
                                 style = SpotiFlyerTypography.subtitle2
                             )
                         }

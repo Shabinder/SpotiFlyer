@@ -72,6 +72,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.shabinder.common.di.worker.ForegroundService"/>
+        <service android:name=".service.ForegroundService"/>
     </application>
 </manifest>

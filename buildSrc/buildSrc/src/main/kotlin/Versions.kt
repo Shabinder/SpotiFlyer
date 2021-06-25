@@ -49,7 +49,7 @@ object Versions {
     const val minSdkVersion = 21
     const val compileSdkVersion = 29
     const val targetSdkVersion = 29
-    const val androidLifecycle = "2.3.0"
+    const val androidxLifecycle = "2.3.1"
 }
 
 object HostOS {
@@ -58,6 +58,10 @@ object HostOS {
     val isMingwX64 = hostOs.startsWith("Windows",true)
     val isMac = hostOs.startsWith("Mac",true)
     val isLinux = hostOs.startsWith("Linux",true)
+}
+
+object MultiPlatformSettings {
+    const val dep = "com.russhwolf:multiplatform-settings-no-arg:0.7.7"
 }
 
 object Koin {
@@ -139,6 +143,10 @@ object Ktor {
     val clientIos = "io.ktor:ktor-client-ios:${Versions.ktor}"
     val clientCio = "io.ktor:ktor-client-cio:${Versions.ktor}"
     val clientJs = "io.ktor:ktor-client-js:${Versions.ktor}"
+}
+
+object Internationalization {
+    const val dep = "de.comahe.i18n4k:i18n4k-core:0.1.1"
 }
 
 object Extras {

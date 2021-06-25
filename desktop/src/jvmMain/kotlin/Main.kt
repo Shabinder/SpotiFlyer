@@ -27,12 +27,21 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponen
 import com.arkivanov.mvikotlin.core.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.core.lifecycle.resume
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
-import com.shabinder.common.di.*
+import com.shabinder.common.di.Dir
+import com.shabinder.common.di.DownloadProgressFlow
+import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.di.initKoin
+import com.shabinder.common.di.isInternetAccessible
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
-import com.shabinder.common.uikit.*
+import com.shabinder.common.uikit.SpotiFlyerColors
+import com.shabinder.common.uikit.SpotiFlyerRootContent
+import com.shabinder.common.uikit.SpotiFlyerShapes
+import com.shabinder.common.uikit.SpotiFlyerTypography
+import com.shabinder.common.uikit.colorOffWhite
 import com.shabinder.database.Database
 import kotlinx.coroutines.runBlocking
 import org.piwik.java.tracking.PiwikTracker
@@ -79,10 +88,11 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
         componentContext = componentContext,
         dependencies = object : SpotiFlyerRoot.Dependencies {
             override val storeFactory = DefaultStoreFactory
-            override val fetchPlatformQueryResult: FetchPlatformQueryResult = koin.get()
-            override val directories: Dir = koin.get()
-            override val database: Database? = directories.db
-            override val downloadProgressReport = DownloadProgressFlow
+            override val fetchQuery: FetchPlatformQueryResult = koin.get()
+            override val dir: Dir = koin.get()
+            override val database: Database? = dir.db
+            override val preferenceManager: PreferenceManager = koin.get()
+            override val downloadProgressFlow = DownloadProgressFlow
             override val actions: Actions = object: Actions {
                 override val platformActions = object : PlatformActions {}
 
@@ -100,7 +110,7 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                         APPROVE_OPTION -> {
                             val directory = fileChooser.selectedFile
                             if(directory.canWrite()){
-                                directories.setDownloadDirectory(directory.absolutePath)
+                                preferenceManager.setDownloadDirectory(directory.absolutePath)
                                 showPopUpMessage("Set New Download Directory:\n${directory.absolutePath}")
                             } else {
                                 showPopUpMessage("Cant Write to Selected Directory!")
@@ -137,10 +147,10 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
             }
             override val analytics = object: SpotiFlyerRoot.Analytics {
                 override fun appLaunchEvent() {
-                    if(directories.isFirstLaunch) {
+                    if(preferenceManager.isFirstLaunch) {
                         // Enable Analytics on First Launch
-                        directories.toggleAnalytics(true)
-                        directories.firstLaunchDone()
+                        preferenceManager.toggleAnalytics(true)
+                        preferenceManager.firstLaunchDone()
                     }
                     tracker.trackAsync {
                         eventName = "App Launch"

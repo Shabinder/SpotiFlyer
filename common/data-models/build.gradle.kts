@@ -1,3 +1,5 @@
+import de.comahe.i18n4k.gradle.plugin.i18n4k
+
 /*
  *  * Copyright (c)  2021  Shabinder Singh
  *  * This program is free software: you can redistribute it and/or modify
@@ -20,10 +22,17 @@ plugins {
     id("multiplatform-setup-test")
     id("kotlin-parcelize")
     kotlin("plugin.serialization")
+    id("de.comahe.i18n4k")
 }
 
 val statelyVersion = "1.1.7"
 val statelyIsoVersion = "1.1.7-a1"
+
+i18n4k {
+     inputDirectory = "../../translations"
+     packageName = "com.shabinder.common.translations"
+    // sourceCodeLocales = listOf("en", "de")
+}
 
 kotlin {
     sourceSets {
@@ -44,6 +53,8 @@ kotlin {
                 implementation("co.touchlab:stately-concurrency:$statelyVersion")
                 implementation("co.touchlab:stately-isolate:$statelyIsoVersion")
                 implementation("co.touchlab:stately-iso-collections:$statelyIsoVersion")
+                implementation(Extras.youtubeDownloader)
+                api(Internationalization.dep)
             }
         }
         androidMain {

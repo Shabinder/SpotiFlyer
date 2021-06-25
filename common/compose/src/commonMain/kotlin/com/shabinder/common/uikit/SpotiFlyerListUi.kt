@@ -17,12 +17,29 @@
 package com.shabinder.common.uikit
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +54,8 @@ import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
+import com.shabinder.common.translations.Strings
+import com.shabinder.common.uikit.dialogs.DonationDialogComponent
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -49,10 +68,11 @@ fun SpotiFlyerListContent(
     LaunchedEffect(model.errorOccurred) {
         /*Handle if Any Exception Occurred*/
         model.errorOccurred?.let {
-            methods.value.showPopUpMessage(it.message ?: "An Error Occurred, Check your Link / Connection")
+            methods.value.showPopUpMessage(it.message ?: Strings.errorOccurred())
             component.onBackPressed()
         }
     }
+
     Box(modifier = modifier.fillMaxSize()) {
         val result = model.queryResult
         if (result == null) {
@@ -60,7 +80,7 @@ fun SpotiFlyerListContent(
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier.padding(8.dp))
-                Text("Loading..", style = appNameStyle, color = colorPrimary)
+                Text("${Strings.loading()}...", style = appNameStyle, color = colorPrimary)
             }
         } else {
 
@@ -83,25 +103,19 @@ fun SpotiFlyerListContent(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
             )
+
             // Donation Dialog Visibility
-            var visibilty by remember { mutableStateOf(false) }
-            DonationDialog(
-                isVisible = visibilty,
-                onDismiss = {
-                    visibilty = false
-                },
-                onSnooze = {
-                    visibilty = false
-                    component.snoozeDonationDialog()
-                }
-            )
+            val (openDonationDialog,dismissDonationDialog,snoozeDonationDialog) = DonationDialogComponent {
+                component.dismissDonationDialogSetOffset()
+            }
+
             DownloadAllButton(
                 onClick = {
                     component.onDownloadAllClicked(model.trackList)
                     // Check If we are allowed to show donation Dialog
                     if (model.askForDonation) {
                         // Show Donation Dialog
-                        visibilty = true
+                        openDonationDialog()
                     }
                 },
                 modifier = Modifier.padding(bottom = 24.dp).align(Alignment.BottomCenter)
@@ -129,7 +143,7 @@ fun TrackCard(
         ImageLoad(
             track.albumArtURL,
             { loadImage() },
-            "Album Art",
+            Strings.albumArt(),
             modifier = Modifier
                 .width(70.dp)
                 .height(70.dp)
@@ -143,7 +157,7 @@ fun TrackCard(
                 modifier = Modifier.padding(horizontal = 8.dp).fillMaxSize()
             ) {
                 Text("${track.artists.firstOrNull()}...", fontSize = 12.sp, maxLines = 1)
-                Text("${track.durationSec / 60} min, ${track.durationSec % 60} sec", fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text("${track.durationSec / 60} ${Strings.minute()}, ${track.durationSec % 60} ${Strings.second()}", fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
         when (track.downloaded) {
@@ -189,7 +203,7 @@ fun CoverImage(
         ImageLoad(
             coverURL,
             { loadImage(coverURL, true) },
-            "Cover Image",
+            Strings.coverImage(),
             modifier = Modifier
                 .padding(12.dp)
                 .width(190.dp)
@@ -212,9 +226,9 @@ fun CoverImage(
 @Composable
 fun DownloadAllButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     ExtendedFloatingActionButton(
-        text = { Text("Download All") },
+        text = { Text(Strings.downloadAll()) },
         onClick = onClick,
-        icon = { Icon(DownloadAllImage(), "Download All Button", tint = Color(0xFF000000)) },
+        icon = { Icon(DownloadAllImage(), Strings.downloadAll() + Strings.button(), tint = Color(0xFF000000)) },
         backgroundColor = colorAccent,
         modifier = modifier
     )

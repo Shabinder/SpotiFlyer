@@ -16,9 +16,9 @@
 
 package com.shabinder.common.di
 
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
+import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -34,9 +34,6 @@ val allTracksStatus: HashMap<String, DownloadStatus> = hashMapOf()
 // IO-Dispatcher
 actual val dispatcherIO: CoroutineDispatcher = Dispatchers.Default
 
-// Current Platform Info
-actual val currentPlatform: AllPlatforms = AllPlatforms.Js
-
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,
     fetcher: FetchPlatformQueryResult,
@@ -45,29 +42,31 @@ actual suspend fun downloadTracks(
     list.forEach { track ->
         withContext(dispatcherIO) {
             allTracksStatus[track.title] = DownloadStatus.Queued
-            val url = fetcher.findMp3DownloadLink(track)
-            if (!url.isNullOrBlank()) { // Successfully Grabbed Mp3 URL
-                downloadFile(url).collect {
-                    when (it) {
-                        is DownloadResult.Success -> {
-                            println("Download Completed")
-                            dir.saveFileWithMetadata(it.byteArray, track) {}
+            fetcher.findMp3DownloadLink(track).fold(
+                success = { url ->
+                    downloadFile(url).collect {
+                        when (it) {
+                            is DownloadResult.Success -> {
+                                println("Download Completed")
+                                dir.saveFileWithMetadata(it.byteArray, track) {}
+                            }
+                            is DownloadResult.Error -> {
+                                allTracksStatus[track.title] = DownloadStatus.Failed(it.cause ?: SpotiFlyerException.UnknownReason(it.cause))
+                                println("Download Error: ${track.title}")
+                            }
+                            is DownloadResult.Progress -> {
+                                allTracksStatus[track.title] = DownloadStatus.Downloading(it.progress)
+                                println("Download Progress: ${it.progress}  : ${track.title}")
+                            }
                         }
-                        is DownloadResult.Error -> {
-                            allTracksStatus[track.title] = DownloadStatus.Failed
-                            println("Download Error: ${track.title}")
-                        }
-                        is DownloadResult.Progress -> {
-                            allTracksStatus[track.title] = DownloadStatus.Downloading(it.progress)
-                            println("Download Progress: ${it.progress}  : ${track.title}")
-                        }
+                        DownloadProgressFlow.emit(allTracksStatus)
                     }
+                },
+                failure = { error ->
+                    allTracksStatus[track.title] = DownloadStatus.Failed(error)
                     DownloadProgressFlow.emit(allTracksStatus)
                 }
-            } else {
-                allTracksStatus[track.title] = DownloadStatus.Failed
-                DownloadProgressFlow.emit(allTracksStatus)
-            }
+            )
         }
     }
 }

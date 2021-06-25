@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import com.shabinder.common.database.R
+import com.shabinder.common.translations.Strings
 import kotlinx.coroutines.flow.MutableStateFlow
 
 actual fun montserratFont() = FontFamily(
@@ -43,7 +44,7 @@ actual fun pristineFont() = FontFamily(
 actual fun DownloadImageTick() {
     Image(
         painterResource(R.drawable.ic_tick),
-        "Download Done"
+        Strings.downloadDone()
     )
 }
 
@@ -51,7 +52,7 @@ actual fun DownloadImageTick() {
 actual fun DownloadImageError() {
     Image(
         painterResource(R.drawable.ic_error),
-        "Error! Cant Download this track"
+        Strings.downloadError()
     )
 }
 
@@ -59,7 +60,7 @@ actual fun DownloadImageError() {
 actual fun DownloadImageArrow(modifier: Modifier) {
     Image(
         painterResource(R.drawable.ic_arrow),
-        "Start Download",
+        Strings.downloadStart(),
         modifier
     )
 }

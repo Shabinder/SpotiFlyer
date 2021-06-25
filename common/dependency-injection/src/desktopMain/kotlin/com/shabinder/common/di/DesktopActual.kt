@@ -17,9 +17,9 @@
 package com.shabinder.common.di
 
 import com.shabinder.common.di.utils.ParallelExecutor
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
+import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -34,9 +34,6 @@ val DownloadScope = ParallelExecutor(Dispatchers.IO)
 // IO-Dispatcher
 actual val dispatcherIO: CoroutineDispatcher = Dispatchers.IO
 
-// Current Platform Info
-actual val currentPlatform: AllPlatforms = AllPlatforms.Jvm
-
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,
     fetcher: FetchPlatformQueryResult,
@@ -44,41 +41,43 @@ actual suspend fun downloadTracks(
 ) {
     list.forEach { trackDetails ->
         DownloadScope.execute { // Send Download to Pool.
-            val url = fetcher.findMp3DownloadLink(trackDetails)
-            if (!url.isNullOrBlank()) { // Successfully Grabbed Mp3 URL
-                downloadFile(url).collect {
-                    when (it) {
-                        is DownloadResult.Error -> {
-                            DownloadProgressFlow.emit(
-                                DownloadProgressFlow.replayCache.getOrElse(
-                                    0
-                                ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Failed) }
-                            )
-                        }
-                        is DownloadResult.Progress -> {
-                            DownloadProgressFlow.emit(
-                                DownloadProgressFlow.replayCache.getOrElse(
-                                    0
-                                ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Downloading(it.progress)) }
-                            )
-                        }
-                        is DownloadResult.Success -> { // Todo clear map
-                            dir.saveFileWithMetadata(it.byteArray, trackDetails) {}
-                            DownloadProgressFlow.emit(
-                                DownloadProgressFlow.replayCache.getOrElse(
-                                    0
-                                ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Downloaded) }
-                            )
+            fetcher.findMp3DownloadLink(trackDetails).fold(
+                success = { url ->
+                    downloadFile(url).collect {
+                        when (it) {
+                            is DownloadResult.Error -> {
+                                DownloadProgressFlow.emit(
+                                    DownloadProgressFlow.replayCache.getOrElse(
+                                        0
+                                    ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Failed(it.cause ?: SpotiFlyerException.UnknownReason(it.cause))) }
+                                )
+                            }
+                            is DownloadResult.Progress -> {
+                                DownloadProgressFlow.emit(
+                                    DownloadProgressFlow.replayCache.getOrElse(
+                                        0
+                                    ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Downloading(it.progress)) }
+                                )
+                            }
+                            is DownloadResult.Success -> { // Todo clear map
+                                dir.saveFileWithMetadata(it.byteArray, trackDetails) {}
+                                DownloadProgressFlow.emit(
+                                    DownloadProgressFlow.replayCache.getOrElse(
+                                        0
+                                    ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Downloaded) }
+                                )
+                            }
                         }
                     }
+                },
+                failure = { error ->
+                    DownloadProgressFlow.emit(
+                        DownloadProgressFlow.replayCache.getOrElse(
+                            0
+                        ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Failed(error)) }
+                    )
                 }
-            } else {
-                DownloadProgressFlow.emit(
-                    DownloadProgressFlow.replayCache.getOrElse(
-                        0
-                    ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Failed) }
-                )
-            }
+            )
         }
     }
 }

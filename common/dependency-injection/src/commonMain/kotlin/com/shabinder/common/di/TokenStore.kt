@@ -18,7 +18,7 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.database.TokenDBQueries
-import com.shabinder.common.di.spotify.authenticateSpotify
+import com.shabinder.common.di.providers.requests.spotify.authenticateSpotify
 import com.shabinder.common.models.spotify.TokenData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -43,7 +43,7 @@ class TokenStore(
         logger.d { "System Time:${Clock.System.now().epochSeconds} , Token Expiry:${token?.expiry}" }
         if (Clock.System.now().epochSeconds > token?.expiry ?: 0 || token == null) {
             logger.d { "Requesting New Token" }
-            token = authenticateSpotify()
+            token = authenticateSpotify().component1()
             GlobalScope.launch { token?.access_token?.let { save(token) } }
         }
         return token

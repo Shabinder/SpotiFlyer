@@ -17,28 +17,27 @@
 package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.currentPlatform
-import com.shabinder.common.di.youtubeMp3.Yt1sMp3
-import com.shabinder.common.models.AllPlatforms
+import com.shabinder.common.di.providers.requests.youtubeMp3.Yt1sMp3
+import com.shabinder.common.models.corsApi
+import com.shabinder.common.models.event.coroutines.SuspendableEvent
+import com.shabinder.common.models.event.coroutines.map
 import io.ktor.client.*
 
-class YoutubeMp3(
-    override val httpClient: HttpClient,
-    override val logger: Kermit,
-    private val dir: Dir,
-) : Yt1sMp3 {
-    suspend fun getMp3DownloadLink(videoID: String): String? = try {
-        logger.i { "Youtube MP3 Link Fetching!" }
-        getLinkFromYt1sMp3(videoID)?.let {
-            logger.i { "Download Link:   $it" }
-            if (currentPlatform is AllPlatforms.Js/* && corsProxy !is CorsProxy.PublicProxyWithExtension*/)
-                "https://cors.spotiflyer.ml/cors/$it"
-            // "https://spotiflyer.azurewebsites.net/$it" // Data OUT Limit issue
-            else it
+interface YoutubeMp3: Yt1sMp3 {
+
+    companion object {
+        operator fun invoke(
+            client: HttpClient,
+            logger: Kermit
+        ): YoutubeMp3 {
+            return object : YoutubeMp3 {
+                override val httpClient: HttpClient = client
+                override val logger: Kermit = logger
+            }
         }
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
+    }
+
+    suspend fun getMp3DownloadLink(videoID: String): SuspendableEvent<String,Throwable> = getLinkFromYt1sMp3(videoID).map {
+        corsApi + it
     }
 }

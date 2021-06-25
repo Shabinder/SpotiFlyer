@@ -22,8 +22,7 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.shabinder.common.di.Dir
-import com.shabinder.common.di.isAnalyticsEnabled
-import com.shabinder.common.di.toggleAnalytics
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.State
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
@@ -39,6 +38,7 @@ import kotlinx.coroutines.flow.map
 
 internal class SpotiFlyerMainStoreProvider(
     private val storeFactory: StoreFactory,
+    private val preferenceManager: PreferenceManager,
     private val dir: Dir,
     database: Database?
 ) {
@@ -76,7 +76,7 @@ internal class SpotiFlyerMainStoreProvider(
 
     private inner class ExecutorImpl : SuspendExecutor<Intent, Unit, State, Result, Nothing>() {
         override suspend fun executeAction(action: Unit, getState: () -> State) {
-            dispatch(Result.ToggleAnalytics(dir.isAnalyticsEnabled))
+            dispatch(Result.ToggleAnalytics(preferenceManager.isAnalyticsEnabled))
             updates?.collect {
                 dispatch(Result.ItemsLoaded(it))
             }
@@ -91,7 +91,7 @@ internal class SpotiFlyerMainStoreProvider(
                 is Intent.SelectCategory -> dispatch(Result.CategoryChanged(intent.category))
                 is Intent.ToggleAnalytics -> {
                     dispatch(Result.ToggleAnalytics(intent.enabled))
-                    dir.toggleAnalytics(intent.enabled)
+                    preferenceManager.toggleAnalytics(intent.enabled)
                 }
             }
         }

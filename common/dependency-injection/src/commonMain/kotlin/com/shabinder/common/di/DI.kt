@@ -20,21 +20,13 @@ import co.touchlab.kermit.Kermit
 import com.russhwolf.settings.Settings
 import com.shabinder.common.database.databaseModule
 import com.shabinder.common.database.getLogger
-import com.shabinder.common.di.audioToMp3.AudioToMp3
-import com.shabinder.common.di.providers.GaanaProvider
-import com.shabinder.common.di.providers.SaavnProvider
-import com.shabinder.common.di.providers.SpotifyProvider
-import com.shabinder.common.di.providers.YoutubeMp3
-import com.shabinder.common.di.providers.YoutubeMusic
-import com.shabinder.common.di.providers.YoutubeProvider
-import io.ktor.client.HttpClient
-import io.ktor.client.features.HttpTimeout
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
-import io.ktor.client.features.logging.DEFAULT
-import io.ktor.client.features.logging.LogLevel
-import io.ktor.client.features.logging.Logger
-import io.ktor.client.features.logging.Logging
+import com.shabinder.common.di.preference.PreferenceManager
+import com.shabinder.common.di.providers.providersModule
+import io.ktor.client.*
+import io.ktor.client.features.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
+import io.ktor.client.features.logging.*
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
@@ -45,7 +37,11 @@ import kotlin.native.concurrent.ThreadLocal
 fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclaration = {}) =
     startKoin {
         appDeclaration()
-        modules(commonModule(enableNetworkLogs = enableNetworkLogs), databaseModule())
+        modules(
+            commonModule(enableNetworkLogs = enableNetworkLogs),
+            providersModule(),
+            databaseModule()
+        )
     }
 
 // Called by IOS
@@ -55,16 +51,9 @@ fun commonModule(enableNetworkLogs: Boolean) = module {
     single { createHttpClient(enableNetworkLogs = enableNetworkLogs) }
     single { Dir(get(), get(), get()) }
     single { Settings() }
+    single { PreferenceManager(get()) }
     single { Kermit(getLogger()) }
     single { TokenStore(get(), get()) }
-    single { AudioToMp3(get(), get()) }
-    single { SpotifyProvider(get(), get(), get()) }
-    single { GaanaProvider(get(), get(), get()) }
-    single { SaavnProvider(get(), get(), get(), get()) }
-    single { YoutubeProvider(get(), get(), get()) }
-    single { YoutubeMp3(get(), get(), get()) }
-    single { YoutubeMusic(get(), get(), get(), get(), get()) }
-    single { FetchPlatformQueryResult(get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
 @ThreadLocal

@@ -2,16 +2,18 @@ package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.Dir
-import com.shabinder.common.di.audioToMp3.AudioToMp3
 import com.shabinder.common.di.finalOutputDir
-import com.shabinder.common.di.saavn.JioSaavnRequests
+import com.shabinder.common.di.providers.requests.audioToMp3.AudioToMp3
+import com.shabinder.common.di.providers.requests.saavn.JioSaavnRequests
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
+import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.saavn.SaavnSong
 import com.shabinder.common.models.spotify.Source
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 
 class SaavnProvider(
     override val httpClient: HttpClient,
@@ -20,19 +22,18 @@ class SaavnProvider(
     private val dir: Dir,
 ) : JioSaavnRequests {
 
-    suspend fun query(fullLink: String): PlatformQueryResult {
-        val result = PlatformQueryResult(
+    suspend fun query(fullLink: String): SuspendableEvent<PlatformQueryResult, Throwable> = SuspendableEvent {
+        PlatformQueryResult(
             folderType = "",
             subFolder = "",
             title = "",
             coverUrl = "",
             trackList = listOf(),
             Source.JioSaavn
-        )
-        with(result) {
+        ).apply {
             when (fullLink.substringAfter("saavn.com/").substringBefore("/")) {
                 "song" -> {
-                    getSong(fullLink).let {
+                    getSong(fullLink).value.let {
                         folderType = "Tracks"
                         subFolder = ""
                         trackList = listOf(it).toTrackDetails(folderType, subFolder)
@@ -41,7 +42,7 @@ class SaavnProvider(
                     }
                 }
                 "album" -> {
-                    getAlbum(fullLink)?.let {
+                    getAlbum(fullLink).value.let {
                         folderType = "Albums"
                         subFolder = removeIllegalChars(it.title)
                         trackList = it.songs.toTrackDetails(folderType, subFolder)
@@ -50,7 +51,7 @@ class SaavnProvider(
                     }
                 }
                 "featured" -> { // Playlist
-                    getPlaylist(fullLink)?.let {
+                    getPlaylist(fullLink).value.let {
                         folderType = "Playlists"
                         subFolder = removeIllegalChars(it.listname)
                         trackList = it.songs.toTrackDetails(folderType, subFolder)
@@ -59,12 +60,10 @@ class SaavnProvider(
                     }
                 }
                 else -> {
-                    // Handle Error
+                    throw SpotiFlyerException.LinkInvalid(fullLink)
                 }
             }
         }
-
-        return result
     }
 
     private fun List<SaavnSong>.toTrackDetails(type: String, subFolder: String): List<TrackDetails> = this.map {

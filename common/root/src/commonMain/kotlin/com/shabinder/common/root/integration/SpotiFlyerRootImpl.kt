@@ -27,13 +27,10 @@ import com.arkivanov.decompose.router
 import com.arkivanov.decompose.statekeeper.Parcelable
 import com.arkivanov.decompose.statekeeper.Parcelize
 import com.arkivanov.decompose.value.Value
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.currentPlatform
-import com.shabinder.common.di.providers.SpotifyProvider
+import com.shabinder.common.di.dispatcherIO
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.models.Actions
-import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.Consumer
 import com.shabinder.common.models.methods
 import com.shabinder.common.root.SpotiFlyerRoot
@@ -41,7 +38,7 @@ import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -79,11 +76,8 @@ internal class SpotiFlyerRootImpl(
     ) {
         instanceKeeper.ensureNeverFrozen()
         methods.value = dependencies.actions.freeze()
-        /*Authenticate Spotify Client*/
-        authenticateSpotify(
-            dependencies.fetchPlatformQueryResult.spotifyProvider,
-            currentPlatform is AllPlatforms.Js
-        )
+        /*Init App Launch & Authenticate Spotify Client*/
+        initAppLaunchAndAuthenticateSpotify(dependencies.fetchQuery::authenticateSpotifyClient)
     }
 
     private val router =
@@ -134,11 +128,12 @@ internal class SpotiFlyerRootImpl(
             }
         }
 
-    private fun authenticateSpotify(spotifyProvider: SpotifyProvider, override: Boolean) {
-        GlobalScope.launch(Dispatchers.Default) {
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun initAppLaunchAndAuthenticateSpotify(authenticator: suspend () -> Unit) {
+        GlobalScope.launch(dispatcherIO) {
             analytics.appLaunchEvent()
             /*Authenticate Spotify Client*/
-            spotifyProvider.authenticateSpotifyClient(override)
+            authenticator()
         }
     }
 
@@ -156,10 +151,7 @@ private fun spotiFlyerMain(componentContext: ComponentContext, output: Consumer<
         componentContext = componentContext,
         dependencies = object : SpotiFlyerMain.Dependencies, Dependencies by dependencies {
             override val mainOutput: Consumer<SpotiFlyerMain.Output> = output
-            override val dir: Dir = directories
-            override val mainAnalytics = object : SpotiFlyerMain.Analytics {
-                override fun donationDialogVisit() = analytics.donationDialogVisit()
-            }
+            override val mainAnalytics = object : SpotiFlyerMain.Analytics , Analytics by analytics {}
         }
     )
 
@@ -167,11 +159,8 @@ private fun spotiFlyerList(componentContext: ComponentContext, link: String, out
     SpotiFlyerList(
         componentContext = componentContext,
         dependencies = object : SpotiFlyerList.Dependencies, Dependencies by dependencies {
-            override val fetchQuery = fetchPlatformQueryResult
-            override val dir: Dir = directories
             override val link: String = link
             override val listOutput: Consumer<SpotiFlyerList.Output> = output
-            override val downloadProgressFlow = downloadProgressReport
-            override val listAnalytics = object : SpotiFlyerList.Analytics {}
+            override val listAnalytics = object : SpotiFlyerList.Analytics, Analytics by analytics {}
         }
     )

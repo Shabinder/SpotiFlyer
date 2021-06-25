@@ -22,7 +22,7 @@ package com.shabinder.common.di.utils
 // Gist: https://gist.github.com/fluidsonic/ba32de21c156bbe8424c8d5fc20dcd8e
 
 import com.shabinder.common.di.dispatcherIO
-import io.ktor.utils.io.core.Closeable
+import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -96,7 +96,7 @@ class ParallelExecutor(
             return
 
         var change = expectedCount - actualCount
-        while (change > 0 && killQueue.poll() != null)
+        while (change > 0 && killQueue.tryReceive().getOrNull() != null)
             change -= 1
 
         if (change > 0)
@@ -104,7 +104,7 @@ class ParallelExecutor(
                 repeat(change) { launchProcessor() }
             }
         else
-            repeat(-change) { killQueue.offer(Unit) }
+            repeat(-change) { killQueue.trySend(Unit).isSuccess }
     }
 
     private class Operation<Result>(

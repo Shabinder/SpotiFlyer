@@ -17,15 +17,16 @@
 package com.shabinder.spotiflyer
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.os.PowerManager
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -51,18 +52,18 @@ import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
 import com.shabinder.common.di.*
-import com.shabinder.common.di.worker.ForegroundService
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.PlatformActions.Companion.SharedPreferencesKey
-import com.shabinder.common.models.Status
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.uikit.*
+import com.shabinder.spotiflyer.service.ForegroundService
 import com.shabinder.spotiflyer.ui.AnalyticsDialog
 import com.shabinder.spotiflyer.ui.NetworkDialog
 import com.shabinder.spotiflyer.ui.PermissionDialog
@@ -78,14 +79,20 @@ class MainActivity : ComponentActivity() {
 
     private val fetcher: FetchPlatformQueryResult by inject()
     private val dir: Dir by inject()
+    private val preferenceManager: PreferenceManager by inject()
     private lateinit var root: SpotiFlyerRoot
     private val callBacks: SpotiFlyerRootCallBacks get() = root.callBacks
     private val trackStatusFlow = MutableSharedFlow<HashMap<String, DownloadStatus>>(1)
     private var permissionGranted = mutableStateOf(true)
-    private lateinit var updateUIReceiver: BroadcastReceiver
-    private lateinit var queryReceiver: BroadcastReceiver
     private val internetAvailability by lazy { ConnectionLiveData(applicationContext) }
     private val tracker get() = (application as App).tracker
+    private val visibleChild get(): SpotiFlyerRoot.Child = root.routerState.value.activeChild.instance
+
+    // Variable for storing instance of our service class
+    var foregroundService: ForegroundService? = null
+
+    // Boolean to check if our activity is bound to service or not
+    var isServiceBound: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,18 +131,18 @@ class MainActivity : ComponentActivity() {
                         AnalyticsDialog(
                             askForAnalyticsPermission,
                             enableAnalytics = {
-                                dir.toggleAnalytics(true)
-                                dir.firstLaunchDone()
+                                preferenceManager.toggleAnalytics(true)
+                                preferenceManager.firstLaunchDone()
                             },
                             dismissDialog = {
                                 askForAnalyticsPermission = false
-                                dir.firstLaunchDone()
+                                preferenceManager.firstLaunchDone()
                             }
                         )
 
                         LaunchedEffect(view) {
                             permissionGranted.value = checkPermissions()
-                            if(dir.isFirstLaunch) {
+                            if(preferenceManager.isFirstLaunch) {
                                 delay(2500)
                                 // Ask For Analytics Permission on first Dialog
                                 askForAnalyticsPermission = true
@@ -149,61 +156,77 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun initialise() {
-        val isGithubRelease = checkAppSignature(this).also {
-            Log.i("SpotiFlyer Github Rel.:",it.toString())
-        }
+        val isGithubRelease = checkAppSignature(this)
         /*
         * Only Send an `Update Notification` on Github Release Builds
         * and Track Downloads for all other releases like F-Droid,
         * for `Github Downloads` we will track Downloads using : https://tooomm.github.io/github-release-stats/?username=Shabinder&repository=SpotiFlyer
         * */
         if(isGithubRelease) { checkIfLatestVersion() }
-        if(dir.isAnalyticsEnabled && !isGithubRelease) {
+        if(preferenceManager.isAnalyticsEnabled && !isGithubRelease) {
             // Download/App Install Event for F-Droid builds
             TrackHelper.track().download().with(tracker)
         }
         handleIntentFromExternalActivity()
+
+        initForegroundService()
     }
+
+    /*START: Foreground Service Handlers*/
+    private fun initForegroundService() {
+        // Start and then Bind to the Service
+        ContextCompat.startForegroundService(
+            this@MainActivity,
+            Intent(this, ForegroundService::class.java)
+        )
+        bindService()
+    }
+
+    /**
+     * Interface for getting the instance of binder from our service class
+     * So client can get instance of our service class and can directly communicate with it.
+     */
+    private val serviceConnection = object : ServiceConnection {
+        val tag = "Service Connection"
+
+        override fun onServiceConnected(className: ComponentName, iBinder: IBinder) {
+            Log.d(tag, "connected to service.")
+            // We've bound to MyService, cast the IBinder and get MyBinder instance
+            val binder = iBinder as ForegroundService.DownloadServiceBinder
+            foregroundService = binder.service
+            isServiceBound = true
+            lifecycleScope.launch {
+                foregroundService?.trackStatusFlowMap?.statusFlow?.let {
+                    trackStatusFlow.emitAll(it.conflate())
+                }
+            }
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            Log.d(tag, "disconnected from service.")
+            isServiceBound = false
+        }
+    }
+
+    /*Used to bind to our service class*/
+    private fun bindService() {
+        Intent(this, ForegroundService::class.java).also { intent ->
+            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    /*Used to unbind from our service class*/
+    private fun unbindService() {
+        Intent(this, ForegroundService::class.java).also {
+            unbindService(serviceConnection)
+        }
+    }
+    /*END: Foreground Service Handlers*/
+
 
     @Composable
     private fun isInternetAvailableState(): State<Boolean?> {
         return internetAvailability.observeAsState()
-    }
-
-    @Suppress("DEPRECATION")
-    private fun setUpOnPrefClickListener() {
-        // Initialize Builder
-        val chooser = StorageChooser.Builder()
-            .withActivity(this)
-            .withFragmentManager(fragmentManager)
-            .withMemoryBar(true)
-            .setTheme(StorageChooser.Theme(applicationContext).apply {
-                scheme = applicationContext.resources.getIntArray(R.array.default_dark)
-            })
-            .setDialogTitle("Set Download Directory")
-            .allowCustomPath(true)
-            .setType(StorageChooser.DIRECTORY_CHOOSER)
-            .build()
-
-        // get path that the user has chosen
-        chooser.setOnSelectListener { path ->
-            Log.d("Setting Base Path", path)
-            val f = File(path)
-            if (f.canWrite()) {
-                // hell yeah :)
-                dir.setDownloadDirectory(path)
-                showPopUpMessage(
-                    "Download Directory Set to:\n${dir.defaultDir()} "
-                )
-            }else{
-                showPopUpMessage(
-                    "NO WRITE ACCESS on \n$path ,\nReverting Back to Previous"
-                )
-            }
-        }
-
-        // Show dialog whenever you want by
-        chooser.show()
     }
 
     private fun showPopUpMessage(string: String, long: Boolean = false) {
@@ -225,9 +248,10 @@ class MainActivity : ComponentActivity() {
             dependencies = object : SpotiFlyerRoot.Dependencies{
                 override val storeFactory = LoggingStoreFactory(DefaultStoreFactory)
                 override val database = this@MainActivity.dir.db
-                override val fetchPlatformQueryResult = this@MainActivity.fetcher
-                override val directories: Dir = this@MainActivity.dir
-                override val downloadProgressReport: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
+                override val fetchQuery = this@MainActivity.fetcher
+                override val dir: Dir = this@MainActivity.dir
+                override val preferenceManager = this@MainActivity.preferenceManager
+                override val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
                 override val actions = object: Actions {
 
                     override val platformActions = object : PlatformActions {
@@ -243,12 +267,9 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        override fun sendTracksToService(array: ArrayList<TrackDetails>) {
-                            for (list in array.chunked(50)) {
-                                val serviceIntent = Intent(this@MainActivity, ForegroundService::class.java)
-                                serviceIntent.putParcelableArrayListExtra("object", list as ArrayList)
-                                ContextCompat.startForegroundService(this@MainActivity, serviceIntent)
-                            }
+                        override fun sendTracksToService(array: List<TrackDetails>) {
+                            if (foregroundService == null) initForegroundService()
+                            foregroundService?.downloadAllTracks(array)
                         }
                     }
 
@@ -256,12 +277,7 @@ class MainActivity : ComponentActivity() {
 
                     override fun setDownloadDirectoryAction() = setUpOnPrefClickListener()
 
-                    override fun queryActiveTracks() {
-                        val serviceIntent = Intent(this@MainActivity, ForegroundService::class.java).apply {
-                            action = "query"
-                        }
-                        ContextCompat.startForegroundService(this@MainActivity, serviceIntent)
-                    }
+                    override fun queryActiveTracks() = this@MainActivity.queryActiveTracks()
 
                     override fun giveDonation() {
                         openPlatform("",platformLink = "https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button")
@@ -303,7 +319,7 @@ class MainActivity : ComponentActivity() {
                 * */
                 override val analytics = object: Analytics {
                     override fun appLaunchEvent() {
-                        if(dir.isAnalyticsEnabled){
+                        if(preferenceManager.isAnalyticsEnabled){
                             TrackHelper.track()
                                 .event("events","App_Launch")
                                 .name("App Launch").with(tracker)
@@ -311,7 +327,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     override fun homeScreenVisit() {
-                        if(dir.isAnalyticsEnabled){
+                        if(preferenceManager.isAnalyticsEnabled){
                             // HomeScreen Visit Event
                             TrackHelper.track().screen("/main_activity/home_screen")
                                 .title("HomeScreen").with(tracker)
@@ -319,7 +335,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     override fun listScreenVisit() {
-                        if(dir.isAnalyticsEnabled){
+                        if(preferenceManager.isAnalyticsEnabled){
                             // ListScreen Visit Event
                             TrackHelper.track().screen("/main_activity/list_screen")
                                 .title("ListScreen").with(tracker)
@@ -327,7 +343,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     override fun donationDialogVisit() {
-                        if (dir.isAnalyticsEnabled) {
+                        if (preferenceManager.isAnalyticsEnabled) {
                             // Donation Dialog Open Event
                             TrackHelper.track().screen("/main_activity/donation_dialog")
                                 .title("DonationDialog").with(tracker)
@@ -337,6 +353,54 @@ class MainActivity : ComponentActivity() {
             }
         )
 
+    private fun queryActiveTracks() {
+        lifecycleScope.launch {
+            foregroundService?.trackStatusFlowMap?.let { tracksStatus ->
+                trackStatusFlow.emit(tracksStatus)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        queryActiveTracks()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun setUpOnPrefClickListener() {
+        // Initialize Builder
+        val chooser = StorageChooser.Builder()
+            .withActivity(this)
+            .withFragmentManager(fragmentManager)
+            .withMemoryBar(true)
+            .setTheme(StorageChooser.Theme(applicationContext).apply {
+                scheme = applicationContext.resources.getIntArray(R.array.default_dark)
+            })
+            .setDialogTitle("Set Download Directory")
+            .allowCustomPath(true)
+            .setType(StorageChooser.DIRECTORY_CHOOSER)
+            .build()
+
+        // get path that the user has chosen
+        chooser.setOnSelectListener { path ->
+            Log.d("Setting Base Path", path)
+            val f = File(path)
+            if (f.canWrite()) {
+                // hell yeah :)
+                preferenceManager.setDownloadDirectory(path)
+                showPopUpMessage(
+                    "Download Directory Set to:\n${dir.defaultDir()} "
+                )
+            }else{
+                showPopUpMessage(
+                    "NO WRITE ACCESS on \n$path ,\nReverting Back to Previous"
+                )
+            }
+        }
+
+        // Show dialog whenever you want by
+        chooser.show()
+    }
 
     @SuppressLint("ObsoleteSdkInt")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -356,76 +420,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    /*
-    * Broadcast Handlers
-    * */
-    private fun initializeBroadcast(){
-        val intentFilter = IntentFilter().apply {
-            addAction(Status.QUEUED.name)
-            addAction(Status.FAILED.name)
-            addAction(Status.DOWNLOADING.name)
-            addAction(Status.COMPLETED.name)
-            addAction("Progress")
-            addAction("Converting")
-        }
-        updateUIReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                //Update Flow with latest details
-                if (intent != null) {
-                    val trackDetails = intent.getParcelableExtra<TrackDetails?>("track")
-                    trackDetails?.let { track ->
-                        lifecycleScope.launch {
-                            val latestMap = trackStatusFlow.replayCache.getOrElse(0
-                            ) { hashMapOf() }.apply {
-                                this[track.title] = when (intent.action) {
-                                    Status.QUEUED.name -> DownloadStatus.Queued
-                                    Status.FAILED.name -> DownloadStatus.Failed
-                                    Status.DOWNLOADING.name -> DownloadStatus.Downloading()
-                                    "Progress" ->  DownloadStatus.Downloading(intent.getIntExtra("progress", 0))
-                                    "Converting" -> DownloadStatus.Converting
-                                    Status.COMPLETED.name -> DownloadStatus.Downloaded
-                                    else -> DownloadStatus.NotDownloaded
-                                }
-                            }
-                            trackStatusFlow.emit(latestMap)
-                            Log.i("Track Update",track.title + track.downloaded.toString())
-                        }
-                    }
-                }
-            }
-        }
-        val queryFilter = IntentFilter().apply { addAction("query_result") }
-        queryReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                //UI update here
-                if (intent != null){
-                    @Suppress("UNCHECKED_CAST")
-                    val trackList = intent.getSerializableExtra("tracks") as? HashMap<String, DownloadStatus>?
-                    trackList?.let { list ->
-                        Log.i("Service Response", "${list.size} Tracks Active")
-                        lifecycleScope.launch {
-                            trackStatusFlow.emit(list)
-                        }
-                    }
-                }
-            }
-        }
-        registerReceiver(updateUIReceiver, intentFilter)
-        registerReceiver(queryReceiver, queryFilter)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        initializeBroadcast()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        unregisterReceiver(updateUIReceiver)
-        unregisterReceiver(queryReceiver)
-    }
-
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -449,6 +443,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService()
     }
 
     companion object {

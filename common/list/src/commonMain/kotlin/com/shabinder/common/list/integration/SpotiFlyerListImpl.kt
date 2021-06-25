@@ -18,10 +18,10 @@ package com.shabinder.common.list.integration
 
 import co.touchlab.stately.ensureNeverFrozen
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.lifecycle.doOnResume
 import com.arkivanov.decompose.value.Value
 import com.shabinder.common.caching.Cache
 import com.shabinder.common.di.Picture
-import com.shabinder.common.di.setDonationOffset
 import com.shabinder.common.di.utils.asValue
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.list.SpotiFlyerList.Dependencies
@@ -38,12 +38,16 @@ internal class SpotiFlyerListImpl(
 
     init {
         instanceKeeper.ensureNeverFrozen()
+        lifecycle.doOnResume {
+            onRefreshTracksStatuses()
+        }
     }
 
     private val store =
         instanceKeeper.getStore {
             SpotiFlyerListStoreProvider(
                 dir = this.dir,
+                preferenceManager = preferenceManager,
                 storeFactory = storeFactory,
                 fetchQuery = fetchQuery,
                 downloadProgressFlow = downloadProgressFlow,
@@ -74,8 +78,8 @@ internal class SpotiFlyerListImpl(
         store.accept(Intent.RefreshTracksStatuses)
     }
 
-    override fun snoozeDonationDialog() {
-        dir.setDonationOffset(offset = 10)
+    override fun dismissDonationDialogSetOffset() {
+        preferenceManager.setDonationOffset(offset = 10)
     }
 
     override suspend fun loadImage(url: String, isCover: Boolean): Picture {

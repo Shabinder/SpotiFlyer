@@ -49,5 +49,5 @@ sealed class DownloadStatus : Parcelable {
     @Parcelize object Queued : DownloadStatus()
     @Parcelize object NotDownloaded : DownloadStatus()
     @Parcelize object Converting : DownloadStatus()
-    @Parcelize object Failed : DownloadStatus()
+    @Parcelize data class Failed(val error: Throwable) : DownloadStatus()
 }

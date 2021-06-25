@@ -16,6 +16,9 @@
 
 package com.shabinder.common.models
 
+import io.github.shabinder.TargetPlatforms
+import io.github.shabinder.activePlatform
+
 sealed class CorsProxy(open val url: String) {
     data class SelfHostedCorsProxy(override val url: String = "https://cors.spotiflyer.ml/cors/" /*"https://spotiflyer.azurewebsites.net/"*/) : CorsProxy(url)
     data class PublicProxyWithExtension(override val url: String = "https://cors.bridged.cc/") : CorsProxy(url)
@@ -45,3 +48,5 @@ sealed class CorsProxy(open val url: String) {
 * Default Self Hosted, However ask user to use extension if possible.
 * */
 var corsProxy: CorsProxy = CorsProxy.SelfHostedCorsProxy()
+
+val corsApi get() = if (activePlatform is TargetPlatforms.Js) corsProxy.url else ""

@@ -19,6 +19,7 @@ package com.shabinder.spotiflyer
 import android.app.Application
 import android.content.Context
 import com.shabinder.common.di.initKoin
+import com.shabinder.common.translations.Strings
 import com.shabinder.spotiflyer.di.appModule
 import org.acra.config.httpSender
 import org.acra.config.notification
@@ -77,10 +78,10 @@ class App: Application(), KoinComponent {
             * Obeying `F-Droid Inclusion Privacy Rules`
             * */
             notification {
-                title = getString(R.string.acra_notification_title)
-                text = getString(R.string.acra_notification_text)
-                channelName = getString(R.string.acra_notification_channel)
-                channelDescription = getString(R.string.acra_notification_channel_desc)
+                title = Strings.acraNotificationTitle()
+                text = Strings.acraNotificationText()
+                channelName = "SpotiFlyer_Crashlytics"
+                channelDescription = "Notification Channel to send Spotiflyer Crashes."
                 sendOnClick = true
             }
             // Send Crash Report to self hosted Acrarium (FOSS)

@@ -22,10 +22,20 @@ include(
     ":common:root",
     ":common:main",
     ":common:list",
+    ":common:preference",
     ":common:data-models",
     ":common:dependency-injection",
     ":android",
     ":desktop",
     ":web-app",
+    ":console-app",
     ":maintenance-tasks"
 )
+
+includeBuild("mosaic/mosaic") {
+    dependencySubstitution {
+        substitute(module("com.jakewharton.mosaic:mosaic-gradle-plugin")).with(project(":mosaic-gradle-plugin"))
+        substitute(module("com.jakewharton.mosaic:mosaic-runtime")).with(project(":mosaic-runtime"))
+        substitute(module("com.jakewharton.mosaic:compose-compiler")).with(project(":compose:compiler"))
+    }
+}

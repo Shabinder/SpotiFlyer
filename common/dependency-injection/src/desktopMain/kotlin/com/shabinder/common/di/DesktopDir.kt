@@ -20,8 +20,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.Mp3File
-import com.russhwolf.settings.Settings
 import com.shabinder.common.database.SpotiFlyerDatabase
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +40,7 @@ import javax.imageio.ImageIO
 
 actual class Dir actual constructor(
     private val logger: Kermit,
-    settingsPref: Settings,
+    private val preferenceManager: PreferenceManager,
     spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
 
@@ -55,7 +55,7 @@ actual class Dir actual constructor(
 
     private val defaultBaseDir = System.getProperty("user.home")
 
-    actual fun defaultDir(): String = (settings.getStringOrNull(DirKey) ?: defaultBaseDir) + fileSeparator() +
+    actual fun defaultDir(): String = (preferenceManager.downloadDir ?: defaultBaseDir) + fileSeparator() +
         "SpotiFlyer" + fileSeparator()
 
     actual fun isPresent(path: String): Boolean = File(path).exists()
@@ -199,7 +199,6 @@ actual class Dir actual constructor(
     }
 
     actual val db: Database? = spotiFlyerDatabase.instance
-    actual val settings: Settings = settingsPref
 }
 
 fun BufferedImage.toImageBitmap() = Image.makeFromEncoded(

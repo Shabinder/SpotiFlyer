@@ -33,12 +33,17 @@ allprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         kotlinOptions {
             jvmTarget = "1.8"
-            useIR = true
+            freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
         }
     }
     afterEvaluate {
         project.extensions.findByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()?.let { kmpExt ->
-            kmpExt.sourceSets.removeAll { it.name == "androidAndroidTestRelease" }
+            kmpExt.sourceSets.run {
+                all {
+                     languageSettings.useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
+                }
+                removeAll { it.name == "androidAndroidTestRelease" }
+            }
         }
     }
 }

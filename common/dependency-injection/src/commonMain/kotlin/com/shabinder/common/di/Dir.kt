@@ -17,33 +17,25 @@
 package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
-import com.russhwolf.settings.Settings
 import com.shabinder.common.database.SpotiFlyerDatabase
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.database.Database
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.get
-import io.ktor.client.statement.HttpStatement
-import io.ktor.http.contentLength
-import io.ktor.http.isSuccess
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlin.math.roundToInt
 
-const val DirKey = "downloadDir"
-const val AnalyticsKey = "analytics"
-const val FirstLaunch = "firstLaunch"
-const val DonationInterval = "donationInterval"
-
 expect class Dir(
     logger: Kermit,
-    settingsPref: Settings,
+    preferenceManager: PreferenceManager,
     spotiFlyerDatabase: SpotiFlyerDatabase,
 ) {
     val db: Database?
-    val settings: Settings
     fun isPresent(path: String): Boolean
     fun fileSeparator(): String
     fun defaultDir(): String
@@ -54,22 +46,6 @@ expect class Dir(
     suspend fun clearCache()
     suspend fun saveFileWithMetadata(mp3ByteArray: ByteArray, trackDetails: TrackDetails, postProcess: (track: TrackDetails) -> Unit = {})
     fun addToLibrary(path: String)
-}
-
-val Dir.isAnalyticsEnabled get() = settings.getBooleanOrNull(AnalyticsKey) ?: false
-fun Dir.toggleAnalytics(enabled: Boolean) = settings.putBoolean(AnalyticsKey, enabled)
-
-fun Dir.setDownloadDirectory(newBasePath: String) = settings.putString(DirKey, newBasePath)
-
-val Dir.getDonationOffset: Int get() = (settings.getIntOrNull(DonationInterval) ?: 3).also {
-    // Min. Donation Asking Interval is `3`
-    if (it < 3) setDonationOffset(3) else setDonationOffset(it - 1)
-}
-fun Dir.setDonationOffset(offset: Int = 5) = settings.putInt(DonationInterval, offset)
-
-val Dir.isFirstLaunch get() = settings.getBooleanOrNull(FirstLaunch) ?: true
-fun Dir.firstLaunchDone() {
-    settings.putBoolean(FirstLaunch, false)
 }
 
 /*
@@ -105,7 +81,7 @@ suspend fun downloadFile(url: String): Flow<DownloadResult> {
             var offset = 0
             do {
                 // Set Length optimally, after how many kb you want a progress update, now it 0.25mb
-                val currentRead = response.content.readAvailable(data, offset, 250000)
+                val currentRead = response.content.readAvailable(data, offset, 2_50_000)
                 offset += currentRead
                 val progress = (offset * 100f / data.size).roundToInt()
                 emit(DownloadResult.Progress(progress))

@@ -14,7 +14,7 @@ actual interface PlatformActions {
 
     fun addToLibrary(path: String)
 
-    fun sendTracksToService(array: ArrayList<TrackDetails>)
+    fun sendTracksToService(array: List<TrackDetails>)
 }
 
 actual val StubPlatformActions = object : PlatformActions {
@@ -24,5 +24,5 @@ actual val StubPlatformActions = object : PlatformActions {
 
     override fun addToLibrary(path: String) {}
 
-    override fun sendTracksToService(array: ArrayList<TrackDetails>) {}
+    override fun sendTracksToService(array: List<TrackDetails>) {}
 }

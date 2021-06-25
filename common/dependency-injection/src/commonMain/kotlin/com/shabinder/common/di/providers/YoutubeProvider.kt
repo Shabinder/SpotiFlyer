@@ -22,7 +22,9 @@ import com.shabinder.common.di.finalOutputDir
 import com.shabinder.common.di.utils.removeIllegalChars
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
+import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.spotify.Source
 import io.github.shabinder.YoutubeDownloader
 import io.github.shabinder.models.YoutubeVideo
@@ -49,7 +51,7 @@ class YoutubeProvider(
     private val sampleDomain2 = "youtube.com"
     private val sampleDomain3 = "youtu.be"
 
-    suspend fun query(fullLink: String): PlatformQueryResult? {
+    suspend fun query(fullLink: String): SuspendableEvent<PlatformQueryResult,Throwable> {
         val link = fullLink.removePrefix("https://").removePrefix("http://")
         if (link.contains("playlist", true) || link.contains("list", true)) {
             // Given Link is of a Playlist
@@ -77,74 +79,15 @@ class YoutubeProvider(
                 )
             } else {
                 logger.d { "Your Youtube Link is not of a Video!!" }
-                null
+                SuspendableEvent.error(SpotiFlyerException.LinkInvalid(fullLink))
             }
         }
     }
 
     private suspend fun getYTPlaylist(
         searchId: String
-    ): PlatformQueryResult? {
-        val result = PlatformQueryResult(
-            folderType = "",
-            subFolder = "",
-            title = "",
-            coverUrl = "",
-            trackList = listOf(),
-            Source.YouTube
-        )
-        result.apply {
-            try {
-                val playlist = ytDownloader.getPlaylist(searchId)
-                val playlistDetails = playlist.details
-                val name = playlistDetails.title
-                subFolder = removeIllegalChars(name)
-                val videos = playlist.videos
-
-                coverUrl = "https://i.ytimg.com/vi/${
-                videos.firstOrNull()?.videoId
-                }/hqdefault.jpg"
-                title = name
-
-                trackList = videos.map {
-                    TrackDetails(
-                        title = it.title ?: "N/A",
-                        artists = listOf(it.author ?: "N/A"),
-                        durationSec = it.lengthSeconds,
-                        albumArtPath = dir.imageCacheDir() + it.videoId + ".jpeg",
-                        source = Source.YouTube,
-                        albumArtURL = "https://i.ytimg.com/vi/${it.videoId}/hqdefault.jpg",
-                        downloaded = if (dir.isPresent(
-                                dir.finalOutputDir(
-                                        itemName = it.title ?: "N/A",
-                                        type = folderType,
-                                        subFolder = subFolder,
-                                        dir.defaultDir()
-                                    )
-                            )
-                        )
-                            DownloadStatus.Downloaded
-                        else {
-                            DownloadStatus.NotDownloaded
-                        },
-                        outputFilePath = dir.finalOutputDir(it.title ?: "N/A", folderType, subFolder, dir.defaultDir()/*,".m4a"*/),
-                        videoID = it.videoId
-                    )
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                logger.d { "An Error Occurred While Processing!" }
-            }
-        }
-        return if (result.title.isNotBlank()) result
-        else null
-    }
-
-    @Suppress("DefaultLocale")
-    private suspend fun getYTTrack(
-        searchId: String,
-    ): PlatformQueryResult? {
-        val result = PlatformQueryResult(
+    ): SuspendableEvent<PlatformQueryResult,Throwable> = SuspendableEvent {
+        PlatformQueryResult(
             folderType = "",
             subFolder = "",
             title = "",
@@ -152,47 +95,90 @@ class YoutubeProvider(
             trackList = listOf(),
             Source.YouTube
         ).apply {
-            try {
-                logger.i { searchId }
-                val video = ytDownloader.getVideo(searchId)
-                coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
-                val detail = video.videoDetails
-                val name = detail.title?.replace(detail.author?.uppercase() ?: "", "", true)
-                    ?: detail.title ?: ""
-                // logger.i{ detail.toString() }
-                trackList = listOf(
-                    TrackDetails(
-                        title = name,
-                        artists = listOf(detail.author ?: "N/A"),
-                        durationSec = detail.lengthSeconds,
-                        albumArtPath = dir.imageCacheDir() + "$searchId.jpeg",
-                        source = Source.YouTube,
-                        albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
-                        downloaded = if (dir.isPresent(
-                                dir.finalOutputDir(
-                                        itemName = name,
-                                        type = folderType,
-                                        subFolder = subFolder,
-                                        defaultDir = dir.defaultDir()
-                                    )
+            val playlist = ytDownloader.getPlaylist(searchId)
+            val playlistDetails = playlist.details
+            val name = playlistDetails.title
+            subFolder = removeIllegalChars(name)
+            val videos = playlist.videos
+
+            coverUrl = "https://i.ytimg.com/vi/${
+                videos.firstOrNull()?.videoId
+            }/hqdefault.jpg"
+            title = name
+
+            trackList = videos.map {
+                TrackDetails(
+                    title = it.title ?: "N/A",
+                    artists = listOf(it.author ?: "N/A"),
+                    durationSec = it.lengthSeconds,
+                    albumArtPath = dir.imageCacheDir() + it.videoId + ".jpeg",
+                    source = Source.YouTube,
+                    albumArtURL = "https://i.ytimg.com/vi/${it.videoId}/hqdefault.jpg",
+                    downloaded = if (dir.isPresent(
+                            dir.finalOutputDir(
+                                itemName = it.title ?: "N/A",
+                                type = folderType,
+                                subFolder = subFolder,
+                                dir.defaultDir()
                             )
                         )
-                            DownloadStatus.Downloaded
-                        else {
-                            DownloadStatus.NotDownloaded
-                        },
-                        outputFilePath = dir.finalOutputDir(name, folderType, subFolder, dir.defaultDir()/*,".m4a"*/),
-                        videoID = searchId
                     )
+                        DownloadStatus.Downloaded
+                    else {
+                        DownloadStatus.NotDownloaded
+                    },
+                    outputFilePath = dir.finalOutputDir(it.title ?: "N/A", folderType, subFolder, dir.defaultDir()/*,".m4a"*/),
+                    videoID = it.videoId
                 )
-                title = name
-            } catch (e: Exception) {
-                e.printStackTrace()
-                logger.e { "An Error Occurred While Processing!,$searchId" }
             }
         }
-        return if (result.title.isNotBlank()) result
-        else null
+    }
+
+    @Suppress("DefaultLocale")
+    private suspend fun getYTTrack(
+        searchId: String,
+    ): SuspendableEvent<PlatformQueryResult,Throwable> = SuspendableEvent {
+        PlatformQueryResult(
+            folderType = "",
+            subFolder = "",
+            title = "",
+            coverUrl = "",
+            trackList = listOf(),
+            Source.YouTube
+        ).apply {
+            val video = ytDownloader.getVideo(searchId)
+            coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
+            val detail = video.videoDetails
+            val name = detail.title?.replace(detail.author?.uppercase() ?: "", "", true)
+                ?: detail.title ?: ""
+            // logger.i{ detail.toString() }
+            trackList = listOf(
+                TrackDetails(
+                    title = name,
+                    artists = listOf(detail.author ?: "N/A"),
+                    durationSec = detail.lengthSeconds,
+                    albumArtPath = dir.imageCacheDir() + "$searchId.jpeg",
+                    source = Source.YouTube,
+                    albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
+                    downloaded = if (dir.isPresent(
+                            dir.finalOutputDir(
+                                itemName = name,
+                                type = folderType,
+                                subFolder = subFolder,
+                                defaultDir = dir.defaultDir()
+                            )
+                        )
+                    )
+                        DownloadStatus.Downloaded
+                    else {
+                        DownloadStatus.NotDownloaded
+                    },
+                    outputFilePath = dir.finalOutputDir(name, folderType, subFolder, dir.defaultDir()/*,".m4a"*/),
+                    videoID = searchId
+                )
+            )
+            title = name
+        }
     }
 }
 

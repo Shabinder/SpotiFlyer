@@ -21,11 +21,10 @@ import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
-import com.shabinder.common.database.getLogger
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.downloadTracks
-import com.shabinder.common.di.getDonationOffset
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.list.SpotiFlyerList.State
 import com.shabinder.common.list.store.SpotiFlyerListStore.Intent
 import com.shabinder.common.models.DownloadStatus
@@ -33,17 +32,16 @@ import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.collect
 
 internal class SpotiFlyerListStoreProvider(
     private val dir: Dir,
+    private val preferenceManager: PreferenceManager,
     private val storeFactory: StoreFactory,
     private val fetchQuery: FetchPlatformQueryResult,
     private val link: String,
     private val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>
 ) {
-    val logger = getLogger()
-
     fun provide(): SpotiFlyerListStore =
         object :
             SpotiFlyerListStore,
@@ -59,8 +57,8 @@ internal class SpotiFlyerListStoreProvider(
         data class ResultFetched(val result: PlatformQueryResult, val trackList: List<TrackDetails>) : Result()
         data class UpdateTrackList(val list: List<TrackDetails>) : Result()
         data class UpdateTrackItem(val item: TrackDetails) : Result()
-        data class ErrorOccurred(val error: Exception) : Result()
-        data class AskForDonation(val isAllowed: Boolean) : Result()
+        data class ErrorOccurred(val error: Throwable) : Result()
+        data class AskForSupport(val isAllowed: Boolean) : Result()
     }
 
     private inner class ExecutorImpl : SuspendExecutor<Intent, Unit, State, Result, Nothing>() {
@@ -70,18 +68,18 @@ internal class SpotiFlyerListStoreProvider(
 
             dir.db?.downloadRecordDatabaseQueries?.getLastInsertId()?.executeAsOneOrNull()?.also {
                 // See if It's Time we can request for support for maintaining this project or not
-                logger.d(message = "Database List Last ID: $it", tag = "Database Last ID")
-                val offset = dir.getDonationOffset
+                fetchQuery.logger.d(message = { "Database List Last ID: $it" }, tag = "Database Last ID")
+                val offset = preferenceManager.getDonationOffset
                 dispatch(
-                    Result.AskForDonation(
+                    Result.AskForSupport(
                         // Every 3rd Interval or After some offset
                         isAllowed = offset < 4 && (it % offset == 0L)
                     )
                 )
             }
 
-            downloadProgressFlow.collectLatest { map ->
-                logger.d(map.size.toString(), "ListStore: flow Updated")
+            downloadProgressFlow.collect { map ->
+                // logger.d(map.size.toString(), "ListStore: flow Updated")
                 val updatedTrackList = getState().trackList.updateTracksStatuses(map)
                 if (updatedTrackList.isNotEmpty()) dispatch(Result.UpdateTrackList(updatedTrackList))
             }
@@ -90,19 +88,17 @@ internal class SpotiFlyerListStoreProvider(
         override suspend fun executeIntent(intent: Intent, getState: () -> State) {
             when (intent) {
                 is Intent.SearchLink -> {
-                    try {
-                        val result = fetchQuery.query(link)
-                        if (result != null) {
+                    val resp = fetchQuery.query(link)
+                    resp.fold(
+                        success = { result ->
                             result.trackList = result.trackList.toMutableList()
                             dispatch((Result.ResultFetched(result, result.trackList.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0) { hashMapOf() }))))
                             executeIntent(Intent.RefreshTracksStatuses, getState)
-                        } else {
-                            throw Exception("An Error Occurred, Check your Link / Connection")
+                        },
+                        failure = {
+                            dispatch(Result.ErrorOccurred(it))
                         }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        dispatch(Result.ErrorOccurred(e))
-                    }
+                    )
                 }
 
                 is Intent.StartDownloadAll -> {
@@ -133,7 +129,7 @@ internal class SpotiFlyerListStoreProvider(
                 is Result.UpdateTrackList -> copy(trackList = result.list)
                 is Result.UpdateTrackItem -> updateTrackItem(result.item)
                 is Result.ErrorOccurred -> copy(errorOccurred = result.error)
-                is Result.AskForDonation -> copy(askForDonation = result.isAllowed)
+                is Result.AskForSupport -> copy(askForDonation = result.isAllowed)
             }
 
         private fun State.updateTrackItem(item: TrackDetails): State {
