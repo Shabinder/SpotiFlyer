@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.HeartIcon
 import com.shabinder.common.uikit.SpotiFlyerLogo
 import com.shabinder.common.uikit.SpotiFlyerTypography
@@ -55,7 +56,7 @@ fun Splash(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
             delay(SplashWaitTime)
             currentOnTimeout()
         }
-        Image(SpotiFlyerLogo(), "SpotiFlyer Logo")
+        Image(SpotiFlyerLogo(), Strings.spotiflyerLogo())
         MadeInIndia(Modifier.align(Alignment.BottomCenter))
     }
 }
@@ -73,21 +74,21 @@ fun MadeInIndia(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "Made with ",
+                text = "${Strings.madeWith()} ",
                 color = colorPrimary,
                 fontSize = 22.sp
             )
             Spacer(modifier = Modifier.padding(start = 4.dp))
-            Icon(HeartIcon(), "Love", tint = Color.Unspecified)
+            Icon(HeartIcon(), Strings.love(), tint = Color.Unspecified)
             Spacer(modifier = Modifier.padding(start = 4.dp))
             Text(
-                text = " in India",
+                text = " ${Strings.inIndia()}",
                 color = colorPrimary,
                 fontSize = 22.sp
             )
         }
         Text(
-            "by: Shabinder Singh",
+            Strings.byDeveloperName(),
             style = SpotiFlyerTypography.h6,
             color = colorAccent,
             fontSize = 14.sp

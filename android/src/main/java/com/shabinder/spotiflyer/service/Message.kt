@@ -1,6 +1,7 @@
 package com.shabinder.spotiflyer.service
 
 import com.shabinder.common.models.DownloadStatus
+import com.shabinder.common.translations.Strings
 
 typealias Message = Pair<String, DownloadStatus>
 
@@ -11,9 +12,9 @@ val Message.downloadStatus: DownloadStatus get()  = second
 val Message.progress: String get() = when (downloadStatus) {
     is DownloadStatus.Downloading -> "-> ${(downloadStatus as DownloadStatus.Downloading).progress}%"
     is DownloadStatus.Converting -> "-> 100%"
-    is DownloadStatus.Downloaded -> "-> Done"
-    is DownloadStatus.Failed -> "-> Failed"
-    is DownloadStatus.Queued -> "-> Queued"
+    is DownloadStatus.Downloaded -> "-> ${Strings.downloadDone}"
+    is DownloadStatus.Failed -> "-> ${Strings.failed()}"
+    is DownloadStatus.Queued -> "-> ${Strings.queued()}"
     is DownloadStatus.NotDownloaded -> ""
 }
 
@@ -23,8 +24,8 @@ val emptyMessage = Message("",DownloadStatus.NotDownloaded)
 //  all Progress data is emitted all together from fun
 fun Message.asString(): String {
     val statusString = when(downloadStatus){
-        is DownloadStatus.Downloading -> "Downloading"
-        is DownloadStatus.Converting -> "Processing"
+        is DownloadStatus.Downloading -> Strings.downloading()
+        is DownloadStatus.Converting -> Strings.processing()
         else -> ""
     }
     return "$statusString $title ${""/*progress*/}".trim()

@@ -43,6 +43,7 @@ import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.failure
+import com.shabinder.common.translations.Strings
 import com.shabinder.spotiflyer.utils.autoclear.AutoClear
 import com.shabinder.spotiflyer.utils.autoclear.autoClear
 import kotlinx.coroutines.Dispatchers
@@ -237,7 +238,7 @@ class ForegroundService : LifecycleService() {
         lifecycleScope.launch {
             logger.d(TAG) { "Killing Self" }
             messageList = messageList.getEmpty().apply {
-                set(index = 0, Message("Cleaning And Exiting",DownloadStatus.NotDownloaded))
+                set(index = 0, Message(Strings.cleaningAndExiting(),DownloadStatus.NotDownloaded))
             }
             downloadService.value.close()
             downloadService.reset()
@@ -257,7 +258,7 @@ class ForegroundService : LifecycleService() {
 
     private fun createNotification(): Notification = NotificationCompat.Builder(this, CHANNEL_ID).run {
         setSmallIcon(R.drawable.ic_download_arrow)
-        setContentTitle("Total: $total  Completed:$converted  Failed:$failed")
+        setContentTitle("${Strings.total()}: $total  ${Strings.completed()}:$converted  ${Strings.failed()}:$failed")
         setSilent(true)
         setProgress(total,failed+converted,false)
         setStyle(
@@ -269,7 +270,7 @@ class ForegroundService : LifecycleService() {
                 addLine(messageList[messageList.size - 5].asString())
             }
         )
-        addAction(R.drawable.ic_round_cancel_24, "Exit", cancelIntent)
+        addAction(R.drawable.ic_round_cancel_24, Strings.exit(), cancelIntent)
         build()
     }
 

@@ -54,6 +54,7 @@ import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
+import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.dialogs.DonationDialogComponent
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -67,7 +68,7 @@ fun SpotiFlyerListContent(
     LaunchedEffect(model.errorOccurred) {
         /*Handle if Any Exception Occurred*/
         model.errorOccurred?.let {
-            methods.value.showPopUpMessage(it.message ?: "An Error Occurred, Check your Link / Connection")
+            methods.value.showPopUpMessage(it.message ?: Strings.errorOccurred())
             component.onBackPressed()
         }
     }
@@ -79,7 +80,7 @@ fun SpotiFlyerListContent(
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier.padding(8.dp))
-                Text("Loading..", style = appNameStyle, color = colorPrimary)
+                Text("${Strings.loading()}...", style = appNameStyle, color = colorPrimary)
             }
         } else {
 
@@ -142,7 +143,7 @@ fun TrackCard(
         ImageLoad(
             track.albumArtURL,
             { loadImage() },
-            "Album Art",
+            Strings.albumArt(),
             modifier = Modifier
                 .width(70.dp)
                 .height(70.dp)
@@ -156,7 +157,7 @@ fun TrackCard(
                 modifier = Modifier.padding(horizontal = 8.dp).fillMaxSize()
             ) {
                 Text("${track.artists.firstOrNull()}...", fontSize = 12.sp, maxLines = 1)
-                Text("${track.durationSec / 60} min, ${track.durationSec % 60} sec", fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text("${track.durationSec / 60} ${Strings.minute()}, ${track.durationSec % 60} ${Strings.second()}", fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
         when (track.downloaded) {
@@ -202,7 +203,7 @@ fun CoverImage(
         ImageLoad(
             coverURL,
             { loadImage(coverURL, true) },
-            "Cover Image",
+            Strings.coverImage(),
             modifier = Modifier
                 .padding(12.dp)
                 .width(190.dp)
@@ -225,9 +226,9 @@ fun CoverImage(
 @Composable
 fun DownloadAllButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     ExtendedFloatingActionButton(
-        text = { Text("Download All") },
+        text = { Text(Strings.downloadAll()) },
         onClick = onClick,
-        icon = { Icon(DownloadAllImage(), "Download All Button", tint = Color(0xFF000000)) },
+        icon = { Icon(DownloadAllImage(), Strings.downloadAll() + Strings.button(), tint = Color(0xFF000000)) },
         backgroundColor = colorAccent,
         modifier = modifier
     )
