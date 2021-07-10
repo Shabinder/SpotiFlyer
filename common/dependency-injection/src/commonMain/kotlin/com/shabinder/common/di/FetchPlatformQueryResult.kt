@@ -101,6 +101,7 @@ class FetchPlatformQueryResult(
                 }
                 Source.YouTube -> {
                     youtubeMp3.getMp3DownloadLink(track.videoID.requireNotNull()).flatMapError {
+                        logger.e("Yt1sMp3 Failed") { it.message ?: "couldn't fetch link for ${track.videoID} ,trying manual extraction" }
                         youtubeProvider.ytDownloader.getVideo(track.videoID!!).get()?.url?.let { m4aLink ->
                             audioToMp3.convertToMp3(m4aLink)
                         } ?: throw SpotiFlyerException.YoutubeLinkNotFound(track.videoID)
@@ -130,8 +131,8 @@ class FetchPlatformQueryResult(
                 SuspendableEvent.error(
                     SpotiFlyerException.DownloadLinkFetchFailed(
                         trackName =  track.title,
-                        jioSaavnError = saavnError,
-                        ytMusicError = ytMusicError
+                        ytMusicError = ytMusicError,
+                        jioSaavnError = saavnError
                     )
                 )
             }

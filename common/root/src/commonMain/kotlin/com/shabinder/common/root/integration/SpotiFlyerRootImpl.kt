@@ -76,6 +76,7 @@ internal class SpotiFlyerRootImpl(
     ) {
         instanceKeeper.ensureNeverFrozen()
         methods.value = dependencies.actions.freeze()
+
         /*Init App Launch & Authenticate Spotify Client*/
         initAppLaunchAndAuthenticateSpotify(dependencies.fetchQuery::authenticateSpotifyClient)
     }

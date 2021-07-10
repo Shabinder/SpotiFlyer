@@ -22,23 +22,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import com.shabinder.common.database.R
 import com.shabinder.common.translations.Strings
 import kotlinx.coroutines.flow.MutableStateFlow
-
-actual fun montserratFont() = FontFamily(
-    Font(R.font.montserrat_light, FontWeight.Light),
-    Font(R.font.montserrat_regular, FontWeight.Normal),
-    Font(R.font.montserrat_medium, FontWeight.Medium),
-    Font(R.font.montserrat_semibold, FontWeight.SemiBold),
-)
-
-actual fun pristineFont() = FontFamily(
-    Font(R.font.pristine_script, FontWeight.Bold)
-)
 
 @Composable
 actual fun DownloadImageTick() {
@@ -49,10 +35,11 @@ actual fun DownloadImageTick() {
 }
 
 @Composable
-actual fun DownloadImageError() {
+actual fun DownloadImageError(modifier: Modifier) {
     Image(
         painterResource(R.drawable.ic_error),
-        Strings.downloadError()
+        Strings.downloadError(),
+        modifier = modifier
     )
 }
 

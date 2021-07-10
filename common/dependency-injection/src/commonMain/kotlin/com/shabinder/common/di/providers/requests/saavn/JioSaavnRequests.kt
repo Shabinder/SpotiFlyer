@@ -243,7 +243,7 @@ interface JioSaavnRequests {
 
             // Skip this Result if No Word is Common in Name
             if (!hasCommonWord) {
-                logger.i("Saavn Removing Common Word") { result.toString() }
+                // logger.i("Saavn Removing Common Word") { result.toString() }
                 continue
             }
 
@@ -264,7 +264,7 @@ interface JioSaavnRequests {
             }
 
             if (artistMatchNumber == 0) {
-                logger.i("Artist Match Saavn Removing") { result.toString() }
+                // logger.i("Artist Match Saavn Removing") { result.toString() }
                 continue
             }
             val artistMatch: Float = (artistMatchNumber.toFloat() / trackArtists.size) * 100
@@ -274,11 +274,12 @@ interface JioSaavnRequests {
             linksWithMatchValue[result.id] = avgMatch
         }
         return linksWithMatchValue.toList().sortedByDescending { it.second }.toMap().also {
-            logger.i { "Match Found for $trackName - ${!it.isNullOrEmpty()}" }
+            logger.i(TAG) { "Match Found for $trackName - ${!it.isNullOrEmpty()}  ${it.keys.firstOrNull() ?: ""}" }
         }
     }
 
     companion object {
+        const val TAG = "Saavn Request"
         // EndPoints
         val search_base_url = "${corsApi}https://www.jiosaavn.com/api.php?__call=autocomplete.get&_format=json&_marker=0&cc=in&includeMetaTags=1&query="
         val song_details_base_url = "${corsApi}https://www.jiosaavn.com/api.php?__call=song.getDetails&cc=in&_marker=0%3F_marker%3D0&_format=json&pids="

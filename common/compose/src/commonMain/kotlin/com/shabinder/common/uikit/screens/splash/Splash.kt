@@ -14,7 +14,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.common.uikit.splash
+package com.shabinder.common.uikit.screens.splash
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -38,9 +38,9 @@ import androidx.compose.ui.unit.sp
 import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.HeartIcon
 import com.shabinder.common.uikit.SpotiFlyerLogo
-import com.shabinder.common.uikit.SpotiFlyerTypography
-import com.shabinder.common.uikit.colorAccent
-import com.shabinder.common.uikit.colorPrimary
+import com.shabinder.common.uikit.configurations.SpotiFlyerTypography
+import com.shabinder.common.uikit.configurations.colorAccent
+import com.shabinder.common.uikit.configurations.colorPrimary
 import kotlinx.coroutines.delay
 
 private const val SplashWaitTime: Long = 2000

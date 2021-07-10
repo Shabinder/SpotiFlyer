@@ -303,7 +303,7 @@ class YoutubeMusic constructor(
         }
         // logger.d("YT Api Result"){"$trackName - $linksWithMatchValue"}
         return linksWithMatchValue.toList().sortedByDescending { it.second }.toMap().also {
-            logger.d(tag) { "Match Found for $trackName - ${!it.isNullOrEmpty()}" }
+            logger.d(tag) { "Match Found for $trackName - ${!it.isNullOrEmpty()}  ${it.keys.firstOrNull() ?: ""}" }
         }
     }
 

@@ -71,6 +71,8 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
                     /*TODO("Not yet implemented")*/
                 }
 
+                override fun copyToClipboard(text: String) {}
+
                 override fun setDownloadDirectoryAction() {}
 
                 override fun queryActiveTracks() {}

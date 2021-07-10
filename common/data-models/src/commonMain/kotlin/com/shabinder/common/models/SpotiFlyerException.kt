@@ -32,8 +32,8 @@ sealed class SpotiFlyerException(override val message: String): Exception(messag
         val jioSaavnError: Throwable,
         val ytMusicError: Throwable,
         override val message: String = "${Strings.noLinkFound()}: $trackName," +
-                " \n JioSaavn Error's StackTrace: ${jioSaavnError.stackTraceToString()} \n " +
-                " \n YtMusic Error's StackTrace: ${ytMusicError.stackTraceToString()} \n "
+                " \n YtMusic Error's StackTrace: ${ytMusicError.stackTraceToString()} \n " +
+                " \n JioSaavn Error's StackTrace: ${jioSaavnError.stackTraceToString()} \n "
     ): SpotiFlyerException(message)
 
     data class LinkInvalid(

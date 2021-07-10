@@ -49,7 +49,7 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:icon="@mipmap/ic_launcher"
         android:largeHeap="true"
-        android:label="@string/app_name"
+        android:label="SpotiFlyer"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:configChanges="orientation|screenSize"
         android:forceDarkAllowed="true"
@@ -57,7 +57,7 @@
         tools:targetApi="q">
         <activity android:name=".MainActivity"
             android:launchMode="singleTask"
-            android:label="@string/app_name"
+            android:label="SpotiFlyer"
             android:hardwareAccelerated="true"
             android:theme="@style/Theme.SpotiFlyer"
             >

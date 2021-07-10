@@ -16,7 +16,7 @@
 
 @file:Suppress("EXPERIMENTAL_API_USAGE")
 
-package com.shabinder.common.uikit
+package com.shabinder.common.uikit.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -60,8 +60,13 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.translations.Strings
-import com.shabinder.common.uikit.splash.Splash
-import com.shabinder.common.uikit.splash.SplashState
+import com.shabinder.common.uikit.SpotiFlyerLogo
+import com.shabinder.common.uikit.Toast
+import com.shabinder.common.uikit.ToastDuration
+import com.shabinder.common.uikit.configurations.appNameStyle
+import com.shabinder.common.uikit.configurations.colorPrimaryDark
+import com.shabinder.common.uikit.screens.splash.Splash
+import com.shabinder.common.uikit.screens.splash.SplashState
 import com.shabinder.common.uikit.utils.verticalGradientScrim
 
 // To Not Show Splash Again After Configuration Change in Android

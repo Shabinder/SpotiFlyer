@@ -20,7 +20,7 @@ actual fun ImageLoad(
     link: String,
     loader: suspend () -> Picture,
     desc: String,
-    modifier: Modifier,
+    modifier: Modifier
     // placeholder: ImageVector
 ) {
     var pic by remember(link) { mutableStateOf<ImageBitmap?>(null) }

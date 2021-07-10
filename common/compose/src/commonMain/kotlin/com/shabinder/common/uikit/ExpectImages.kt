@@ -67,14 +67,7 @@ expect fun RazorPay(): Painter
 expect fun HeartIcon(): Painter
 
 @Composable
-expect fun DownloadImageError()
+expect fun DownloadImageError(modifier: Modifier)
 
 @Composable
 expect fun DownloadImageArrow(modifier: Modifier)
-
-@Composable
-expect fun DonationDialog(
-    isVisible: Boolean,
-    onDismiss: () -> Unit,
-    onSnooze: () -> Unit
-)

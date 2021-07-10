@@ -31,7 +31,7 @@ val statelyIsoVersion = "1.1.7-a1"
 i18n4k {
      inputDirectory = "../../translations"
      packageName = "com.shabinder.common.translations"
-    // sourceCodeLocales = listOf("en", "de")
+     // sourceCodeLocales = listOf("en", "de", "es", "fr", "id", "pt", "ru", "uk")
 }
 
 kotlin {

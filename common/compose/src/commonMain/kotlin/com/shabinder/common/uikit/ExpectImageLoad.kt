@@ -8,7 +8,7 @@ import com.shabinder.common.di.Picture
 expect fun ImageLoad(
     link: String,
     loader: suspend () -> Picture,
-    desc: String = "Album Art",
-    modifier: Modifier = Modifier,
+    desc: String,
+    modifier: Modifier
     // placeholder:Painter = PlaceHolderImage()
 )

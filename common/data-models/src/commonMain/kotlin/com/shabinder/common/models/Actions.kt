@@ -36,6 +36,9 @@ interface Actions {
     // Share SpotiFlyer App
     fun shareApp()
 
+    // Copy to Clipboard
+    fun copyToClipboard(text: String)
+
     // Open / Redirect to another Platform
     fun openPlatform(packageID: String, platformLink: String)
     fun writeMp3Tags(trackDetails: TrackDetails)
@@ -48,6 +51,8 @@ private fun stubActions(): Actions = object : Actions {
     override fun queryActiveTracks() {}
     override fun giveDonation() {}
     override fun shareApp() {}
+    override fun copyToClipboard(text: String) {}
+
     override fun openPlatform(packageID: String, platformLink: String) {}
     override fun writeMp3Tags(trackDetails: TrackDetails) {}
 

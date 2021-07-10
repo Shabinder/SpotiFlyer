@@ -14,7 +14,7 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.common.uikit
+package com.shabinder.common.uikit.screens
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.BorderStroke
@@ -84,7 +84,23 @@ import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
 import com.shabinder.common.models.DownloadRecord
 import com.shabinder.common.models.methods
 import com.shabinder.common.translations.Strings
+import com.shabinder.common.uikit.GaanaLogo
+import com.shabinder.common.uikit.GithubLogo
+import com.shabinder.common.uikit.ImageLoad
+import com.shabinder.common.uikit.SaavnLogo
+import com.shabinder.common.uikit.ShareImage
+import com.shabinder.common.uikit.SpotifyLogo
+import com.shabinder.common.uikit.VerticalScrollbar
+import com.shabinder.common.uikit.YoutubeLogo
+import com.shabinder.common.uikit.YoutubeMusicLogo
+import com.shabinder.common.uikit.configurations.SpotiFlyerShapes
+import com.shabinder.common.uikit.configurations.SpotiFlyerTypography
+import com.shabinder.common.uikit.configurations.colorAccent
+import com.shabinder.common.uikit.configurations.colorOffWhite
+import com.shabinder.common.uikit.configurations.colorPrimary
+import com.shabinder.common.uikit.configurations.transparent
 import com.shabinder.common.uikit.dialogs.DonationDialogComponent
+import com.shabinder.common.uikit.rememberScrollbarAdapter
 
 @Composable
 fun SpotiFlyerMainContent(component: SpotiFlyerMain) {

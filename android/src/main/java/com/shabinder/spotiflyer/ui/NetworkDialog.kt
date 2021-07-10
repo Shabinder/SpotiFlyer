@@ -44,9 +44,9 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.shabinder.common.translations.Strings
-import com.shabinder.common.uikit.SpotiFlyerShapes
-import com.shabinder.common.uikit.SpotiFlyerTypography
-import com.shabinder.common.uikit.colorOffWhite
+import com.shabinder.common.uikit.configurations.SpotiFlyerShapes
+import com.shabinder.common.uikit.configurations.SpotiFlyerTypography
+import com.shabinder.common.uikit.configurations.colorOffWhite
 import kotlinx.coroutines.delay
 
 @ExperimentalAnimationApi
@@ -88,7 +88,8 @@ fun NetworkDialog(
                     ) {
                         Image(Icons.Rounded.CloudOff,
                             Strings.noInternetConnection(),Modifier.size(42.dp),colorFilter = ColorFilter.tint(
-                            colorOffWhite))
+                            colorOffWhite
+                            ))
                         Spacer(modifier = Modifier.padding(start = 16.dp))
                         Text(
                             text = Strings.checkInternetConnection(),

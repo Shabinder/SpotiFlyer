@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.shabinder.common.models.event.coroutines
 
 import kotlin.properties.ReadOnlyProperty

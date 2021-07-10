@@ -17,6 +17,8 @@
 package com.shabinder.spotiflyer
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -31,11 +33,20 @@ import android.os.PowerManager
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.*
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.core.content.ContextCompat
@@ -51,7 +62,10 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
-import com.shabinder.common.di.*
+import com.shabinder.common.di.ConnectionLiveData
+import com.shabinder.common.di.Dir
+import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.di.observeAsState
 import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.DownloadStatus
@@ -63,17 +77,27 @@ import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.translations.Strings
-import com.shabinder.common.uikit.*
+import com.shabinder.common.uikit.configurations.SpotiFlyerTheme
+import com.shabinder.common.uikit.configurations.colorOffWhite
+import com.shabinder.common.uikit.screens.SpotiFlyerRootContent
 import com.shabinder.spotiflyer.service.ForegroundService
 import com.shabinder.spotiflyer.ui.AnalyticsDialog
 import com.shabinder.spotiflyer.ui.NetworkDialog
 import com.shabinder.spotiflyer.ui.PermissionDialog
-import com.shabinder.spotiflyer.utils.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import com.shabinder.spotiflyer.utils.checkAppSignature
+import com.shabinder.spotiflyer.utils.checkIfLatestVersion
+import com.shabinder.spotiflyer.utils.checkPermissions
+import com.shabinder.spotiflyer.utils.disableDozeMode
+import com.shabinder.spotiflyer.utils.requestStoragePermission
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.matomo.sdk.extra.TrackHelper
 import java.io.File
+
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
@@ -293,6 +317,14 @@ class MainActivity : ComponentActivity() {
 
                         val shareIntent = Intent.createChooser(sendIntent, null)
                         startActivity(shareIntent)
+                    }
+
+                    override fun copyToClipboard(text: String) {
+                        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                        val clip = ClipData.newPlainText("SpotiFlyer Selection", text)
+                        clipboard.setPrimaryClip(clip)
+
+                        showPopUpMessage("StackTrace Copied to Clipboard.")
                     }
 
                     override fun openPlatform(packageID: String, platformLink: String) {

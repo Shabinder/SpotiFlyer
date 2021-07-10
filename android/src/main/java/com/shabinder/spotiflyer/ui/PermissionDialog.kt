@@ -29,9 +29,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shabinder.common.translations.Strings
-import com.shabinder.common.uikit.SpotiFlyerShapes
-import com.shabinder.common.uikit.SpotiFlyerTypography
-import com.shabinder.common.uikit.colorPrimary
+import com.shabinder.common.uikit.configurations.SpotiFlyerShapes
+import com.shabinder.common.uikit.configurations.SpotiFlyerTypography
+import com.shabinder.common.uikit.configurations.colorPrimary
 import kotlinx.coroutines.delay
 
 @ExperimentalAnimationApi

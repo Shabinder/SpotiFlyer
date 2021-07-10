@@ -19,17 +19,21 @@
 object Versions {
     // App's Version (To be bumped at each update)
     const val versionName = "3.1.0"
-    const val versionCode = 20
 
+    const val versionCode = 20
     // Kotlin
     const val kotlinVersion = "1.5.10"
+
     const val coroutinesVersion = "1.5.0"
 
     // Code Formatting
     const val ktLint = "10.1.0"
 
+    // Console-App UI
+    const val mosaic = "0.1.0"
+
     // DI
-    const val koin = "3.1.0"
+    const val koin = "3.1.2"
 
     // Logger
     const val kermit = "0.1.9"
@@ -44,6 +48,9 @@ object Versions {
 
     const val sqliteJdbcDriver = "3.34.0"
     const val slf4j = "1.7.31"
+
+    // Internationalisation
+    const val i18n4k = "0.1.2"
 
     // Android
     const val minSdkVersion = 21
@@ -80,15 +87,11 @@ object Androidx {
     const val junit = "androidx.test.ext:junit:1.1.2"
     const val expresso = "androidx.test.espresso:espresso-core:3.3.0"
 
-    /*object Compose{
-        const val materialIcon = "androidx.compose.material:material-icons-extended:${Versions.compose}"
-        const val ui = "androidx.compose.ui:ui:${Versions.compose}"
-        const val uiGraphics = "androidx.compose.ui:ui-graphics:${Versions.compose}"
-        const val uiTooling = "androidx.compose.ui:ui-tooling:${Versions.compose}"
-        const val foundationLayout = "androidx.compose.foundation:foundation-layout:${Versions.compose}"
-        const val material = "androidx.compose.material:material:${Versions.compose}"
-        const val runtimeLiveData = "androidx.compose.runtime:runtime-livedata:${Versions.compose}"
-    }*/
+    const val gradlePlugin = "com.android.tools.build:gradle:4.1.1"
+}
+
+object KTLint {
+    const val gradlePlugin = "org.jlleitschuh.gradle:ktlint-gradle:${Versions.ktLint}"
 }
 
 object JetBrains {
@@ -106,7 +109,9 @@ object JetBrains {
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
     }
 }
-
+object Mosaic {
+    const val gradlePlugin = "com.jakewharton.mosaic:mosaic-gradle-plugin:${Versions.mosaic}"
+}
 object Decompose {
     private const val VERSION = "0.2.6"
     const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
@@ -146,7 +151,8 @@ object Ktor {
 }
 
 object Internationalization {
-    const val dep = "de.comahe.i18n4k:i18n4k-core:0.1.1"
+    const val dep = "de.comahe.i18n4k:i18n4k-core:${Versions.i18n4k}"
+    const val gradlePlugin = "de.comahe.i18n4k:i18n4k-gradle-plugin:${Versions.i18n4k}"
 }
 
 object Extras {

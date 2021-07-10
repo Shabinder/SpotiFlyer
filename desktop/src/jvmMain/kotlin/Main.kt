@@ -37,20 +37,24 @@ import com.shabinder.common.models.Actions
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
-import com.shabinder.common.uikit.SpotiFlyerColors
-import com.shabinder.common.uikit.SpotiFlyerRootContent
-import com.shabinder.common.uikit.SpotiFlyerShapes
-import com.shabinder.common.uikit.SpotiFlyerTypography
-import com.shabinder.common.uikit.colorOffWhite
+import com.shabinder.common.uikit.configurations.SpotiFlyerColors
+import com.shabinder.common.uikit.configurations.SpotiFlyerShapes
+import com.shabinder.common.uikit.configurations.SpotiFlyerTypography
+import com.shabinder.common.uikit.configurations.colorOffWhite
+import com.shabinder.common.uikit.screens.SpotiFlyerRootContent
 import com.shabinder.database.Database
 import kotlinx.coroutines.runBlocking
 import org.piwik.java.tracking.PiwikTracker
 import utils.trackAsync
 import utils.trackScreenAsync
 import java.awt.Desktop
+import java.awt.Toolkit
+import java.awt.datatransfer.Clipboard
+import java.awt.datatransfer.StringSelection
 import java.net.URI
 import javax.swing.JFileChooser
 import javax.swing.JFileChooser.APPROVE_OPTION
+
 
 private val koin = initKoin(enableNetworkLogs = true).koin
 private lateinit var showToast: (String)->Unit
@@ -129,6 +133,11 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                 }
 
                 override fun shareApp() = openLink("https://github.com/Shabinder/SpotiFlyer")
+                override fun copyToClipboard(text: String) {
+                    val data = StringSelection(text)
+                    val cb: Clipboard = Toolkit.getDefaultToolkit().systemClipboard
+                    cb.setContents(data, data)
+                }
 
                 override fun openPlatform(packageID: String, platformLink: String) = openLink(platformLink)
 

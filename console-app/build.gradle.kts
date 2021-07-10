@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm")// version "1.4.32"
+    kotlin("jvm")
     kotlin("plugin.serialization")
     id("ktlint-setup")
     id("com.jakewharton.mosaic")

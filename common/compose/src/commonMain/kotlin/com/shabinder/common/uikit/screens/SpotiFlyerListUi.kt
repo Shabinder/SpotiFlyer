@@ -14,8 +14,9 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.shabinder.common.uikit
+package com.shabinder.common.uikit.screens
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -37,6 +39,8 @@ import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,7 +59,20 @@ import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
 import com.shabinder.common.translations.Strings
+import com.shabinder.common.uikit.DownloadAllImage
+import com.shabinder.common.uikit.DownloadImageArrow
+import com.shabinder.common.uikit.DownloadImageError
+import com.shabinder.common.uikit.DownloadImageTick
+import com.shabinder.common.uikit.ImageLoad
+import com.shabinder.common.uikit.VerticalScrollbar
+import com.shabinder.common.uikit.configurations.SpotiFlyerTypography
+import com.shabinder.common.uikit.configurations.appNameStyle
+import com.shabinder.common.uikit.configurations.colorAccent
+import com.shabinder.common.uikit.configurations.colorPrimary
+import com.shabinder.common.uikit.configurations.lightGray
 import com.shabinder.common.uikit.dialogs.DonationDialogComponent
+import com.shabinder.common.uikit.dialogs.ErrorInfoDialog
+import com.shabinder.common.uikit.rememberScrollbarAdapter
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -133,6 +150,7 @@ fun SpotiFlyerListContent(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TrackCard(
     track: TrackDetails,
@@ -168,7 +186,19 @@ fun TrackCard(
                 CircularProgressIndicator()
             }
             is DownloadStatus.Failed -> {
-                DownloadImageError()
+                val (openErrorDialog,dismissErrorDialog) = ErrorInfoDialog((track.downloaded as DownloadStatus.Failed).error)
+
+                Icon(Icons.Rounded.Info,Strings.downloadError(),tint = lightGray,modifier = Modifier.size(42.dp).clickable {
+                    openErrorDialog()
+                }.padding(start = 4.dp,end = 12.dp))
+
+                DownloadImageError(
+                    Modifier.clickable(
+                        onClick = {
+                            downloadTrack()
+                        }
+                    )
+                )
             }
             is DownloadStatus.Downloading -> {
                 CircularProgressIndicator(progress = (track.downloaded as DownloadStatus.Downloading).progress.toFloat() / 100f)

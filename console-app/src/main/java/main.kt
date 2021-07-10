@@ -5,7 +5,7 @@ import com.jakewharton.mosaic.Text
 import com.jakewharton.mosaic.runMosaic
 import kotlinx.coroutines.delay
 
-fun main(/*args: Array<String>*/) = runMosaic {
+fun main() = runMosaic {
     // TODO https://github.com/JakeWharton/mosaic/issues/3
     var count by mutableStateOf(0)
 
