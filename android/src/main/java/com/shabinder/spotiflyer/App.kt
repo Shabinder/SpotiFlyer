@@ -86,7 +86,7 @@ class App: Application(), KoinComponent {
             }
             // Send Crash Report to self hosted Acrarium (FOSS)
             httpSender {
-                uri = "https://acrarium.spotiflyer.ml/report"
+                uri = "https://acrarium.spotiflyer.ml/acrarium/report"
                 basicAuthLogin = "sDj2xCKQIxw0dujf"
                 basicAuthPassword = "O83du0TsgsDJ69zN"
                 httpMethod = HttpSender.Method.POST
