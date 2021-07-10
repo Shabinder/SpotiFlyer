@@ -42,7 +42,7 @@ kotlin {
                 implementation(compose.animation)
 
                 implementation(Extras.kermit)
-                implementation("dev.icerock.moko:parcelize:0.7.0")
+                implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt") {
                     @Suppress("DEPRECATION")
                     isForce = true

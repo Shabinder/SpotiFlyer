@@ -14,9 +14,10 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@file:Suppress("UNUSED_VARIABLE")
+
 package com.shabinder.common.uikit.screens
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,7 +35,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -74,7 +74,6 @@ import com.shabinder.common.uikit.dialogs.DonationDialogComponent
 import com.shabinder.common.uikit.dialogs.ErrorInfoDialog
 import com.shabinder.common.uikit.rememberScrollbarAdapter
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SpotiFlyerListContent(
     component: SpotiFlyerList,
@@ -150,7 +149,6 @@ fun SpotiFlyerListContent(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TrackCard(
     track: TrackDetails,

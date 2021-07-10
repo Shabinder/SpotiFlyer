@@ -65,7 +65,7 @@ kotlin {
                 implementation(Extras.kermit)
                 implementation(Serialization.json)
                 implementation("co.touchlab:stately-common:1.1.7")
-                implementation("dev.icerock.moko:parcelize:0.7.0")
+                implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt") {
                     @Suppress("DEPRECATION")
                     isForce = true

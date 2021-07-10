@@ -324,7 +324,7 @@ class MainActivity : ComponentActivity() {
                         val clip = ClipData.newPlainText("SpotiFlyer Selection", text)
                         clipboard.setPrimaryClip(clip)
 
-                        showPopUpMessage("StackTrace Copied to Clipboard.")
+                        showPopUpMessage("Text Copied to Clipboard.")
                     }
 
                     override fun openPlatform(packageID: String, platformLink: String) {

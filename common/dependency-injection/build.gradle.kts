@@ -30,7 +30,7 @@ kotlin {
             dependencies {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
-                implementation("org.jetbrains.kotlinx:atomicfu:0.16.1")
+                implementation("org.jetbrains.kotlinx:atomicfu:0.16.2")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.1")
                 api(MultiPlatformSettings.dep)
                 implementation(Extras.youtubeDownloader)
