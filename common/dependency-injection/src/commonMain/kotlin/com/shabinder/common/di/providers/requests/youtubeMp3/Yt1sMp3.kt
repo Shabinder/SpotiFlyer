@@ -22,6 +22,7 @@ import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.flatMap
 import com.shabinder.common.models.event.coroutines.map
 import com.shabinder.common.requireNotNull
+import io.github.shabinder.utils.getJsonObject
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
@@ -62,7 +63,10 @@ interface Yt1sMp3 {
             )
         }
 
-        response["kc"].requireNotNull().jsonPrimitive.content
+        response.getJsonObject("links")
+            .getJsonObject("mp3")
+            .getJsonObject("192")
+            ?.get("k").requireNotNull().jsonPrimitive.content
     }
 
     private suspend fun getConvertedMp3Link(videoID: String, key: String): SuspendableEvent<JsonObject,Throwable> = SuspendableEvent {
