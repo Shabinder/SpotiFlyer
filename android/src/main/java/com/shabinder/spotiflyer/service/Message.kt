@@ -31,4 +31,4 @@ fun Message.asString(): String {
     return "$statusString $title ${""/*progress*/}".trim()
 }
 
-fun List<Message>.getEmpty(): MutableList<Message> = MutableList(size) { emptyMessage }
+fun List<Message>.getEmpty(): MutableList<Message> = java.util.Collections.synchronizedList(MutableList(size) { emptyMessage })

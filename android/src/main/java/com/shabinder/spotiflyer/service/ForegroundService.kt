@@ -62,7 +62,7 @@ class ForegroundService : LifecycleService() {
     private val logger: Kermit by inject()
     private val dir: Dir by inject()
 
-    private var messageList = MutableList(5) { emptyMessage }
+    private var messageList = java.util.Collections.synchronizedList(MutableList(5) { emptyMessage })
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
     private val cancelIntent: PendingIntent by lazy {
@@ -275,18 +275,24 @@ class ForegroundService : LifecycleService() {
     }
 
     private fun addToNotification(message: Message) {
-        messageList.add(message)
+        synchronized(messageList) {
+            messageList.add(message)
+        }
         updateNotification()
     }
 
     private fun removeFromNotification(message: Message) {
-        messageList.removeAll { it.title == message.title }
+        synchronized(messageList) {
+            messageList.removeAll { it.title == message.title }
+        }
         updateNotification()
     }
 
     private fun updateProgressInNotification(message: Message) {
-        val index = messageList.indexOfFirst { it.title == message.title }
-        messageList[index] = message
+        synchronized(messageList) {
+            val index = messageList.indexOfFirst { it.title == message.title }
+            messageList[index] = message
+        }
         updateNotification()
     }
 
