@@ -22,6 +22,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.Picture
 import com.shabinder.common.di.preference.PreferenceManager
+import com.shabinder.common.models.Actions
 import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.models.Consumer
 import com.shabinder.common.preference.integration.SpotiFlyerPreferenceImpl
@@ -34,7 +35,9 @@ interface SpotiFlyerPreference {
 
     fun toggleAnalytics(enabled: Boolean)
 
-    fun setDownloadDirectory(newBasePath: String)
+    fun selectNewDownloadDirectory()
+
+    fun setPreferredQuality(quality: AudioQuality)
 
     suspend fun loadImage(url: String): Picture
 
@@ -43,6 +46,7 @@ interface SpotiFlyerPreference {
         val storeFactory: StoreFactory
         val dir: Dir
         val preferenceManager: PreferenceManager
+        val actions: Actions
         val preferenceAnalytics: Analytics
     }
 
@@ -54,6 +58,7 @@ interface SpotiFlyerPreference {
 
     data class State(
         val preferredQuality: AudioQuality = AudioQuality.KBPS320,
+        val downloadPath: String = "",
         val isAnalyticsEnabled: Boolean = false
     )
 }

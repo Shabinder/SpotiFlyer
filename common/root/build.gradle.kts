@@ -30,6 +30,7 @@ fun org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer.generateFramewor
         export(project(":common:database"))
         export(project(":common:main"))
         export(project(":common:list"))
+        export(project(":common:preference"))
         export(Decompose.decompose)
         export(MVIKotlin.mvikotlinMain)
         export(MVIKotlin.mvikotlinLogging)
@@ -65,6 +66,7 @@ kotlin {
                 implementation(project(":common:database"))
                 implementation(project(":common:list"))
                 implementation(project(":common:main"))
+                implementation(project(":common:preference"))
                 implementation(SqlDelight.coroutineExtensions)
             }
         }
@@ -79,6 +81,7 @@ kotlin {
                     api(project(":common:database"))
                     api(project(":common:list"))
                     api(project(":common:main"))
+                    api(project(":common:preference"))
                     api(Decompose.decompose)
                     api(MVIKotlin.mvikotlinMain)
                     api(MVIKotlin.mvikotlinLogging)

@@ -300,7 +300,7 @@ class MainActivity : ComponentActivity() {
 
                     override fun showPopUpMessage(string: String, long: Boolean) = this@MainActivity.showPopUpMessage(string,long)
 
-                    override fun setDownloadDirectoryAction() = setUpOnPrefClickListener()
+                    override fun setDownloadDirectoryAction(callBack: (String) -> Unit) = setUpOnPrefClickListener(callBack)
 
                     override fun queryActiveTracks() = this@MainActivity.queryActiveTracks()
 
@@ -400,7 +400,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Suppress("DEPRECATION")
-    private fun setUpOnPrefClickListener() {
+    private fun setUpOnPrefClickListener(callBack : (String) -> Unit) {
         // Initialize Builder
         val chooser = StorageChooser.Builder()
             .withActivity(this)
@@ -421,6 +421,7 @@ class MainActivity : ComponentActivity() {
             if (f.canWrite()) {
                 // hell yeah :)
                 preferenceManager.setDownloadDirectory(path)
+                callBack(dir.defaultDir())
                 showPopUpMessage(Strings.downloadDirectorySetTo("\n${dir.defaultDir()}"))
             }else{
                 showPopUpMessage(Strings.noWriteAccess("\n$path "))

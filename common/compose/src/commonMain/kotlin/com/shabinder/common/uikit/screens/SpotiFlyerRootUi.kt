@@ -136,8 +136,8 @@ fun MainScreen(modifier: Modifier = Modifier, alpha: Float, topPadding: Dp = 0.d
         AppBar(
             backgroundColor = appBarColor,
             onBackPressed = callBacks::popBackToHomeScreen,
-            setDownloadDirectory = callBacks::setDownloadDirectory,
-            isBackButtonVisible = activeComponent.value.activeChild.instance is Child.List,
+            openPreferenceScreen = callBacks::openPreferenceScreen,
+            isBackButtonVisible = activeComponent.value.activeChild.instance !is Child.Main,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.padding(top = topPadding))
@@ -148,6 +148,7 @@ fun MainScreen(modifier: Modifier = Modifier, alpha: Float, topPadding: Dp = 0.d
             when (val child = it.instance) {
                 is Child.Main -> SpotiFlyerMainContent(component = child.component)
                 is Child.List -> SpotiFlyerListContent(component = child.component)
+                is Child.Preference -> SpotiFlyerPreferenceContent(component = child.component)
             }
         }
     }
@@ -158,7 +159,7 @@ fun MainScreen(modifier: Modifier = Modifier, alpha: Float, topPadding: Dp = 0.d
 fun AppBar(
     backgroundColor: Color,
     onBackPressed: () -> Unit,
-    setDownloadDirectory: () -> Unit,
+    openPreferenceScreen: () -> Unit,
     isBackButtonVisible: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -189,7 +190,7 @@ fun AppBar(
         },
         actions = {
             IconButton(
-                onClick = { setDownloadDirectory() }
+                onClick = { openPreferenceScreen() }
             ) {
                 Icon(Icons.Filled.Settings, Strings.preferences(), tint = Color.Gray)
             }

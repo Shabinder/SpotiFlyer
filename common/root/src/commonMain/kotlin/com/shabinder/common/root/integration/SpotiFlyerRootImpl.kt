@@ -33,6 +33,7 @@ import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.Consumer
 import com.shabinder.common.models.methods
+import com.shabinder.common.preference.SpotiFlyerPreference
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.SpotiFlyerRoot.Child
@@ -47,6 +48,7 @@ internal class SpotiFlyerRootImpl(
     componentContext: ComponentContext,
     private val main: (ComponentContext, output: Consumer<SpotiFlyerMain.Output>) -> SpotiFlyerMain,
     private val list: (ComponentContext, link: String, output: Consumer<SpotiFlyerList.Output>) -> SpotiFlyerList,
+    private val preference: (ComponentContext, output: Consumer<SpotiFlyerPreference.Output>) -> SpotiFlyerPreference,
     private val actions: Actions,
     private val analytics: Analytics
 ) : SpotiFlyerRoot, ComponentContext by componentContext {
@@ -57,19 +59,13 @@ internal class SpotiFlyerRootImpl(
     ) : this(
         componentContext = componentContext,
         main = { childContext, output ->
-            spotiFlyerMain(
-                childContext,
-                output,
-                dependencies
-            )
+            spotiFlyerMain(childContext, output, dependencies)
         },
         list = { childContext, link, output ->
-            spotiFlyerList(
-                childContext,
-                link,
-                output,
-                dependencies
-            )
+            spotiFlyerList(childContext, link, output, dependencies)
+        },
+        preference = { childContext, output ->
+            spotiFlyerPreference(childContext, output, dependencies)
         },
         actions = dependencies.actions.freeze(),
         analytics = dependencies.analytics
@@ -95,20 +91,25 @@ internal class SpotiFlyerRootImpl(
     override val callBacks = object : SpotiFlyerRootCallBacks {
         override fun searchLink(link: String) = onMainOutput(SpotiFlyerMain.Output.Search(link))
         override fun popBackToHomeScreen() {
-            if (router.state.value.activeChild.instance is Child.List && router.state.value.backStack.isNotEmpty()) {
+            if (router.state.value.activeChild.instance !is Child.Main && router.state.value.backStack.isNotEmpty()) {
                 router.popWhile {
                     it !is Configuration.Main
                 }
             }
         }
+
+        override fun openPreferenceScreen() {
+            router.push(Configuration.Preference)
+        }
+
         override fun showToast(text: String) { toastState.value = text }
-        override fun setDownloadDirectory() { actions.setDownloadDirectoryAction() }
     }
 
     private fun createChild(configuration: Configuration, componentContext: ComponentContext): Child =
         when (configuration) {
             is Configuration.Main -> Child.Main(main(componentContext, Consumer(::onMainOutput)))
             is Configuration.List -> Child.List(list(componentContext, configuration.link, Consumer(::onListOutput)))
+            is Configuration.Preference -> Child.Preference(preference(componentContext, Consumer(::onPreferenceOutput)),)
         }
 
     private fun onMainOutput(output: SpotiFlyerMain.Output) =
@@ -128,6 +129,15 @@ internal class SpotiFlyerRootImpl(
                 analytics.homeScreenVisit()
             }
         }
+    private fun onPreferenceOutput(output: SpotiFlyerPreference.Output): Unit =
+        when (output) {
+            is SpotiFlyerPreference.Output.Finished -> {
+                if (router.state.value.activeChild.instance is Child.Preference && router.state.value.backStack.isNotEmpty()) {
+                    router.pop()
+                }
+                Unit
+            }
+        }
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun initAppLaunchAndAuthenticateSpotify(authenticator: suspend () -> Unit) {
@@ -141,6 +151,9 @@ internal class SpotiFlyerRootImpl(
     private sealed class Configuration : Parcelable {
         @Parcelize
         object Main : Configuration()
+
+        @Parcelize
+        object Preference : Configuration()
 
         @Parcelize
         data class List(val link: String) : Configuration()
@@ -163,5 +176,14 @@ private fun spotiFlyerList(componentContext: ComponentContext, link: String, out
             override val link: String = link
             override val listOutput: Consumer<SpotiFlyerList.Output> = output
             override val listAnalytics = object : SpotiFlyerList.Analytics, Analytics by analytics {}
+        }
+    )
+
+private fun spotiFlyerPreference(componentContext: ComponentContext, output: Consumer<SpotiFlyerPreference.Output>, dependencies: Dependencies): SpotiFlyerPreference =
+    SpotiFlyerPreference(
+        componentContext = componentContext,
+        dependencies = object : SpotiFlyerPreference.Dependencies, Dependencies by dependencies {
+            override val prefOutput: Consumer<SpotiFlyerPreference.Output> = output
+            override val preferenceAnalytics = object : SpotiFlyerPreference.Analytics, Analytics by analytics {}
         }
     )

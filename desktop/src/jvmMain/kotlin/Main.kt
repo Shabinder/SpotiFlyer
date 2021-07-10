@@ -37,6 +37,7 @@ import com.shabinder.common.models.Actions
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
+import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.configurations.SpotiFlyerColors
 import com.shabinder.common.uikit.configurations.SpotiFlyerShapes
 import com.shabinder.common.uikit.configurations.SpotiFlyerTypography
@@ -106,7 +107,7 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                     }
                 }
 
-                override fun setDownloadDirectoryAction() {
+                override fun setDownloadDirectoryAction(callBack: (String) -> Unit) {
                     val fileChooser = JFileChooser().apply {
                         fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
                     }
@@ -115,9 +116,10 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                             val directory = fileChooser.selectedFile
                             if(directory.canWrite()){
                                 preferenceManager.setDownloadDirectory(directory.absolutePath)
-                                showPopUpMessage("Set New Download Directory:\n${directory.absolutePath}")
+                                callBack(dir.defaultDir())
+                                showPopUpMessage("${Strings.setDownloadDirectory()} \n${dir.defaultDir()}")
                             } else {
-                                showPopUpMessage("Cant Write to Selected Directory!")
+                                showPopUpMessage(Strings.noWriteAccess("\n${directory.absolutePath} "))
                             }
                         }
                         else -> {

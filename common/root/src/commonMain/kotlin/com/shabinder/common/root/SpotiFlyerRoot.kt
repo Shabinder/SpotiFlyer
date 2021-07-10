@@ -27,6 +27,7 @@ import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.DownloadStatus
+import com.shabinder.common.preference.SpotiFlyerPreference
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.root.integration.SpotiFlyerRootImpl
@@ -45,6 +46,7 @@ interface SpotiFlyerRoot {
     sealed class Child {
         data class Main(val component: SpotiFlyerMain) : Child()
         data class List(val component: SpotiFlyerList) : Child()
+        data class Preference(val component: SpotiFlyerPreference) : Child()
     }
 
     interface Dependencies {

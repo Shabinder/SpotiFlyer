@@ -73,7 +73,7 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
 
                 override fun copyToClipboard(text: String) {}
 
-                override fun setDownloadDirectoryAction() {}
+                override fun setDownloadDirectoryAction(callBack: (String) -> Unit) {}
 
                 override fun queryActiveTracks() {}
 

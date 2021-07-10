@@ -21,14 +21,19 @@ import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
+import com.shabinder.common.di.Dir
 import com.shabinder.common.di.preference.PreferenceManager
+import com.shabinder.common.models.Actions
+import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.models.methods
 import com.shabinder.common.preference.SpotiFlyerPreference.State
 import com.shabinder.common.preference.store.SpotiFlyerPreferenceStore.Intent
 
 internal class SpotiFlyerPreferenceStoreProvider(
     private val storeFactory: StoreFactory,
-    private val preferenceManager: PreferenceManager
+    private val preferenceManager: PreferenceManager,
+    private val dir: Dir,
+    private val actions: Actions
 ) {
 
     fun provide(): SpotiFlyerPreferenceStore =
@@ -43,12 +48,16 @@ internal class SpotiFlyerPreferenceStoreProvider(
             ) {}
 
     private sealed class Result {
-        data class ToggleAnalytics(val isEnabled: Boolean) : Result()
+        data class AnalyticsToggled(val isEnabled: Boolean) : Result()
+        data class DownloadPathSet(val path: String) : Result()
+        data class PreferredAudioQualityChanged(val quality: AudioQuality) : Result()
     }
 
     private inner class ExecutorImpl : SuspendExecutor<Intent, Unit, State, Result, Nothing>() {
         override suspend fun executeAction(action: Unit, getState: () -> State) {
-            dispatch(Result.ToggleAnalytics(preferenceManager.isAnalyticsEnabled))
+            dispatch(Result.AnalyticsToggled(preferenceManager.isAnalyticsEnabled))
+            dispatch(Result.PreferredAudioQualityChanged(preferenceManager.audioQuality))
+            dispatch(Result.DownloadPathSet(dir.defaultDir()))
         }
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) {
@@ -57,8 +66,16 @@ internal class SpotiFlyerPreferenceStoreProvider(
                 is Intent.GiveDonation -> methods.value.giveDonation()
                 is Intent.ShareApp -> methods.value.shareApp()
                 is Intent.ToggleAnalytics -> {
-                    dispatch(Result.ToggleAnalytics(intent.enabled))
+                    dispatch(Result.AnalyticsToggled(intent.enabled))
                     preferenceManager.toggleAnalytics(intent.enabled)
+                }
+                is Intent.SetDownloadDirectory -> {
+                    dispatch(Result.DownloadPathSet(intent.path))
+                    preferenceManager.setDownloadDirectory(intent.path)
+                }
+                is Intent.SetPreferredAudioQuality -> {
+                    dispatch(Result.PreferredAudioQualityChanged(intent.quality))
+                    preferenceManager.setPreferredAudioQuality(intent.quality)
                 }
             }
         }
@@ -67,7 +84,9 @@ internal class SpotiFlyerPreferenceStoreProvider(
     private object ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
             when (result) {
-                is Result.ToggleAnalytics -> copy(isAnalyticsEnabled = result.isEnabled)
+                is Result.AnalyticsToggled -> copy(isAnalyticsEnabled = result.isEnabled)
+                is Result.DownloadPathSet -> copy(downloadPath = result.path)
+                is Result.PreferredAudioQualityChanged -> copy(preferredQuality = result.quality)
             }
     }
 }

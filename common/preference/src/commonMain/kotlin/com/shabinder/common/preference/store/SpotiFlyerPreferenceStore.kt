@@ -17,12 +17,15 @@
 package com.shabinder.common.preference.store
 
 import com.arkivanov.mvikotlin.core.store.Store
+import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.preference.SpotiFlyerPreference
 
 internal interface SpotiFlyerPreferenceStore : Store<SpotiFlyerPreferenceStore.Intent, SpotiFlyerPreference.State, Nothing> {
     sealed class Intent {
         data class OpenPlatform(val platformID: String, val platformLink: String) : Intent()
         data class ToggleAnalytics(val enabled: Boolean) : Intent()
+        data class SetDownloadDirectory(val path: String) : Intent()
+        data class SetPreferredAudioQuality(val quality: AudioQuality) : Intent()
         object GiveDonation : Intent()
         object ShareApp : Intent()
     }

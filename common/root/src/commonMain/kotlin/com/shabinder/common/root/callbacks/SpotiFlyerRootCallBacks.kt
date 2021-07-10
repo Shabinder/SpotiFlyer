@@ -20,5 +20,5 @@ interface SpotiFlyerRootCallBacks {
     fun searchLink(link: String)
     fun showToast(text: String)
     fun popBackToHomeScreen()
-    fun setDownloadDirectory()
+    fun openPreferenceScreen()
 }

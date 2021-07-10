@@ -1,0 +1,7 @@
+ - YT Quality 128 -> 192 KBPS
+ - Bug Fixes
+ - Better Error Handling, and Bubbling upto the caller
+ - Error Dialog with error info added
+ - YT extraction fixed
+ - Retry on Error Logo Added
+ - Translations added for languages: Locales - de, en, es, fr, id, pt, ru, uk

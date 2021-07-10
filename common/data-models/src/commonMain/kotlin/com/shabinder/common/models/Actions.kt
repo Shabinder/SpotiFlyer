@@ -22,7 +22,7 @@ interface Actions {
     fun showPopUpMessage(string: String, long: Boolean = false)
 
     // Change Download Directory
-    fun setDownloadDirectoryAction()
+    fun setDownloadDirectoryAction(callBack: (String) -> Unit)
 
     /*
     * Query Downloading Tracks
@@ -47,7 +47,7 @@ interface Actions {
 private fun stubActions(): Actions = object : Actions {
     override val platformActions = StubPlatformActions
     override fun showPopUpMessage(string: String, long: Boolean) {}
-    override fun setDownloadDirectoryAction() {}
+    override fun setDownloadDirectoryAction(callBack: (String) -> Unit) {}
     override fun queryActiveTracks() {}
     override fun giveDonation() {}
     override fun shareApp() {}

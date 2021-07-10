@@ -22,6 +22,7 @@ import com.arkivanov.decompose.value.Value
 import com.shabinder.common.caching.Cache
 import com.shabinder.common.di.Picture
 import com.shabinder.common.di.utils.asValue
+import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.preference.SpotiFlyerPreference
 import com.shabinder.common.preference.SpotiFlyerPreference.Dependencies
 import com.shabinder.common.preference.SpotiFlyerPreference.State
@@ -42,7 +43,9 @@ internal class SpotiFlyerPreferenceImpl(
         instanceKeeper.getStore {
             SpotiFlyerPreferenceStoreProvider(
                 storeFactory = storeFactory,
-                preferenceManager = preferenceManager
+                preferenceManager = preferenceManager,
+                dir = dir,
+                actions = actions
             ).provide()
         }
 
@@ -59,8 +62,14 @@ internal class SpotiFlyerPreferenceImpl(
         store.accept(Intent.ToggleAnalytics(enabled))
     }
 
-    override fun setDownloadDirectory(newBasePath: String) {
-        preferenceManager.setDownloadDirectory(newBasePath)
+    override fun selectNewDownloadDirectory() {
+        actions.setDownloadDirectoryAction {
+            store.accept(Intent.SetDownloadDirectory(dir.defaultDir()))
+        }
+    }
+
+    override fun setPreferredQuality(quality: AudioQuality) {
+        store.accept(Intent.SetPreferredAudioQuality(quality))
     }
 
     override suspend fun loadImage(url: String): Picture {
