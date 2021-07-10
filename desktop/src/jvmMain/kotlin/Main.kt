@@ -116,7 +116,7 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                             val directory = fileChooser.selectedFile
                             if(directory.canWrite()){
                                 preferenceManager.setDownloadDirectory(directory.absolutePath)
-                                callBack(dir.defaultDir())
+                                callBack(directory.absolutePath)
                                 showPopUpMessage("${Strings.setDownloadDirectory()} \n${dir.defaultDir()}")
                             } else {
                                 showPopUpMessage(Strings.noWriteAccess("\n${directory.absolutePath} "))

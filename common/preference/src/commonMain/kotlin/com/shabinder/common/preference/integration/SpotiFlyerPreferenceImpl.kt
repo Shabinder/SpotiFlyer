@@ -64,7 +64,7 @@ internal class SpotiFlyerPreferenceImpl(
 
     override fun selectNewDownloadDirectory() {
         actions.setDownloadDirectoryAction {
-            store.accept(Intent.SetDownloadDirectory(dir.defaultDir()))
+            store.accept(Intent.SetDownloadDirectory(it))
         }
     }
 

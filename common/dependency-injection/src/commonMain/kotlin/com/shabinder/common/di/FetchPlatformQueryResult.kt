@@ -18,6 +18,7 @@ package com.shabinder.common.di
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.database.DownloadRecordDatabaseQueries
+import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.di.providers.GaanaProvider
 import com.shabinder.common.di.providers.SaavnProvider
 import com.shabinder.common.di.providers.SpotifyProvider
@@ -26,6 +27,7 @@ import com.shabinder.common.di.providers.YoutubeMusic
 import com.shabinder.common.di.providers.YoutubeProvider
 import com.shabinder.common.di.providers.get
 import com.shabinder.common.di.providers.requests.audioToMp3.AudioToMp3
+import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
@@ -48,6 +50,7 @@ class FetchPlatformQueryResult(
     private val youtubeMp3: YoutubeMp3,
     private val audioToMp3: AudioToMp3,
     val dir: Dir,
+    val preferenceManager: PreferenceManager,
     val logger: Kermit
 ) {
     private val db: DownloadRecordDatabaseQueries?
@@ -89,18 +92,19 @@ class FetchPlatformQueryResult(
     // 1) Try Finding on JioSaavn (better quality upto 320KBPS)
     // 2) If Not found try finding on Youtube Music
     suspend fun findMp3DownloadLink(
-        track: TrackDetails
+        track: TrackDetails,
+        preferredQuality: AudioQuality = preferenceManager.audioQuality
     ): SuspendableEvent<String,Throwable> =
         if (track.videoID != null) {
             // We Already have VideoID
             when (track.source) {
                 Source.JioSaavn -> {
                     saavnProvider.getSongFromID(track.videoID.requireNotNull()).flatMap { song ->
-                        song.media_url?.let { audioToMp3.convertToMp3(it) } ?: findHighestQualityMp3Link(track)
+                        song.media_url?.let { audioToMp3.convertToMp3(it) } ?: findMp3Link(track,preferredQuality)
                     }
                 }
                 Source.YouTube -> {
-                    youtubeMp3.getMp3DownloadLink(track.videoID.requireNotNull()).flatMapError {
+                    youtubeMp3.getMp3DownloadLink(track.videoID.requireNotNull(),preferredQuality).flatMapError {
                         logger.e("Yt1sMp3 Failed") { it.message ?: "couldn't fetch link for ${track.videoID} ,trying manual extraction" }
                         youtubeProvider.ytDownloader.getVideo(track.videoID!!).get()?.url?.let { m4aLink ->
                             audioToMp3.convertToMp3(m4aLink)
@@ -109,24 +113,26 @@ class FetchPlatformQueryResult(
                 }
                 else -> {
                     /*We should never reach here for now*/
-                    findHighestQualityMp3Link(track)
+                    findMp3Link(track,preferredQuality)
                 }
             }
         } else {
-            findHighestQualityMp3Link(track)
+            findMp3Link(track,preferredQuality)
         }
 
-    private suspend fun findHighestQualityMp3Link(
-        track: TrackDetails
+    private suspend fun findMp3Link(
+        track: TrackDetails,
+        preferredQuality: AudioQuality
     ):SuspendableEvent<String,Throwable> {
         // Try Fetching Track from Jio Saavn
         return saavnProvider.findMp3SongDownloadURL(
             trackName = track.title,
-            trackArtists = track.artists
+            trackArtists = track.artists,
+            preferredQuality = preferredQuality
         ).flatMapError { saavnError ->
             logger.e { "Fetching From Saavn Failed: \n${saavnError.stackTraceToString()}" }
             // Saavn Failed, Lets Try Fetching Now From Youtube Music
-            youtubeMusic.findMp3SongDownloadURLYT(track).flatMapError { ytMusicError ->
+            youtubeMusic.findMp3SongDownloadURLYT(track,preferredQuality).flatMapError { ytMusicError ->
                 // If Both Failed Bubble the Exception Up with both StackTraces
                 SuspendableEvent.error(
                     SpotiFlyerException.DownloadLinkFetchFailed(

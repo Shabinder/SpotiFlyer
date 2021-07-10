@@ -3,6 +3,7 @@ package com.shabinder.common.di.providers.requests.saavn
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.globalJson
 import com.shabinder.common.di.providers.requests.audioToMp3.AudioToMp3
+import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.models.corsApi
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.map
@@ -38,11 +39,13 @@ interface JioSaavnRequests {
     suspend fun findMp3SongDownloadURL(
         trackName: String,
         trackArtists: List<String>,
+        preferredQuality: AudioQuality
     ): SuspendableEvent<String,Throwable> = searchForSong(trackName).map { songs ->
         val bestMatches = sortByBestMatch(songs, trackName, trackArtists)
 
         val m4aLink: String by getSongFromID(bestMatches.keys.first()).map { song ->
-            song.media_url.requireNotNull()
+            val optimalQuality = if(song.is320Kbps && ((preferredQuality.kbps.toIntOrNull() ?: 0) > 160)) AudioQuality.KBPS320 else AudioQuality.KBPS160
+            song.media_url.requireNotNull().replaceAfterLast("_","${optimalQuality.kbps}.mp4")
         }
 
         val mp3Link by audioToMp3.convertToMp3(m4aLink)

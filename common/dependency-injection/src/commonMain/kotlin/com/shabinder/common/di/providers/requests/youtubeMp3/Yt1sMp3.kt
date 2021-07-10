@@ -17,6 +17,7 @@
 package com.shabinder.common.di.providers.requests.youtubeMp3
 
 import co.touchlab.kermit.Kermit
+import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.models.corsApi
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.flatMap
@@ -42,7 +43,7 @@ interface Yt1sMp3 {
     /*
     * Downloadable Mp3 Link for YT videoID.
     * */
-    suspend fun getLinkFromYt1sMp3(videoID: String): SuspendableEvent<String,Throwable> = getKey(videoID).flatMap { key ->
+    suspend fun getLinkFromYt1sMp3(videoID: String,quality: AudioQuality): SuspendableEvent<String,Throwable> = getKey(videoID,quality).flatMap { key ->
         getConvertedMp3Link(videoID, key).map {
             it["dlink"].requireNotNull()
                 .jsonPrimitive.content.replace("\"", "")
@@ -53,7 +54,7 @@ interface Yt1sMp3 {
     * POST:https://yt1s.com/api/ajaxSearch/index
     * Body Form= q:yt video link ,vt:format=mp3
     * */
-    private suspend fun getKey(videoID: String): SuspendableEvent<String,Throwable> = SuspendableEvent {
+    private suspend fun getKey(videoID: String,quality: AudioQuality): SuspendableEvent<String,Throwable> = SuspendableEvent {
         val response: JsonObject = httpClient.post("${corsApi}https://yt1s.com/api/ajaxSearch/index") {
             body = FormDataContent(
                 Parameters.build {
@@ -63,10 +64,17 @@ interface Yt1sMp3 {
             )
         }
 
-        response.getJsonObject("links")
+        val mp3Keys = response.getJsonObject("links")
             .getJsonObject("mp3")
-            .getJsonObject("192")
-            ?.get("k").requireNotNull().jsonPrimitive.content
+
+        val requestedKBPS = when(quality) {
+            AudioQuality.KBPS128 -> "mp3128"
+            else -> quality.kbps
+        }
+
+        val specificQualityKey = mp3Keys.getJsonObject(requestedKBPS) ?: mp3Keys.getJsonObject("192")
+
+        specificQualityKey?.get("k").requireNotNull().jsonPrimitive.content
     }
 
     private suspend fun getConvertedMp3Link(videoID: String, key: String): SuspendableEvent<JsonObject,Throwable> = SuspendableEvent {

@@ -18,6 +18,7 @@ package com.shabinder.common.di.providers
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.di.providers.requests.audioToMp3.AudioToMp3
+import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.YoutubeTrack
@@ -57,11 +58,14 @@ class YoutubeMusic constructor(
 
     // Get Downloadable Link
     suspend fun findMp3SongDownloadURLYT(
-        trackDetails: TrackDetails
+        trackDetails: TrackDetails,
+        preferredQuality: AudioQuality
     ): SuspendableEvent<String, Throwable> {
         return getYTIDBestMatch(trackDetails).flatMap { videoID ->
+            // As YT compress Audio hence there is no benefit of quality for more than 192
+            val optimalQuality = if((preferredQuality.kbps.toIntOrNull() ?: 0) > 192) AudioQuality.KBPS192 else preferredQuality
             // 1 Try getting Link from Yt1s
-            youtubeMp3.getMp3DownloadLink(videoID).flatMapError {
+            youtubeMp3.getMp3DownloadLink(videoID, optimalQuality).flatMapError {
                 // 2 if Yt1s failed , Extract Manually
                 youtubeProvider.ytDownloader.getVideo(videoID).get()?.url?.let { m4aLink ->
                     audioToMp3.convertToMp3(m4aLink)

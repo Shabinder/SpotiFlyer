@@ -421,7 +421,7 @@ class MainActivity : ComponentActivity() {
             if (f.canWrite()) {
                 // hell yeah :)
                 preferenceManager.setDownloadDirectory(path)
-                callBack(dir.defaultDir())
+                callBack(path)
                 showPopUpMessage(Strings.downloadDirectorySetTo("\n${dir.defaultDir()}"))
             }else{
                 showPopUpMessage(Strings.noWriteAccess("\n$path "))
