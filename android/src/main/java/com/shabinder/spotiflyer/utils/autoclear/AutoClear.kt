@@ -28,7 +28,8 @@ class AutoClear<T : Any?>(
         get() = observer.value
         set(value) { observer.value = value }
 
-    val value: T get() = _value.requireNotNull()
+    val value: T get() = _value ?: initializer?.invoke()
+        ?: throw IllegalStateException("The value has not yet been set or no default initializer provided")
 
     fun getOrNull(): T? = _value
 
