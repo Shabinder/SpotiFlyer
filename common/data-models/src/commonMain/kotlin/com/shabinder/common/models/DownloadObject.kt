@@ -30,6 +30,7 @@ data class TrackDetails(
     var albumName: String? = null,
     var albumArtists: List<String> = emptyList(),
     var genre: List<String> = emptyList(),
+    var trackNumber: Int? = null,
     var year: String? = null,
     var comment: String? = null,
     var lyrics: String? = null,

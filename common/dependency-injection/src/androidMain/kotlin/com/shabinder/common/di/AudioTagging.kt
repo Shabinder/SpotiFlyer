@@ -40,6 +40,8 @@ fun Mp3File.setId3v1Tags(track: TrackDetails): Mp3File {
         album = track.albumName
         year = track.year
         comment = "Genres:${track.comment}"
+        if(track.trackNumber != null)
+            this.track = track.trackNumber.toString()
     }
     this.id3v1Tag = id3v1Tag
     return this
@@ -53,10 +55,13 @@ suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails) {
         title = track.title
         album = track.albumName
         year = track.year
+
         genreDescription = "Genre: " + track.genre.joinToString(", ")
         comment = track.comment
         lyrics = track.lyrics ?: ""
         url = track.trackUrl
+        if(track.trackNumber != null)
+            this.track = track.trackNumber.toString()
     }
     try {
         val art = File(track.albumArtPath)

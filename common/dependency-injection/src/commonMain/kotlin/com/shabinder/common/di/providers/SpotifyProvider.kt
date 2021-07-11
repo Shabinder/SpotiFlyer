@@ -200,6 +200,7 @@ class SpotifyProvider(
     private fun List<Track>.toTrackDetailsList(type: String, subFolder: String) = this.map {
         TrackDetails(
             title = it.name.toString(),
+            trackNumber = it.track_number,
             genre = it.album?.genres?.filterNotNull() ?: emptyList(),
             artists = it.artists?.map { artist -> artist?.name.toString() } ?: listOf(),
             albumArtists = it.album?.artists?.mapNotNull { artist -> artist?.name } ?: emptyList(),
