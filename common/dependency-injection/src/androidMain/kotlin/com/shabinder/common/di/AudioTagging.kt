@@ -48,13 +48,14 @@ fun Mp3File.setId3v1Tags(track: TrackDetails): Mp3File {
 @Suppress("BlockingMethodInNonBlockingContext")
 suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails) {
     val id3v2Tag = ID3v24Tag().apply {
-
+        albumArtist = track.albumArtists.joinToString(", ")
         artist = track.artists.joinToString(", ")
         title = track.title
         album = track.albumName
         year = track.year
-        comment = "Genres:${track.comment}"
-        lyrics = "Gonna Implement Soon"
+        genreDescription = "Genre: " + track.genre.joinToString(", ")
+        comment = track.comment
+        lyrics = track.lyrics ?: ""
         url = track.trackUrl
     }
     try {

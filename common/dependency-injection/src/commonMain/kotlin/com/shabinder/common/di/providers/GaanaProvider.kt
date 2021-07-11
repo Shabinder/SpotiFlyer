@@ -126,6 +126,7 @@ class GaanaProvider(
             durationSec = it.duration,
             albumArtPath = dir.imageCacheDir() + (it.artworkLink.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg",
             albumName = it.album_title,
+            genre = it.genre?.mapNotNull { genre -> genre?.name } ?: emptyList(),
             year = it.release_date,
             comment = "Genres:${it.genre?.map { genre -> genre?.name }?.reduceOrNull { acc, s -> acc + s }}",
             trackUrl = it.lyrics_url,

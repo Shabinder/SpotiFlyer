@@ -30,8 +30,6 @@ import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
-import com.shabinder.common.models.spotify.Album
-import com.shabinder.common.models.spotify.Image
 import com.shabinder.common.models.spotify.PlaylistTrack
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.models.spotify.Track
@@ -133,15 +131,7 @@ class SpotifyProvider(
                     val albumObject = getAlbum(link)
                     folderType = "Albums"
                     subFolder = albumObject.name.toString()
-                    albumObject.tracks?.items?.forEach {
-                        it.album = Album(
-                            images = listOf(
-                                Image(
-                                    url = albumObject.images?.elementAtOrNull(0)?.url
-                                )
-                            )
-                        )
-                    }
+                    albumObject.tracks?.items?.forEach { it.album = albumObject }
 
                     albumObject.tracks?.items?.toTrackDetailsList(folderType, subFolder).let {
                         if (it.isNullOrEmpty()) {
@@ -210,7 +200,9 @@ class SpotifyProvider(
     private fun List<Track>.toTrackDetailsList(type: String, subFolder: String) = this.map {
         TrackDetails(
             title = it.name.toString(),
+            genre = it.album?.genres?.filterNotNull() ?: emptyList(),
             artists = it.artists?.map { artist -> artist?.name.toString() } ?: listOf(),
+            albumArtists = it.album?.artists?.mapNotNull { artist -> artist?.name } ?: emptyList(),
             durationSec = (it.duration_ms / 1000).toInt(),
             albumArtPath = dir.imageCacheDir() + (it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast('/') + ".jpeg",
             albumName = it.album?.name,
