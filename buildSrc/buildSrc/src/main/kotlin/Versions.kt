@@ -18,9 +18,9 @@
 
 object Versions {
     // App's Version (To be bumped at each update)
-    const val versionName = "3.2.0"
+    const val versionName = "3.2.1"
 
-    const val versionCode = 21
+    const val versionCode = 22
     // Kotlin
     const val kotlinVersion = "1.5.10"
 
@@ -56,7 +56,7 @@ object Versions {
 
     // Android
     const val minSdkVersion = 21
-    const val compileSdkVersion = 29
+    const val compileSdkVersion = 30
     const val targetSdkVersion = 29
     const val androidxLifecycle = "2.3.1"
 }
