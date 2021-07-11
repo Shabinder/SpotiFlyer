@@ -31,8 +31,9 @@ class SaavnProvider(
             trackList = listOf(),
             Source.JioSaavn
         ).apply {
-            when (fullLink.substringAfter("saavn.com/").substringBefore("/")) {
-                "song" -> {
+            val pageLink = fullLink.substringAfter("saavn.com/").substringBefore("?")
+            when {
+                pageLink.contains("/song/",true) -> {
                     getSong(fullLink).value.let {
                         folderType = "Tracks"
                         subFolder = ""
@@ -41,7 +42,7 @@ class SaavnProvider(
                         coverUrl = it.image.replace("http:", "https:")
                     }
                 }
-                "album" -> {
+                pageLink.contains("/album/",true) -> {
                     getAlbum(fullLink).value.let {
                         folderType = "Albums"
                         subFolder = removeIllegalChars(it.title)
@@ -50,7 +51,7 @@ class SaavnProvider(
                         coverUrl = it.image.replace("http:", "https:")
                     }
                 }
-                "featured" -> { // Playlist
+                pageLink.contains("/featured/",true) -> { // Playlist
                     getPlaylist(fullLink).value.let {
                         folderType = "Playlists"
                         subFolder = removeIllegalChars(it.listname)

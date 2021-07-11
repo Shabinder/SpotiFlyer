@@ -88,7 +88,7 @@ actual fun GithubLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_g
 actual fun PaypalLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_paypal_logo.xml")) as Painter
 
 @Composable
-actual fun OpenCollectiveLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_opencollective_icon")) as Painter
+actual fun OpenCollectiveLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_opencollective_icon.xml")) as Painter
 
 @Composable
 actual fun RazorPay() = rememberVectorPainter(vectorXmlResource("drawable/ic_indian_rupee.xml")) as Painter
