@@ -90,7 +90,6 @@ Have any questions, doubts or want to present your opinions, views? You're alway
 ### Todos 📄
  - Write **Tests**.
  - Support for Podcasts/Episodes and Shows.
- - Preference Screen.
  - Build a Media Player into this app. [#113](https://github.com/Shabinder/SpotiFlyer/issues/113) 
  
 ### Note
