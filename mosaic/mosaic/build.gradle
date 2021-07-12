@@ -1,0 +1,82 @@
+buildscript {
+	apply from: '../dependencies.gradle'
+
+	dependencies {
+		classpath deps.kotlinGradlePlugin
+		// We don't use this dependency directly. However, we reference a type from the Kotlin Gradle
+		// plugin whose classloading causes com.android.build.gradle.api.BaseVariant to also be loaded.
+		classpath 'com.android.tools.build:gradle:4.2.0'
+		classpath 'com.vanniktech:gradle-maven-publish-plugin:0.13.0'
+		classpath 'org.jetbrains.dokka:dokka-gradle-plugin:1.4.30'
+		classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
+	}
+	repositories {
+		mavenCentral()
+		google()
+		gradlePluginPortal()
+		jcenter() // Dokka
+	}
+}
+
+apply plugin: 'org.jetbrains.dokka'
+dokkaHtmlMultiModule {
+	removeChildTasks([
+		// Do not include Compose in our documentation site.
+		project(":compose:compiler"),
+		project(":compose:runtime"),
+	])
+}
+
+allprojects {
+	group = GROUP
+	version = VERSION_NAME
+
+	repositories {
+		mavenCentral()
+		jcenter {
+			mavenContent {
+				includeModule("org.jetbrains.kotlinx", "kotlinx-html-jvm")
+			}
+		}
+	}
+
+	tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+		kotlinOptions {
+			jvmTarget = '1.8'
+		}
+	}
+
+	tasks.withType(JavaCompile).configureEach {
+		sourceCompatibility = JavaVersion.VERSION_1_8
+		targetCompatibility = JavaVersion.VERSION_1_8
+	}
+
+	tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinCompile).configureEach { task ->
+		task.kotlinOptions {
+			freeCompilerArgs += [
+				'-progressive',
+				'-Xjvm-default=all',
+				'-Xopt-in=kotlin.RequiresOptIn',
+			]
+		}
+	}
+
+	tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile).configureEach { task ->
+		task.kotlinOptions {
+			jvmTarget = "1.8"
+			useIR = true
+		}
+	}
+
+	plugins.withId('com.vanniktech.maven.publish') {
+		mavenPublish {
+			targets {
+				installArchives {
+					def url = file("${rootProject.buildDir}/localMaven").toURI().toString()
+					releaseRepositoryUrl = url
+					snapshotRepositoryUrl = url
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,54 @@
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'com.vanniktech.maven.publish'
+
+dependencies {
+	compileOnly gradleApi()
+	compileOnly deps.kotlinGradlePlugin
+
+	testImplementation deps.junit
+	testImplementation deps.truth
+	testImplementation gradleTestKit()
+}
+
+gradlePlugin {
+	plugins {
+		mosaic {
+			id = "com.jakewharton.mosaic"
+			displayName = "Mosaic"
+			description = "Jetpack Compose for console UI"
+			implementationClass = "com.jakewharton.mosaic.gradle.MosaicPlugin"
+		}
+	}
+}
+
+test {
+	dependsOn(':compose:runtime:installArchives')
+	dependsOn(':compose:compiler:installArchives')
+	dependsOn(':mosaic-gradle-plugin:installArchives')
+	dependsOn(':mosaic-runtime:installArchives')
+}
+
+def versionDirectory = "$buildDir/generated/version/"
+
+sourceSets {
+	main.java.srcDir versionDirectory
+}
+
+task pluginVersion {
+	def outputDir = file(versionDirectory)
+
+	inputs.property 'mosaicVersion', project.version
+	outputs.dir outputDir
+
+	doLast {
+		def versionFile = file("$outputDir/com/jakewharton/mosaic/gradle/version.kt")
+		versionFile.parentFile.mkdirs()
+		versionFile.text = """// Generated file. Do not edit!
+package com.jakewharton.mosaic.gradle
+internal const val mosaicVersion = "${project.version}"
+"""
+	}
+}
+
+tasks.getByName('compileKotlin').dependsOn('pluginVersion')

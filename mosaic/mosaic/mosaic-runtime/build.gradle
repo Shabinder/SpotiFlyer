@@ -1,0 +1,14 @@
+import org.jetbrains.kotlin.gradle.plugin.KotlinPluginKt
+
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'com.vanniktech.maven.publish'
+
+dependencies {
+	api project(':compose:runtime')
+	implementation deps.jansi
+
+	testImplementation deps.junit
+	testImplementation deps.truth
+
+	add(KotlinPluginKt.PLUGIN_CLASSPATH_CONFIGURATION_NAME, project(':compose:compiler'))
+}

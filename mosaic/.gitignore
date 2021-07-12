@@ -1,0 +1,11 @@
+# IntelliJ IDEA
+/.idea
+*.iml
+
+# Gradle
+/.gradle
+build
+/reports
+
+# Gradle (nested build)
+/mosaic/.gradle

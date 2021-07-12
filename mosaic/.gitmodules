@@ -1,0 +1,3 @@
+[submodule "mosaic/compose/upstream"]
+	path = mosaic/compose/upstream
+	url = https://android.googlesource.com/platform/frameworks/support

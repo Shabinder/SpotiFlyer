@@ -1,0 +1,45 @@
+name: build
+
+on:
+  pull_request: {}
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2.3.4
+
+      # Validate before checking out submodules which have their own wrappers.
+      - uses: gradle/wrapper-validation-action@v1
+
+      - run: git submodule update --init
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - run: ./gradlew -p mosaic build dokkaHtmlMultiModule
+      - run: ./gradlew build
+
+      - run: ./gradlew -p mosaic publish
+        if: ${{ github.ref == 'refs/heads/trunk' && github.repository == 'JakeWharton/mosaic' }}
+        env:
+          ORG_GRADLE_PROJECT_SONATYPE_NEXUS_USERNAME: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
+          ORG_GRADLE_PROJECT_SONATYPE_NEXUS_PASSWORD: ${{ secrets.SONATYPE_NEXUS_PASSWORD }}
+
+      - name: Deploy docs to website
+        if: ${{ github.ref == 'refs/heads/trunk' && github.repository == 'JakeWharton/mosaic' }}
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: site
+          FOLDER: mosaic/build/dokka/htmlMultiModule
+          TARGET_FOLDER: docs/latest/
+          CLEAN: true

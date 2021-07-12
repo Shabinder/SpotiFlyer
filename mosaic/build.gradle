@@ -1,0 +1,26 @@
+buildscript {
+	apply from: 'dependencies.gradle'
+
+	dependencies {
+		classpath deps.kotlinGradlePlugin
+
+		// Normally you would declare a version here, but we use dependency substitution in
+		// settings.gradle to use the version built from inside the repo.
+		classpath 'com.jakewharton.mosaic:mosaic-gradle-plugin'
+	}
+	repositories {
+		mavenCentral()
+	}
+}
+
+subprojects {
+	repositories {
+		mavenCentral()
+	}
+
+	tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+		kotlinOptions {
+			jvmTarget = '1.8'
+		}
+	}
+}
