@@ -41,7 +41,7 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 
                         
 <!--START_SECTION:DCI-->
-<a href="https://github.com/Shabinder/SpotiFlyer/releases/latest"><img src="https://hcti.io/v1/image/bc18c099-873f-4a30-a92b-26d872423451" height="125" width="280" alt="Total Downloads"></a>
+<a href="https://github.com/Shabinder/SpotiFlyer/releases/latest"><img src="https://hcti.io/v1/image/51490ae8-f74b-4200-97d6-48e639f49781" height="125" width="280" alt="Total Downloads"></a>
 <!--END_SECTION:DCI-->
 
         
