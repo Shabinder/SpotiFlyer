@@ -32,10 +32,10 @@ interface AudioToMp3 {
     suspend fun convertToMp3(
         URL: String,
         audioQuality: AudioQuality = AudioQuality.getQuality(URL.substringBeforeLast(".").takeLast(3)),
-    ): SuspendableEvent<String,Throwable> = SuspendableEvent {
+    ): SuspendableEvent<String, Throwable> = SuspendableEvent {
         // Active Host ex - https://hostveryfast.onlineconverter.com/file/send
         // Convert Job Request ex - https://www.onlineconverter.com/convert/309a0f2bbaeb5687b04f96b6d65b47bfdd
-        var (activeHost,jobLink) = convertRequest(URL, audioQuality).value
+        var (activeHost, jobLink) = convertRequest(URL, audioQuality).value
 
         // (jobStatus.contains("d")) == COMPLETION
         var jobStatus: String
@@ -48,7 +48,7 @@ interface AudioToMp3 {
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
-                if(e is ClientRequestException && e.response.status.value == 404) {
+                if (e is ClientRequestException && e.response.status.value == 404) {
                     // No Need to Retry, Host/Converter is Busy
                     throw SpotiFlyerException.MP3ConversionFailed(e.message)
                 }
@@ -74,7 +74,7 @@ interface AudioToMp3 {
     private suspend fun convertRequest(
         URL: String,
         audioQuality: AudioQuality = AudioQuality.KBPS160,
-    ): SuspendableEvent<Pair<String,String>,Throwable> = SuspendableEvent {
+    ): SuspendableEvent<Pair<String, String>, Throwable> = SuspendableEvent {
         val activeHost by getHost()
         val convertJob = client.submitFormWithBinaryData<String>(
             url = activeHost,
@@ -104,17 +104,17 @@ interface AudioToMp3 {
         }.execute()
         logger.i("Schedule Conversion Job") { job.status.isSuccess().toString() }
 
-        Pair(activeHost,convertJob)
+        Pair(activeHost, convertJob)
     }
 
     // Active Host free to process conversion
     // ex - https://hostveryfast.onlineconverter.com/file/send
-    private suspend fun getHost(): SuspendableEvent<String,Throwable> = SuspendableEvent {
+    private suspend fun getHost(): SuspendableEvent<String, Throwable> = SuspendableEvent {
         client.get<String>("https://www.onlineconverter.com/get/host") {
             headers {
                 header("Host", "www.onlineconverter.com")
             }
-        }//.also { logger.i("Active Host") { it } }
+        } // .also { logger.i("Active Host") { it } }
     }
 
     // Extract full Domain from URL

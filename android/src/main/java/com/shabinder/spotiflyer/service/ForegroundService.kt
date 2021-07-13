@@ -57,7 +57,7 @@ import java.io.File
 class ForegroundService : LifecycleService() {
 
     private var downloadService: AutoClear<ParallelExecutor> = autoClear { ParallelExecutor(Dispatchers.IO) }
-    val trackStatusFlowMap by autoClear { TrackStatusFlowMap(MutableSharedFlow(replay = 1),lifecycleScope) }
+    val trackStatusFlowMap by autoClear { TrackStatusFlowMap(MutableSharedFlow(replay = 1), lifecycleScope) }
     private val fetcher: FetchPlatformQueryResult by inject()
     private val logger: Kermit by inject()
     private val dir: Dir by inject()
@@ -133,18 +133,18 @@ class ForegroundService : LifecycleService() {
             updateNotification()
         }
 
-        trackList.forEach {
-            trackStatusFlowMap[it.title] = DownloadStatus.Queued
+        for (track in trackList) {
+            trackStatusFlowMap[track.title] = DownloadStatus.Queued
             lifecycleScope.launch {
                 downloadService.value.execute {
-                    fetcher.findMp3DownloadLink(it).fold(
+                    fetcher.findMp3DownloadLink(track).fold(
                         success = { url ->
-                            enqueueDownload(url, it)
+                            enqueueDownload(url, track)
                         },
                         failure = { error ->
                             failed++
                             updateNotification()
-                            trackStatusFlowMap[it.title] = DownloadStatus.Failed(error)
+                            trackStatusFlowMap[track.title] = DownloadStatus.Failed(error)
                         }
                     )
                 }
@@ -238,7 +238,7 @@ class ForegroundService : LifecycleService() {
         lifecycleScope.launch {
             logger.d(TAG) { "Killing Self" }
             messageList = messageList.getEmpty().apply {
-                set(index = 0, Message(Strings.cleaningAndExiting(),DownloadStatus.NotDownloaded))
+                set(index = 0, Message(Strings.cleaningAndExiting(), DownloadStatus.NotDownloaded))
             }
             downloadService.getOrNull()?.close()
             downloadService.reset()
@@ -260,7 +260,7 @@ class ForegroundService : LifecycleService() {
         setSmallIcon(R.drawable.ic_download_arrow)
         setContentTitle("${Strings.total()}: $total  ${Strings.completed()}:$converted  ${Strings.failed()}:$failed")
         setSilent(true)
-        setProgress(total,failed+converted,false)
+        setProgress(total, failed + converted, false)
         setStyle(
             NotificationCompat.InboxStyle().run {
                 addLine(messageList[messageList.size - 1].asString())

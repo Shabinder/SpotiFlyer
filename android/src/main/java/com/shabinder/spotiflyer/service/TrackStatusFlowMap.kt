@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 class TrackStatusFlowMap(
-    val statusFlow: MutableSharedFlow<HashMap<String,DownloadStatus>>,
+    val statusFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>,
     private val scope: CoroutineScope
-): HashMap<String,DownloadStatus>() {
+) : HashMap<String, DownloadStatus>() {
     override fun put(key: String, value: DownloadStatus): DownloadStatus? {
         val res = super.put(key, value)
         scope.launch { statusFlow.emit(this@TrackStatusFlowMap) }

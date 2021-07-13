@@ -40,7 +40,7 @@ fun Mp3File.setId3v1Tags(track: TrackDetails): Mp3File {
         album = track.albumName
         year = track.year
         comment = "Genres:${track.comment}"
-        if(track.trackNumber != null)
+        if (track.trackNumber != null)
             this.track = track.trackNumber.toString()
     }
     this.id3v1Tag = id3v1Tag
@@ -60,7 +60,7 @@ suspend fun Mp3File.setId3v2TagsAndSaveFile(track: TrackDetails) {
         comment = track.comment
         lyrics = track.lyrics ?: ""
         url = track.trackUrl
-        if(track.trackNumber != null)
+        if (track.trackNumber != null)
             this.track = track.trackNumber.toString()
     }
     try {

@@ -121,7 +121,7 @@ fun SpotiFlyerListContent(
             )
 
             // Donation Dialog Visibility
-            val (openDonationDialog,dismissDonationDialog,snoozeDonationDialog) = DonationDialogComponent {
+            val (openDonationDialog, dismissDonationDialog, snoozeDonationDialog) = DonationDialogComponent {
                 component.dismissDonationDialogSetOffset()
             }
 
@@ -184,11 +184,14 @@ fun TrackCard(
                 CircularProgressIndicator()
             }
             is DownloadStatus.Failed -> {
-                val (openErrorDialog,dismissErrorDialog) = ErrorInfoDialog((track.downloaded as DownloadStatus.Failed).error)
+                val (openErrorDialog, dismissErrorDialog) = ErrorInfoDialog((track.downloaded as DownloadStatus.Failed).error)
 
-                Icon(Icons.Rounded.Info,Strings.downloadError(),tint = lightGray,modifier = Modifier.size(42.dp).clickable {
-                    openErrorDialog()
-                }.padding(start = 4.dp,end = 12.dp))
+                Icon(
+                    Icons.Rounded.Info, Strings.downloadError(), tint = lightGray,
+                    modifier = Modifier.size(42.dp).clickable {
+                        openErrorDialog()
+                    }.padding(start = 4.dp, end = 12.dp)
+                )
 
                 DownloadImageError(
                     Modifier.clickable(

@@ -35,7 +35,7 @@ import com.shabinder.common.uikit.RazorPay
 import com.shabinder.common.uikit.configurations.SpotiFlyerTypography
 import com.shabinder.common.uikit.configurations.colorAccent
 
-typealias DonationDialogCallBacks = Triple<openAction,dismissAction,snoozeAction>
+typealias DonationDialogCallBacks = Triple<openAction, dismissAction, snoozeAction>
 internal typealias openAction = () -> Unit
 internal typealias dismissAction = () -> Unit
 private typealias snoozeAction = () -> Unit
@@ -58,7 +58,7 @@ fun DonationDialogComponent(onDismissExtra: () -> Unit): DonationDialogCallBacks
         onDismissExtra()
         isDonationDialogVisible = false
     }
-    return DonationDialogCallBacks(openDonationDialog,dismissDonationDialog,snoozeDonationDialog)
+    return DonationDialogCallBacks(openDonationDialog, dismissDonationDialog, snoozeDonationDialog)
 }
 
 @ExperimentalAnimationApi
@@ -68,7 +68,7 @@ fun DonationDialog(
     onDismiss: () -> Unit,
     onSnooze: () -> Unit
 ) {
-    Dialog(isVisible,onDismiss) {
+    Dialog(isVisible, onDismiss) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             border = BorderStroke(1.dp, Color.Gray) // Gray

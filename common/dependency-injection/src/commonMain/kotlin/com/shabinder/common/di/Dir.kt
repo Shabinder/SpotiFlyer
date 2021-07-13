@@ -59,7 +59,7 @@ fun Dir.createDirectories() {
         createDirectory(defaultDir() + "Albums/")
         createDirectory(defaultDir() + "Playlists/")
         createDirectory(defaultDir() + "YT_Downloads/")
-    } catch (e:Exception){}
+    } catch (e: Exception) {}
 }
 
 fun Dir.finalOutputDir(itemName: String, type: String, subFolder: String, defaultDir: String, extension: String = ".mp3"): String =

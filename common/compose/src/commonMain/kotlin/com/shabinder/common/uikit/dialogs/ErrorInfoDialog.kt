@@ -31,7 +31,7 @@ import com.shabinder.common.uikit.Dialog
 import com.shabinder.common.uikit.configurations.SpotiFlyerTypography
 import com.shabinder.common.uikit.configurations.colorAccent
 
-typealias ErrorInfoDialogCallBacks = Pair<openAction,dismissAction>
+typealias ErrorInfoDialogCallBacks = Pair<openAction, dismissAction>
 
 @Composable
 fun ErrorInfoDialog(error: Throwable): ErrorInfoDialogCallBacks {
@@ -75,5 +75,5 @@ fun ErrorInfoDialog(error: Throwable): ErrorInfoDialogCallBacks {
         }
     }
 
-    return ErrorInfoDialogCallBacks(openErrorDialog,onDismissDialog)
+    return ErrorInfoDialogCallBacks(openErrorDialog, onDismissDialog)
 }

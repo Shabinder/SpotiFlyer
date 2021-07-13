@@ -56,9 +56,8 @@ import java.net.URI
 import javax.swing.JFileChooser
 import javax.swing.JFileChooser.APPROVE_OPTION
 
-
 private val koin = initKoin(enableNetworkLogs = true).koin
-private lateinit var showToast: (String)->Unit
+private lateinit var showToast: (String) -> Unit
 private val tracker: PiwikTracker by lazy {
     PiwikTracker("https://matomo.spotiflyer.ml/matomo.php")
 }
@@ -68,7 +67,7 @@ fun main() {
     val lifecycle = LifecycleRegistry()
     lifecycle.resume()
 
-    Window("SpotiFlyer",size = IntSize(450,800)) {
+    Window("SpotiFlyer", size = IntSize(450, 800)) {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = Color.Black,
@@ -80,7 +79,7 @@ fun main() {
                 shapes = SpotiFlyerShapes
             ) {
                 val root: SpotiFlyerRoot = SpotiFlyerRootContent(rememberRootComponent(factory = ::spotiFlyerRoot))
-                showToast =  root.callBacks::showToast
+                showToast = root.callBacks::showToast
             }
         }
     }
@@ -98,11 +97,11 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
             override val database: Database? = dir.db
             override val preferenceManager: PreferenceManager = koin.get()
             override val downloadProgressFlow = DownloadProgressFlow
-            override val actions: Actions = object: Actions {
+            override val actions: Actions = object : Actions {
                 override val platformActions = object : PlatformActions {}
 
                 override fun showPopUpMessage(string: String, long: Boolean) {
-                    if(::showToast.isInitialized){
+                    if (::showToast.isInitialized) {
                         showToast(string)
                     }
                 }
@@ -114,7 +113,7 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                     when (fileChooser.showOpenDialog(AppManager.focusedWindow?.window)) {
                         APPROVE_OPTION -> {
                             val directory = fileChooser.selectedFile
-                            if(directory.canWrite()){
+                            if (directory.canWrite()) {
                                 preferenceManager.setDownloadDirectory(directory.absolutePath)
                                 callBack(directory.absolutePath)
                                 showPopUpMessage("${Strings.setDownloadDirectory()} \n${dir.defaultDir()}")
@@ -128,7 +127,7 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                     }
                 }
 
-                override fun queryActiveTracks() {/**/}
+                override fun queryActiveTracks() { /**/ }
 
                 override fun giveDonation() {
                     openLink("https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button")
@@ -143,22 +142,22 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
 
                 override fun openPlatform(packageID: String, platformLink: String) = openLink(platformLink)
 
-                fun openLink(link:String) {
+                fun openLink(link: String) {
                     if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                         Desktop.getDesktop().browse(URI(link))
                     }
                 }
 
-                override fun writeMp3Tags(trackDetails: TrackDetails) {/*IMPLEMENTED*/}
+                override fun writeMp3Tags(trackDetails: TrackDetails) { /*IMPLEMENTED*/ }
 
                 override val isInternetAvailable: Boolean
-                    get() =  runBlocking {
+                    get() = runBlocking {
                         isInternetAccessible()
                     }
             }
-            override val analytics = object: SpotiFlyerRoot.Analytics {
+            override val analytics = object : SpotiFlyerRoot.Analytics {
                 override fun appLaunchEvent() {
-                    if(preferenceManager.isFirstLaunch) {
+                    if (preferenceManager.isFirstLaunch) {
                         // Enable Analytics on First Launch
                         preferenceManager.toggleAnalytics(true)
                         preferenceManager.firstLaunchDone()

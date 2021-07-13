@@ -4,9 +4,8 @@ import org.piwik.java.tracking.PiwikRequest
 import org.piwik.java.tracking.PiwikTracker
 import java.net.URL
 
-
 fun PiwikTracker.trackAsync(
-    baseURL:String = "https://com.shabinder.spotiflyer/",
+    baseURL: String = "https://com.shabinder.spotiflyer/",
     requestBuilder: PiwikRequest.() -> Unit = {}
 ) {
     val req = PiwikRequest(
@@ -18,7 +17,7 @@ fun PiwikTracker.trackAsync(
 }
 
 fun PiwikTracker.trackScreenAsync(
-    screenAddress:String,
+    screenAddress: String,
     requestBuilder: PiwikRequest.() -> Unit = {}
 ) {
     val req = PiwikRequest(

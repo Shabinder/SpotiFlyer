@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.util.Base64
-import android.util.Log
 import com.shabinder.spotiflyer.App
 import java.security.MessageDigest
 
@@ -22,14 +21,14 @@ fun checkAppSignature(context: Context): Boolean {
             // Log.d("REMOVE_ME", "Include this string as a value for SIGNATURE:$currentSignature")
             // Log.d("REMOVE_ME HEX", "Include this string as a value for SIGNATURE Hex:${currentSignature.toByteArray().toHEX()}")
 
-            //compare signatures
+            // compare signatures
             if (App.SIGNATURE_HEX == currentSignature.toByteArray().toHEX()) {
                 return true
             }
         }
     } catch (e: Exception) {
         e.printStackTrace()
-        //assumes an issue in checking signature., but we let the caller decide on what to do.
+        // assumes an issue in checking signature., but we let the caller decide on what to do.
     }
     return false
 }

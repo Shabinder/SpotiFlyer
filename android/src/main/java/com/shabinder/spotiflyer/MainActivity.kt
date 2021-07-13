@@ -98,7 +98,6 @@ import org.koin.android.ext.android.inject
 import org.matomo.sdk.extra.TrackHelper
 import java.io.File
 
-
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
 
@@ -167,7 +166,7 @@ class MainActivity : ComponentActivity() {
 
                         LaunchedEffect(view) {
                             permissionGranted.value = checkPermissions()
-                            if(preferenceManager.isFirstLaunch) {
+                            if (preferenceManager.isFirstLaunch) {
                                 delay(2500)
                                 // Ask For Analytics Permission on first Dialog
                                 askForAnalyticsPermission = true
@@ -187,8 +186,8 @@ class MainActivity : ComponentActivity() {
         * and Track Downloads for all other releases like F-Droid,
         * for `Github Downloads` we will track Downloads using : https://tooomm.github.io/github-release-stats/?username=Shabinder&repository=SpotiFlyer
         * */
-        if(isGithubRelease) { checkIfLatestVersion() }
-        if(preferenceManager.isAnalyticsEnabled && !isGithubRelease) {
+        if (isGithubRelease) { checkIfLatestVersion() }
+        if (preferenceManager.isAnalyticsEnabled && !isGithubRelease) {
             // Download/App Install Event for F-Droid builds
             TrackHelper.track().download().with(tracker)
         }
@@ -248,7 +247,6 @@ class MainActivity : ComponentActivity() {
     }
     /*END: Foreground Service Handlers*/
 
-
     @Composable
     private fun isInternetAvailableState(): State<Boolean?> {
         return internetAvailability.observeAsState()
@@ -258,7 +256,7 @@ class MainActivity : ComponentActivity() {
         android.widget.Toast.makeText(
             applicationContext,
             string,
-            if(long) android.widget.Toast.LENGTH_LONG else android.widget.Toast.LENGTH_SHORT
+            if (long) android.widget.Toast.LENGTH_LONG else android.widget.Toast.LENGTH_SHORT
         ).show()
     }
 
@@ -270,23 +268,24 @@ class MainActivity : ComponentActivity() {
     private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
         SpotiFlyerRoot(
             componentContext,
-            dependencies = object : SpotiFlyerRoot.Dependencies{
+            dependencies = object : SpotiFlyerRoot.Dependencies {
                 override val storeFactory = LoggingStoreFactory(DefaultStoreFactory)
                 override val database = this@MainActivity.dir.db
                 override val fetchQuery = this@MainActivity.fetcher
                 override val dir: Dir = this@MainActivity.dir
                 override val preferenceManager = this@MainActivity.preferenceManager
                 override val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
-                override val actions = object: Actions {
+                override val actions = object : Actions {
 
                     override val platformActions = object : PlatformActions {
                         override val imageCacheDir: String = applicationContext.cacheDir.absolutePath + File.separator
-                        override val sharedPreferences = applicationContext.getSharedPreferences(SharedPreferencesKey,
+                        override val sharedPreferences = applicationContext.getSharedPreferences(
+                            SharedPreferencesKey,
                             MODE_PRIVATE
                         )
 
                         override fun addToLibrary(path: String) {
-                            MediaScannerConnection.scanFile (
+                            MediaScannerConnection.scanFile(
                                 applicationContext,
                                 listOf(path).toTypedArray(), null, null
                             )
@@ -298,14 +297,14 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    override fun showPopUpMessage(string: String, long: Boolean) = this@MainActivity.showPopUpMessage(string,long)
+                    override fun showPopUpMessage(string: String, long: Boolean) = this@MainActivity.showPopUpMessage(string, long)
 
                     override fun setDownloadDirectoryAction(callBack: (String) -> Unit) = setUpOnPrefClickListener(callBack)
 
                     override fun queryActiveTracks() = this@MainActivity.queryActiveTracks()
 
                     override fun giveDonation() {
-                        openPlatform("",platformLink = "https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button")
+                        openPlatform("", platformLink = "https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button")
                     }
 
                     override fun shareApp() {
@@ -342,25 +341,25 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    override fun writeMp3Tags(trackDetails: TrackDetails) {/*IMPLEMENTED*/}
+                    override fun writeMp3Tags(trackDetails: TrackDetails) { /*IMPLEMENTED*/ }
 
-                    override val isInternetAvailable get()  = internetAvailability.value ?: true
+                    override val isInternetAvailable get() = internetAvailability.value ?: true
                 }
 
                 /*
                 * Analytics Will Only Be Sent if User Granted us the Permission
                 * */
-                override val analytics = object: Analytics {
+                override val analytics = object : Analytics {
                     override fun appLaunchEvent() {
-                        if(preferenceManager.isAnalyticsEnabled){
+                        if (preferenceManager.isAnalyticsEnabled) {
                             TrackHelper.track()
-                                .event("events","App_Launch")
+                                .event("events", "App_Launch")
                                 .name("App Launch").with(tracker)
                         }
                     }
 
                     override fun homeScreenVisit() {
-                        if(preferenceManager.isAnalyticsEnabled){
+                        if (preferenceManager.isAnalyticsEnabled) {
                             // HomeScreen Visit Event
                             TrackHelper.track().screen("/main_activity/home_screen")
                                 .title("HomeScreen").with(tracker)
@@ -368,7 +367,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     override fun listScreenVisit() {
-                        if(preferenceManager.isAnalyticsEnabled){
+                        if (preferenceManager.isAnalyticsEnabled) {
                             // ListScreen Visit Event
                             TrackHelper.track().screen("/main_activity/list_screen")
                                 .title("ListScreen").with(tracker)
@@ -400,15 +399,17 @@ class MainActivity : ComponentActivity() {
     }
 
     @Suppress("DEPRECATION")
-    private fun setUpOnPrefClickListener(callBack : (String) -> Unit) {
+    private fun setUpOnPrefClickListener(callBack: (String) -> Unit) {
         // Initialize Builder
         val chooser = StorageChooser.Builder()
             .withActivity(this)
             .withFragmentManager(fragmentManager)
             .withMemoryBar(true)
-            .setTheme(StorageChooser.Theme(applicationContext).apply {
-                scheme = applicationContext.resources.getIntArray(R.array.default_dark)
-            })
+            .setTheme(
+                StorageChooser.Theme(applicationContext).apply {
+                    scheme = applicationContext.resources.getIntArray(R.array.default_dark)
+                }
+            )
             .setDialogTitle(Strings.setDownloadDirectory())
             .allowCustomPath(true)
             .setType(StorageChooser.DIRECTORY_CHOOSER)
@@ -423,7 +424,7 @@ class MainActivity : ComponentActivity() {
                 preferenceManager.setDownloadDirectory(path)
                 callBack(path)
                 showPopUpMessage(Strings.downloadDirectorySetTo("\n${dir.defaultDir()}"))
-            }else{
+            } else {
                 showPopUpMessage(Strings.noWriteAccess("\n$path "))
             }
         }
@@ -445,7 +446,7 @@ class MainActivity : ComponentActivity() {
                     // Ignoring battery optimization
                     permissionGranted.value = true
                 } else {
-                    disableDozeMode(disableDozeCode)//Again Ask For Permission!!
+                    disableDozeMode(disableDozeCode) // Again Ask For Permission!!
                 }
             }
         }
@@ -463,12 +464,12 @@ class MainActivity : ComponentActivity() {
                     val filterLinkRegex = """http.+\w""".toRegex()
                     val string = it.replace("\n".toRegex(), " ")
                     val link = filterLinkRegex.find(string)?.value.toString()
-                    Log.i("Intent",link)
+                    Log.i("Intent", link)
                     lifecycleScope.launch {
-                        while(!this@MainActivity::root.isInitialized){
+                        while (!this@MainActivity::root.isInitialized) {
                             delay(100)
                         }
-                        if(methods.value.isInternetAvailable)callBacks.searchLink(link)
+                        if (methods.value.isInternetAvailable)callBacks.searchLink(link)
                     }
                 }
             }

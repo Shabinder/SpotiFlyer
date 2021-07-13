@@ -8,7 +8,7 @@ import java.io.File
  **/
 fun cleanFiles(dir: File) {
     try {
-        Log.d("File Cleaning","Starting Cleaning in ${dir.path} ")
+        Log.d("File Cleaning", "Starting Cleaning in ${dir.path} ")
         val fList = dir.listFiles()
         fList?.let {
             for (file in fList) {
@@ -16,7 +16,7 @@ fun cleanFiles(dir: File) {
                     cleanFiles(file)
                 } else if (file.isFile) {
                     if (file.path.toString().substringAfterLast(".") != "mp3") {
-                        Log.d("Files Cleaning","Cleaning ${file.path}")
+                        Log.d("Files Cleaning", "Cleaning ${file.path}")
                         file.delete()
                     }
                 }
@@ -24,4 +24,3 @@ fun cleanFiles(dir: File) {
         }
     } catch (e: Exception) { e.printStackTrace() }
 }
-

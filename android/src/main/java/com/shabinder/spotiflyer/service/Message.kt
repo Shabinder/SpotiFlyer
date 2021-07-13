@@ -7,7 +7,7 @@ typealias Message = Pair<String, DownloadStatus>
 
 val Message.title: String get() = first
 
-val Message.downloadStatus: DownloadStatus get()  = second
+val Message.downloadStatus: DownloadStatus get() = second
 
 val Message.progress: String get() = when (downloadStatus) {
     is DownloadStatus.Downloading -> "-> ${(downloadStatus as DownloadStatus.Downloading).progress}%"
@@ -18,12 +18,12 @@ val Message.progress: String get() = when (downloadStatus) {
     is DownloadStatus.NotDownloaded -> ""
 }
 
-val emptyMessage = Message("",DownloadStatus.NotDownloaded)
+val emptyMessage = Message("", DownloadStatus.NotDownloaded)
 
 // `Progress` is not being shown because we don't get get consistent Updates from Download Fun ,
 //  all Progress data is emitted all together from fun
 fun Message.asString(): String {
-    val statusString = when(downloadStatus){
+    val statusString = when (downloadStatus) {
         is DownloadStatus.Downloading -> Strings.downloading()
         is DownloadStatus.Converting -> Strings.processing()
         else -> ""

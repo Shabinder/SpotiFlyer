@@ -58,7 +58,7 @@ class FetchPlatformQueryResult(
 
     suspend fun authenticateSpotifyClient() = spotifyProvider.authenticateSpotifyClient()
 
-    suspend fun query(link: String): SuspendableEvent<PlatformQueryResult,Throwable> {
+    suspend fun query(link: String): SuspendableEvent<PlatformQueryResult, Throwable> {
         val result = when {
             // SPOTIFY
             link.contains("spotify", true) ->
@@ -94,17 +94,17 @@ class FetchPlatformQueryResult(
     suspend fun findMp3DownloadLink(
         track: TrackDetails,
         preferredQuality: AudioQuality = preferenceManager.audioQuality
-    ): SuspendableEvent<String,Throwable> =
+    ): SuspendableEvent<String, Throwable> =
         if (track.videoID != null) {
             // We Already have VideoID
             when (track.source) {
                 Source.JioSaavn -> {
                     saavnProvider.getSongFromID(track.videoID.requireNotNull()).flatMap { song ->
-                        song.media_url?.let { audioToMp3.convertToMp3(it) } ?: findMp3Link(track,preferredQuality)
+                        song.media_url?.let { audioToMp3.convertToMp3(it) } ?: findMp3Link(track, preferredQuality)
                     }
                 }
                 Source.YouTube -> {
-                    youtubeMp3.getMp3DownloadLink(track.videoID.requireNotNull(),preferredQuality).flatMapError {
+                    youtubeMp3.getMp3DownloadLink(track.videoID.requireNotNull(), preferredQuality).flatMapError {
                         logger.e("Yt1sMp3 Failed") { it.message ?: "couldn't fetch link for ${track.videoID} ,trying manual extraction" }
                         youtubeProvider.ytDownloader.getVideo(track.videoID!!).get()?.url?.let { m4aLink ->
                             audioToMp3.convertToMp3(m4aLink)
@@ -113,17 +113,17 @@ class FetchPlatformQueryResult(
                 }
                 else -> {
                     /*We should never reach here for now*/
-                    findMp3Link(track,preferredQuality)
+                    findMp3Link(track, preferredQuality)
                 }
             }
         } else {
-            findMp3Link(track,preferredQuality)
+            findMp3Link(track, preferredQuality)
         }
 
     private suspend fun findMp3Link(
         track: TrackDetails,
         preferredQuality: AudioQuality
-    ):SuspendableEvent<String,Throwable> {
+    ): SuspendableEvent<String, Throwable> {
         // Try Fetching Track from Jio Saavn
         return saavnProvider.findMp3SongDownloadURL(
             trackName = track.title,
@@ -132,11 +132,11 @@ class FetchPlatformQueryResult(
         ).flatMapError { saavnError ->
             logger.e { "Fetching From Saavn Failed: \n${saavnError.stackTraceToString()}" }
             // Saavn Failed, Lets Try Fetching Now From Youtube Music
-            youtubeMusic.findMp3SongDownloadURLYT(track,preferredQuality).flatMapError { ytMusicError ->
+            youtubeMusic.findMp3SongDownloadURLYT(track, preferredQuality).flatMapError { ytMusicError ->
                 // If Both Failed Bubble the Exception Up with both StackTraces
                 SuspendableEvent.error(
                     SpotiFlyerException.DownloadLinkFetchFailed(
-                        trackName =  track.title,
+                        trackName = track.title,
                         ytMusicError = ytMusicError,
                         jioSaavnError = saavnError
                     )

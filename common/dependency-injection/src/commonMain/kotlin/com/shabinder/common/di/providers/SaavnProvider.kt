@@ -33,7 +33,7 @@ class SaavnProvider(
         ).apply {
             val pageLink = fullLink.substringAfter("saavn.com/").substringBefore("?")
             when {
-                pageLink.contains("/song/",true) -> {
+                pageLink.contains("/song/", true) -> {
                     getSong(fullLink).value.let {
                         folderType = "Tracks"
                         subFolder = ""
@@ -42,7 +42,7 @@ class SaavnProvider(
                         coverUrl = it.image.replace("http:", "https:")
                     }
                 }
-                pageLink.contains("/album/",true) -> {
+                pageLink.contains("/album/", true) -> {
                     getAlbum(fullLink).value.let {
                         folderType = "Albums"
                         subFolder = removeIllegalChars(it.title)
@@ -51,7 +51,7 @@ class SaavnProvider(
                         coverUrl = it.image.replace("http:", "https:")
                     }
                 }
-                pageLink.contains("/featured/",true) -> { // Playlist
+                pageLink.contains("/featured/", true) -> { // Playlist
                     getPlaylist(fullLink).value.let {
                         folderType = "Playlists"
                         subFolder = removeIllegalChars(it.listname)

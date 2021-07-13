@@ -32,9 +32,9 @@ import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 
 fun Activity.checkIfLatestVersion() {
-    AppUpdater(this,0).run {
+    AppUpdater(this, 0).run {
         setDisplay(Display.NOTIFICATION)
-        showAppUpdated(false)//true:Show App is Updated Dialog
+        showAppUpdated(false) // true:Show App is Updated Dialog
         setUpdateFrom(UpdateFrom.XML)
         setUpdateXML("https://raw.githubusercontent.com/Shabinder/SpotiFlyer/Compose/app/src/main/res/xml/app_update.xml")
         setCancelable(false)
@@ -42,24 +42,26 @@ fun Activity.checkIfLatestVersion() {
     }
 }
 
-fun Activity.checkPermissions():Boolean = ContextCompat
-        .checkSelfPermission(this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-            &&
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) == PackageManager.PERMISSION_GRANTED
-            } else true
-
+fun Activity.checkPermissions(): Boolean = ContextCompat
+    .checkSelfPermission(
+        this,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    ) == PackageManager.PERMISSION_GRANTED &&
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+    } else true
 
 @SuppressLint("BatteryLife", "ObsoleteSdkInt")
-fun Activity.disableDozeMode(requestCode:Int) {
+fun Activity.disableDozeMode(requestCode: Int) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         val pm =
             this.getSystemService(Context.POWER_SERVICE) as PowerManager
         val isIgnoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(packageName)
         if (!isIgnoringBatteryOptimizations) {
-            val intent = Intent().apply{
+            val intent = Intent().apply {
                 action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
                 data = Uri.parse("package:$packageName")
             }

@@ -40,12 +40,12 @@ interface JioSaavnRequests {
         trackName: String,
         trackArtists: List<String>,
         preferredQuality: AudioQuality
-    ): SuspendableEvent<String,Throwable> = searchForSong(trackName).map { songs ->
+    ): SuspendableEvent<String, Throwable> = searchForSong(trackName).map { songs ->
         val bestMatches = sortByBestMatch(songs, trackName, trackArtists)
 
         val m4aLink: String by getSongFromID(bestMatches.keys.first()).map { song ->
-            val optimalQuality = if(song.is320Kbps && ((preferredQuality.kbps.toIntOrNull() ?: 0) > 160)) AudioQuality.KBPS320 else AudioQuality.KBPS160
-            song.media_url.requireNotNull().replaceAfterLast("_","${optimalQuality.kbps}.mp4")
+            val optimalQuality = if (song.is320Kbps && ((preferredQuality.kbps.toIntOrNull() ?: 0) > 160)) AudioQuality.KBPS320 else AudioQuality.KBPS160
+            song.media_url.requireNotNull().replaceAfterLast("_", "${optimalQuality.kbps}.mp4")
         }
 
         val mp3Link by audioToMp3.convertToMp3(m4aLink)
@@ -56,7 +56,7 @@ interface JioSaavnRequests {
     suspend fun searchForSong(
         query: String,
         includeLyrics: Boolean = false
-    ): SuspendableEvent<List<SaavnSearchResult>,Throwable> = SuspendableEvent {
+    ): SuspendableEvent<List<SaavnSearchResult>, Throwable> = SuspendableEvent {
 
         val searchURL = search_base_url + query
         val results = mutableListOf<SaavnSearchResult>()
@@ -67,12 +67,12 @@ interface JioSaavnRequests {
                 (it as JsonObject).formatData().let { jsonObject ->
                     results.add(globalJson.decodeFromJsonElement(SaavnSearchResult.serializer(), jsonObject))
                 }
-        }
+            }
 
         results
     }
 
-    suspend fun getLyrics(ID: String): SuspendableEvent<String,Throwable> = SuspendableEvent {
+    suspend fun getLyrics(ID: String): SuspendableEvent<String, Throwable> = SuspendableEvent {
         (Json.parseToJsonElement(httpClient.get(lyrics_base_url + ID)) as JsonObject)
             .getString("lyrics").requireNotNull()
     }
@@ -80,7 +80,7 @@ interface JioSaavnRequests {
     suspend fun getSong(
         URL: String,
         fetchLyrics: Boolean = false
-    ): SuspendableEvent<SaavnSong,Throwable> = SuspendableEvent {
+    ): SuspendableEvent<SaavnSong, Throwable> = SuspendableEvent {
         val id = getSongID(URL)
         val data = ((globalJson.parseToJsonElement(httpClient.get(song_details_base_url + id)) as JsonObject)[id] as JsonObject)
             .formatData(fetchLyrics)
@@ -91,7 +91,7 @@ interface JioSaavnRequests {
     suspend fun getSongFromID(
         ID: String,
         fetchLyrics: Boolean = false
-    ): SuspendableEvent<SaavnSong,Throwable> = SuspendableEvent {
+    ): SuspendableEvent<SaavnSong, Throwable> = SuspendableEvent {
         val data = ((globalJson.parseToJsonElement(httpClient.get(song_details_base_url + ID)) as JsonObject)[ID] as JsonObject)
             .formatData(fetchLyrics)
 
@@ -112,7 +112,7 @@ interface JioSaavnRequests {
     suspend fun getPlaylist(
         URL: String,
         includeLyrics: Boolean = false
-    ): SuspendableEvent<SaavnPlaylist,Throwable> = SuspendableEvent {
+    ): SuspendableEvent<SaavnPlaylist, Throwable> = SuspendableEvent {
         globalJson.decodeFromJsonElement(
             SaavnPlaylist.serializer(),
             (globalJson.parseToJsonElement(httpClient.get(playlist_details_base_url + getPlaylistID(URL).value)) as JsonObject)
@@ -122,7 +122,7 @@ interface JioSaavnRequests {
 
     private suspend fun getPlaylistID(
         URL: String
-    ): SuspendableEvent<String,Throwable> = SuspendableEvent {
+    ): SuspendableEvent<String, Throwable> = SuspendableEvent {
         val res = httpClient.get<String>(URL)
         try {
             res.split("\"type\":\"playlist\",\"id\":\"")[1].split('"')[0]
@@ -134,7 +134,7 @@ interface JioSaavnRequests {
     suspend fun getAlbum(
         URL: String,
         includeLyrics: Boolean = false
-    ): SuspendableEvent<SaavnAlbum,Throwable> = SuspendableEvent {
+    ): SuspendableEvent<SaavnAlbum, Throwable> = SuspendableEvent {
         globalJson.decodeFromJsonElement(
             SaavnAlbum.serializer(),
             (globalJson.parseToJsonElement(httpClient.get(album_details_base_url + getAlbumID(URL).value)) as JsonObject)
@@ -144,7 +144,7 @@ interface JioSaavnRequests {
 
     private suspend fun getAlbumID(
         URL: String
-    ): SuspendableEvent<String,Throwable> = SuspendableEvent {
+    ): SuspendableEvent<String, Throwable> = SuspendableEvent {
         val res = httpClient.get<String>(URL)
         try {
             res.split("\"album_id\":\"")[1].split('"')[0]

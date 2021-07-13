@@ -18,15 +18,15 @@ internal suspend fun updateDownloadCards(
         fileName = "README.md"
     ).decryptedContent
 
-    var totalDownloads:Int = GithubService.getGithubRepoReleasesInfo(
+    var totalDownloads: Int = GithubService.getGithubRepoReleasesInfo(
         secrets.ownerName,
         secrets.repoName
     ).let { allReleases ->
         var totalCount = 0
 
-        for(release in allReleases){
+        for (release in allReleases) {
             release.assets.forEach {
-                //debug("${it.name}: ${release.tag_name}" ,"Downloads: ${it.download_count}")
+                // debug("${it.name}: ${release.tag_name}" ,"Downloads: ${it.download_count}")
                 totalCount += it.download_count
             }
         }
@@ -75,19 +75,18 @@ private suspend fun getDownloadCard(
         contentLength = req.headers["Content-Length"]?.toLong() ?: 0
         // debug(contentLength.toString())
 
-        if(retryCount-- == 0){
+        if (retryCount-- == 0) {
             // FAIL Gracefully
             throw(RETRY_LIMIT_EXHAUSTED())
         }
-    }while (contentLength<40_000)
+    } while (contentLength <40_000)
     return downloadCard
 }
-
 
 fun getDownloadCardHtml(
     count: Int,
     date: String, // ex: 06 Jun 2021
-):String {
+): String {
     return """
         <div class="card-container">
           <div id="card" class="dark-bg">

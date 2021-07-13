@@ -130,8 +130,7 @@ inline fun <V, E : Throwable> Event<V, E>.unwrap(failure: (E) -> Nothing): V =
 inline fun <V, E : Throwable> Event<V, E>.unwrapError(success: (V) -> Nothing): E =
     apply { component1()?.let(success) }.component2()!!
 
-
-sealed class Event<out V : Any?, out E : Throwable>: ReadOnlyProperty<Any?, V> {
+sealed class Event<out V : Any?, out E : Throwable> : ReadOnlyProperty<Any?, V> {
 
     open operator fun component1(): V? = null
     open operator fun component2(): E? = null

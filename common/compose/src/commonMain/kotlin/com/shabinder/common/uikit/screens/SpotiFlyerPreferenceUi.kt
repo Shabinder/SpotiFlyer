@@ -47,7 +47,7 @@ import com.shabinder.common.uikit.configurations.colorOffWhite
 @Composable
 fun SpotiFlyerPreferenceContent(component: SpotiFlyerPreference) {
     val model by component.model.subscribeAsState()
-    
+
     val stateVertical = rememberScrollState(0)
 
     Column(Modifier.fillMaxSize().padding(8.dp).verticalScroll(stateVertical)) {
@@ -82,7 +82,7 @@ fun SpotiFlyerPreferenceContent(component: SpotiFlyerPreference) {
                                         save()
                                     }
                                 )
-                                .padding(horizontal = 16.dp,vertical = 2.dp)
+                                .padding(horizontal = 16.dp, vertical = 2.dp)
                         ) {
                             RadioButton(
                                 selected = (quality == model.preferredQuality),
@@ -98,7 +98,6 @@ fun SpotiFlyerPreferenceContent(component: SpotiFlyerPreference) {
                             )
                         }
                     }
-
                 }
 
                 Spacer(Modifier.padding(top = 12.dp))
@@ -155,9 +154,8 @@ fun SpotiFlyerPreferenceContent(component: SpotiFlyerPreference) {
                 }
             }
         }
-        Spacer(modifier = Modifier.padding(top = 8.dp))    
+        Spacer(modifier = Modifier.padding(top = 8.dp))
     }
-
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -165,7 +163,7 @@ fun SpotiFlyerPreferenceContent(component: SpotiFlyerPreference) {
 fun SettingsRow(
     icon: Painter,
     title: String,
-    value:String,
+    value: String,
     editContent: @Composable ColumnScope.(() -> Unit) -> Unit
 ) {
 

@@ -5,5 +5,4 @@ class SuspendedValidation<out E : Throwable>(vararg resultSequence: SuspendableE
     val failures: List<E> = resultSequence.filterIsInstance<SuspendableEvent.Failure<*, E>>().map { it.getThrowable() }
 
     val hasFailure = failures.isNotEmpty()
-
 }

@@ -53,10 +53,10 @@ import kotlinx.coroutines.delay
 @Composable
 fun NetworkDialog(
     networkAvailability: State<Boolean?>
-){
+) {
     var visible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         delay(2600)
         visible = true
     }
@@ -75,21 +75,30 @@ fun NetworkDialog(
                         Text("Retry",color = Color.Black,fontSize = 18.sp,textAlign = TextAlign.Center)
                         Icon(Icons.Rounded.SyncProblem,"Check Network Connection Again")
                     }
-                */},
-            title = { Text(Strings.noInternetConnection(),
-                style = SpotiFlyerTypography.h5,
-                textAlign = TextAlign.Center) },
+                */
+            },
+            title = {
+                Text(
+                    Strings.noInternetConnection(),
+                    style = SpotiFlyerTypography.h5,
+                    textAlign = TextAlign.Center
+                )
+            },
             backgroundColor = Color.DarkGray,
             text = {
-                Column(horizontalAlignment = Alignment.CenterHorizontally,verticalArrangement = Arrangement.Center){
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Spacer(modifier = Modifier.padding(8.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
                     ) {
-                        Image(Icons.Rounded.CloudOff,
-                            Strings.noInternetConnection(),Modifier.size(42.dp),colorFilter = ColorFilter.tint(
-                            colorOffWhite
-                            ))
+                        Image(
+                            Icons.Rounded.CloudOff,
+                            Strings.noInternetConnection(), Modifier.size(42.dp),
+                            colorFilter = ColorFilter.tint(
+                                colorOffWhite
+                            )
+                        )
                         Spacer(modifier = Modifier.padding(start = 16.dp))
                         Text(
                             text = Strings.checkInternetConnection(),
@@ -97,8 +106,8 @@ fun NetworkDialog(
                         )
                     }
                 }
-            }
-            ,shape = SpotiFlyerShapes.medium
+            },
+            shape = SpotiFlyerShapes.medium
         )
     }
 }

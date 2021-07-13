@@ -31,9 +31,8 @@ allprojects {
         maven(url = "https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven")
     }
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = "1.8"
-        }
+        dependsOn(":common:data-models:generateI18n4kFiles")
+        kotlinOptions { jvmTarget = "1.8" }
     }
     afterEvaluate {
         project.extensions.findByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()?.let { kmpExt ->

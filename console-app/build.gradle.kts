@@ -28,7 +28,6 @@ dependencies {
     implementation(project(":common:list"))
     implementation(project(":common:list"))
 
-
     // Decompose
     implementation(Decompose.decompose)
     implementation(Decompose.extensionsCompose)

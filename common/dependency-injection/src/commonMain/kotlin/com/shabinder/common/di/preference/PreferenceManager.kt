@@ -3,7 +3,7 @@ package com.shabinder.common.di.preference
 import com.russhwolf.settings.Settings
 import com.shabinder.common.models.AudioQuality
 
-class PreferenceManager(settings: Settings): Settings by settings {
+class PreferenceManager(settings: Settings) : Settings by settings {
 
     companion object {
         const val DIR_KEY = "downloadDir"
@@ -17,14 +17,13 @@ class PreferenceManager(settings: Settings): Settings by settings {
     val isAnalyticsEnabled get() = getBooleanOrNull(ANALYTICS_KEY) ?: false
     fun toggleAnalytics(enabled: Boolean) = putBoolean(ANALYTICS_KEY, enabled)
 
-
     /* DOWNLOAD DIRECTORY */
     val downloadDir get() = getStringOrNull(DIR_KEY)
     fun setDownloadDirectory(newBasePath: String) = putString(DIR_KEY, newBasePath)
 
     /* Preferred Audio Quality */
     val audioQuality get() = AudioQuality.getQuality(getStringOrNull(PREFERRED_AUDIO_QUALITY) ?: "320")
-    fun setPreferredAudioQuality(quality: AudioQuality) = putString(PREFERRED_AUDIO_QUALITY,quality.kbps)
+    fun setPreferredAudioQuality(quality: AudioQuality) = putString(PREFERRED_AUDIO_QUALITY, quality.kbps)
 
     /* OFFSET FOR WHEN TO ASK FOR SUPPORT */
     val getDonationOffset: Int get() = (getIntOrNull(DONATION_INTERVAL) ?: 3).also {
@@ -32,7 +31,6 @@ class PreferenceManager(settings: Settings): Settings by settings {
         if (it < 3) setDonationOffset(3) else setDonationOffset(it - 1)
     }
     fun setDonationOffset(offset: Int = 5) = putInt(DONATION_INTERVAL, offset)
-
 
     /* TO CHECK IF THIS IS APP's FIRST LAUNCH */
     val isFirstLaunch get() = getBooleanOrNull(FIRST_LAUNCH) ?: true

@@ -24,7 +24,7 @@ import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.map
 import io.ktor.client.*
 
-interface YoutubeMp3: Yt1sMp3 {
+interface YoutubeMp3 : Yt1sMp3 {
 
     companion object {
         operator fun invoke(
@@ -38,7 +38,7 @@ interface YoutubeMp3: Yt1sMp3 {
         }
     }
 
-    suspend fun getMp3DownloadLink(videoID: String,quality: AudioQuality): SuspendableEvent<String,Throwable> = getLinkFromYt1sMp3(videoID,quality).map {
+    suspend fun getMp3DownloadLink(videoID: String, quality: AudioQuality): SuspendableEvent<String, Throwable> = getLinkFromYt1sMp3(videoID, quality).map {
         corsApi + it
     }
 }

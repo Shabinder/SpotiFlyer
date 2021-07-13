@@ -19,7 +19,6 @@ internal object GithubService {
 
     private const val baseURL = Common.GITHUB_API
 
-
     suspend fun getGithubRepoReleasesInfo(
         ownerName: String,
         repoName: String,

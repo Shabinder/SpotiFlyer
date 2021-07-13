@@ -23,6 +23,7 @@ plugins {
     kotlin("android")
     id("kotlin-parcelize")
     id("org.jetbrains.compose")
+    id("ktlint-setup")
 }
 
 group = "com.shabinder"
@@ -39,7 +40,7 @@ repositories {
 android {
     val props = gradleLocalProperties(rootDir)
 
-    if(props.containsKey("storeFileDir")) {
+    if (props.containsKey("storeFileDir")) {
         signingConfigs {
             create("release") {
                 storeFile = file(props.getProperty("storeFileDir"))
@@ -65,7 +66,7 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             // isShrinkResources = true
-            if(props.containsKey("storeFileDir")){
+            if (props.containsKey("storeFileDir")) {
                 signingConfig = signingConfigs.getByName("release")
             }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -134,7 +135,7 @@ dependencies {
     }
 
     implementation(Extras.kermit)
-    //implementation("com.jakewharton.timber:timber:4.7.1")
+    // implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
     implementation("com.github.shabinder:storage-chooser:2.0.4.45")
     implementation("com.google.accompanist:accompanist-insets:0.12.0")

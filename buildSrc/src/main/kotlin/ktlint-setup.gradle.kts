@@ -19,26 +19,14 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint-idea")
 }
 
-subprojects {
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
-    apply(plugin = "org.jlleitschuh.gradle.ktlint-idea")
-    repositories {
-        // Required to download KtLint
-        mavenCentral()
+ktlint {
+    outputToConsole.set(true)
+    ignoreFailures.set(true)
+    coloredOutput.set(true)
+    verbose.set(true)
+    disabledRules.set(setOf("filename,no-wildcard-imports"))
+    filter {
+        exclude("**/generated/**")
+        exclude("**/build/**")
     }
-    ktlint {
-        android.set(true)
-        outputToConsole.set(true)
-        ignoreFailures.set(true)
-        coloredOutput.set(true)
-        verbose.set(true)
-        filter {
-            exclude("**/generated/**")
-            exclude("**/build/**")
-        }
-    }
-    // Optionally configure plugin
-    /*configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-        debug.set(true)
-    }*/
 }

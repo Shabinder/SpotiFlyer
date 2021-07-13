@@ -106,7 +106,7 @@ import com.shabinder.common.uikit.rememberScrollbarAdapter
 fun SpotiFlyerMainContent(component: SpotiFlyerMain) {
     val model by component.model.subscribeAsState()
 
-    val (openDonationDialog,_,_) = DonationDialogComponent {
+    val (openDonationDialog, _, _) = DonationDialogComponent {
         component.dismissDonationDialogOffset()
     }
 
@@ -253,7 +253,7 @@ fun SearchPanel(
 @Composable
 fun AboutColumn(
     modifier: Modifier = Modifier,
-    analyticsEnabled:Boolean,
+    analyticsEnabled: Boolean,
     openDonationDialog: () -> Unit,
     toggleAnalytics: (enabled: Boolean) -> Unit
 ) {

@@ -43,7 +43,7 @@ interface Yt1sMp3 {
     /*
     * Downloadable Mp3 Link for YT videoID.
     * */
-    suspend fun getLinkFromYt1sMp3(videoID: String,quality: AudioQuality): SuspendableEvent<String,Throwable> = getKey(videoID,quality).flatMap { key ->
+    suspend fun getLinkFromYt1sMp3(videoID: String, quality: AudioQuality): SuspendableEvent<String, Throwable> = getKey(videoID, quality).flatMap { key ->
         getConvertedMp3Link(videoID, key).map {
             it["dlink"].requireNotNull()
                 .jsonPrimitive.content.replace("\"", "")
@@ -54,7 +54,7 @@ interface Yt1sMp3 {
     * POST:https://yt1s.com/api/ajaxSearch/index
     * Body Form= q:yt video link ,vt:format=mp3
     * */
-    private suspend fun getKey(videoID: String,quality: AudioQuality): SuspendableEvent<String,Throwable> = SuspendableEvent {
+    private suspend fun getKey(videoID: String, quality: AudioQuality): SuspendableEvent<String, Throwable> = SuspendableEvent {
         val response: JsonObject = httpClient.post("${corsApi}https://yt1s.com/api/ajaxSearch/index") {
             body = FormDataContent(
                 Parameters.build {
@@ -67,7 +67,7 @@ interface Yt1sMp3 {
         val mp3Keys = response.getJsonObject("links")
             .getJsonObject("mp3")
 
-        val requestedKBPS = when(quality) {
+        val requestedKBPS = when (quality) {
             AudioQuality.KBPS128 -> "mp3128"
             else -> quality.kbps
         }
@@ -77,7 +77,7 @@ interface Yt1sMp3 {
         specificQualityKey?.get("k").requireNotNull().jsonPrimitive.content
     }
 
-    private suspend fun getConvertedMp3Link(videoID: String, key: String): SuspendableEvent<JsonObject,Throwable> = SuspendableEvent {
+    private suspend fun getConvertedMp3Link(videoID: String, key: String): SuspendableEvent<JsonObject, Throwable> = SuspendableEvent {
         httpClient.post("${corsApi}https://yt1s.com/api/ajaxConvert/convert") {
             body = FormDataContent(
                 Parameters.build {

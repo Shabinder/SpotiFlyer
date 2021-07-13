@@ -34,8 +34,8 @@ import com.shabinder.common.uikit.configurations.colorPrimary
 @ExperimentalAnimationApi
 @Composable
 fun AnalyticsDialog(
-    isVisible:Boolean,
-    enableAnalytics: ()->Unit,
+    isVisible: Boolean,
+    enableAnalytics: () -> Unit,
     dismissDialog: () -> Unit,
 ) {
     // Analytics Permission Dialog
@@ -43,10 +43,10 @@ fun AnalyticsDialog(
         AlertDialog(
             onDismissRequest = dismissDialog,
             title = {
-                Row(verticalAlignment = Alignment.CenterVertically,horizontalArrangement = Arrangement.SpaceEvenly) {
-                    Icon(Icons.Rounded.Insights,Strings.analytics(), Modifier.size(42.dp))
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
+                    Icon(Icons.Rounded.Insights, Strings.analytics(), Modifier.size(42.dp))
                     Spacer(Modifier.padding(horizontal = 8.dp))
-                    Text(Strings.grantAnalytics(),style = SpotiFlyerTypography.h5,textAlign = TextAlign.Center)
+                    Text(Strings.grantAnalytics(), style = SpotiFlyerTypography.h5, textAlign = TextAlign.Center)
                 }
             },
             backgroundColor = Color.DarkGray,
@@ -60,7 +60,7 @@ fun AnalyticsDialog(
                         shape = SpotiFlyerShapes.medium,
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF303030))
                     ) {
-                        Text(Strings.no(),color = colorPrimary,fontSize = 18.sp,textAlign = TextAlign.Center)
+                        Text(Strings.no(), color = colorPrimary, fontSize = 18.sp, textAlign = TextAlign.Center)
                     }
                     Spacer(Modifier.padding(vertical = 4.dp))
                     TextButton(
@@ -73,14 +73,14 @@ fun AnalyticsDialog(
                             .padding(horizontal = 8.dp),
                         shape = SpotiFlyerShapes.medium
                     ) {
-                        Text(Strings.yes(),color = Color.Black,fontSize = 18.sp,textAlign = TextAlign.Center)
+                        Text(Strings.yes(), color = Color.Black, fontSize = 18.sp, textAlign = TextAlign.Center)
                     }
                 }
             },
             text = {
-                Text(Strings.analyticsDescription(),style = SpotiFlyerTypography.body2,textAlign = TextAlign.Center)
+                Text(Strings.analyticsDescription(), style = SpotiFlyerTypography.body2, textAlign = TextAlign.Center)
             },
-            properties = DialogProperties(dismissOnBackPress = false,dismissOnClickOutside = false)
+            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
         )
-    }   
+    }
 }

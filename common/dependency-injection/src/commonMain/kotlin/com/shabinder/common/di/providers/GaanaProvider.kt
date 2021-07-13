@@ -37,7 +37,7 @@ class GaanaProvider(
 
     private val gaanaPlaceholderImageUrl = "https://a10.gaanacdn.com/images/social/gaana_social.jpg"
 
-    suspend fun query(fullLink: String): SuspendableEvent<PlatformQueryResult,Throwable> = SuspendableEvent {
+    suspend fun query(fullLink: String): SuspendableEvent<PlatformQueryResult, Throwable> = SuspendableEvent {
         // Link Schema: https://gaana.com/type/link
         val gaanaLink = fullLink.substringAfter("gaana.com/")
 

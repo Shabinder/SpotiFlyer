@@ -4,7 +4,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.Font
 
-
 actual fun montserratFont() = FontFamily(
     Font("font/montserrat_light.ttf", FontWeight.Light),
     Font("font/montserrat_regular.ttf", FontWeight.Normal),

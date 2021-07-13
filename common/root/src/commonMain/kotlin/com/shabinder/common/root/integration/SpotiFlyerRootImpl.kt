@@ -165,7 +165,7 @@ private fun spotiFlyerMain(componentContext: ComponentContext, output: Consumer<
         componentContext = componentContext,
         dependencies = object : SpotiFlyerMain.Dependencies, Dependencies by dependencies {
             override val mainOutput: Consumer<SpotiFlyerMain.Output> = output
-            override val mainAnalytics = object : SpotiFlyerMain.Analytics , Analytics by analytics {}
+            override val mainAnalytics = object : SpotiFlyerMain.Analytics, Analytics by analytics {}
         }
     )
 

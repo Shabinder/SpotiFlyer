@@ -31,7 +31,7 @@ import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import kotlin.native.concurrent.SharedImmutable
 
-suspend fun authenticateSpotify(): SuspendableEvent<TokenData,Throwable> = SuspendableEvent {
+suspend fun authenticateSpotify(): SuspendableEvent<TokenData, Throwable> = SuspendableEvent {
     if (methods.value.isInternetAvailable) {
         spotifyAuthClient.post("https://accounts.spotify.com/api/token") {
             body = FormDataContent(Parameters.build { append("grant_type", "client_credentials") })

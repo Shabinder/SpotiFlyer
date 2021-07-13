@@ -7,10 +7,10 @@ fun getUpdatedContent(
     oldContent: String,
     newInsertionText: String,
     tagName: String
-): String{
+): String {
     return getReplaceableRegex(tagName).replace(
         oldContent,
-        getReplacementText(tagName,newInsertionText)
+        getReplacementText(tagName, newInsertionText)
     )
 }
 
@@ -26,5 +26,5 @@ private fun getReplacementText(
             ${Common.START_SECTION(tagName)}
             $newInsertionText
             ${Common.END_SECTION(tagName)}
-        """.trimIndent()
+    """.trimIndent()
 }

@@ -34,7 +34,7 @@ import org.matomo.sdk.Matomo
 import org.matomo.sdk.Tracker
 import org.matomo.sdk.TrackerBuilder
 
-class App: Application(), KoinComponent {
+class App : Application(), KoinComponent {
 
     companion object {
         const val SIGNATURE_HEX = "53304f6d75736a2f30484230334c454b714753525763724259444d3d0a"
@@ -42,7 +42,8 @@ class App: Application(), KoinComponent {
 
     val tracker: Tracker by lazy {
         TrackerBuilder.createDefault(
-            "https://matomo.spotiflyer.ml/matomo.php", 1)
+            "https://matomo.spotiflyer.ml/matomo.php", 1
+        )
             .build(Matomo.getInstance(this)).apply {
                 if (BuildConfig.DEBUG) {
                     /*Timber.plant(DebugTree())

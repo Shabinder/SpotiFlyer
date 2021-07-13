@@ -3,7 +3,7 @@ package com.shabinder.spotiflyer.utils.autoclear.lifecycleobservers
 import androidx.lifecycle.LifecycleOwner
 import com.shabinder.spotiflyer.utils.autoclear.LifecycleAutoInitializer
 
-class LifecycleCreateAndDestroyObserver<T: Any?>(
+class LifecycleCreateAndDestroyObserver<T : Any?>(
     private val initializer: (() -> T)?
 ) : LifecycleAutoInitializer<T> {
 

@@ -25,8 +25,8 @@ fun main(args: Array<String>) {
                 updatedGithubContent,
                 secrets
             )
-        } catch (e:Exception) {
-            debug("Analytics Image Updation Failed",e.message.toString())
+        } catch (e: Exception) {
+            debug("Analytics Image Updation Failed", e.message.toString())
         }
 
         // TASK -> Update Total Downloads Card
@@ -35,8 +35,8 @@ fun main(args: Array<String>) {
                 updatedGithubContent,
                 secrets.copy(tagName = "DCI")
             )
-        } catch (e:Exception) {
-            debug("Download Card Updation Failed",e.message.toString())
+        } catch (e: Exception) {
+            debug("Download Card Updation Failed", e.message.toString())
         }
 
         // Write New Updated README.md

@@ -28,9 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
 import java.lang.Exception
-import java.net.InetSocketAddress
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 

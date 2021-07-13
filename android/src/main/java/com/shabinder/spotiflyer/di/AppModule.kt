@@ -18,4 +18,4 @@ package com.shabinder.spotiflyer.di
 
 import org.koin.dsl.module
 
-fun appModule(enableLogging:Boolean = false) = module {}
+fun appModule(enableLogging: Boolean = false) = module {}

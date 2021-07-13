@@ -63,7 +63,7 @@ class YoutubeMusic constructor(
     ): SuspendableEvent<String, Throwable> {
         return getYTIDBestMatch(trackDetails).flatMap { videoID ->
             // As YT compress Audio hence there is no benefit of quality for more than 192
-            val optimalQuality = if((preferredQuality.kbps.toIntOrNull() ?: 0) > 192) AudioQuality.KBPS192 else preferredQuality
+            val optimalQuality = if ((preferredQuality.kbps.toIntOrNull() ?: 0) > 192) AudioQuality.KBPS192 else preferredQuality
             // 1 Try getting Link from Yt1s
             youtubeMp3.getMp3DownloadLink(videoID, optimalQuality).flatMapError {
                 // 2 if Yt1s failed , Extract Manually
@@ -79,7 +79,7 @@ class YoutubeMusic constructor(
 
     private suspend fun getYTIDBestMatch(
         trackDetails: TrackDetails
-    ):SuspendableEvent<String,Throwable> =
+    ): SuspendableEvent<String, Throwable> =
         getYTTracks("${trackDetails.title} - ${trackDetails.artists.joinToString(",")}").map { matchList ->
             sortByBestMatch(
                 matchList,
@@ -89,7 +89,7 @@ class YoutubeMusic constructor(
             ).keys.firstOrNull() ?: throw SpotiFlyerException.NoMatchFound(trackDetails.title)
         }
 
-    private suspend fun getYTTracks(query: String): SuspendableEvent<List<YoutubeTrack>,Throwable> =
+    private suspend fun getYTTracks(query: String): SuspendableEvent<List<YoutubeTrack>, Throwable> =
         getYoutubeMusicResponse(query).map { youtubeResponseData ->
             val youtubeTracks = mutableListOf<YoutubeTrack>()
             val responseObj = Json.parseToJsonElement(youtubeResponseData)
@@ -233,9 +233,9 @@ class YoutubeMusic constructor(
                     }
                 }
             }
-        // logger.d {youtubeTracks.joinToString("\n")}
-        youtubeTracks
-    }
+            // logger.d {youtubeTracks.joinToString("\n")}
+            youtubeTracks
+        }
 
     private fun sortByBestMatch(
         ytTracks: List<YoutubeTrack>,
@@ -311,7 +311,7 @@ class YoutubeMusic constructor(
         }
     }
 
-    private suspend fun getYoutubeMusicResponse(query: String): SuspendableEvent<String,Throwable> = SuspendableEvent {
+    private suspend fun getYoutubeMusicResponse(query: String): SuspendableEvent<String, Throwable> = SuspendableEvent {
         httpClient.post("${corsApi}https://music.youtube.com/youtubei/v1/search?alt=json&key=$apiKey") {
             contentType(ContentType.Application.Json)
             headers {

@@ -51,7 +51,7 @@ class YoutubeProvider(
     private val sampleDomain2 = "youtube.com"
     private val sampleDomain3 = "youtu.be"
 
-    suspend fun query(fullLink: String): SuspendableEvent<PlatformQueryResult,Throwable> {
+    suspend fun query(fullLink: String): SuspendableEvent<PlatformQueryResult, Throwable> {
         val link = fullLink.removePrefix("https://").removePrefix("http://")
         if (link.contains("playlist", true) || link.contains("list", true)) {
             // Given Link is of a Playlist
@@ -86,7 +86,7 @@ class YoutubeProvider(
 
     private suspend fun getYTPlaylist(
         searchId: String
-    ): SuspendableEvent<PlatformQueryResult,Throwable> = SuspendableEvent {
+    ): SuspendableEvent<PlatformQueryResult, Throwable> = SuspendableEvent {
         PlatformQueryResult(
             folderType = "",
             subFolder = "",
@@ -102,7 +102,7 @@ class YoutubeProvider(
             val videos = playlist.videos
 
             coverUrl = "https://i.ytimg.com/vi/${
-                videos.firstOrNull()?.videoId
+            videos.firstOrNull()?.videoId
             }/hqdefault.jpg"
             title = name
 
@@ -116,11 +116,11 @@ class YoutubeProvider(
                     albumArtURL = "https://i.ytimg.com/vi/${it.videoId}/hqdefault.jpg",
                     downloaded = if (dir.isPresent(
                             dir.finalOutputDir(
-                                itemName = it.title ?: "N/A",
-                                type = folderType,
-                                subFolder = subFolder,
-                                dir.defaultDir()
-                            )
+                                    itemName = it.title ?: "N/A",
+                                    type = folderType,
+                                    subFolder = subFolder,
+                                    dir.defaultDir()
+                                )
                         )
                     )
                         DownloadStatus.Downloaded
@@ -137,7 +137,7 @@ class YoutubeProvider(
     @Suppress("DefaultLocale")
     private suspend fun getYTTrack(
         searchId: String,
-    ): SuspendableEvent<PlatformQueryResult,Throwable> = SuspendableEvent {
+    ): SuspendableEvent<PlatformQueryResult, Throwable> = SuspendableEvent {
         PlatformQueryResult(
             folderType = "",
             subFolder = "",
@@ -162,11 +162,11 @@ class YoutubeProvider(
                     albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
                     downloaded = if (dir.isPresent(
                             dir.finalOutputDir(
-                                itemName = name,
-                                type = folderType,
-                                subFolder = subFolder,
-                                defaultDir = dir.defaultDir()
-                            )
+                                    itemName = name,
+                                    type = folderType,
+                                    subFolder = subFolder,
+                                    defaultDir = dir.defaultDir()
+                                )
                         )
                     )
                         DownloadStatus.Downloaded

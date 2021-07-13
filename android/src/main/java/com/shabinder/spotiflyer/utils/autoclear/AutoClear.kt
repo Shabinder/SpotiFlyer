@@ -2,7 +2,6 @@ package com.shabinder.spotiflyer.utils.autoclear
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import com.shabinder.common.requireNotNull
 import com.shabinder.spotiflyer.utils.autoclear.AutoClear.Companion.TRIGGER
 import com.shabinder.spotiflyer.utils.autoclear.lifecycleobservers.LifecycleCreateAndDestroyObserver
 import com.shabinder.spotiflyer.utils.autoclear.lifecycleobservers.LifecycleResumeAndPauseObserver
@@ -34,7 +33,7 @@ class AutoClear<T : Any?>(
     fun getOrNull(): T? = _value
 
     private val observer: LifecycleAutoInitializer<T?> by lazy {
-        when(trigger) {
+        when (trigger) {
             TRIGGER.ON_CREATE -> LifecycleCreateAndDestroyObserver(initializer)
             TRIGGER.ON_START -> LifecycleStartAndStopObserver(initializer)
             TRIGGER.ON_RESUME -> LifecycleResumeAndPauseObserver(initializer)

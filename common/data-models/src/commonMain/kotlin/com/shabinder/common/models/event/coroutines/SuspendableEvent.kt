@@ -19,7 +19,7 @@ infix fun <V : Any?, E : Throwable> SuspendableEvent<V, E>.or(fallback: V) = whe
     else -> SuspendableEvent.Success(fallback)
 }
 
-suspend inline infix fun <V : Any?, E : Throwable> SuspendableEvent<V, E>.getOrElse(crossinline fallback:suspend (E) -> V): V {
+suspend inline infix fun <V : Any?, E : Throwable> SuspendableEvent<V, E>.getOrElse(crossinline fallback: suspend (E) -> V): V {
     return when (this) {
         is SuspendableEvent.Success -> value
         is SuspendableEvent.Failure -> fallback(error)
@@ -93,7 +93,6 @@ suspend inline fun <V : Any?, U : Any> SuspendableEvent<V, *>.fanout(
 ): SuspendableEvent<Pair<V, U>, *> =
     flatMap { outer -> other().map { outer to it } }
 
-
 suspend fun <V : Any?, E : Throwable> List<SuspendableEvent<V, E>>.lift(): SuspendableEvent<List<V>, E> = fold(
     SuspendableEvent.Success<MutableList<V>, E>(mutableListOf<V>()) as SuspendableEvent<MutableList<V>, E>
 ) { acc, result ->
@@ -102,7 +101,7 @@ suspend fun <V : Any?, E : Throwable> List<SuspendableEvent<V, E>>.lift(): Suspe
     }
 }
 
-sealed class SuspendableEvent<out V : Any?, out E : Throwable>: ReadOnlyProperty<Any?,V> {
+sealed class SuspendableEvent<out V : Any?, out E : Throwable> : ReadOnlyProperty<Any?, V> {
 
     abstract operator fun component1(): V?
     abstract operator fun component2(): E?
@@ -156,7 +155,7 @@ sealed class SuspendableEvent<out V : Any?, out E : Throwable>: ReadOnlyProperty
         // Factory methods
         fun <E : Throwable> error(ex: E) = Failure<Nothing, E>(ex)
 
-        inline fun <V : Any?> of(value: V?,crossinline fail: (() -> Throwable) = { Throwable() }): SuspendableEvent<V, Throwable> {
+        inline fun <V : Any?> of(value: V?, crossinline fail: (() -> Throwable) = { Throwable() }): SuspendableEvent<V, Throwable> {
             return value?.let { Success<V, Nothing>(it) } ?: error(fail())
         }
 
@@ -172,5 +171,4 @@ sealed class SuspendableEvent<out V : Any?, out E : Throwable>: ReadOnlyProperty
             crossinline block: suspend () -> V
         ): SuspendableEvent<V, Throwable> = of(block)
     }
-
 }
