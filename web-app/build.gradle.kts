@@ -48,7 +48,7 @@ dependencies {
     //  https://youtrack.jetbrains.com/issue/KTOR-2670
         isForce = true
     }
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt") {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt") {
         @Suppress("DEPRECATION")
         isForce = true
     }
