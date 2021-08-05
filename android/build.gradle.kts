@@ -138,7 +138,7 @@ dependencies {
     // implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
     implementation("com.github.shabinder:storage-chooser:2.0.4.45")
-    implementation("com.google.accompanist:accompanist-insets:0.12.0")
+    implementation("com.google.accompanist:accompanist-insets:0.16.0")
 
     // Test
     testImplementation("junit:junit:4.13.2")
