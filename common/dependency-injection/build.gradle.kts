@@ -42,6 +42,7 @@ kotlin {
             dependencies {
                 implementation(compose.materialIconsExtended)
                 implementation(Extras.mp3agic)
+                implementation(Extras.Android.countly)
                 // implementation(files("$rootDir/libs/mobile-ffmpeg.aar"))
             }
         }
@@ -49,6 +50,7 @@ kotlin {
             dependencies {
                 implementation(compose.materialIconsExtended)
                 implementation(Extras.mp3agic)
+                implementation(Extras.Desktop.countly)
             }
         }
         jsMain {

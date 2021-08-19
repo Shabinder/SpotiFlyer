@@ -50,7 +50,7 @@ dependencies {
     implementation(Ktor.clientSerialization)
     implementation(Serialization.json)
     // testDeps
-    testImplementation(kotlin("test-junit"))
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.5.21")
 }
 
 tasks.test {

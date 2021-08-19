@@ -17,12 +17,7 @@
 package com.shabinder.spotiflyer
 
 import android.annotation.SuppressLint
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -40,13 +35,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.core.content.ContextCompat
@@ -65,14 +54,11 @@ import com.google.accompanist.insets.statusBarsPadding
 import com.shabinder.common.di.ConnectionLiveData
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.di.analytics.AnalyticsManager
 import com.shabinder.common.di.observeAsState
 import com.shabinder.common.di.preference.PreferenceManager
-import com.shabinder.common.models.Actions
-import com.shabinder.common.models.DownloadStatus
-import com.shabinder.common.models.PlatformActions
+import com.shabinder.common.models.*
 import com.shabinder.common.models.PlatformActions.Companion.SharedPreferencesKey
-import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.models.methods
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
@@ -84,17 +70,14 @@ import com.shabinder.spotiflyer.service.ForegroundService
 import com.shabinder.spotiflyer.ui.AnalyticsDialog
 import com.shabinder.spotiflyer.ui.NetworkDialog
 import com.shabinder.spotiflyer.ui.PermissionDialog
-import com.shabinder.spotiflyer.utils.checkAppSignature
-import com.shabinder.spotiflyer.utils.checkIfLatestVersion
-import com.shabinder.spotiflyer.utils.checkPermissions
-import com.shabinder.spotiflyer.utils.disableDozeMode
-import com.shabinder.spotiflyer.utils.requestStoragePermission
+import com.shabinder.spotiflyer.utils.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 import org.matomo.sdk.extra.TrackHelper
 import java.io.File
 
@@ -104,12 +87,13 @@ class MainActivity : ComponentActivity() {
     private val fetcher: FetchPlatformQueryResult by inject()
     private val dir: Dir by inject()
     private val preferenceManager: PreferenceManager by inject()
+    private val analyticsManager: AnalyticsManager by inject { parametersOf(this) }
     private lateinit var root: SpotiFlyerRoot
     private val callBacks: SpotiFlyerRootCallBacks get() = root.callBacks
     private val trackStatusFlow = MutableSharedFlow<HashMap<String, DownloadStatus>>(1)
     private var permissionGranted = mutableStateOf(true)
     private val internetAvailability by lazy { ConnectionLiveData(applicationContext) }
-    private val tracker get() = (application as App).tracker
+
     private val visibleChild get(): SpotiFlyerRoot.Child = root.routerState.value.activeChild.instance
 
     // Variable for storing instance of our service class
@@ -186,11 +170,10 @@ class MainActivity : ComponentActivity() {
         * and Track Downloads for all other releases like F-Droid,
         * for `Github Downloads` we will track Downloads using : https://tooomm.github.io/github-release-stats/?username=Shabinder&repository=SpotiFlyer
         * */
-        if (isGithubRelease) { checkIfLatestVersion() }
-        if (preferenceManager.isAnalyticsEnabled && !isGithubRelease) {
-            // Download/App Install Event for F-Droid builds
-            TrackHelper.track().download().with(tracker)
+        if (isGithubRelease) {
+            checkIfLatestVersion()
         }
+        // TODO Track Download Event
         handleIntentFromExternalActivity()
 
         initForegroundService()
@@ -297,14 +280,19 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    override fun showPopUpMessage(string: String, long: Boolean) = this@MainActivity.showPopUpMessage(string, long)
+                    override fun showPopUpMessage(string: String, long: Boolean) =
+                        this@MainActivity.showPopUpMessage(string, long)
 
-                    override fun setDownloadDirectoryAction(callBack: (String) -> Unit) = setUpOnPrefClickListener(callBack)
+                    override fun setDownloadDirectoryAction(callBack: (String) -> Unit) =
+                        setUpOnPrefClickListener(callBack)
 
                     override fun queryActiveTracks() = this@MainActivity.queryActiveTracks()
 
                     override fun giveDonation() {
-                        openPlatform("", platformLink = "https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button")
+                        openPlatform(
+                            "",
+                            platformLink = "https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button"
+                        )
                     }
 
                     override fun shareApp() {
@@ -341,7 +329,8 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    override fun writeMp3Tags(trackDetails: TrackDetails) { /*IMPLEMENTED*/ }
+                    override fun writeMp3Tags(trackDetails: TrackDetails) { /*IMPLEMENTED*/
+                    }
 
                     override val isInternetAvailable get() = internetAvailability.value ?: true
                 }
@@ -351,35 +340,19 @@ class MainActivity : ComponentActivity() {
                 * */
                 override val analytics = object : Analytics {
                     override fun appLaunchEvent() {
-                        if (preferenceManager.isAnalyticsEnabled) {
-                            TrackHelper.track()
-                                .event("events", "App_Launch")
-                                .name("App Launch").with(tracker)
-                        }
+                        analyticsManager.sendEvent("app_launch")
                     }
 
                     override fun homeScreenVisit() {
-                        if (preferenceManager.isAnalyticsEnabled) {
-                            // HomeScreen Visit Event
-                            TrackHelper.track().screen("/main_activity/home_screen")
-                                .title("HomeScreen").with(tracker)
-                        }
+                        analyticsManager.sendView("home_screen")
                     }
 
                     override fun listScreenVisit() {
-                        if (preferenceManager.isAnalyticsEnabled) {
-                            // ListScreen Visit Event
-                            TrackHelper.track().screen("/main_activity/list_screen")
-                                .title("ListScreen").with(tracker)
-                        }
+                        analyticsManager.sendView("list_screen")
                     }
 
                     override fun donationDialogVisit() {
-                        if (preferenceManager.isAnalyticsEnabled) {
-                            // Donation Dialog Open Event
-                            TrackHelper.track().screen("/main_activity/donation_dialog")
-                                .title("DonationDialog").with(tracker)
-                        }
+                        analyticsManager.sendEvent("open_donation_dialog")
                     }
                 }
             }
@@ -469,7 +442,7 @@ class MainActivity : ComponentActivity() {
                         while (!this@MainActivity::root.isInitialized) {
                             delay(100)
                         }
-                        if (methods.value.isInternetAvailable)callBacks.searchLink(link)
+                        if (methods.value.isInternetAvailable) callBacks.searchLink(link)
                     }
                 }
             }
@@ -479,6 +452,16 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unbindService()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        analyticsManager.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        analyticsManager.onStop()
     }
 
     companion object {

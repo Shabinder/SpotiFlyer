@@ -14,7 +14,6 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import Extras.Android.Acra
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.compose.compose
 
@@ -73,7 +72,6 @@ android {
         }
     }
     kotlinOptions {
-        useIR = true
         jvmTarget = "1.8"
     }
     compileOptions {
@@ -123,10 +121,8 @@ dependencies {
 
     // Extras
     with(Extras.Android) {
-        implementation(Acra.notification)
-        implementation(Acra.http)
+        implementation(countly)
         implementation(appUpdator)
-        implementation(matomo)
     }
 
     with(Versions.androidxLifecycle) {
@@ -138,7 +134,7 @@ dependencies {
     // implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
     implementation("com.github.shabinder:storage-chooser:2.0.4.45")
-    implementation("com.google.accompanist:accompanist-insets:0.12.0")
+    implementation("com.google.accompanist:accompanist-insets:0.16.1")
 
     // Test
     testImplementation("junit:junit:4.13.2")

@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-js"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-js:1.5.21")
     implementation(Koin.core)
     implementation(Extras.kermit)
     implementation(Decompose.decompose)
@@ -44,11 +44,11 @@ dependencies {
     implementation("co.touchlab:stately-common:1.1.7")
     implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
     // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1") {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2") {
     //  https://youtrack.jetbrains.com/issue/KTOR-2670
         isForce = true
     }
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt") {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt") {
         @Suppress("DEPRECATION")
         isForce = true
     }

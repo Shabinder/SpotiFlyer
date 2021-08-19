@@ -66,7 +66,7 @@ kotlin {
                 implementation(Serialization.json)
                 implementation("co.touchlab:stately-common:1.1.7")
                 implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt") {
+                implementation(JetBrains.Kotlin.coroutines) {
                     @Suppress("DEPRECATION")
                     isForce = true
                 }
@@ -75,7 +75,7 @@ kotlin {
 
         named("androidMain") {
             dependencies {
-                implementation("androidx.appcompat:appcompat:1.3.0")
+                implementation(Androidx.androidxActivity)
                 implementation(Androidx.core)
                 implementation(compose.runtime)
                 implementation(compose.material)

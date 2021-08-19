@@ -20,6 +20,7 @@ import co.touchlab.kermit.Kermit
 import com.russhwolf.settings.Settings
 import com.shabinder.common.database.databaseModule
 import com.shabinder.common.database.getLogger
+import com.shabinder.common.di.analytics.analyticsModule
 import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.di.providers.providersModule
 import io.ktor.client.*
@@ -39,6 +40,7 @@ fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclarat
         appDeclaration()
         modules(
             commonModule(enableNetworkLogs = enableNetworkLogs),
+            analyticsModule(),
             providersModule(),
             databaseModule()
         )

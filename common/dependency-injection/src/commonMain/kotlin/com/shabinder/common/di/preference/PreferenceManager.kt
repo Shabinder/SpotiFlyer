@@ -14,8 +14,8 @@ class PreferenceManager(settings: Settings) : Settings by settings {
     }
 
     /* ANALYTICS */
-    val isAnalyticsEnabled get() = getBooleanOrNull(ANALYTICS_KEY) ?: false
-    fun toggleAnalytics(enabled: Boolean) = putBoolean(ANALYTICS_KEY, enabled)
+    // val isAnalyticsEnabled get() = getBooleanOrNull(ANALYTICS_KEY) ?: false
+    // fun toggleAnalytics(enabled: Boolean) = putBoolean(ANALYTICS_KEY, enabled)
 
     /* DOWNLOAD DIRECTORY */
     val downloadDir get() = getStringOrNull(DIR_KEY)

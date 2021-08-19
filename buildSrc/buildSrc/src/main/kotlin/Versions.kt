@@ -22,9 +22,9 @@ object Versions {
 
     const val versionCode = 22
     // Kotlin
-    const val kotlinVersion = "1.5.10"
+    const val kotlinVersion = "1.5.21"
 
-    const val coroutinesVersion = "1.5.0"
+    const val coroutinesVersion = "1.5.1"
 
     // Code Formatting
     const val ktLint = "10.1.0"
@@ -41,24 +41,24 @@ object Versions {
     const val mokoParcelize = "0.7.1"
 
     // Internet
-    const val ktor = "1.6.0"
+    const val ktor = "1.6.2"
 
-    const val kotlinxSerialization = "1.2.1"
+    const val kotlinxSerialization = "1.2.2"
 
     // Database
-    const val sqlDelight = "1.5.0"
+    const val sqlDelight = "1.5.1"
 
     const val sqliteJdbcDriver = "3.34.0"
     const val slf4j = "1.7.31"
 
     // Internationalisation
-    const val i18n4k = "0.1.2"
+    const val i18n4k = "0.1.3"
 
     // Android
     const val minSdkVersion = 21
     const val compileSdkVersion = 30
     const val targetSdkVersion = 29
-    const val androidxLifecycle = "2.3.1"
+    const val androidxLifecycle = "2.4.0-alpha03"
 }
 
 object HostOS {
@@ -81,8 +81,8 @@ object Koin {
 }
 
 object Androidx {
-    const val androidxActivity = "androidx.activity:activity-compose:1.3.0-beta02"
-    const val core = "androidx.core:core-ktx:1.5.0"
+    const val androidxActivity = "androidx.activity:activity-compose:1.3.1"
+    const val core = "androidx.core:core-ktx:1.6.0"
     const val palette = "androidx.palette:palette-ktx:1.0.0"
     const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutinesVersion}"
 
@@ -98,6 +98,7 @@ object KTLint {
 
 object JetBrains {
     object Kotlin {
+        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}"
         const val serialization = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlinVersion}"
         const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:${Versions.kotlinVersion}"
@@ -107,15 +108,16 @@ object JetBrains {
 
     object Compose {
         // __LATEST_COMPOSE_RELEASE_VERSION__
-        const val VERSION = "0.4.0"
+        private const val VERSION = "1.0.0-alpha3"
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
     }
 }
 object Mosaic {
     const val gradlePlugin = "com.jakewharton.mosaic:mosaic-gradle-plugin:${Versions.mosaic}"
 }
+
 object Decompose {
-    private const val VERSION = "0.2.6"
+    private const val VERSION = "0.3.1"
     const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
     const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
     const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"
@@ -164,15 +166,12 @@ object Extras {
     const val jaudioTagger = "com.github.Shabinder:JAudioTagger-Android:1.0"
     const val kermit = "co.touchlab:kermit:${Versions.kermit}"
     object Android {
-        object Acra {
-            // Self Hosted Crashlytics (FOSS)
-            private const val VERSION = "5.8.3"
-            val http = "ch.acra:acra-http:$VERSION"
-            val notification = "ch.acra:acra-notification:$VERSION"
-        }
-        // Self Hosted Analytics (FOSS)
-        val matomo = "org.matomo.sdk:tracker:4.1.2"
+        // Self Hosted Analytics & Crashlytics (FOSS)
+        val countly = "ly.count.android:sdk:20.11.8"
         val appUpdator = "com.github.amitbd1508:AppUpdater:4.1.0"
+    }
+    object Desktop {
+        val countly = "ly.count.sdk:java:20.11.0"
     }
 }
 
