@@ -22,6 +22,8 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.di.analytics.AnalyticsEvent
+import com.shabinder.common.di.analytics.AnalyticsManager
 import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
@@ -55,16 +57,9 @@ interface SpotiFlyerRoot {
         val fetchQuery: FetchPlatformQueryResult
         val dir: Dir
         val preferenceManager: PreferenceManager
+        val analyticsManager: AnalyticsManager
         val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>
         val actions: Actions
-        val analytics: Analytics
-    }
-
-    interface Analytics {
-        fun appLaunchEvent()
-        fun homeScreenVisit()
-        fun listScreenVisit()
-        fun donationDialogVisit()
     }
 }
 

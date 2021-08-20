@@ -60,7 +60,6 @@ import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.models.*
 import com.shabinder.common.models.PlatformActions.Companion.SharedPreferencesKey
 import com.shabinder.common.root.SpotiFlyerRoot
-import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.configurations.SpotiFlyerTheme
@@ -78,7 +77,6 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
-import org.matomo.sdk.extra.TrackHelper
 import java.io.File
 
 @ExperimentalAnimationApi
@@ -94,7 +92,7 @@ class MainActivity : ComponentActivity() {
     private var permissionGranted = mutableStateOf(true)
     private val internetAvailability by lazy { ConnectionLiveData(applicationContext) }
 
-    private val visibleChild get(): SpotiFlyerRoot.Child = root.routerState.value.activeChild.instance
+    // private val visibleChild get(): SpotiFlyerRoot.Child = root.routerState.value.activeChild.instance
 
     // Variable for storing instance of our service class
     var foregroundService: ForegroundService? = null
@@ -139,7 +137,8 @@ class MainActivity : ComponentActivity() {
                         AnalyticsDialog(
                             askForAnalyticsPermission,
                             enableAnalytics = {
-                                preferenceManager.toggleAnalytics(true)
+                                // preferenceManager.toggleAnalytics(true)
+                                analyticsManager.giveConsent()
                                 preferenceManager.firstLaunchDone()
                             },
                             dismissDialog = {
@@ -257,6 +256,7 @@ class MainActivity : ComponentActivity() {
                 override val fetchQuery = this@MainActivity.fetcher
                 override val dir: Dir = this@MainActivity.dir
                 override val preferenceManager = this@MainActivity.preferenceManager
+                override val analyticsManager: AnalyticsManager = this@MainActivity.analyticsManager
                 override val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
                 override val actions = object : Actions {
 
@@ -329,31 +329,11 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    override fun writeMp3Tags(trackDetails: TrackDetails) { /*IMPLEMENTED*/
+                    override fun writeMp3Tags(trackDetails: TrackDetails) {
+                        /*IMPLEMENTED*/
                     }
 
                     override val isInternetAvailable get() = internetAvailability.value ?: true
-                }
-
-                /*
-                * Analytics Will Only Be Sent if User Granted us the Permission
-                * */
-                override val analytics = object : Analytics {
-                    override fun appLaunchEvent() {
-                        analyticsManager.sendEvent("app_launch")
-                    }
-
-                    override fun homeScreenVisit() {
-                        analyticsManager.sendView("home_screen")
-                    }
-
-                    override fun listScreenVisit() {
-                        analyticsManager.sendView("list_screen")
-                    }
-
-                    override fun donationDialogVisit() {
-                        analyticsManager.sendEvent("open_donation_dialog")
-                    }
                 }
             }
         )

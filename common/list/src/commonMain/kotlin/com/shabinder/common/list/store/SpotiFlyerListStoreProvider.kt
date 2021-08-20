@@ -25,6 +25,7 @@ import com.shabinder.common.di.Dir
 import com.shabinder.common.di.FetchPlatformQueryResult
 import com.shabinder.common.di.downloadTracks
 import com.shabinder.common.di.preference.PreferenceManager
+import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.list.SpotiFlyerList.State
 import com.shabinder.common.list.store.SpotiFlyerListStore.Intent
 import com.shabinder.common.models.DownloadStatus
@@ -34,14 +35,7 @@ import com.shabinder.common.models.methods
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 
-internal class SpotiFlyerListStoreProvider(
-    private val dir: Dir,
-    private val preferenceManager: PreferenceManager,
-    private val storeFactory: StoreFactory,
-    private val fetchQuery: FetchPlatformQueryResult,
-    private val link: String,
-    private val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>
-) {
+internal class SpotiFlyerListStoreProvider(dependencies: SpotiFlyerList.Dependencies): SpotiFlyerList.Dependencies by dependencies {
     fun provide(): SpotiFlyerListStore =
         object :
             SpotiFlyerListStore,

@@ -41,13 +41,14 @@ internal class SpotiFlyerMainImpl(
     init {
         instanceKeeper.ensureNeverFrozen()
         lifecycle.doOnResume {
-            store.accept(Intent.ToggleAnalytics(preferenceManager.isAnalyticsEnabled))
+            store.accept(Intent.ToggleAnalytics(analyticsManager.isTracking()))
         }
     }
 
     private val store =
         instanceKeeper.getStore {
             SpotiFlyerMainStoreProvider(
+                analyticsManager = analyticsManager,
                 preferenceManager = preferenceManager,
                 storeFactory = storeFactory,
                 database = database,

@@ -30,6 +30,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.shabinder.common.di.Dir
 import com.shabinder.common.di.DownloadProgressFlow
 import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.di.analytics.AnalyticsManager
 import com.shabinder.common.di.initKoin
 import com.shabinder.common.di.isInternetAccessible
 import com.shabinder.common.di.preference.PreferenceManager
@@ -58,9 +59,6 @@ import javax.swing.JFileChooser.APPROVE_OPTION
 
 private val koin = initKoin(enableNetworkLogs = true).koin
 private lateinit var showToast: (String) -> Unit
-private val tracker: PiwikTracker by lazy {
-    PiwikTracker("https://matomo.spotiflyer.ml/matomo.php")
-}
 
 fun main() {
 
@@ -96,6 +94,7 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
             override val dir: Dir = koin.get()
             override val database: Database? = dir.db
             override val preferenceManager: PreferenceManager = koin.get()
+            override val analyticsManager: AnalyticsManager = koin.get()
             override val downloadProgressFlow = DownloadProgressFlow
             override val actions: Actions = object : Actions {
                 override val platformActions = object : PlatformActions {}
@@ -159,13 +158,8 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                 override fun appLaunchEvent() {
                     if (preferenceManager.isFirstLaunch) {
                         // Enable Analytics on First Launch
-                        preferenceManager.toggleAnalytics(true)
+                        analyticsManager.giveConsent()
                         preferenceManager.firstLaunchDone()
-                    }
-                    tracker.trackAsync {
-                        eventName = "App Launch"
-                        eventAction = "App_Launch"
-                        eventCategory = "events"
                     }
                 }
 
