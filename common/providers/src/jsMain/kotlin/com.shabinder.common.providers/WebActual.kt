@@ -16,18 +16,13 @@
 
 package com.shabinder.common.providers
 
+import com.shabinder.common.core_components.file_manager.DownloadProgressFlow
 import com.shabinder.common.core_components.file_manager.FileManager
+import com.shabinder.common.core_components.file_manager.allTracksStatus
 import com.shabinder.common.core_components.file_manager.downloadFile
 import com.shabinder.common.models.*
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
-
-val DownloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = MutableSharedFlow(1)
-
-// Error:https://github.com/Kotlin/kotlinx.atomicfu/issues/182
-// val DownloadScope = ParallelExecutor(Dispatchers.Default) //Download Pool of 4 parallel
-val allTracksStatus: HashMap<String, DownloadStatus> = hashMapOf()
 
 actual suspend fun downloadTracks(
     list: List<TrackDetails>,

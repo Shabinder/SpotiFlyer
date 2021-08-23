@@ -81,6 +81,7 @@ class ForegroundService : LifecycleService() {
     inner class DownloadServiceBinder : Binder() {
         val service get() = this@ForegroundService
     }
+
     private val myBinder: IBinder = DownloadServiceBinder()
 
     override fun onBind(intent: Intent): IBinder {
@@ -304,12 +305,16 @@ class ForegroundService : LifecycleService() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (isFinished) { killService() }
+        if (isFinished) {
+            killService()
+        }
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        if (isFinished) { killService() }
+        if (isFinished) {
+            killService()
+        }
     }
 
     companion object {

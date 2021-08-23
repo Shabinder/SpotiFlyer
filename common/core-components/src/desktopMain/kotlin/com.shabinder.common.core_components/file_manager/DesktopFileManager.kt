@@ -22,12 +22,14 @@ import co.touchlab.kermit.Kermit
 import com.mpatric.mp3agic.InvalidDataException
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.common.core_components.media_converter.MediaConverter
+import com.shabinder.common.core_components.parallel_executor.ParallelExecutor
 import com.shabinder.common.core_components.picture.Picture
 import com.shabinder.common.core_components.preference_manager.PreferenceManager
 import com.shabinder.common.core_components.removeAllTags
 import com.shabinder.common.core_components.setId3v1Tags
 import com.shabinder.common.core_components.setId3v2TagsAndSaveFile
 import com.shabinder.common.database.SpotiFlyerDatabase
+import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.dispatcherIO
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
@@ -36,6 +38,7 @@ import com.shabinder.common.models.event.coroutines.map
 import com.shabinder.database.Database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.skija.Image
@@ -50,9 +53,14 @@ import java.net.HttpURLConnection
 import java.net.URL
 import javax.imageio.ImageIO
 
-actual internal fun fileManagerModule() = module {
+internal actual fun fileManagerModule() = module {
     single { DesktopFileManager(get(), get(), get(), get()) } bind FileManager::class
 }
+
+val DownloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = MutableSharedFlow(1)
+
+// Scope Allowing 4 Parallel Downloads
+val DownloadScope = ParallelExecutor(Dispatchers.IO)
 
 class DesktopFileManager(
     override val logger: Kermit,

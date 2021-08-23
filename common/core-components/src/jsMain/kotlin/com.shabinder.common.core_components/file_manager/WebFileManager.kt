@@ -17,9 +17,7 @@
 package com.shabinder.common.core_components.file_manager
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.core_components.DownloadProgressFlow
 import com.shabinder.common.core_components.ID3Writer
-import com.shabinder.common.core_components.allTracksStatus
 import com.shabinder.common.core_components.media_converter.MediaConverter
 import com.shabinder.common.core_components.picture.Picture
 import com.shabinder.common.core_components.preference_manager.PreferenceManager
@@ -34,6 +32,7 @@ import com.shabinder.common.utils.removeIllegalChars
 import com.shabinder.database.Database
 import kotlinext.js.Object
 import kotlinext.js.js
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
@@ -142,3 +141,9 @@ class WebFileManager(
 fun ByteArray.toArrayBuffer(): ArrayBuffer {
     return this.unsafeCast<Int8Array>().buffer
 }
+
+val DownloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = MutableSharedFlow(1)
+
+// Error:https://github.com/Kotlin/kotlinx.atomicfu/issues/182
+// val DownloadScope = ParallelExecutor(Dispatchers.Default) //Download Pool of 4 parallel
+val allTracksStatus: HashMap<String, DownloadStatus> = hashMapOf()
