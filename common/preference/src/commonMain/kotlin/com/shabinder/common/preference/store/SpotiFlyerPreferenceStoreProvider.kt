@@ -51,7 +51,7 @@ internal class SpotiFlyerPreferenceStoreProvider(
         override suspend fun executeAction(action: Unit, getState: () -> State) {
             dispatch(Result.AnalyticsToggled(analyticsManager.isTracking()))
             dispatch(Result.PreferredAudioQualityChanged(preferenceManager.audioQuality))
-            dispatch(Result.DownloadPathSet(dir.defaultDir()))
+            dispatch(Result.DownloadPathSet(fileManager.defaultDir()))
         }
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) {

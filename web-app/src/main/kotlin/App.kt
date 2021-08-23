@@ -21,8 +21,8 @@ import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
-import com.shabinder.common.di.DownloadProgressFlow
-import com.shabinder.common.di.preference.PreferenceManager
+import com.shabinder.common.core_components.file_manager.DownloadProgressFlow
+import com.shabinder.common.core_components.preference_manager.PreferenceManager
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails

@@ -1,0 +1,22 @@
+<!--
+  ~ Copyright (c)  2021  Shabinder Singh
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<vector android:height="44dp" android:viewportHeight="192"
+    android:viewportWidth="192" android:width="44dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#FF0000" android:pathData="M96,96m-88,0a88,88 0,1 1,176 0a88,88 0,1 1,-176 0"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M96,54.04c23.14,0 41.96,18.82 41.96,41.96S119.14,137.96 96,137.96S54.04,119.14 54.04,96S72.86,54.04 96,54.04M96,50c-25.41,0 -46,20.59 -46,46s20.59,46 46,46s46,-20.59 46,-46S121.41,50 96,50L96,50z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M80,119l39,-24l-39,-22z"/>
+</vector>

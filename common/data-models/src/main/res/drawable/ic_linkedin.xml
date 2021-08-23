@@ -1,0 +1,33 @@
+<!--
+  ~ Copyright (c)  2021  Shabinder Singh
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="52dp" android:height="52dp"
+    android:viewportWidth="512" android:viewportHeight="512">
+    <path android:pathData="m140.008,423h-30c-11.047,0 -20,-8.953 -20,-20v-186c0,-11.047 8.953,-20 20,-20h30c11.047,0 20,8.953 20,20v186c0,11.047 -8.953,20 -20,20zM166.992,124.996c0,-22.629 -18.359,-40.996 -40.977,-40.996 -22.703,0 -41.016,18.367 -41.016,40.996 0,22.637 18.313,41.004 41.016,41.004 22.617,0 40.977,-18.367 40.977,-41.004zM422,403v-104.336c0,-60.668 -12.816,-105.664 -83.688,-105.664 -34.055,0 -56.914,17.031 -66.246,34.742h-0.066v-10.742c0,-11.047 -8.953,-20 -20,-20h-28c-11.047,0 -20,8.953 -20,20v186c0,11.047 8.953,20 20,20h28c11.047,0 20,-8.953 20,-20v-92.211c0,-29.387 7.48,-57.855 43.906,-57.855 35.93,0 37.094,33.605 37.094,59.723v90.344c0,11.047 8.953,20 20,20h29c11.047,0 20,-8.953 20,-20zM512,432c0,-11.047 -8.953,-20 -20,-20s-20,8.953 -20,20c0,22.055 -17.945,40 -40,40h-352c-22.055,0 -40,-17.945 -40,-40v-352c0,-22.055 17.945,-40 40,-40h352c22.055,0 40,17.945 40,40v251c0,11.047 8.953,20 20,20s20,-8.953 20,-20v-251c0,-44.113 -35.887,-80 -80,-80h-352c-44.113,0 -80,35.887 -80,80v352c0,44.113 35.887,80 80,80h352c44.113,0 80,-35.887 80,-80zM512,432">
+        <aapt:attr name="android:fillColor">
+            <gradient android:endX="512" android:endY="256"
+                android:startX="0" android:startY="256" android:type="linear">
+                <item android:color="#FF00F2FE" android:offset="0"/>
+                <item android:color="#FF03EFFE" android:offset="0.0208"/>
+                <item android:color="#FF24D2FE" android:offset="0.2931"/>
+                <item android:color="#FF3CBDFE" android:offset="0.5538"/>
+                <item android:color="#FF4AB0FE" android:offset="0.7956"/>
+                <item android:color="#FF4FACFE" android:offset="1"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

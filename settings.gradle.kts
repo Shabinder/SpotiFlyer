@@ -27,11 +27,10 @@ include(
     ":common:providers",
     ":common:core-components",
     ":common:dependency-injection",
+    ":ffmpeg-kit:android:ffmpeg-kit-android-lib",
     ":android",
     ":desktop",
     ":web-app",
-    ":console-app",
+    //":console-app",
     ":maintenance-tasks"
 )
-include("common:core-components")
-findProject(":common:core-components")?.name = "core-components"

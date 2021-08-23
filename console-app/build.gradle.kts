@@ -52,7 +52,17 @@ dependencies {
     // testDeps
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.5.21")
 }
-
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs = freeCompilerArgs.plus(
+            listOf(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+            )
+        )
+    }
+}
 tasks.test {
     useJUnit()
 }

@@ -32,13 +32,13 @@ import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.shabinder.common.di.*
 import com.shabinder.common.core_components.analytics.AnalyticsManager
+import com.shabinder.common.core_components.file_manager.DownloadProgressFlow
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.core_components.preference_manager.PreferenceManager
 import com.shabinder.common.core_components.utils.isInternetAccessible
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.providers.DownloadProgressFlow
 import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.translations.Strings

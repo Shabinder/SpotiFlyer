@@ -19,7 +19,8 @@ kotlin {
             dependencies {
                 implementation(Extras.mp3agic)
                 implementation(Extras.Android.countly)
-                api(files("$rootDir/libs/mobile-ffmpeg.aar"))
+                implementation(project(":ffmpeg-kit:android:ffmpeg-kit-android-lib"))
+                //api(files("$rootDir/libs/mobile-ffmpeg.aar"))
             }
         }
         desktopMain {

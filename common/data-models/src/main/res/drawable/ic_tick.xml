@@ -1,0 +1,30 @@
+<!--
+  ~ Copyright (c)  2021  Shabinder Singh
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="40dp" android:height="40dp"
+    android:viewportWidth="512" android:viewportHeight="512">
+    <path android:pathData="m512,256c0,141.387 -114.613,256 -256,256s-256,-114.613 -256,-256 114.613,-256 256,-256 256,114.613 256,256zM512,256">
+        <aapt:attr name="android:fillColor">
+            <gradient android:endX="512" android:endY="256"
+                android:startX="0" android:startY="256" android:type="linear">
+                <item android:color="#748AFF" android:offset="0"/>
+                <item android:color="#FF3C64" android:offset="1"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#000000" android:pathData="m175,395.246c-4.035,0 -7.902,-1.629 -10.727,-4.512l-81,-82.832c-5.789,-5.922 -5.684,-15.418 0.238,-21.211 5.922,-5.793 15.418,-5.688 21.211,0.238l70.273,71.859 232.277,-237.523c5.793,-5.922 15.289,-6.027 21.211,-0.234 5.926,5.789 6.031,15.289 0.238,21.211l-243,248.492c-2.82,2.883 -6.688,4.512 -10.723,4.512zM175,395.246"/>
+</vector>

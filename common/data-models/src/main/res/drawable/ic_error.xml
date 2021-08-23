@@ -1,0 +1,31 @@
+<!--
+  ~ Copyright (c)  2021  Shabinder Singh
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="40dp" android:height="40dp"
+    android:viewportWidth="512" android:viewportHeight="512">
+    <path android:pathData="m512,256c0,141.387 -114.613,256 -256,256s-256,-114.613 -256,-256 114.613,-256 256,-256 256,114.613 256,256zM512,256">
+        <aapt:attr name="android:fillColor">
+            <gradient android:endX="512" android:endY="256"
+                android:startX="0" android:startY="256" android:type="linear">
+                <item android:color="#748AFF" android:offset="0"/>
+                <item android:color="#FF3C64" android:offset="1"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#000" android:pathData="m256,56c-110.281,0 -200,89.719 -200,200s89.719,200 200,200 200,-89.719 200,-200 -89.719,-200 -200,-200zM256,426c-93.738,0 -170,-76.262 -170,-170s76.262,-170 170,-170 170,76.262 170,170 -76.262,170 -170,170zM256,426"/>
+    <path android:fillColor="#000" android:pathData="m324.18,187.82c-5.859,-5.855 -15.355,-5.855 -21.215,0l-46.965,46.965 -46.965,-46.965c-5.859,-5.855 -15.355,-5.855 -21.215,0 -5.855,5.859 -5.855,15.355 0,21.215l46.965,46.965 -46.965,46.965c-5.855,5.859 -5.855,15.355 0,21.215 2.93,2.93 6.77,4.395 10.605,4.395 3.84,0 7.68,-1.465 10.605,-4.395l46.969,-46.965 46.965,46.965c2.93,2.93 6.77,4.395 10.605,4.395 3.84,0 7.68,-1.465 10.609,-4.395 5.855,-5.859 5.855,-15.355 0,-21.215l-46.965,-46.965 46.965,-46.965c5.855,-5.859 5.855,-15.355 0,-21.215zM324.18,187.82"/>
+</vector>
