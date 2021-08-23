@@ -4,3 +4,6 @@
 [submodule "mosaic"]
 	path = mosaic
 	url = https://github.com/JakeWharton/mosaic
+[submodule "ffmpeg-kit"]
+	path = ffmpeg-kit
+	url = https://github.com/tanersener/ffmpeg-kit

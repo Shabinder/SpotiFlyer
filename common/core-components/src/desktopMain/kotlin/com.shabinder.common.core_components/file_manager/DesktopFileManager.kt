@@ -36,11 +36,8 @@ import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.failure
 import com.shabinder.common.models.event.coroutines.map
 import com.shabinder.database.Database
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.jetbrains.skija.Image
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -103,7 +100,7 @@ class DesktopFileManager(
         File(imageCacheDir()).deleteRecursively()
     }
 
-    override suspend fun cacheImage(image: Any, path: String) {
+    override suspend fun cacheImage(image: Any, path: String): Unit = withContext(dispatcherIO) {
         try {
             (image as? BufferedImage)?.let {
                 ImageIO.write(it, "jpeg", File(path))
@@ -185,6 +182,7 @@ class DesktopFileManager(
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun freshImage(url: String, reqWidth: Int, reqHeight: Int): ImageBitmap? {
         return withContext(Dispatchers.IO) {
