@@ -108,7 +108,7 @@ object JetBrains {
 
     object Compose {
         // __LATEST_COMPOSE_RELEASE_VERSION__
-        private const val VERSION = "1.0.0-alpha3"
+        private const val VERSION = "1.0.0-alpha2"
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
     }
 }

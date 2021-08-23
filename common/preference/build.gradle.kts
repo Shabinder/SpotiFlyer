@@ -28,6 +28,8 @@ kotlin {
                 implementation(project(":common:dependency-injection"))
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
+                implementation(project(":common:core-components"))
+                implementation(project(":common:providers"))
                 implementation(SqlDelight.coroutineExtensions)
             }
         }

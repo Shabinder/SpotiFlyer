@@ -20,8 +20,8 @@ import co.touchlab.stately.ensureNeverFrozen
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.shabinder.common.caching.Cache
-import com.shabinder.common.di.Picture
-import com.shabinder.common.di.utils.asValue
+import com.shabinder.common.core_components.picture.Picture
+import com.shabinder.common.core_components.utils.asValue
 import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.preference.SpotiFlyerPreference
 import com.shabinder.common.preference.SpotiFlyerPreference.Dependencies
@@ -41,12 +41,7 @@ internal class SpotiFlyerPreferenceImpl(
 
     private val store =
         instanceKeeper.getStore {
-            SpotiFlyerPreferenceStoreProvider(
-                storeFactory = storeFactory,
-                preferenceManager = preferenceManager,
-                dir = dir,
-                actions = actions
-            ).provide()
+            SpotiFlyerPreferenceStoreProvider(dependencies).provide()
         }
 
     private val cache = Cache.Builder
@@ -74,7 +69,7 @@ internal class SpotiFlyerPreferenceImpl(
 
     override suspend fun loadImage(url: String): Picture {
         return cache.get(url) {
-            dir.loadImage(url, 150, 150)
+            fileManager.loadImage(url, 150, 150)
         }
     }
 }

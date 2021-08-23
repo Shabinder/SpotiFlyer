@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":common:list"))
     implementation(project(":common:database"))
     implementation(project(":common:data-models"))
+    implementation(project(":common:core-components"))
     implementation(project(":common:dependency-injection"))
     implementation("co.touchlab:stately-common:1.1.7")
     implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")

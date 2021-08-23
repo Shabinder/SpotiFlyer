@@ -24,6 +24,8 @@ include(
     ":common:list",
     ":common:preference",
     ":common:data-models",
+    ":common:providers",
+    ":common:core-components",
     ":common:dependency-injection",
     ":android",
     ":desktop",
@@ -31,3 +33,5 @@ include(
     ":console-app",
     ":maintenance-tasks"
 )
+include("common:core-components")
+findProject(":common:core-components")?.name = "core-components"

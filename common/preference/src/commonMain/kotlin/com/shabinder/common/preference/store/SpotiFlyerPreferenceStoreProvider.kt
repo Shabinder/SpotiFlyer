@@ -19,24 +19,16 @@ package com.shabinder.common.preference.store
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
-import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.analytics.AnalyticsManager
-import com.shabinder.common.di.preference.PreferenceManager
-import com.shabinder.common.models.Actions
 import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.models.methods
+import com.shabinder.common.preference.SpotiFlyerPreference
 import com.shabinder.common.preference.SpotiFlyerPreference.State
 import com.shabinder.common.preference.store.SpotiFlyerPreferenceStore.Intent
 
 internal class SpotiFlyerPreferenceStoreProvider(
-    private val storeFactory: StoreFactory,
-    private val analyticsManager: AnalyticsManager,
-    private val preferenceManager: PreferenceManager,
-    private val dir: Dir,
-    private val actions: Actions
-) {
+    dependencies: SpotiFlyerPreference.Dependencies
+) : SpotiFlyerPreference.Dependencies by dependencies {
 
     fun provide(): SpotiFlyerPreferenceStore =
         object :

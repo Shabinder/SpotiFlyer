@@ -15,9 +15,9 @@
  */
 
 import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.decompose.lifecycle.LifecycleRegistry
-import com.arkivanov.decompose.lifecycle.destroy
-import com.arkivanov.decompose.lifecycle.resume
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.arkivanov.essenty.lifecycle.destroy
+import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
@@ -38,7 +38,7 @@ external interface AppProps : RProps {
 
 @Suppress("FunctionName")
 fun RBuilder.App(attrs: AppProps.() -> Unit): ReactElement {
-    return child(App::class){
+    return child(App::class) {
         this.attrs(attrs)
     }
 }
@@ -46,7 +46,7 @@ fun RBuilder.App(attrs: AppProps.() -> Unit): ReactElement {
 @Suppress("EXPERIMENTAL_IS_NOT_ENABLED", "NON_EXPORTABLE_TYPE")
 @OptIn(ExperimentalJsExport::class)
 @JsExport
-class App(props: AppProps): RComponent<AppProps, RState>(props) {
+class App(props: AppProps) : RComponent<AppProps, RState>(props) {
 
     private val lifecycle = LifecycleRegistry()
     private val ctx = DefaultComponentContext(lifecycle = lifecycle)
@@ -60,9 +60,10 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
         object : SpotiFlyerRoot.Dependencies {
             override val storeFactory: StoreFactory = LoggingStoreFactory(DefaultStoreFactory)
             override val fetchQuery = dependencies.fetchPlatformQueryResult
-            override val dir = dependencies.directories
+            override val fileManager = dependencies.fileManager
+            override val analyticsManager = dependencies.analyticsManager
             override val preferenceManager: PreferenceManager = dependencies.preferenceManager
-            override val database: Database? = dir.db
+            override val database: Database? = fileManager.db
             override val downloadProgressFlow = DownloadProgressFlow
             override val actions = object : Actions {
                 override val platformActions = object : PlatformActions {}
@@ -83,26 +84,10 @@ class App(props: AppProps): RComponent<AppProps, RState>(props) {
 
                 override fun openPlatform(packageID: String, platformLink: String) {}
 
-                override fun writeMp3Tags(trackDetails: TrackDetails) {/*IMPLEMENTED*/}
+                override fun writeMp3Tags(trackDetails: TrackDetails) {/*IMPLEMENTED*/
+                }
 
                 override val isInternetAvailable: Boolean = true
-            }
-            override val analytics = object: SpotiFlyerRoot.Analytics{
-                override fun appLaunchEvent() {
-                    // TODO("Not yet implemented")
-                }
-
-                override fun homeScreenVisit() {
-                    // TODO("Not yet implemented")
-                }
-
-                override fun listScreenVisit() {
-                    // TODO("Not yet implemented")
-                }
-
-                override fun donationDialogVisit() {
-                    // TODO("Not yet implemented")
-                }
             }
         }
     )

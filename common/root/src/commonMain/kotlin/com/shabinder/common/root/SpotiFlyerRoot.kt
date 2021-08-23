@@ -20,16 +20,15 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.RouterState
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.FetchPlatformQueryResult
-import com.shabinder.common.di.analytics.AnalyticsEvent
-import com.shabinder.common.di.analytics.AnalyticsManager
-import com.shabinder.common.di.preference.PreferenceManager
+import com.shabinder.common.core_components.analytics.AnalyticsManager
+import com.shabinder.common.core_components.file_manager.FileManager
+import com.shabinder.common.core_components.preference_manager.PreferenceManager
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.preference.SpotiFlyerPreference
+import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.root.integration.SpotiFlyerRootImpl
@@ -55,7 +54,7 @@ interface SpotiFlyerRoot {
         val storeFactory: StoreFactory
         val database: Database?
         val fetchQuery: FetchPlatformQueryResult
-        val dir: Dir
+        val fileManager: FileManager
         val preferenceManager: PreferenceManager
         val analyticsManager: AnalyticsManager
         val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>

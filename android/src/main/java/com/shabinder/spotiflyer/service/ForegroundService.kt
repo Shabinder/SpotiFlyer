@@ -33,17 +33,17 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.FetchPlatformQueryResult
-import com.shabinder.common.di.R
-import com.shabinder.common.di.downloadFile
-import com.shabinder.common.di.utils.ParallelExecutor
+import com.shabinder.common.core_components.file_manager.FileManager
+import com.shabinder.common.core_components.file_manager.downloadFile
+import com.shabinder.common.core_components.parallel_executor.ParallelExecutor
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.failure
+import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.translations.Strings
+import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.utils.autoclear.AutoClear
 import com.shabinder.spotiflyer.utils.autoclear.autoClear
 import kotlinx.coroutines.Dispatchers
@@ -60,7 +60,7 @@ class ForegroundService : LifecycleService() {
     val trackStatusFlowMap by autoClear { TrackStatusFlowMap(MutableSharedFlow(replay = 1), lifecycleScope) }
     private val fetcher: FetchPlatformQueryResult by inject()
     private val logger: Kermit by inject()
-    private val dir: Dir by inject()
+    private val dir: FileManager by inject()
 
     private var messageList = java.util.Collections.synchronizedList(MutableList(5) { emptyMessage })
     private var wakeLock: PowerManager.WakeLock? = null
@@ -136,8 +136,8 @@ class ForegroundService : LifecycleService() {
         for (track in trackList) {
             trackStatusFlowMap[track.title] = DownloadStatus.Queued
             lifecycleScope.launch {
-                downloadService.value.execute {
-                    fetcher.findMp3DownloadLink(track).fold(
+                downloadService.value.executeSuspending {
+                    fetcher.findBestDownloadLink(track).fold(
                         success = { url ->
                             enqueueDownload(url, track)
                         },

@@ -18,22 +18,17 @@ package com.shabinder.common.root.integration
 
 import co.touchlab.stately.ensureNeverFrozen
 import co.touchlab.stately.freeze
-import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.RouterState
-import com.arkivanov.decompose.pop
-import com.arkivanov.decompose.popWhile
-import com.arkivanov.decompose.push
-import com.arkivanov.decompose.router
+import com.arkivanov.decompose.*
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
-import com.shabinder.common.di.analytics.AnalyticsEvent
-import com.shabinder.common.di.analytics.AnalyticsView
-import com.shabinder.common.di.dispatcherIO
+import com.shabinder.common.core_components.analytics.AnalyticsEvent
+import com.shabinder.common.core_components.analytics.AnalyticsView
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.Consumer
+import com.shabinder.common.models.dispatcherIO
 import com.shabinder.common.models.methods
 import com.shabinder.common.preference.SpotiFlyerPreference
 import com.shabinder.common.root.SpotiFlyerRoot
@@ -48,7 +43,8 @@ import kotlinx.coroutines.launch
 internal class SpotiFlyerRootImpl(
     componentContext: ComponentContext,
     dependencies: Dependencies,
-) : SpotiFlyerRoot, ComponentContext by componentContext, Dependencies by dependencies, Actions by dependencies.actions {
+) : SpotiFlyerRoot, ComponentContext by componentContext, Dependencies by dependencies,
+    Actions by dependencies.actions {
 
     init {
         instanceKeeper.ensureNeverFrozen()
@@ -99,6 +95,7 @@ internal class SpotiFlyerRootImpl(
                     Consumer(::onMainOutput),
                 )
             )
+
             is Configuration.List -> Child.List(
                 spotiFlyerList(
                     componentContext,
@@ -106,6 +103,7 @@ internal class SpotiFlyerRootImpl(
                     Consumer(::onListOutput),
                 )
             )
+
             is Configuration.Preference -> Child.Preference(
                 spotiFlyerPreference(
                     componentContext,

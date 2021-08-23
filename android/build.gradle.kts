@@ -104,6 +104,8 @@ dependencies {
     implementation(project(":common:root"))
     implementation(project(":common:dependency-injection"))
     implementation(project(":common:data-models"))
+    implementation(project(":common:core-components"))
+    implementation(project(":common:providers"))
 
     // Koin
     implementation(Koin.android)

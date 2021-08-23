@@ -39,8 +39,10 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common:database"))
                 implementation(project(":common:dependency-injection"))
+                implementation(project(":common:core-components"))
                 implementation(project(":common:data-models"))
                 implementation(project(":common:compose"))
+                implementation(project(":common:providers"))
                 implementation(project(":common:root"))
 
                 // Decompose

@@ -19,17 +19,12 @@ package com.shabinder.common.main.store
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
-import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.analytics.AnalyticsManager
-import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.State
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
 import com.shabinder.common.models.DownloadRecord
 import com.shabinder.common.models.methods
-import com.shabinder.database.Database
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.Dispatchers

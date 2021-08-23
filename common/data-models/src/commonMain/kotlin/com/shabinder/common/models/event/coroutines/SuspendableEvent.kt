@@ -155,6 +155,8 @@ sealed class SuspendableEvent<out V : Any?, out E : Throwable> : ReadOnlyPropert
         // Factory methods
         fun <E : Throwable> error(ex: E) = Failure<Nothing, E>(ex)
 
+        fun <V : Any> success(res: V) = Success<V, Throwable>(res)
+
         inline fun <V : Any?> of(value: V?, crossinline fail: (() -> Throwable) = { Throwable() }): SuspendableEvent<V, Throwable> {
             return value?.let { Success<V, Nothing>(it) } ?: error(fail())
         }

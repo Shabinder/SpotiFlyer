@@ -11,8 +11,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import com.shabinder.common.di.Picture
-import com.shabinder.common.di.dispatcherIO
+import com.shabinder.common.core_components.picture.Picture
+import com.shabinder.common.models.dispatcherIO
 import kotlinx.coroutines.withContext
 
 @Composable

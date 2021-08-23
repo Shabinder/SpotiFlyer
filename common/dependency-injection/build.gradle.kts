@@ -30,33 +30,8 @@ kotlin {
             dependencies {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
-                implementation("org.jetbrains.kotlinx:atomicfu:0.16.2")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.1")
-                api(MultiPlatformSettings.dep)
-                implementation(Extras.youtubeDownloader)
-                implementation(Extras.fuzzyWuzzy)
-                implementation(MVIKotlin.rx)
-            }
-        }
-        androidMain {
-            dependencies {
-                implementation(compose.materialIconsExtended)
-                implementation(Extras.mp3agic)
-                implementation(Extras.Android.countly)
-                // implementation(files("$rootDir/libs/mobile-ffmpeg.aar"))
-            }
-        }
-        desktopMain {
-            dependencies {
-                implementation(compose.materialIconsExtended)
-                implementation(Extras.mp3agic)
-                implementation(Extras.Desktop.countly)
-            }
-        }
-        jsMain {
-            dependencies {
-                implementation(npm("browser-id3-writer", "4.4.0"))
-                implementation(npm("file-saver", "2.0.4"))
+                implementation(project(":common:providers"))
+                implementation(project(":common:core-components"))
             }
         }
     }

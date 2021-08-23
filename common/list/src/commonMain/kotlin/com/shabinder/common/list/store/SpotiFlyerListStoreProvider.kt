@@ -19,12 +19,7 @@ package com.shabinder.common.list.store
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
-import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.FetchPlatformQueryResult
-import com.shabinder.common.di.downloadTracks
-import com.shabinder.common.di.preference.PreferenceManager
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.list.SpotiFlyerList.State
 import com.shabinder.common.list.store.SpotiFlyerListStore.Intent
@@ -32,10 +27,11 @@ import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.methods
-import kotlinx.coroutines.flow.MutableSharedFlow
+import com.shabinder.common.providers.downloadTracks
 import kotlinx.coroutines.flow.collect
 
-internal class SpotiFlyerListStoreProvider(dependencies: SpotiFlyerList.Dependencies): SpotiFlyerList.Dependencies by dependencies {
+internal class SpotiFlyerListStoreProvider(dependencies: SpotiFlyerList.Dependencies) :
+    SpotiFlyerList.Dependencies by dependencies {
     fun provide(): SpotiFlyerListStore =
         object :
             SpotiFlyerListStore,
@@ -60,7 +56,7 @@ internal class SpotiFlyerListStoreProvider(dependencies: SpotiFlyerList.Dependen
         override suspend fun executeAction(action: Unit, getState: () -> State) {
             executeIntent(Intent.SearchLink(link), getState)
 
-            dir.db?.downloadRecordDatabaseQueries?.getLastInsertId()?.executeAsOneOrNull()?.also {
+            fileManager.db?.downloadRecordDatabaseQueries?.getLastInsertId()?.executeAsOneOrNull()?.also {
                 // See if It's Time we can request for support for maintaining this project or not
                 fetchQuery.logger.d(message = { "Database List Last ID: $it" }, tag = "Database Last ID")
                 val offset = preferenceManager.getDonationOffset
@@ -86,7 +82,12 @@ internal class SpotiFlyerListStoreProvider(dependencies: SpotiFlyerList.Dependen
                     resp.fold(
                         success = { result ->
                             result.trackList = result.trackList.toMutableList()
-                            dispatch((Result.ResultFetched(result, result.trackList.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0) { hashMapOf() }))))
+                            dispatch(
+                                (Result.ResultFetched(
+                                    result,
+                                    result.trackList.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0) { hashMapOf() })
+                                ))
+                            )
                             executeIntent(Intent.RefreshTracksStatuses, getState)
                         },
                         failure = {
@@ -101,21 +102,28 @@ internal class SpotiFlyerListStoreProvider(dependencies: SpotiFlyerList.Dependen
                             return@map it.copy(downloaded = DownloadStatus.Queued)
                         it
                     }
-                    dispatch(Result.UpdateTrackList(list.updateTracksStatuses(downloadProgressFlow.replayCache.getOrElse(0) { hashMapOf() })))
+                    dispatch(
+                        Result.UpdateTrackList(
+                            list.updateTracksStatuses(
+                                downloadProgressFlow.replayCache.getOrElse(
+                                    0
+                                ) { hashMapOf() })
+                        )
+                    )
 
-                    val finalList =
-                        intent.trackList.filter { it.downloaded == DownloadStatus.NotDownloaded }
-                    if (finalList.isNullOrEmpty()) methods.value.showPopUpMessage("All Songs are Processed")
-                    else downloadTracks(finalList, fetchQuery, dir)
+                    val finalList = intent.trackList.filter { it.downloaded == DownloadStatus.NotDownloaded }
+                    if (finalList.isEmpty()) methods.value.showPopUpMessage("All Songs are Processed")
+                    else downloadTracks(finalList, fetchQuery, fileManager)
                 }
                 is Intent.StartDownload -> {
                     dispatch(Result.UpdateTrackItem(intent.track.copy(downloaded = DownloadStatus.Queued)))
-                    downloadTracks(listOf(intent.track), fetchQuery, dir)
+                    downloadTracks(listOf(intent.track), fetchQuery, fileManager)
                 }
                 is Intent.RefreshTracksStatuses -> methods.value.queryActiveTracks()
             }
         }
     }
+
     private object ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
             when (result) {
@@ -134,6 +142,7 @@ internal class SpotiFlyerListStoreProvider(dependencies: SpotiFlyerList.Dependen
             return this
         }
     }
+
     private fun List<TrackDetails>.updateTracksStatuses(map: HashMap<String, DownloadStatus>): List<TrackDetails> {
         val titleList = this.map { it.title }
         val updatedList = mutableListOf<TrackDetails>().also { it.addAll(this) }
@@ -141,7 +150,11 @@ internal class SpotiFlyerListStoreProvider(dependencies: SpotiFlyerList.Dependen
         for (newTrack in map) {
             titleList.indexOf(newTrack.key).let { position ->
                 if (position != -1) {
-                    updatedList.getOrNull(position)?.copy(downloaded = newTrack.value, progress = (newTrack.value as? DownloadStatus.Downloading)?.progress ?: updatedList[position].progress)?.also { updatedTrack ->
+                    updatedList.getOrNull(position)?.copy(
+                        downloaded = newTrack.value,
+                        progress = (newTrack.value as? DownloadStatus.Downloading)?.progress
+                            ?: updatedList[position].progress
+                    )?.also { updatedTrack ->
                         updatedList[position] = updatedTrack
                         // logger.d("$position) ${updatedTrack.downloaded} - ${updatedTrack.title}","List Store Track Update")
                     }

@@ -18,16 +18,13 @@ package com.shabinder.common.main.integration
 
 import co.touchlab.stately.ensureNeverFrozen
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.lifecycle.doOnResume
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.essenty.lifecycle.doOnResume
 import com.shabinder.common.caching.Cache
-import com.shabinder.common.di.Picture
-import com.shabinder.common.di.utils.asValue
+import com.shabinder.common.core_components.picture.Picture
+import com.shabinder.common.core_components.utils.asValue
 import com.shabinder.common.main.SpotiFlyerMain
-import com.shabinder.common.main.SpotiFlyerMain.Dependencies
-import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
-import com.shabinder.common.main.SpotiFlyerMain.Output
-import com.shabinder.common.main.SpotiFlyerMain.State
+import com.shabinder.common.main.SpotiFlyerMain.*
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
 import com.shabinder.common.main.store.SpotiFlyerMainStoreProvider
 import com.shabinder.common.main.store.getStore
@@ -47,13 +44,7 @@ internal class SpotiFlyerMainImpl(
 
     private val store =
         instanceKeeper.getStore {
-            SpotiFlyerMainStoreProvider(
-                analyticsManager = analyticsManager,
-                preferenceManager = preferenceManager,
-                storeFactory = storeFactory,
-                database = database,
-                dir = dir
-            ).provide()
+            SpotiFlyerMainStoreProvider(dependencies).provide()
         }
 
     private val cache = Cache.Builder
@@ -84,7 +75,7 @@ internal class SpotiFlyerMainImpl(
 
     override suspend fun loadImage(url: String): Picture {
         return cache.get(url) {
-            dir.loadImage(url, 150, 150)
+            fileManager.loadImage(url, 150, 150)
         }
     }
 

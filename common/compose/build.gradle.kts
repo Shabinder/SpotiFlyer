@@ -34,6 +34,7 @@ kotlin {
                 implementation(project(":common:main"))
                 implementation(project(":common:list"))
                 implementation(project(":common:preference"))
+                implementation(project(":common:core-components"))
                 implementation(project(":common:database"))
                 implementation(project(":common:data-models"))
                 implementation(project(":common:dependency-injection"))

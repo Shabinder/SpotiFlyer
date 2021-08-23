@@ -5,7 +5,8 @@ enum class AudioQuality(val kbps: String) {
     KBPS160("160"),
     KBPS192("192"),
     KBPS256("256"),
-    KBPS320("320");
+    KBPS320("320"),
+    UNKNOWN("-1");
 
     companion object {
         fun getQuality(kbps: String): AudioQuality {
@@ -15,6 +16,7 @@ enum class AudioQuality(val kbps: String) {
                 "192" -> KBPS192
                 "256" -> KBPS256
                 "320" -> KBPS320
+                "-1" -> UNKNOWN
                 else -> KBPS160 // Use 160 as baseline
             }
         }
