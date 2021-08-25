@@ -124,25 +124,25 @@ class FetchPlatformQueryResult(
                         null
                     }
                 }
-                // if videoID wasn't present || fetching using video ID failed
-                if (downloadLink.isNullOrBlank()) {
+            }
+            // if videoID wasn't present || fetching using video ID failed
+            if (downloadLink.isNullOrBlank()) {
 
-                    // Try Fetching Track from Available Sources
-                    val queryResult = saavnProvider.findBestSongDownloadURL(
-                        trackName = track.title,
-                        trackArtists = track.artists,
-                        preferredQuality = preferredQuality
-                    ).flatMapError { saavnError ->
-                        appendPadded("Fetching From Saavn Failed:", saavnError.stackTraceToString())
-                        // Saavn Failed, Lets Try Fetching Now From Youtube Music
-                        youtubeMusic.findMp3SongDownloadURLYT(track, preferredQuality).also {
-                            if (it is SuspendableEvent.Failure)
-                                appendPadded("Fetching From YT-Music Failed:", it.component2()?.stackTraceToString())
-                        }
+                // Try Fetching Track from Available Sources
+                val queryResult = saavnProvider.findBestSongDownloadURL(
+                    trackName = track.title,
+                    trackArtists = track.artists,
+                    preferredQuality = preferredQuality
+                ).flatMapError { saavnError ->
+                    appendPadded("Fetching From Saavn Failed:", saavnError.stackTraceToString())
+                    // Saavn Failed, Lets Try Fetching Now From Youtube Music
+                    youtubeMusic.findMp3SongDownloadURLYT(track, preferredQuality).also {
+                        if (it is SuspendableEvent.Failure)
+                            appendPadded("Fetching From YT-Music Failed:", it.component2()?.stackTraceToString())
                     }
-
-                    downloadLink = queryResult.component1()
                 }
+
+                downloadLink = queryResult.component1()
             }
         }
         return if (downloadLink.isNullOrBlank()) SuspendableEvent.error(

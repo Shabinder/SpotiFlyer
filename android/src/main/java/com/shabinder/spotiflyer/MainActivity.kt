@@ -91,8 +91,7 @@ class MainActivity : ComponentActivity() {
     private val trackStatusFlow = MutableSharedFlow<HashMap<String, DownloadStatus>>(1)
     private var permissionGranted = mutableStateOf(true)
     private val internetAvailability by lazy { ConnectionLiveData(applicationContext) }
-
-    private val rootComponent = spotiFlyerRoot(defaultComponentContext())
+    private lateinit var rootComponent: SpotiFlyerRoot
     // private val visibleChild get(): SpotiFlyerRoot.Child = root.routerState.value.activeChild.instance
 
     // Variable for storing instance of our service class
@@ -105,7 +104,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
+        rootComponent = spotiFlyerRoot(defaultComponentContext())
         setContent {
             SpotiFlyerTheme {
                 Surface(contentColor = colorOffWhite) {

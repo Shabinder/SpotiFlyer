@@ -51,15 +51,15 @@ internal class AndroidAnalyticsManager(private val mainActivity: Activity) : Ana
         Countly.sharedInstance().consent().removeConsentAll()
     }
 
-    override fun sendView(name: String, extras: Map<String, Any>) {
+    override fun sendView(name: String, extras: MutableMap<String, Any>) {
         Countly.sharedInstance().views().recordView(name, extras)
     }
 
-    override fun sendEvent(eventName: String, extras: Map<String, Any>) {
+    override fun sendEvent(eventName: String, extras: MutableMap<String, Any>) {
         Countly.sharedInstance().events().recordEvent(eventName, extras)
     }
 
-    override fun sendCrashReport(error: Throwable, extras: Map<String, Any>) {
+    override fun sendCrashReport(error: Throwable, extras: MutableMap<String, Any>) {
         Countly.sharedInstance().crashes().recordUnhandledException(error, extras)
     }
 }

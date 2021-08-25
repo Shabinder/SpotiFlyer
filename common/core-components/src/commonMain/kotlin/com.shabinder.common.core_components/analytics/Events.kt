@@ -1,6 +1,6 @@
 package com.shabinder.common.core_components.analytics
 
-sealed class AnalyticsEvent(private val eventName: String, private val extras: Map<String, Any> = emptyMap()): AnalyticsManager.Companion.AnalyticsAction() {
+sealed class AnalyticsEvent(private val eventName: String, private val extras: MutableMap<String, Any> = mutableMapOf()): AnalyticsManager.Companion.AnalyticsAction() {
 
     override fun track(analyticsManager: AnalyticsManager) = analyticsManager.sendEvent(eventName,extras)
 

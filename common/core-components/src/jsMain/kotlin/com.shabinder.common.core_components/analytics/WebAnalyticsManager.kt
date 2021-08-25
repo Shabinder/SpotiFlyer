@@ -18,11 +18,11 @@ private val webAnalytics =
 
         override fun revokeConsent() {}
 
-        override fun sendView(name: String, extras: Map<String, Any>) {}
+        override fun sendView(name: String, extras: MutableMap<String, Any>) {}
 
-        override fun sendEvent(eventName: String, extras: Map<String, Any>) {}
+        override fun sendEvent(eventName: String, extras: MutableMap<String, Any>) {}
 
-        override fun sendCrashReport(error: Throwable, extras: Map<String, Any>) {}
+        override fun sendCrashReport(error: Throwable, extras: MutableMap<String, Any>) {}
     }
 
 actual fun analyticsModule() = module {

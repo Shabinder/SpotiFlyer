@@ -9,10 +9,10 @@ interface AnalyticsManager {
     fun giveConsent()
     fun isTracking(): Boolean
     fun revokeConsent()
-    fun sendView(name: String, extras: Map<String, Any> = emptyMap())
-    fun sendEvent(eventName: String, extras: Map<String, Any> = emptyMap())
+    fun sendView(name: String, extras: MutableMap<String, Any> = mutableMapOf())
+    fun sendEvent(eventName: String, extras: MutableMap<String, Any> = mutableMapOf())
     fun track(event: AnalyticsAction) = event.track(this)
-    fun sendCrashReport(error: Throwable, extras: Map<String, Any> = emptyMap())
+    fun sendCrashReport(error: Throwable, extras: MutableMap<String, Any> = mutableMapOf())
 
     companion object {
         abstract class AnalyticsAction {

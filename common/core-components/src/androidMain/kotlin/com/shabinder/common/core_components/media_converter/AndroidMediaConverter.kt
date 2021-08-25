@@ -15,9 +15,9 @@ class AndroidMediaConverter : MediaConverter() {
         progressCallbacks: (Long) -> Unit,
     ) = executeSafelyInPool {
         val kbpsArg = if (audioQuality == AudioQuality.UNKNOWN) "" else "-b:a ${audioQuality.kbps}k"
-
+        // -acodec libmp3lame
         val session = FFmpegKit.execute(
-            "-i $inputFilePath -y $kbpsArg -acodec libmp3lame -vn $outputFilePath"
+            "-i $inputFilePath -y $kbpsArg -vn $outputFilePath"
         )
 
         when (session.returnCode.value) {

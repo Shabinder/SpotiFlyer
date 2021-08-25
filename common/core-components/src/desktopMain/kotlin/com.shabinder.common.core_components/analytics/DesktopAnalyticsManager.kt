@@ -43,21 +43,21 @@ internal class DesktopAnalyticsManager(
         Countly.onConsentRemoval(*featuresSet)
     }
 
-    override fun sendView(name: String, extras: Map<String, Any>) {
+    override fun sendView(name: String, extras: MutableMap<String, Any>) {
         Countly.api().view(name)
     }
 
-    override fun sendEvent(eventName: String, extras: Map<String, Any>) {
+    override fun sendEvent(eventName: String, extras: MutableMap<String, Any>) {
         Countly.api().event(eventName)
-            .setSegmentation(extras.filterValues { it is String } as? Map<String, String> ?: emptyMap()).record()
+            .setSegmentation(extras.filterValues { it is String } as? MutableMap<String, String> ?: emptyMap()).record()
     }
 
-    override fun sendCrashReport(error: Throwable, extras: Map<String, Any>) {
+    override fun sendCrashReport(error: Throwable, extras: MutableMap<String, Any>) {
         Countly.api().addCrashReport(
             error,
             extras.getOrDefault("fatal", true) as Boolean,
             error.javaClass.simpleName,
-            extras.filterValues { it is String } as? Map<String, String> ?: emptyMap()
+            extras.filterValues { it is String } as? MutableMap<String, String> ?: emptyMap()
         )
     }
 
