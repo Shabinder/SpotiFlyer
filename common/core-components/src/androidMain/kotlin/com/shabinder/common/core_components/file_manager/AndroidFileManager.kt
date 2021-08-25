@@ -65,7 +65,8 @@ class AndroidFileManager(
     spotiFlyerDatabase: SpotiFlyerDatabase
 ) : FileManager {
     @Suppress("DEPRECATION")
-    private val defaultBaseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).toString()
+    private val defaultBaseDir =
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).toString()
 
     override fun fileSeparator(): String = File.separator
 
@@ -124,7 +125,8 @@ class AndroidFileManager(
             } catch (e: Exception) {
                 // Media File Isn't MP3 lets Convert It first
                 if (e is InvalidDataException) {
-                    val convertedFilePath = songFile.absolutePath.substringBeforeLast('.') + ".temp.mp3"
+                    val convertedFilePath =
+                        songFile.absolutePath.substringBeforeLast('.') + ".temp.mp3"
 
                     val conversionResult = mediaConverter.convertAudioFile(
                         inputFilePath = songFile.absolutePath,
@@ -138,9 +140,13 @@ class AndroidFileManager(
                             .setId3v2TagsAndSaveFile(trackDetails, trackDetails.outputFilePath)
 
                         addToLibrary(trackDetails.outputFilePath)
-                    }.failure {
-                        throw it
-                    }
+                        File(convertedFilePath).delete()
+                    }.fold(
+                        success = {},
+                        failure = {
+                            throw it
+                        }
+                    )
                 } else throw e
             }
             SuspendableEvent.success(trackDetails.outputFilePath)
@@ -154,16 +160,17 @@ class AndroidFileManager(
 
     override fun addToLibrary(path: String) = methods.value.platformActions.addToLibrary(path)
 
-    override suspend fun loadImage(url: String, reqWidth: Int, reqHeight: Int): Picture = withContext(dispatcherIO) {
-        val cachePath = imageCacheDir() + getNameURL(url)
-        Picture(
-            image = (loadCachedImage(cachePath, reqWidth, reqHeight) ?: freshImage(
-                url,
-                reqWidth,
-                reqHeight
-            ))?.asImageBitmap()
-        )
-    }
+    override suspend fun loadImage(url: String, reqWidth: Int, reqHeight: Int): Picture =
+        withContext(dispatcherIO) {
+            val cachePath = imageCacheDir() + getNameURL(url)
+            Picture(
+                image = (loadCachedImage(cachePath, reqWidth, reqHeight) ?: freshImage(
+                    url,
+                    reqWidth,
+                    reqHeight
+                ))?.asImageBitmap()
+            )
+        }
 
     private fun loadCachedImage(cachePath: String, reqWidth: Int, reqHeight: Int): Bitmap? {
         return try {
@@ -186,28 +193,32 @@ class AndroidFileManager(
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun freshImage(url: String, reqWidth: Int, reqHeight: Int): Bitmap? = withContext(dispatcherIO) {
-        try {
-            val source = URL(url)
-            val connection: HttpURLConnection = source.openConnection() as HttpURLConnection
-            connection.connectTimeout = 5000
-            connection.connect()
+    private suspend fun freshImage(url: String, reqWidth: Int, reqHeight: Int): Bitmap? =
+        withContext(dispatcherIO) {
+            try {
+                val source = URL(url)
+                val connection: HttpURLConnection = source.openConnection() as HttpURLConnection
+                connection.connectTimeout = 5000
+                connection.connect()
 
-            val input: ByteArray = connection.inputStream.readBytes()
+                val input: ByteArray = connection.inputStream.readBytes()
 
-            // Get Memory Efficient Bitmap
-            val bitmap: Bitmap? = getMemoryEfficientBitmap(input, reqWidth, reqHeight)
+                // Get Memory Efficient Bitmap
+                val bitmap: Bitmap? = getMemoryEfficientBitmap(input, reqWidth, reqHeight)
 
-            parallelExecutor.executeSuspending {
-                // Decode and Cache Full Sized Image in Background
-                cacheImage(BitmapFactory.decodeByteArray(input, 0, input.size), imageCacheDir() + getNameURL(url))
+                parallelExecutor.executeSuspending {
+                    // Decode and Cache Full Sized Image in Background
+                    cacheImage(
+                        BitmapFactory.decodeByteArray(input, 0, input.size),
+                        imageCacheDir() + getNameURL(url)
+                    )
+                }
+                bitmap // return Memory Efficient Bitmap
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
             }
-            bitmap // return Memory Efficient Bitmap
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
         }
-    }
 
     /*
     * Parallel Executor with 2 concurrent operation at a time.
