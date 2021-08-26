@@ -1,3 +1,7 @@
+Codebase is under **active refactoring and development**, hence releases will be delayed,</br>
+**Track Progress** here & Meantime **preview releases** will be shared here only: https://github.com/Shabinder/SpotiFlyer/issues/374
+
+
 ![Web Cover](art/cover-web.jpg)
 ![Android Cover](art/cover-android.jpg)
 ![Desktop Cover](art/cover-desktop.jpg)
