@@ -43,7 +43,6 @@ class AndroidMediaConverter : MediaConverter() {
             else -> throw SpotiFlyerException.MP3ConversionFailed("FFmpeg Conversion Failed for $inputFilePath")
         }
     }
-
 }
 
 internal actual fun mediaConverterModule() = module {

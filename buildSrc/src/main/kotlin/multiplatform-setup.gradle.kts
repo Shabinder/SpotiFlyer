@@ -38,7 +38,11 @@ kotlin {
     android()
 
     js(BOTH) {
-        browser()
+        browser {
+            commonWebpackConfig {
+                cssSupport.enabled = true
+            }
+        }
         // nodejs()
     }
 
@@ -102,9 +106,13 @@ kotlin {
         named("jsMain") {
             dependencies {
                 implementation(Ktor.clientJs)
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-react:17.0.2-pre.213-kotlin-1.5.10")
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:17.0.2-pre.213-kotlin-1.5.10")
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:5.3.0-pre.213-kotlin-1.5.10")
+
+                /*with(KotlinJSWrappers) {
+                    implementation(enforcedPlatform(bom))
+                    implementation(kotlinReact)
+                    implementation(kotlinReactDom)
+                    implementation(kotlinStyled)
+                }*/
             }
         }
         if(HostOS.isMac){

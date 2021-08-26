@@ -23,7 +23,7 @@ version = "0.1"
 
 repositories {
     mavenCentral()
-    maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")
+    //maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")
 }
 
 dependencies {
@@ -46,17 +46,24 @@ dependencies {
     implementation("co.touchlab:stately-common:1.1.7")
     implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
     // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2") {
     //  https://youtrack.jetbrains.com/issue/KTOR-2670
+        @Suppress("DEPRECATION")
         isForce = true
     }
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt") {
         @Suppress("DEPRECATION")
         isForce = true
     }
-    implementation("org.jetbrains.kotlin-wrappers:kotlin-react:17.0.2-pre.213-kotlin-1.5.10")
-    implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:17.0.2-pre.213-kotlin-1.5.10")
-    implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:5.3.0-pre.213-kotlin-1.5.10")
+
+    with(KotlinJSWrappers) {
+        implementation(enforcedPlatform(bom))
+        implementation(kotlinReact)
+        implementation(kotlinReactDom)
+        implementation(kotlinStyled)
+    }
 }
 
 kotlin {

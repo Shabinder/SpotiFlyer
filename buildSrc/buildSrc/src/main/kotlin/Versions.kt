@@ -16,11 +16,17 @@
 
 @file:Suppress("MayBeConstant", "SpellCheckingInspection")
 
+import org.gradle.api.Action
+import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.kotlin.dsl.accessors.runtime.addDependencyTo
+
 object Versions {
     // App's Version (To be bumped at each update)
     const val versionName = "3.2.11"
 
     const val versionCode = 23
+
     // Kotlin
     const val kotlinVersion = "1.5.21"
 
@@ -64,13 +70,21 @@ object Versions {
 object HostOS {
     // Host OS Properties
     private val hostOs = System.getProperty("os.name")
-    val isMingwX64 = hostOs.startsWith("Windows",true)
-    val isMac = hostOs.startsWith("Mac",true)
-    val isLinux = hostOs.startsWith("Linux",true)
+    val isMingwX64 = hostOs.startsWith("Windows", true)
+    val isMac = hostOs.startsWith("Mac", true)
+    val isLinux = hostOs.startsWith("Linux", true)
 }
 
 object MultiPlatformSettings {
     const val dep = "com.russhwolf:multiplatform-settings-no-arg:0.7.7"
+}
+
+object KotlinJSWrappers {
+    private const val bomVersion = "0.0.1-pre.235-kotlin-1.5.21"
+    val bom = "org.jetbrains.kotlin-wrappers:kotlin-wrappers-bom:${bomVersion}"
+    const val kotlinReact = "org.jetbrains.kotlin-wrappers:kotlin-react"
+    const val kotlinReactDom = "org.jetbrains.kotlin-wrappers:kotlin-react-dom"
+    const val kotlinStyled = "org.jetbrains.kotlin-wrappers:kotlin-styled"
 }
 
 object Koin {
@@ -89,7 +103,7 @@ object Androidx {
     const val junit = "androidx.test.ext:junit:1.1.2"
     const val expresso = "androidx.test.espresso:espresso-core:3.3.0"
 
-    const val gradlePlugin = "com.android.tools.build:gradle:4.1.1"
+    const val gradlePlugin = "com.android.tools.build:gradle:7.0.1"
 }
 
 object KTLint {
@@ -103,7 +117,8 @@ object JetBrains {
         const val serialization = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlinVersion}"
         const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:${Versions.kotlinVersion}"
         const val testJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlinVersion}"
-        const val testAnnotationsCommon = "org.jetbrains.kotlin:kotlin-test-annotations-common:${Versions.kotlinVersion}"
+        const val testAnnotationsCommon =
+            "org.jetbrains.kotlin:kotlin-test-annotations-common:${Versions.kotlinVersion}"
     }
 
     object Compose {
@@ -112,6 +127,7 @@ object JetBrains {
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
     }
 }
+
 object Mosaic {
     const val gradlePlugin = "com.jakewharton.mosaic:mosaic-gradle-plugin:${Versions.mosaic}"
 }
@@ -165,11 +181,13 @@ object Extras {
     const val mp3agic = "com.mpatric:mp3agic:0.9.0"
     const val jaudioTagger = "com.github.Shabinder:JAudioTagger-Android:1.0"
     const val kermit = "co.touchlab:kermit:${Versions.kermit}"
+
     object Android {
         // Self Hosted Analytics & Crashlytics (FOSS)
         val countly = "ly.count.android:sdk:20.11.8"
         val appUpdator = "com.github.amitbd1508:AppUpdater:4.1.0"
     }
+
     object Desktop {
         val countly = "ly.count.sdk:java:20.11.0"
     }
@@ -190,3 +208,10 @@ object SqlDelight {
     val nativeDriverMacos = "com.squareup.sqldelight:native-driver-macosx64:${Versions.sqlDelight}"
     val jdbcDriver = "org.xerial:sqlite-jdbc:${Versions.sqliteJdbcDriver}"
 }
+
+fun DependencyHandler.`implementation`(
+    dependencyNotation: String,
+    dependencyConfiguration: ExternalModuleDependency.() -> Unit
+): ExternalModuleDependency = addDependencyTo(
+    this, "implementation", dependencyNotation
+) { dependencyConfiguration() }

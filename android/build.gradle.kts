@@ -31,9 +31,6 @@ version = Versions.versionName
 repositories {
     google()
     mavenCentral()
-    // Remove jcenter as soon as following issue closes
-    // https://github.com/matomo-org/matomo-sdk-android/issues/301
-    jcenter()
 }
 
 android {
@@ -50,13 +47,13 @@ android {
         }
     }
 
-    compileSdkVersion(Versions.compileSdkVersion)
+    compileSdk = Versions.compileSdkVersion
     buildToolsVersion = "30.0.3"
 
     defaultConfig {
         applicationId = "com.shabinder.spotiflyer"
-        minSdkVersion(Versions.minSdkVersion)
-        targetSdkVersion(Versions.targetSdkVersion)
+        minSdk = Versions.minSdkVersion
+        targetSdk = Versions.targetSdkVersion
         versionCode = Versions.versionCode
         versionName = Versions.versionName
     }
@@ -90,7 +87,9 @@ android {
         }
     }
     packagingOptions {
-        exclude("META-INF/*")
+        resources.excludes.apply {
+            add("META-INF/*")
+        }
     }
 }
 dependencies {

@@ -27,8 +27,13 @@ allprojects {
         // mavenLocal()
         maven(url = "https://jitpack.io")
         maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")
         maven(url = "https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven")
+    }
+    /*Fixes: Could not resolve org.nodejs:node*/
+    plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+        configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
+            download = false
+        }
     }
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         dependsOn(":common:data-models:generateI18n4kFiles")
