@@ -1,9 +1,9 @@
 name: Maintenance
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *' #once a day
+on: [ pull_request ]
+  #workflow_dispatch:
+  #schedule:
+  #  - cron: '0 0 * * *' #once a day
 
 jobs:
   build:
