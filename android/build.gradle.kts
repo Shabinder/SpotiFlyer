@@ -16,6 +16,7 @@
 
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.compose.compose
+import org.jetbrains.kotlin.kapt.cli.main
 
 plugins {
     id("com.android.application")
@@ -56,8 +57,21 @@ android {
         targetSdk = Versions.targetSdkVersion
         versionCode = Versions.versionCode
         versionName = Versions.versionName
-    }
 
+        ndk {
+            abiFilters.addAll(setOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a"))
+        }
+    }
+    sourceSets {
+        named("main") {
+            jniLibs.srcDir("../ffmpeg-android-maker/output/lib")
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path("CMakeLists.txt")
+        }
+    }
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
@@ -65,7 +79,10 @@ android {
             if (props.containsKey("storeFileDir")) {
                 signingConfig = signingConfigs.getByName("release")
             }
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     kotlinOptions {
@@ -87,8 +104,13 @@ android {
         }
     }
     packagingOptions {
-        resources.excludes.apply {
-            add("META-INF/*")
+        resources {
+            excludes.apply {
+                add("META-INF/*")
+            }
+            jniLibs.pickFirsts.apply {
+                add("**/*.so")
+            }
         }
     }
 }

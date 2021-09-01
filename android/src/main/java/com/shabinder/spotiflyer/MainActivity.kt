@@ -65,6 +65,7 @@ import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.configurations.SpotiFlyerTheme
 import com.shabinder.common.uikit.configurations.colorOffWhite
 import com.shabinder.common.uikit.screens.SpotiFlyerRootContent
+import com.shabinder.spotiflyer.ffmpeg.FFmpeg
 import com.shabinder.spotiflyer.service.ForegroundService
 import com.shabinder.spotiflyer.ui.AnalyticsDialog
 import com.shabinder.spotiflyer.ui.NetworkDialog
@@ -105,6 +106,8 @@ class MainActivity : ComponentActivity() {
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, false)
         rootComponent = spotiFlyerRoot(defaultComponentContext())
+        Log.d("FFmpeg","init")
+        FFmpeg.testInit()
         setContent {
             SpotiFlyerTheme {
                 Surface(contentColor = colorOffWhite) {
