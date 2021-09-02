@@ -3,10 +3,7 @@ package com.shabinder.common.providers.saavn
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.core_components.file_manager.finalOutputDir
-import com.shabinder.common.models.DownloadStatus
-import com.shabinder.common.models.PlatformQueryResult
-import com.shabinder.common.models.SpotiFlyerException
-import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.*
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.saavn.SaavnSong
 import com.shabinder.common.models.spotify.Source
@@ -81,6 +78,7 @@ class SaavnProvider(
             albumArtURL = it.image.replace("http:", "https:"),
             lyrics = it.lyrics ?: it.lyrics_snippet,
             source = Source.JioSaavn,
+            audioQuality = if(it.is320Kbps) AudioQuality.KBPS320 else AudioQuality.KBPS160,
             outputFilePath = fileManager.finalOutputDir(it.song, type, subFolder, fileManager.defaultDir() /*".m4a"*/)
         )
     }

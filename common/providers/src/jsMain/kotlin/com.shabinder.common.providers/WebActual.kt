@@ -33,8 +33,9 @@ actual suspend fun downloadTracks(
         withContext(dispatcherIO) {
             allTracksStatus[track.title] = DownloadStatus.Queued
             fetcher.findBestDownloadLink(track).fold(
-                success = { url ->
-                    downloadFile(url).collect {
+                success = { res ->
+                    track.audioQuality = res.second
+                    downloadFile(res.first).collect {
                         when (it) {
                             is DownloadResult.Success -> {
                                 println("Download Completed")

@@ -139,8 +139,8 @@ class ForegroundService : LifecycleService() {
             lifecycleScope.launch {
                 downloadService.value.executeSuspending {
                     fetcher.findBestDownloadLink(track).fold(
-                        success = { url ->
-                            enqueueDownload(url, track)
+                        success = { res ->
+                            enqueueDownload(res.first, track.apply { audioQuality = res.second })
                         },
                         failure = { error ->
                             failed++

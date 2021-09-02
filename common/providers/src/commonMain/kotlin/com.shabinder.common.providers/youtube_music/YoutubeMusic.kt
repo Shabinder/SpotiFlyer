@@ -50,7 +50,7 @@ class YoutubeMusic constructor(
     suspend fun findMp3SongDownloadURLYT(
         trackDetails: TrackDetails,
         preferredQuality: AudioQuality = fileManager.preferenceManager.audioQuality
-    ): SuspendableEvent<String, Throwable> {
+    ): SuspendableEvent<Pair<String,AudioQuality>, Throwable> {
         return getYTIDBestMatch(trackDetails).flatMap { videoID ->
             // As YT compress Audio hence there is no benefit of quality for more than 192
             val optimalQuality =
@@ -67,6 +67,8 @@ class YoutubeMusic constructor(
                             message = "Caught Following Errors While Finding Downloadable Link for $videoID :   \n${it.stackTraceToString()}"
                         )
                 }
+            }.map {
+                Pair(it,optimalQuality)
             }
         }
     }

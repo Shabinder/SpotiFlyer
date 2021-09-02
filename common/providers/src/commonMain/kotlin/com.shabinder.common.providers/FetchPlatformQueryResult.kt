@@ -91,27 +91,35 @@ class FetchPlatformQueryResult(
     suspend fun findBestDownloadLink(
         track: TrackDetails,
         preferredQuality: AudioQuality = preferenceManager.audioQuality
-    ): SuspendableEvent<String, Throwable> {
+    ): SuspendableEvent<Pair<String, AudioQuality>, Throwable> {
         var downloadLink: String? = null
+        var audioQuality = AudioQuality.KBPS192
 
         val errorTrace = buildString(track) {
             if (track.videoID != null) {
                 // We Already have VideoID
                 downloadLink = when (track.source) {
                     Source.JioSaavn -> {
-                        saavnProvider.getSongFromID(track.videoID.requireNotNull()).component1()?.media_url
+                        saavnProvider.getSongFromID(track.videoID.requireNotNull()).component1()
+                            ?.also { audioQuality = it.audioQuality }
+                            ?.media_url
                     }
                     Source.YouTube -> {
-                        youtubeMp3.getMp3DownloadLink(track.videoID.requireNotNull(), preferredQuality)
-                            .let { ytMp3Link ->
-                                if (ytMp3Link is SuspendableEvent.Failure || ytMp3Link.component1().isNullOrBlank()) {
+                        youtubeMp3.getMp3DownloadLink(
+                            track.videoID.requireNotNull(),
+                            preferredQuality
+                        ).let { ytMp3Link ->
+                                if (ytMp3Link is SuspendableEvent.Failure || ytMp3Link.component1()
+                                        .isNullOrBlank()
+                                ) {
                                     appendPadded(
                                         "Yt1sMp3 Failed for ${track.videoID}:",
                                         ytMp3Link.component2()
                                             ?: "couldn't fetch link for ${track.videoID} ,trying manual extraction"
                                     )
                                     appendLine("Trying Local Extraction")
-                                    youtubeProvider.ytDownloader.getVideo(track.videoID!!).get()?.url
+                                    youtubeProvider.ytDownloader.getVideo(track.videoID!!)
+                                        .get()?.url
                                 } else ytMp3Link.component1()
                             }
                     }
@@ -137,24 +145,35 @@ class FetchPlatformQueryResult(
                     appendPadded("Fetching From Saavn Failed:", saavnError.stackTraceToString())
                     // Saavn Failed, Lets Try Fetching Now From Youtube Music
                     youtubeMusic.findMp3SongDownloadURLYT(track, preferredQuality).also {
+                        // Append Error To StackTrace
                         if (it is SuspendableEvent.Failure)
-                            appendPadded("Fetching From YT-Music Failed:", it.component2()?.stackTraceToString())
+                            appendPadded(
+                                "Fetching From YT-Music Failed:",
+                                it.component2()?.stackTraceToString()
+                            )
                     }
                 }
 
-                downloadLink = queryResult.component1()
+                queryResult.component1()?.let {
+                    downloadLink = it.first
+                    audioQuality = it.second
+                }
             }
         }
         return if (downloadLink.isNullOrBlank()) SuspendableEvent.error(
             SpotiFlyerException.DownloadLinkFetchFailed(errorTrace)
-        ) else SuspendableEvent.success(downloadLink.requireNotNull())
+        ) else SuspendableEvent.success(Pair(downloadLink.requireNotNull(),audioQuality))
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun addToDatabaseAsync(link: String, result: PlatformQueryResult) {
         GlobalScope.launch(dispatcherIO) {
             db?.add(
-                result.folderType, result.title, link, result.coverUrl, result.trackList.size.toLong()
+                result.folderType,
+                result.title,
+                link,
+                result.coverUrl,
+                result.trackList.size.toLong()
             )
         }
     }

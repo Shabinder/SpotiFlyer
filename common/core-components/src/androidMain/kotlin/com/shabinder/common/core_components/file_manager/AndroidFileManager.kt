@@ -131,6 +131,7 @@ class AndroidFileManager(
                     val conversionResult = mediaConverter.convertAudioFile(
                         inputFilePath = songFile.absolutePath,
                         outputFilePath = convertedFilePath,
+                        trackDetails.audioQuality
                     )
 
                     conversionResult.map { outputFilePath ->

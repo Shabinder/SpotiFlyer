@@ -32,18 +32,21 @@ interface JioSaavnRequests {
         trackName: String,
         trackArtists: List<String>,
         preferredQuality: AudioQuality
-    ): SuspendableEvent<String, Throwable> = searchForSong(trackName).map { songs ->
+    ): SuspendableEvent<Pair<String,AudioQuality>, Throwable> = searchForSong(trackName).map { songs ->
         val bestMatch = sortByBestMatch(songs, trackName, trackArtists).keys.firstOrNull() ?:
             throw SpotiFlyerException.DownloadLinkFetchFailed("No SAAVN Match Found for $trackName")
 
+        var audioQuality: AudioQuality = AudioQuality.KBPS160
         val m4aLink: String by getSongFromID(bestMatch).map { song ->
             val optimalQuality = if (song.is320Kbps && ((preferredQuality.kbps.toIntOrNull()
                     ?: 0) > 160)
             ) AudioQuality.KBPS320 else AudioQuality.KBPS160
+            audioQuality = optimalQuality
+
             song.media_url.requireNotNull().replaceAfterLast("_", "${optimalQuality.kbps}.mp4")
         }
 
-        m4aLink
+        Pair(m4aLink,audioQuality)
     }
 
     suspend fun searchForSong(

@@ -34,8 +34,9 @@ actual suspend fun downloadTracks(
     list.forEach { trackDetails ->
         DownloadScope.executeSuspending { // Send Download to Pool.
             fetcher.findBestDownloadLink(trackDetails).fold(
-                success = { url ->
-                    downloadFile(url).collect {
+                success = { res ->
+                    trackDetails.audioQuality = res.second
+                    downloadFile(res.first).collect {
                         when (it) {
                             is DownloadResult.Error -> {
                                 DownloadProgressFlow.emit(

@@ -23,9 +23,9 @@ import org.gradle.kotlin.dsl.accessors.runtime.addDependencyTo
 
 object Versions {
     // App's Version (To be bumped at each update)
-    const val versionName = "3.2.11"
+    const val versionName = "3.3"
 
-    const val versionCode = 23
+    const val versionCode = 24
 
     // Kotlin
     const val kotlinVersion = "1.5.21"
