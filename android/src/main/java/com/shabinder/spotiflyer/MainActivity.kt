@@ -119,7 +119,7 @@ class MainActivity : ComponentActivity() {
             val inputFilePath = "/storage/emulated/0/Music/SpotiFlyer/Playlists/Sing-along_Punjabi/Kya_Baat_Ay.mp3"
             val outputFilePath = "/storage/emulated/0/Music/SpotiFlyer/Playlists/Sing-along_Punjabi/Kya_Baat_Ay.temp.mp3"
             val kbpsArg = "-b:a 192k"
-            ffmpeg.execute(arrayOf("-i", inputFilePath, /*"-acodec", "libmp3lame",*/ "-vn", outputFilePath),object : ExecuteBinaryResponseHandler() {
+            ffmpeg.execute(arrayOf("-i", inputFilePath, "-y", /*"-acodec", "libmp3lame",*/ "-vn", outputFilePath),object : ExecuteBinaryResponseHandler() {
                 override fun onSuccess(message: String?) {
                     Log.d("FFmpeg Command", "Success $message")
                 }
