@@ -152,7 +152,7 @@ class AndroidFileManager(
             SuspendableEvent.success(trackDetails.outputFilePath)
         } catch (e: Throwable) {
             e.printStackTrace()
-            if (songFile.exists()) songFile.delete()
+            //if (songFile.exists()) songFile.delete()
             logger.e { "${songFile.absolutePath} could not be created" }
             SuspendableEvent.error(e)
         }

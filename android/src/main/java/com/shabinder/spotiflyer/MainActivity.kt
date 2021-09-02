@@ -54,10 +54,12 @@ import com.google.accompanist.insets.statusBarsPadding
 import com.shabinder.common.core_components.ConnectionLiveData
 import com.shabinder.common.core_components.analytics.AnalyticsManager
 import com.shabinder.common.core_components.file_manager.FileManager
+import com.shabinder.common.core_components.media_converter.AndroidMediaConverter
 import com.shabinder.common.core_components.preference_manager.PreferenceManager
 import com.shabinder.common.di.observeAsState
 import com.shabinder.common.models.*
 import com.shabinder.common.models.PlatformActions.Companion.SharedPreferencesKey
+import com.shabinder.common.models.event.coroutines.success
 import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
@@ -65,7 +67,6 @@ import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.configurations.SpotiFlyerTheme
 import com.shabinder.common.uikit.configurations.colorOffWhite
 import com.shabinder.common.uikit.screens.SpotiFlyerRootContent
-import com.shabinder.spotiflyer.ffmpeg.FFmpeg
 import com.shabinder.spotiflyer.service.ForegroundService
 import com.shabinder.spotiflyer.ui.AnalyticsDialog
 import com.shabinder.spotiflyer.ui.NetworkDialog
@@ -106,8 +107,15 @@ class MainActivity : ComponentActivity() {
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, false)
         rootComponent = spotiFlyerRoot(defaultComponentContext())
-        Log.d("FFmpeg","init")
-        FFmpeg.testInit()
+        lifecycleScope.launch {
+            Log.d("FFmpeg", "init")
+            AndroidMediaConverter().convertAudioFile("/storage/emulated/0/Music/SpotiFlyer/Playlists/Sing-along_Punjabi/Kya_Baat_Ay.mp3","/storage/emulated/0/Music/SpotiFlyer/Playlists/Sing-along_Punjabi/Kya_Baat_Ay.temp.mp3").fold({
+                Log.d("FFmpeg Success",it)
+            }){
+                it.printStackTrace()
+            }
+        }
+        /*FFmpeg.testInit()*/
         setContent {
             SpotiFlyerTheme {
                 Surface(contentColor = colorOffWhite) {
@@ -246,7 +254,11 @@ class MainActivity : ComponentActivity() {
     }
 
     @Suppress("DEPRECATION")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         permissionGranted.value = checkPermissions()
     }
@@ -261,11 +273,13 @@ class MainActivity : ComponentActivity() {
                 override val fileManager: FileManager = this@MainActivity.fileManager
                 override val preferenceManager = this@MainActivity.preferenceManager
                 override val analyticsManager: AnalyticsManager = this@MainActivity.analyticsManager
-                override val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
+                override val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> =
+                    trackStatusFlow
                 override val actions = object : Actions {
 
                     override val platformActions = object : PlatformActions {
-                        override val imageCacheDir: String = applicationContext.cacheDir.absolutePath + File.separator
+                        override val imageCacheDir: String =
+                            applicationContext.cacheDir.absolutePath + File.separator
                         override val sharedPreferences = applicationContext.getSharedPreferences(
                             SharedPreferencesKey,
                             MODE_PRIVATE

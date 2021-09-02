@@ -1,17 +1,9 @@
 package com.shabinder.common.core_components.media_converter
 
-import android.util.Log
-import com.arthenica.ffmpegkit.FFmpegKit
-import com.arthenica.ffmpegkit.ReturnCode
+import com.shabinder.spotiflyer.ffmpeg.AndroidFFmpeg.runTranscode
 import com.shabinder.common.models.AudioQuality
-import com.shabinder.common.models.SpotiFlyerException
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import com.arthenica.ffmpegkit.FFprobeKit
-
-import com.arthenica.ffmpegkit.MediaInformationSession
-import kotlin.math.ceil
-import kotlin.math.roundToInt
 
 
 class AndroidMediaConverter : MediaConverter() {
@@ -21,7 +13,10 @@ class AndroidMediaConverter : MediaConverter() {
         audioQuality: AudioQuality,
         progressCallbacks: (Long) -> Unit,
     ) = executeSafelyInPool {
-        val kbpsArg = if (audioQuality == AudioQuality.UNKNOWN) {
+        // 192 is Default
+        val audioBitrate = if (audioQuality == AudioQuality.UNKNOWN) 192 else audioQuality.kbps.toIntOrNull() ?: 192
+        runTranscode(inputFilePath,outputFilePath,audioBitrate).toString()
+        /*val kbpsArg = if (audioQuality == AudioQuality.UNKNOWN) {
             val mediaInformation = FFprobeKit.getMediaInformation(inputFilePath)
             val bitrate = ((mediaInformation.mediaInformation.bitrate).toFloat()/1000).roundToInt()
             Log.d("MEDIA-INPUT Bit", bitrate.toString())
@@ -41,7 +36,7 @@ class AndroidMediaConverter : MediaConverter() {
                 throw SpotiFlyerException.MP3ConversionFailed("FFmpeg Conversion Canceled for $inputFilePath")
             }
             else -> throw SpotiFlyerException.MP3ConversionFailed("FFmpeg Conversion Failed for $inputFilePath")
-        }
+        }*/
     }
 }
 

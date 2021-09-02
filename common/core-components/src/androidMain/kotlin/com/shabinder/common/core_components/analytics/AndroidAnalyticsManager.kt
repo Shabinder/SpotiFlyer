@@ -24,7 +24,7 @@ internal class AndroidAnalyticsManager(private val mainActivity: Activity) : Ana
                 setIdMode(DeviceId.Type.OPEN_UDID)
                 setViewTracking(true)
                 enableCrashReporting()
-                setLoggingEnabled(true)
+                setLoggingEnabled(false)
                 setRecordAllThreadsWithCrash()
                 setRequiresConsent(true)
                 setShouldIgnoreAppCrawlers(true)

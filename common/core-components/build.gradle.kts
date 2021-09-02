@@ -19,7 +19,8 @@ kotlin {
             dependencies {
                 implementation(Extras.mp3agic)
                 implementation(Extras.Android.countly)
-                implementation("com.arthenica:ffmpeg-kit-audio:4.4.LTS")
+                implementation(project(":ffmpeg:ffmpeg-kit-android-lib"))
+//                implementation("com.arthenica:ffmpeg-kit-audio:4.4.LTS")
                 //api(files("$rootDir/libs/mobile-ffmpeg.aar"))
             }
         }

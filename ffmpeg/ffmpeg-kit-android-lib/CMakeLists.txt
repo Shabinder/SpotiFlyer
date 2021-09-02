@@ -9,7 +9,7 @@ set(
         # List variable name
         ffmpeg_libs_names
         # Values in the list
-        avutil avformat avcodec avresample swresample
+        avutil avformat avcodec swresample avdevice avfilter swscale
 )
 
 foreach (ffmpeg_lib_name ${ffmpeg_libs_names})
@@ -28,22 +28,29 @@ endforeach ()
 
 add_library(
         # Name for a library to build
-        spotiflyer-converter
+        spotiflyer-ffmpeg
         # Type of a library
         SHARED
         # All cpp files to compile
-        src/main/cpp/main.cpp
-        #        src/main/cpp/media_file_builder.cpp
-        #        src/main/cpp/media_file_builder_jni.cpp
-        #        src/main/cpp/frame_loader_context.cpp
-        #        src/main/cpp/frame_loader_context_jni.cpp
-        #        src/main/cpp/frame_extractor.cpp
-        #        src/main/cpp/utils.cpp
+        # mobile-ffmpeg
+       src/main/cpp/doc_examples_transcode_aac.c
+
+        # ffmpeg-kit
+#        src/main/cpp/ffmpegkit.c
+#        src/main/cpp/ffprobekit.c
+#        src/main/cpp/ffmpegkit_exception.c
+#        src/main/cpp/fftools_cmdutils.c
+#        src/main/cpp/fftools_ffmpeg.c
+#        src/main/cpp/fftools_ffprobe.c
+#        src/main/cpp/fftools_ffmpeg_opt.c
+#        src/main/cpp/fftools_ffmpeg_hw.c
+#        src/main/cpp/fftools_ffmpeg_filter.c
+#        src/main/cpp/saf_wrapper.c
 )
 
 target_link_libraries(
         # Library to link
-        spotiflyer-converter
+        spotiflyer-ffmpeg
         # List of libraries to link against:
         # Library for writing messages in LogCat
         log

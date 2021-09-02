@@ -57,20 +57,6 @@ android {
         targetSdk = Versions.targetSdkVersion
         versionCode = Versions.versionCode
         versionName = Versions.versionName
-
-        ndk {
-            abiFilters.addAll(setOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a"))
-        }
-    }
-    sourceSets {
-        named("main") {
-            jniLibs.srcDir("../ffmpeg-android-maker/output/lib")
-        }
-    }
-    externalNativeBuild {
-        cmake {
-            path("CMakeLists.txt")
-        }
     }
     buildTypes {
         getByName("release") {
@@ -101,16 +87,6 @@ android {
             exclude(group = "androidx.compose.material")
             exclude(group = "androidx.compose.runtime")
             exclude(group = "androidx.compose.ui")
-        }
-    }
-    packagingOptions {
-        resources {
-            excludes.apply {
-                add("META-INF/*")
-            }
-            jniLibs.pickFirsts.apply {
-                add("**/*.so")
-            }
         }
     }
 }
