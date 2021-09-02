@@ -25,6 +25,7 @@ dependencies {
     implementation(Ktor.clientLogging)
     implementation(Ktor.clientSerialization)
     implementation(Serialization.json)
+
     // testDeps
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.5.21")
 }

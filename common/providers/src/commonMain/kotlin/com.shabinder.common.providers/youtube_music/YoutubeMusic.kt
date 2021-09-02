@@ -17,6 +17,7 @@
 package com.shabinder.common.providers.youtube_music
 
 import co.touchlab.kermit.Kermit
+import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.models.*
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.flatMap
@@ -37,7 +38,8 @@ class YoutubeMusic constructor(
     private val logger: Kermit,
     private val httpClient: HttpClient,
     private val youtubeProvider: YoutubeProvider,
-    private val youtubeMp3: YoutubeMp3
+    private val youtubeMp3: YoutubeMp3,
+    private val fileManager: FileManager,
 ) {
     companion object {
         const val apiKey = "AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30"
@@ -47,12 +49,14 @@ class YoutubeMusic constructor(
     // Get Downloadable Link
     suspend fun findMp3SongDownloadURLYT(
         trackDetails: TrackDetails,
-        preferredQuality: AudioQuality
+        preferredQuality: AudioQuality = fileManager.preferenceManager.audioQuality
     ): SuspendableEvent<String, Throwable> {
         return getYTIDBestMatch(trackDetails).flatMap { videoID ->
             // As YT compress Audio hence there is no benefit of quality for more than 192
             val optimalQuality =
-                if ((preferredQuality.kbps.toIntOrNull() ?: 0) > 192) AudioQuality.KBPS192 else preferredQuality
+                if ((preferredQuality.kbps.toIntOrNull()
+                        ?: 0) > 192
+                ) AudioQuality.KBPS192 else preferredQuality
             // 1 Try getting Link from Yt1s
             youtubeMp3.getMp3DownloadLink(videoID, optimalQuality).flatMapError {
                 // 2 if Yt1s failed , Extract Manually
@@ -76,7 +80,8 @@ class YoutubeMusic constructor(
                 trackName = trackDetails.title,
                 trackArtists = trackDetails.artists,
                 trackDurationSec = trackDetails.durationSec
-            ).keys.firstOrNull() ?: throw SpotiFlyerException.NoMatchFound(trackDetails.title)
+            ).also { logger.d("YT-M Matches:") { it.entries.joinToString("\n") { "${it.key} --- ${it.value}" } } }.keys.firstOrNull()
+                ?: throw SpotiFlyerException.NoMatchFound(trackDetails.title)
         }
 
     private suspend fun getYTTracks(query: String): SuspendableEvent<List<YoutubeTrack>, Throwable> =
@@ -85,6 +90,10 @@ class YoutubeMusic constructor(
             val responseObj = Json.parseToJsonElement(youtubeResponseData)
             // logger.i { "Youtube Music Response Received" }
             val contentBlocks = responseObj.jsonObject["contents"]
+                ?.jsonObject?.get("tabbedSearchResultsRenderer")
+                ?.jsonObject?.get("tabs")?.jsonArray?.get(0)
+                ?.jsonObject?.get("tabRenderer")
+                ?.jsonObject?.get("content")
                 ?.jsonObject?.get("sectionListRenderer")
                 ?.jsonObject?.get("contents")?.jsonArray
 
@@ -180,9 +189,10 @@ class YoutubeMusic constructor(
                             if (detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]?.jsonObject?.size ?: 0 < 2) continue
 
                             // if not a dummy, collect All Variables
-                            val details = detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]
-                                ?.jsonObject?.get("text")
-                                ?.jsonObject?.get("runs")?.jsonArray ?: listOf()
+                            val details =
+                                detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]
+                                    ?.jsonObject?.get("text")
+                                    ?.jsonObject?.get("runs")?.jsonArray ?: listOf()
 
                             for (d in details) {
                                 d.jsonObject["text"]?.jsonPrimitive?.contentOrNull?.let {
@@ -198,7 +208,11 @@ class YoutubeMusic constructor(
                     ! Filter Out non-Song/Video results and incomplete results here itself
                     ! From what we know about detail order, note that [1] - indicate result type
                     */
-                    if (availableDetails.size == 5 && availableDetails[1] in listOf("Song", "Video")) {
+                    if (availableDetails.size == 5 && availableDetails[1] in listOf(
+                            "Song",
+                            "Video"
+                        )
+                    ) {
 
                         // skip if result is in hours instead of minutes (no song is that long)
                         if (availableDetails[4].split(':').size != 2) continue
@@ -228,7 +242,7 @@ class YoutubeMusic constructor(
             youtubeTracks
         }
 
-    private fun sortByBestMatch(
+    fun sortByBestMatch(
         ytTracks: List<YoutubeTrack>,
         trackName: String,
         trackArtists: List<String>,
@@ -249,12 +263,16 @@ class YoutubeMusic constructor(
             val trackNameWords = trackName.lowercase().split(" ")
 
             for (nameWord in trackNameWords) {
-                if (nameWord.isNotBlank() && FuzzySearch.partialRatio(nameWord, resultName) > 85) hasCommonWord = true
+                if (nameWord.isNotBlank() && FuzzySearch.partialRatio(
+                        nameWord,
+                        resultName
+                    ) > 85
+                ) hasCommonWord = true
             }
 
             // Skip this Result if No Word is Common in Name
             if (!hasCommonWord) {
-                // log("YT Api Removing", result.toString())
+                logger.d("YT Api Removing No common Word") { result.toString() }
                 continue
             }
 
@@ -265,18 +283,26 @@ class YoutubeMusic constructor(
 
             if (result.type == "Song") {
                 for (artist in trackArtists) {
-                    if (FuzzySearch.ratio(artist.lowercase(), result.artist?.lowercase() ?: "") > 85)
+                    if (FuzzySearch.ratio(
+                            artist.lowercase(),
+                            result.artist?.lowercase() ?: ""
+                        ) > 85
+                    )
                         artistMatchNumber++
                 }
             } else { // i.e. is a Video
                 for (artist in trackArtists) {
-                    if (FuzzySearch.partialRatio(artist.lowercase(), result.name?.lowercase() ?: "") > 85)
+                    if (FuzzySearch.partialRatio(
+                            artist.lowercase(),
+                            result.name?.lowercase() ?: ""
+                        ) > 85
+                    )
                         artistMatchNumber++
                 }
             }
 
             if (artistMatchNumber == 0F) {
-                // logger.d{ "YT Api Removing:   $result" }
+                logger.d { "YT Api Removing Artist Match 0:   $result" }
                 continue
             }
 
@@ -302,21 +328,22 @@ class YoutubeMusic constructor(
         }
     }
 
-    private suspend fun getYoutubeMusicResponse(query: String): SuspendableEvent<String, Throwable> = SuspendableEvent {
-        httpClient.post("${corsApi}https://music.youtube.com/youtubei/v1/search?alt=json&key=$apiKey") {
-            contentType(ContentType.Application.Json)
-            headers {
-                append("referer", "https://music.youtube.com/search")
-            }
-            body = buildJsonObject {
-                putJsonObject("context") {
-                    putJsonObject("client") {
-                        put("clientName", "WEB_REMIX")
-                        put("clientVersion", "0.1")
-                    }
+    private suspend fun getYoutubeMusicResponse(query: String): SuspendableEvent<String, Throwable> =
+        SuspendableEvent {
+            httpClient.post("${corsApi}https://music.youtube.com/youtubei/v1/search?alt=json&key=$apiKey") {
+                contentType(ContentType.Application.Json)
+                headers {
+                    append("referer", "https://music.youtube.com/search")
                 }
-                put("query", query)
+                body = buildJsonObject {
+                    putJsonObject("context") {
+                        putJsonObject("client") {
+                            put("clientName", "WEB_REMIX")
+                            put("clientVersion", "0.1")
+                        }
+                    }
+                    put("query", query)
+                }
             }
         }
-    }
 }

@@ -17,6 +17,6 @@ fun providersModule(enableNetworkLogs: Boolean) = module {
     single { SaavnProvider(get(), get(), get()) }
     single { YoutubeProvider(get(), get(), get()) }
     single { YoutubeMp3(get(), get()) }
-    single { YoutubeMusic(get(), get(), get(), get()) }
+    single { YoutubeMusic(get(), get(), get(), get(), get()) }
     single { FetchPlatformQueryResult(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }
