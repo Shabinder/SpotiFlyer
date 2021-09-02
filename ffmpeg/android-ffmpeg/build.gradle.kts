@@ -13,24 +13,12 @@ android {
 
         minSdk = Versions.minSdkVersion
         targetSdk = Versions.targetSdkVersion
+//        versionCode = Versions.versionCode
+//        versionName = Versions.versionName
 
-        /*versionCode = Versions.versionCode
-        versionName = Versions.versionName*/
-
-        ndk {
+        /*ndk {
             abiFilters.addAll(setOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a"))
-        }
-    }
-
-    sourceSets {
-        named("main") {
-            jniLibs.srcDir("../ffmpeg-android-maker/output/lib")
-        }
-    }
-    externalNativeBuild {
-        cmake {
-            path("CMakeLists.txt")
-        }
+        }*/
     }
 
     buildTypes {
@@ -61,3 +49,4 @@ android {
 }
 
 dependencies { /**/ }
+

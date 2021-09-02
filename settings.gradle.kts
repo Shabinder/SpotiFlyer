@@ -27,7 +27,7 @@ include(
     ":common:providers",
     ":common:core-components",
     ":common:dependency-injection",
-    ":ffmpeg:ffmpeg-kit-android-lib",
+    ":ffmpeg:android-ffmpeg",
     ":android",
     ":desktop",
     ":web-app",

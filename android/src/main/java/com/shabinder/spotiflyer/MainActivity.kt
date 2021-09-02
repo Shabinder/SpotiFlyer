@@ -77,6 +77,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.launch
+import nl.bravobit.ffmpeg.*
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import java.io.File
@@ -107,13 +108,37 @@ class MainActivity : ComponentActivity() {
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, false)
         rootComponent = spotiFlyerRoot(defaultComponentContext())
+        val ffmpeg = FFmpeg.getInstance(this@MainActivity)
+        val ffprobe = FFprobe.getInstance(this@MainActivity)
         lifecycleScope.launch {
             Log.d("FFmpeg", "init")
-            AndroidMediaConverter().convertAudioFile("/storage/emulated/0/Music/SpotiFlyer/Playlists/Sing-along_Punjabi/Kya_Baat_Ay.mp3","/storage/emulated/0/Music/SpotiFlyer/Playlists/Sing-along_Punjabi/Kya_Baat_Ay.temp.mp3").fold({
-                Log.d("FFmpeg Success",it)
-            }){
-                it.printStackTrace()
-            }
+            FFmpegConfig.versionFFmpeg(this@MainActivity)
+            FFmpegConfig.codecsFFmpeg(this@MainActivity)
+            FFmpegConfig.versionFFprobe(this@MainActivity)
+            Log.d("FFmpeg Support", ffmpeg.isSupported.toString())
+            val inputFilePath = "/storage/emulated/0/Music/SpotiFlyer/Playlists/Sing-along_Punjabi/Kya_Baat_Ay.mp3"
+            val outputFilePath = "/storage/emulated/0/Music/SpotiFlyer/Playlists/Sing-along_Punjabi/Kya_Baat_Ay.temp.mp3"
+            val kbpsArg = "-b:a 192k"
+            ffmpeg.execute(arrayOf("-i", inputFilePath, /*"-acodec", "libmp3lame",*/ "-vn", outputFilePath),object : ExecuteBinaryResponseHandler() {
+                override fun onSuccess(message: String?) {
+                    Log.d("FFmpeg Command", "Success $message")
+                }
+
+                override fun onProgress(message: String?) {
+                    Log.d("FFmpeg Command", "Progress $message")
+                }
+
+                override fun onFailure(message: String?) {
+                    Log.d("FFmpeg Command", "Failed $message")
+                }
+
+            })
+
+            /* AndroidMediaConverter().convertAudioFile("/storage/emulated/0/Music/SpotiFlyer/Playlists/Sing-along_Punjabi/Kya_Baat_Ay.mp3","/storage/emulated/0/Music/SpotiFlyer/Playlists/Sing-along_Punjabi/Kya_Baat_Ay.temp.mp3").fold({
+                 Log.d("FFmpeg Success",it)
+             }){
+                 it.printStackTrace()
+             }*/
         }
         /*FFmpeg.testInit()*/
         setContent {

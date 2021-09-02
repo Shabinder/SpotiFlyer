@@ -1,6 +1,5 @@
 package com.shabinder.common.core_components.media_converter
 
-import com.shabinder.spotiflyer.ffmpeg.AndroidFFmpeg.runTranscode
 import com.shabinder.common.models.AudioQuality
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -14,8 +13,12 @@ class AndroidMediaConverter : MediaConverter() {
         progressCallbacks: (Long) -> Unit,
     ) = executeSafelyInPool {
         // 192 is Default
-        val audioBitrate = if (audioQuality == AudioQuality.UNKNOWN) 192 else audioQuality.kbps.toIntOrNull() ?: 192
-        runTranscode(inputFilePath,outputFilePath,audioBitrate).toString()
+        val audioBitrate =
+            if (audioQuality == AudioQuality.UNKNOWN) 192 else audioQuality.kbps.toIntOrNull()
+                ?: 192
+
+        ""
+        //runTranscode(inputFilePath,outputFilePath,audioBitrate).toString()
         /*val kbpsArg = if (audioQuality == AudioQuality.UNKNOWN) {
             val mediaInformation = FFprobeKit.getMediaInformation(inputFilePath)
             val bitrate = ((mediaInformation.mediaInformation.bitrate).toFloat()/1000).roundToInt()
