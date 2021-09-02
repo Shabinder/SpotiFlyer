@@ -3,4 +3,4 @@
 	url = https://github.com/Shabinder/spotiflyer-ios
 [submodule "ffmpeg/ffmpeg-android-maker"]
 	path = ffmpeg/ffmpeg-android-maker
-	url = https://github.com/Shabinder/ffmpeg-android-maker
+	url = https://github.com/Shabinder/ffmpeg-android-maker/
