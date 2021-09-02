@@ -20,8 +20,6 @@ kotlin {
                 implementation(Extras.mp3agic)
                 implementation(Extras.Android.countly)
                 implementation(project(":ffmpeg:android-ffmpeg"))
-//                implementation("com.arthenica:ffmpeg-kit-audio:4.4.LTS")
-                //api(files("$rootDir/libs/mobile-ffmpeg.aar"))
             }
         }
         desktopMain {
