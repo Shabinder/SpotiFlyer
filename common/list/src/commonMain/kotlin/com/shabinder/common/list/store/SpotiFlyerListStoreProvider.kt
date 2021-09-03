@@ -98,7 +98,7 @@ internal class SpotiFlyerListStoreProvider(dependencies: SpotiFlyerList.Dependen
 
                 is Intent.StartDownloadAll -> {
                     val list = intent.trackList.map {
-                        if (it.downloaded == DownloadStatus.NotDownloaded)
+                        if (it.downloaded is DownloadStatus.NotDownloaded || it.downloaded is DownloadStatus.Failed)
                             return@map it.copy(downloaded = DownloadStatus.Queued)
                         it
                     }

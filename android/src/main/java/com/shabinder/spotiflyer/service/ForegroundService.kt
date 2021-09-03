@@ -44,7 +44,6 @@ import com.shabinder.common.models.event.coroutines.failure
 import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.translations.Strings
 import com.shabinder.spotiflyer.R
-import com.shabinder.spotiflyer.utils.autoclear.AutoClear
 import com.shabinder.spotiflyer.utils.autoclear.autoClear
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -57,13 +56,19 @@ import java.io.File
 
 class ForegroundService : LifecycleService() {
 
-    private var downloadService: AutoClear<ParallelExecutor> = autoClear { ParallelExecutor(Dispatchers.IO) }
-    val trackStatusFlowMap by autoClear { TrackStatusFlowMap(MutableSharedFlow(replay = 1), lifecycleScope) }
+    private lateinit var downloadService: ParallelExecutor
+    val trackStatusFlowMap by autoClear {
+        TrackStatusFlowMap(
+            MutableSharedFlow(replay = 1),
+            lifecycleScope
+        )
+    }
     private val fetcher: FetchPlatformQueryResult by inject()
     private val logger: Kermit by inject()
     private val dir: FileManager by inject()
 
-    private var messageList = java.util.Collections.synchronizedList(MutableList(5) { emptyMessage })
+    private var messageList =
+        java.util.Collections.synchronizedList(MutableList(5) { emptyMessage })
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
     private val cancelIntent: PendingIntent by lazy {
@@ -92,6 +97,7 @@ class ForegroundService : LifecycleService() {
 
     override fun onCreate() {
         super.onCreate()
+        downloadService = ParallelExecutor(Dispatchers.IO)
         createNotificationChannel(CHANNEL_ID, "Downloader Service")
     }
 
@@ -138,7 +144,7 @@ class ForegroundService : LifecycleService() {
         for (track in trackList) {
             trackStatusFlowMap[track.title] = DownloadStatus.Queued
             lifecycleScope.launch {
-                downloadService.value.executeSuspending {
+                downloadService.executeSuspending {
                     fetcher.findBestDownloadLink(track).fold(
                         success = { res ->
                             enqueueDownload(res.first, track.apply { audioQuality = res.second })
@@ -165,7 +171,8 @@ class ForegroundService : LifecycleService() {
                 is DownloadResult.Error -> {
                     logger.d(TAG) { it.message }
                     failed++
-                    trackStatusFlowMap[track.title] = DownloadStatus.Failed(it.cause ?: Exception(it.message))
+                    trackStatusFlowMap[track.title] =
+                        DownloadStatus.Failed(it.cause ?: Exception(it.message))
                     removeFromNotification(Message(track.title, DownloadStatus.Downloading()))
                 }
 
@@ -178,7 +185,12 @@ class ForegroundService : LifecycleService() {
                     coroutineScope {
                         SuspendableEvent {
                             // Save File and Embed Metadata
-                            val job = launch(Dispatchers.Default) { dir.saveFileWithMetadata(it.byteArray, track) {} }
+                            val job = launch(Dispatchers.Default) {
+                                dir.saveFileWithMetadata(
+                                    it.byteArray,
+                                    track
+                                ) {}
+                            }
 
                             // Send Converting Status
                             trackStatusFlowMap[track.title] = DownloadStatus.Converting
@@ -186,16 +198,27 @@ class ForegroundService : LifecycleService() {
 
                             // All Processing Completed for this Track
                             job.invokeOnCompletion { throwable ->
-                                if(throwable != null && throwable !is CancellationException) {
+                                if (throwable != null && throwable !is CancellationException) {
                                     // handle error
                                     failed++
-                                    trackStatusFlowMap[track.title] = DownloadStatus.Failed(throwable)
-                                    removeFromNotification(Message(track.title, DownloadStatus.Converting))
+                                    trackStatusFlowMap[track.title] =
+                                        DownloadStatus.Failed(throwable)
+                                    removeFromNotification(
+                                        Message(
+                                            track.title,
+                                            DownloadStatus.Converting
+                                        )
+                                    )
                                     return@invokeOnCompletion
                                 }
                                 converted++
                                 trackStatusFlowMap[track.title] = DownloadStatus.Downloaded
-                                removeFromNotification(Message(track.title, DownloadStatus.Converting))
+                                removeFromNotification(
+                                    Message(
+                                        track.title,
+                                        DownloadStatus.Converting
+                                    )
+                                )
                             }
                             logger.d(TAG) { "${track.title} Download Completed" }
                             downloaded++
@@ -249,8 +272,7 @@ class ForegroundService : LifecycleService() {
             messageList = messageList.getEmpty().apply {
                 set(index = 0, Message(Strings.cleaningAndExiting(), DownloadStatus.NotDownloaded))
             }
-            downloadService.getOrNull()?.close()
-            downloadService.reset()
+            downloadService.close()
             updateNotification()
             cleanFiles(File(dir.defaultDir()))
             // cleanFiles(File(dir.imageCacheDir()))
@@ -265,23 +287,24 @@ class ForegroundService : LifecycleService() {
         }
     }
 
-    private fun createNotification(): Notification = NotificationCompat.Builder(this, CHANNEL_ID).run {
-        setSmallIcon(R.drawable.ic_download_arrow)
-        setContentTitle("${Strings.total()}: $total  ${Strings.completed()}:$converted  ${Strings.failed()}:$failed")
-        setSilent(true)
-        setProgress(total, failed + converted, false)
-        setStyle(
-            NotificationCompat.InboxStyle().run {
-                addLine(messageList[messageList.size - 1].asString())
-                addLine(messageList[messageList.size - 2].asString())
-                addLine(messageList[messageList.size - 3].asString())
-                addLine(messageList[messageList.size - 4].asString())
-                addLine(messageList[messageList.size - 5].asString())
-            }
-        )
-        addAction(R.drawable.ic_round_cancel_24, Strings.exit(), cancelIntent)
-        build()
-    }
+    private fun createNotification(): Notification =
+        NotificationCompat.Builder(this, CHANNEL_ID).run {
+            setSmallIcon(R.drawable.ic_download_arrow)
+            setContentTitle("${Strings.total()}: $total  ${Strings.completed()}:$converted  ${Strings.failed()}:$failed")
+            setSilent(true)
+            setProgress(total, failed + converted, false)
+            setStyle(
+                NotificationCompat.InboxStyle().run {
+                    addLine(messageList[messageList.size - 1].asString())
+                    addLine(messageList[messageList.size - 2].asString())
+                    addLine(messageList[messageList.size - 3].asString())
+                    addLine(messageList[messageList.size - 4].asString())
+                    addLine(messageList[messageList.size - 5].asString())
+                }
+            )
+            addAction(R.drawable.ic_round_cancel_24, Strings.exit(), cancelIntent)
+            build()
+        }
 
     private fun addToNotification(message: Message) {
         synchronized(messageList) {
