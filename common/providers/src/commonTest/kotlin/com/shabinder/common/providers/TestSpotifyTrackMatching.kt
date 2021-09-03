@@ -16,8 +16,8 @@ class TestSpotifyTrackMatching {
     }
 
     private val spotifyToken: String?
-//        get() = null
-    get() = "BQB41HqrLcrh5eRYaL97GvaH6tRe-1EktQ8VGTWUQuFnYVWBEoTcF7T_8ogqVn1GHl9HCcMiQ0HBT-ybC74"
+        get() = null
+//    get() = "BQB41HqrLcrh5eRYaL97GvaH6tRe-1EktQ8VGTWUQuFnYVWBEoTcF7T_8ogqVn1GHl9HCcMiQ0HBT-ybC74"
 
     @Test
     fun matchVideo() = runBlocking {

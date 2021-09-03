@@ -67,12 +67,15 @@ interface Yt1sMp3 {
         val mp3Keys = response.getJsonObject("links")
             .getJsonObject("mp3")
 
+        // This Site now only gives 128kbps mp3 which is reasonable
         val requestedKBPS = when (quality) {
             AudioQuality.KBPS128 -> "mp3128"
-            else -> quality.kbps
+            else -> "mp3128"//quality.kbps
         }
 
-        val specificQualityKey = mp3Keys.getJsonObject(requestedKBPS) ?: mp3Keys.getJsonObject("192")
+        val specificQualityKey = mp3Keys.getJsonObject(requestedKBPS)
+            ?: // Try M4a Link
+            response.getJsonObject("links").getJsonObject("m4a").getJsonObject("140")
 
         specificQualityKey?.get("k").requireNotNull().jsonPrimitive.content
     }
