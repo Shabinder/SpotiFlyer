@@ -49,7 +49,7 @@ internal class SpotiFlyerPreferenceStoreProvider(
 
     private inner class ExecutorImpl : SuspendExecutor<Intent, Unit, State, Result, Nothing>() {
         override suspend fun executeAction(action: Unit, getState: () -> State) {
-            dispatch(Result.AnalyticsToggled(analyticsManager.isTracking()))
+            dispatch(Result.AnalyticsToggled(preferenceManager.isAnalyticsEnabled))
             dispatch(Result.PreferredAudioQualityChanged(preferenceManager.audioQuality))
             dispatch(Result.DownloadPathSet(fileManager.defaultDir()))
         }
@@ -61,7 +61,9 @@ internal class SpotiFlyerPreferenceStoreProvider(
                 is Intent.ShareApp -> methods.value.shareApp()
                 is Intent.ToggleAnalytics -> {
                     dispatch(Result.AnalyticsToggled(intent.enabled))
-                    preferenceManager.toggleAnalytics(intent.enabled)
+                    preferenceManager.toggleAnalytics(intent.enabled) {
+                        if (intent.enabled) analyticsManager.giveConsent() else analyticsManager.revokeConsent()
+                    }
                 }
                 is Intent.SetDownloadDirectory -> {
                     dispatch(Result.DownloadPathSet(intent.path))

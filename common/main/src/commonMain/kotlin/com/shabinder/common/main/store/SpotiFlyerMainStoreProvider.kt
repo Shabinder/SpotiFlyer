@@ -67,7 +67,7 @@ internal class SpotiFlyerMainStoreProvider(dependencies: SpotiFlyerMain.Dependen
 
     private inner class ExecutorImpl : SuspendExecutor<Intent, Unit, State, Result, Nothing>() {
         override suspend fun executeAction(action: Unit, getState: () -> State) {
-            dispatch(Result.AnalyticsToggled(analyticsManager.isTracking()))
+            dispatch(Result.AnalyticsToggled(preferenceManager.isAnalyticsEnabled))
             updates?.collect {
                 dispatch(Result.ItemsLoaded(it))
             }
@@ -82,7 +82,9 @@ internal class SpotiFlyerMainStoreProvider(dependencies: SpotiFlyerMain.Dependen
                 is Intent.SelectCategory -> dispatch(Result.CategoryChanged(intent.category))
                 is Intent.ToggleAnalytics -> {
                     dispatch(Result.AnalyticsToggled(intent.enabled))
-                    analyticsManager.giveConsent()
+                    preferenceManager.toggleAnalytics(intent.enabled) {
+                        if (intent.enabled) analyticsManager.giveConsent() else analyticsManager.revokeConsent()
+                    }
                 }
             }
         }

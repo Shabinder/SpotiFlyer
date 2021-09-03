@@ -137,8 +137,9 @@ class MainActivity : ComponentActivity() {
                         AnalyticsDialog(
                             askForAnalyticsPermission,
                             enableAnalytics = {
-                                // preferenceManager.toggleAnalytics(true)
-                                analyticsManager.giveConsent()
+                                preferenceManager.toggleAnalytics(true) {
+                                    analyticsManager.giveConsent()
+                                }
                                 preferenceManager.firstLaunchDone()
                             },
                             dismissDialog = {

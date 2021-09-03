@@ -38,7 +38,7 @@ internal class SpotiFlyerMainImpl(
     init {
         instanceKeeper.ensureNeverFrozen()
         lifecycle.doOnResume {
-            store.accept(Intent.ToggleAnalytics(analyticsManager.isTracking()))
+            store.accept(Intent.ToggleAnalytics(preferenceManager.isAnalyticsEnabled))
         }
     }
 

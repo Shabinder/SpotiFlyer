@@ -17,7 +17,10 @@ class PreferenceManager(
 
     /* ANALYTICS */
      val isAnalyticsEnabled get() = getBooleanOrNull(ANALYTICS_KEY) ?: false
-     fun toggleAnalytics(enabled: Boolean) = putBoolean(ANALYTICS_KEY, enabled)
+     fun toggleAnalytics(enabled: Boolean,f: () -> Unit = {}) {
+         putBoolean(ANALYTICS_KEY, enabled)
+         f()
+     }
 
     /* DOWNLOAD DIRECTORY */
     val downloadDir get() = getStringOrNull(DIR_KEY)
