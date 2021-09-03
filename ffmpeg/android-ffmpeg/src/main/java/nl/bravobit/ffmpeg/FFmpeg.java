@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 public class FFmpeg implements FFbinaryInterface {
@@ -34,7 +35,6 @@ public class FFmpeg implements FFbinaryInterface {
 
     @Override
     public boolean isSupported() {
-
         // get ffmpeg file
         File ffmpeg = FileUtils.getFFmpeg(context.provide());
 

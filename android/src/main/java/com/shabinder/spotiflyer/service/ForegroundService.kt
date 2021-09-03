@@ -46,6 +46,7 @@ import com.shabinder.common.translations.Strings
 import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.utils.autoclear.AutoClear
 import com.shabinder.spotiflyer.utils.autoclear.autoClear
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -184,7 +185,14 @@ class ForegroundService : LifecycleService() {
                             addToNotification(Message(track.title, DownloadStatus.Converting))
 
                             // All Processing Completed for this Track
-                            job.invokeOnCompletion {
+                            job.invokeOnCompletion { throwable ->
+                                if(throwable != null && throwable !is CancellationException) {
+                                    // handle error
+                                    failed++
+                                    trackStatusFlowMap[track.title] = DownloadStatus.Failed(throwable)
+                                    removeFromNotification(Message(track.title, DownloadStatus.Converting))
+                                    return@invokeOnCompletion
+                                }
                                 converted++
                                 trackStatusFlowMap[track.title] = DownloadStatus.Downloaded
                                 removeFromNotification(Message(track.title, DownloadStatus.Converting))

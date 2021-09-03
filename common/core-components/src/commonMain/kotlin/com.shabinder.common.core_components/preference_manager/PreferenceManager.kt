@@ -1,10 +1,11 @@
 package com.shabinder.common.core_components.preference_manager
 
 import com.russhwolf.settings.Settings
+import com.shabinder.common.core_components.analytics.AnalyticsManager
 import com.shabinder.common.models.AudioQuality
 
 class PreferenceManager(
-    settings: Settings
+    settings: Settings,
 ) : Settings by settings {
 
     companion object {
@@ -15,11 +16,15 @@ class PreferenceManager(
         const val PREFERRED_AUDIO_QUALITY = "preferredAudioQuality"
     }
 
+    lateinit var analyticsManager: AnalyticsManager
+
     /* ANALYTICS */
      val isAnalyticsEnabled get() = getBooleanOrNull(ANALYTICS_KEY) ?: false
-     fun toggleAnalytics(enabled: Boolean,f: () -> Unit = {}) {
+     fun toggleAnalytics(enabled: Boolean) {
          putBoolean(ANALYTICS_KEY, enabled)
-         f()
+         if (this::analyticsManager.isInitialized) {
+             if (enabled) analyticsManager.giveConsent() else analyticsManager.revokeConsent()
+         }
      }
 
     /* DOWNLOAD DIRECTORY */

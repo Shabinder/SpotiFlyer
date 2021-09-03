@@ -20,6 +20,7 @@ class AndroidMediaConverter(private val appContext: Context) : MediaConverter() 
         progressCallbacks: (Long) -> Unit,
     ) = executeSafelyInPool {
         var progressing = true
+        var error = ""
         var timeout = 600_000L * 2 // 20 min
         val progressDelayCheck = 500L
         // 192 is Default
@@ -47,17 +48,19 @@ class AndroidMediaConverter(private val appContext: Context) : MediaConverter() 
                 }
 
                 override fun onFailure(message: String?) {
-                    Log.d("FFmpeg Command", "Failed $message")
+                    error = "Failed: $message $inputFilePath"
+                    error += "FFmpeg Support" + FFmpeg.getInstance(appContext).isSupported.toString()
+                    Log.d("FFmpeg Error", error)
                     progressing = false
-                    throw SpotiFlyerException.MP3ConversionFailed(message = "Android FFmpeg Failed: $message")
                 }
             }
         )
         while (progressing) {
-            if (timeout < 0) throw SpotiFlyerException.MP3ConversionFailed("Conversion Timeout for $inputFilePath")
+            if (timeout < 0) throw SpotiFlyerException.MP3ConversionFailed("$error Conversion Timeout for $inputFilePath")
             delay(progressDelayCheck)
             timeout -= progressDelayCheck
         }
+        if(error.isNotBlank()) throw SpotiFlyerException.MP3ConversionFailed(error)
         // Return output file path after successful conversion
         outputFilePath
     }

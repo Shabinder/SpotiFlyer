@@ -61,9 +61,7 @@ internal class SpotiFlyerPreferenceStoreProvider(
                 is Intent.ShareApp -> methods.value.shareApp()
                 is Intent.ToggleAnalytics -> {
                     dispatch(Result.AnalyticsToggled(intent.enabled))
-                    preferenceManager.toggleAnalytics(intent.enabled) {
-                        if (intent.enabled) analyticsManager.giveConsent() else analyticsManager.revokeConsent()
-                    }
+                    preferenceManager.toggleAnalytics(intent.enabled)
                 }
                 is Intent.SetDownloadDirectory -> {
                     dispatch(Result.DownloadPathSet(intent.path))

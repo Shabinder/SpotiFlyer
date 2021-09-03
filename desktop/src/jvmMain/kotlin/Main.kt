@@ -105,8 +105,10 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
             override val fetchQuery: FetchPlatformQueryResult = koin.get()
             override val fileManager: FileManager = koin.get()
             override val database: Database? = fileManager.db
-            override val preferenceManager: PreferenceManager = koin.get()
             override val analyticsManager: AnalyticsManager = koin.get()
+            override val preferenceManager: PreferenceManager = koin.get<PreferenceManager>().also {
+                it.analyticsManager = analyticsManager
+            }
             override val downloadProgressFlow = DownloadProgressFlow
             override val actions: Actions = object : Actions {
                 override val platformActions = object : PlatformActions {}

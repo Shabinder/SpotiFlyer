@@ -49,11 +49,13 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:icon="@mipmap/ic_launcher"
+        android:hardwareAccelerated="true"
         android:largeHeap="true"
         android:label="SpotiFlyer"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:configChanges="orientation|screenSize"
         android:forceDarkAllowed="true"
+        android:extractNativeLibs="true"
         android:requestLegacyExternalStorage="true"
         tools:targetApi="q">
         <activity android:name=".MainActivity"

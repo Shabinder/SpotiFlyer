@@ -5,8 +5,8 @@ import android.content.Context;
 import java.io.File;
 
 class FileUtils {
-    private static final String FFMPEG_FILE_NAME = "ffmpeg";
-    private static final String FFPROBE_FILE_NAME = "ffprobe";
+    private static final String FFMPEG_FILE_NAME = "lib..ffmpeg..so";
+    private static final String FFPROBE_FILE_NAME = "lib..ffprobe..so";
 
     static File getFFmpeg(Context context) {
         File folder = new File(context.getApplicationInfo().nativeLibraryDir);

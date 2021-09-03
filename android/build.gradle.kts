@@ -36,7 +36,6 @@ repositories {
 
 android {
     val props = gradleLocalProperties(rootDir)
-
     if (props.containsKey("storeFileDir")) {
         signingConfigs {
             create("release") {

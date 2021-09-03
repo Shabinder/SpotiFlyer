@@ -39,6 +39,7 @@ public class FFprobe implements FFbinaryInterface {
 
         // check if ffprobe can be executed
         if (!ffprobe.canExecute()) {
+            // try to make executable
             Log.e("ffprobe cannot execute");
             return false;
         }

@@ -82,9 +82,7 @@ internal class SpotiFlyerMainStoreProvider(dependencies: SpotiFlyerMain.Dependen
                 is Intent.SelectCategory -> dispatch(Result.CategoryChanged(intent.category))
                 is Intent.ToggleAnalytics -> {
                     dispatch(Result.AnalyticsToggled(intent.enabled))
-                    preferenceManager.toggleAnalytics(intent.enabled) {
-                        if (intent.enabled) analyticsManager.giveConsent() else analyticsManager.revokeConsent()
-                    }
+                    preferenceManager.toggleAnalytics(intent.enabled)
                 }
             }
         }

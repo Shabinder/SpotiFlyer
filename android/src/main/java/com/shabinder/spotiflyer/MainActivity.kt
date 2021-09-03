@@ -102,6 +102,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        preferenceManager.analyticsManager = analyticsManager
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, false)
         rootComponent = spotiFlyerRoot(defaultComponentContext())
@@ -137,9 +138,7 @@ class MainActivity : ComponentActivity() {
                         AnalyticsDialog(
                             askForAnalyticsPermission,
                             enableAnalytics = {
-                                preferenceManager.toggleAnalytics(true) {
-                                    analyticsManager.giveConsent()
-                                }
+                                preferenceManager.toggleAnalytics(true)
                                 preferenceManager.firstLaunchDone()
                             },
                             dismissDialog = {

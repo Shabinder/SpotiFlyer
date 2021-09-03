@@ -16,14 +16,13 @@
 
 @file:Suppress("MayBeConstant", "SpellCheckingInspection")
 
-import org.gradle.api.Action
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.kotlin.dsl.accessors.runtime.addDependencyTo
 
 object Versions {
     // App's Version (To be bumped at each update)
-    const val versionName = "3.2.5"
+    const val versionName = "3.3.0"
 
     const val versionCode = 24
 
