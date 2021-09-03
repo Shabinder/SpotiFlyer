@@ -84,6 +84,12 @@ class ParallelExecutor(
         coroutineContext.cancel(cause)
     }
 
+    fun reviveIfClosed() {
+        if (!service.isActive) {
+            closeAndReInit()
+        }
+    }
+
     fun closeAndReInit(newConcurrentOperationLimit: Int = 4) {
         // Close Everything
         close()
@@ -94,6 +100,7 @@ class ParallelExecutor(
         killQueue = Channel(Channel.UNLIMITED)
         operationQueue = Channel(Channel.RENDEZVOUS)
         concurrentOperationLimit = atomic(newConcurrentOperationLimit)
+        startOrStopProcessors(expectedCount = this.concurrentOperationLimit.value, actualCount = 0)
     }
 
     private fun CoroutineScope.launchProcessor() = launch {

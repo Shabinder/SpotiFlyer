@@ -104,6 +104,7 @@ class ForegroundService : LifecycleService() {
     @SuppressLint("WakelockTimeout")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+        downloadService.reviveIfClosed()
         // Send a notification that service is started
         Log.i(TAG, "Foreground Service Started.")
         startForeground(NOTIFICATION_ID, createNotification())
@@ -135,6 +136,7 @@ class ForegroundService : LifecycleService() {
      * Function To Download All Tracks Available in a List
      **/
     fun downloadAllTracks(trackList: List<TrackDetails>) {
+        downloadService.reviveIfClosed()
         trackList.size.also { size ->
             total += size
             isSingleDownload = (size == 1)
