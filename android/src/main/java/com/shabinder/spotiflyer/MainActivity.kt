@@ -17,12 +17,7 @@
 package com.shabinder.spotiflyer
 
 import android.annotation.SuppressLint
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -40,20 +35,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
+import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.codekidlabs.storagechooser.R
@@ -62,19 +51,15 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
-import com.shabinder.common.di.ConnectionLiveData
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.core_components.ConnectionLiveData
+import com.shabinder.common.core_components.analytics.AnalyticsManager
+import com.shabinder.common.core_components.file_manager.FileManager
+import com.shabinder.common.core_components.preference_manager.PreferenceManager
 import com.shabinder.common.di.observeAsState
-import com.shabinder.common.di.preference.PreferenceManager
-import com.shabinder.common.models.Actions
-import com.shabinder.common.models.DownloadStatus
-import com.shabinder.common.models.PlatformActions
+import com.shabinder.common.models.*
 import com.shabinder.common.models.PlatformActions.Companion.SharedPreferencesKey
-import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.models.methods
+import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.root.SpotiFlyerRoot
-import com.shabinder.common.root.SpotiFlyerRoot.Analytics
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
 import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.configurations.SpotiFlyerTheme
@@ -84,33 +69,29 @@ import com.shabinder.spotiflyer.service.ForegroundService
 import com.shabinder.spotiflyer.ui.AnalyticsDialog
 import com.shabinder.spotiflyer.ui.NetworkDialog
 import com.shabinder.spotiflyer.ui.PermissionDialog
-import com.shabinder.spotiflyer.utils.checkAppSignature
-import com.shabinder.spotiflyer.utils.checkIfLatestVersion
-import com.shabinder.spotiflyer.utils.checkPermissions
-import com.shabinder.spotiflyer.utils.disableDozeMode
-import com.shabinder.spotiflyer.utils.requestStoragePermission
+import com.shabinder.spotiflyer.utils.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.matomo.sdk.extra.TrackHelper
+import org.koin.core.parameter.parametersOf
 import java.io.File
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
 
     private val fetcher: FetchPlatformQueryResult by inject()
-    private val dir: Dir by inject()
+    private val fileManager: FileManager by inject()
     private val preferenceManager: PreferenceManager by inject()
-    private lateinit var root: SpotiFlyerRoot
-    private val callBacks: SpotiFlyerRootCallBacks get() = root.callBacks
+    private val analyticsManager: AnalyticsManager by inject { parametersOf(this) }
+    private val callBacks: SpotiFlyerRootCallBacks get() = this.rootComponent.callBacks
     private val trackStatusFlow = MutableSharedFlow<HashMap<String, DownloadStatus>>(1)
     private var permissionGranted = mutableStateOf(true)
     private val internetAvailability by lazy { ConnectionLiveData(applicationContext) }
-    private val tracker get() = (application as App).tracker
-    private val visibleChild get(): SpotiFlyerRoot.Child = root.routerState.value.activeChild.instance
+    private lateinit var rootComponent: SpotiFlyerRoot
+    // private val visibleChild get(): SpotiFlyerRoot.Child = root.routerState.value.activeChild.instance
 
     // Variable for storing instance of our service class
     var foregroundService: ForegroundService? = null
@@ -120,9 +101,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        preferenceManager.analyticsManager = analyticsManager
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
+        this.rootComponent = spotiFlyerRoot(defaultComponentContext())
         setContent {
             SpotiFlyerTheme {
                 Surface(contentColor = colorOffWhite) {
@@ -131,8 +113,8 @@ class MainActivity : ComponentActivity() {
                         val view = LocalView.current
 
                         Box {
-                            root = SpotiFlyerRootContent(
-                                rememberRootComponent(::spotiFlyerRoot),
+                            SpotiFlyerRootContent(
+                                this@MainActivity.rootComponent,
                                 Modifier.statusBarsPadding().navigationBarsPadding()
                             )
                             Spacer(
@@ -186,11 +168,10 @@ class MainActivity : ComponentActivity() {
         * and Track Downloads for all other releases like F-Droid,
         * for `Github Downloads` we will track Downloads using : https://tooomm.github.io/github-release-stats/?username=Shabinder&repository=SpotiFlyer
         * */
-        if (isGithubRelease) { checkIfLatestVersion() }
-        if (preferenceManager.isAnalyticsEnabled && !isGithubRelease) {
-            // Download/App Install Event for F-Droid builds
-            TrackHelper.track().download().with(tracker)
+        if (isGithubRelease) {
+            checkIfLatestVersion()
         }
+        // TODO Track Download Event
         handleIntentFromExternalActivity()
 
         initForegroundService()
@@ -260,7 +241,12 @@ class MainActivity : ComponentActivity() {
         ).show()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    @Suppress("DEPRECATION")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         permissionGranted.value = checkPermissions()
     }
@@ -270,15 +256,18 @@ class MainActivity : ComponentActivity() {
             componentContext,
             dependencies = object : SpotiFlyerRoot.Dependencies {
                 override val storeFactory = LoggingStoreFactory(DefaultStoreFactory)
-                override val database = this@MainActivity.dir.db
+                override val database = this@MainActivity.fileManager.db
                 override val fetchQuery = this@MainActivity.fetcher
-                override val dir: Dir = this@MainActivity.dir
+                override val fileManager: FileManager = this@MainActivity.fileManager
                 override val preferenceManager = this@MainActivity.preferenceManager
-                override val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> = trackStatusFlow
+                override val analyticsManager: AnalyticsManager = this@MainActivity.analyticsManager
+                override val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> =
+                    trackStatusFlow
                 override val actions = object : Actions {
 
                     override val platformActions = object : PlatformActions {
-                        override val imageCacheDir: String = applicationContext.cacheDir.absolutePath + File.separator
+                        override val imageCacheDir: String =
+                            applicationContext.cacheDir.absolutePath + File.separator
                         override val sharedPreferences = applicationContext.getSharedPreferences(
                             SharedPreferencesKey,
                             MODE_PRIVATE
@@ -292,19 +281,26 @@ class MainActivity : ComponentActivity() {
                         }
 
                         override fun sendTracksToService(array: List<TrackDetails>) {
-                            if (foregroundService == null) initForegroundService()
-                            foregroundService?.downloadAllTracks(array)
+                            for (chunk in array.chunked(25)) {
+                                if (foregroundService == null) initForegroundService()
+                                foregroundService?.downloadAllTracks(chunk)
+                            }
                         }
                     }
 
-                    override fun showPopUpMessage(string: String, long: Boolean) = this@MainActivity.showPopUpMessage(string, long)
+                    override fun showPopUpMessage(string: String, long: Boolean) =
+                        this@MainActivity.showPopUpMessage(string, long)
 
-                    override fun setDownloadDirectoryAction(callBack: (String) -> Unit) = setUpOnPrefClickListener(callBack)
+                    override fun setDownloadDirectoryAction(callBack: (String) -> Unit) =
+                        setUpOnPrefClickListener(callBack)
 
                     override fun queryActiveTracks() = this@MainActivity.queryActiveTracks()
 
                     override fun giveDonation() {
-                        openPlatform("", platformLink = "https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button")
+                        openPlatform(
+                            "",
+                            platformLink = "https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button"
+                        )
                     }
 
                     override fun shareApp() {
@@ -341,46 +337,11 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    override fun writeMp3Tags(trackDetails: TrackDetails) { /*IMPLEMENTED*/ }
+                    override fun writeMp3Tags(trackDetails: TrackDetails) {
+                        /*IMPLEMENTED*/
+                    }
 
                     override val isInternetAvailable get() = internetAvailability.value ?: true
-                }
-
-                /*
-                * Analytics Will Only Be Sent if User Granted us the Permission
-                * */
-                override val analytics = object : Analytics {
-                    override fun appLaunchEvent() {
-                        if (preferenceManager.isAnalyticsEnabled) {
-                            TrackHelper.track()
-                                .event("events", "App_Launch")
-                                .name("App Launch").with(tracker)
-                        }
-                    }
-
-                    override fun homeScreenVisit() {
-                        if (preferenceManager.isAnalyticsEnabled) {
-                            // HomeScreen Visit Event
-                            TrackHelper.track().screen("/main_activity/home_screen")
-                                .title("HomeScreen").with(tracker)
-                        }
-                    }
-
-                    override fun listScreenVisit() {
-                        if (preferenceManager.isAnalyticsEnabled) {
-                            // ListScreen Visit Event
-                            TrackHelper.track().screen("/main_activity/list_screen")
-                                .title("ListScreen").with(tracker)
-                        }
-                    }
-
-                    override fun donationDialogVisit() {
-                        if (preferenceManager.isAnalyticsEnabled) {
-                            // Donation Dialog Open Event
-                            TrackHelper.track().screen("/main_activity/donation_dialog")
-                                .title("DonationDialog").with(tracker)
-                        }
-                    }
                 }
             }
         )
@@ -423,7 +384,7 @@ class MainActivity : ComponentActivity() {
                 // hell yeah :)
                 preferenceManager.setDownloadDirectory(path)
                 callBack(path)
-                showPopUpMessage(Strings.downloadDirectorySetTo("\n${dir.defaultDir()}"))
+                showPopUpMessage(Strings.downloadDirectorySetTo("\n${fileManager.defaultDir()}"))
             } else {
                 showPopUpMessage(Strings.noWriteAccess("\n$path "))
             }
@@ -433,6 +394,7 @@ class MainActivity : ComponentActivity() {
         chooser.show()
     }
 
+    @Suppress("DEPRECATION")
     @SuppressLint("ObsoleteSdkInt")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -466,10 +428,10 @@ class MainActivity : ComponentActivity() {
                     val link = filterLinkRegex.find(string)?.value.toString()
                     Log.i("Intent", link)
                     lifecycleScope.launch {
-                        while (!this@MainActivity::root.isInitialized) {
+                        while (!this@MainActivity::rootComponent.isInitialized) {
                             delay(100)
                         }
-                        if (methods.value.isInternetAvailable)callBacks.searchLink(link)
+                        if (methods.value.isInternetAvailable) callBacks.searchLink(link)
                     }
                 }
             }
@@ -479,6 +441,16 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unbindService()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        analyticsManager.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        analyticsManager.onStop()
     }
 
     companion object {

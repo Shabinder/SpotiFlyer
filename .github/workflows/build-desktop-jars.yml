@@ -1,0 +1,95 @@
+on:
+  [workflow_dispatch]
+
+jobs:
+  create-linux-package:
+    runs-on: ubuntu-latest
+    name: Create Deb Package
+    steps:
+      # Setup Java environment for the next steps
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15
+
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v2.3.1
+
+      # Build Desktop application
+      - name: Desktop App
+        run: ./gradlew :desktop:packageUberJarForCurrentOS
+
+      # Create a Draft Release
+      - name: Draft Release
+        uses: ncipollo/release-action@v1
+        with:
+          draft: true
+          tag: "3.3.0"
+          artifacts: "desktop\build\compose\jars\*.jar"
+          token: ${{ secrets.GH_TOKEN }}
+          commit: main
+#          bodyFile: "body.md"
+#
+#  create-macos-package:
+#    runs-on: macos-latest
+##    needs: create_staging_repository
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#      - name: Configure JDK
+#        uses: actions/setup-java@v1
+#        with:
+#          java-version: 14
+#      - name: Publish
+#        run: |
+#          ./gradlew publishAllPublicationsToMavenRepository -PSONATYPE_REPOSITORY_ID=${{ needs.create_staging_repository.outputs.repository_id }}
+#        env:
+#          MANUAL_REPOSITORY: ${{ secrets.MANUAL_REPOSITORY }}
+#          SONATYPE_REPOSITORY_ID: ${{ needs.create_staging_repository.outputs.repository_id }}
+#          SONATYPE_USERNAME: ${{ secrets.NEXUS_ACTIONS_SONATYPE_USERNAME }}
+#          SONATYPE_PASSWORD: ${{ secrets.NEXUS_ACTIONS_SONATYPE_PASSWORD }}
+#          GPG_PRIVATE_KEY: ${{ secrets.NEXUS_ACTIONS_GPG_PRIVATE_KEY }}
+#          GPG_PRIVATE_PASSWORD: ${{ secrets.NEXUS_ACTIONS_GPG_PRIVATE_PASSWORD }}
+#
+#  create-windows-package:
+#    runs-on: windows-latest
+#    needs: create_staging_repository
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#      - name: Configure JDK
+#        uses: actions/setup-java@v1
+#        with:
+#          java-version: 14
+#      - name: Publish
+#        run: |
+#          ./gradlew publishMingwX64PublicationToMavenRepository -PSONATYPE_REPOSITORY_ID=${{ needs.create_staging_repository.outputs.repository_id }}
+#        env:
+#          MANUAL_REPOSITORY: ${{ secrets.MANUAL_REPOSITORY }}
+#          SONATYPE_REPOSITORY_ID: ${{ needs.create_staging_repository.outputs.repository_id }}
+#          SONATYPE_USERNAME: ${{ secrets.NEXUS_ACTIONS_SONATYPE_USERNAME }}
+#          SONATYPE_PASSWORD: ${{ secrets.NEXUS_ACTIONS_SONATYPE_PASSWORD }}
+#          GPG_PRIVATE_KEY: ${{ secrets.NEXUS_ACTIONS_GPG_PRIVATE_KEY }}
+#          GPG_PRIVATE_PASSWORD: ${{ secrets.NEXUS_ACTIONS_GPG_PRIVATE_PASSWORD }}
+#
+#  finalize:
+#    runs-on: ubuntu-latest
+#    needs: [create_staging_repository,macos,windows]
+#    if: ${{ always() && needs.create_staging_repository.result == 'success' }}
+#    steps:
+#      - name: Discard
+#        if: ${{ needs.macos.result != 'success' || needs.windows.result != 'success' }}
+#        uses: nexus-actions/drop-nexus-staging-repo@main
+#        with:
+#          username: ${{ secrets.NEXUS_ACTIONS_SONATYPE_USERNAME }}
+#          password: ${{ secrets.NEXUS_ACTIONS_SONATYPE_PASSWORD }}
+#          staging_repository_id: ${{ needs.create_staging_repository.outputs.repository_id }}
+#      - name: Release
+#        if: ${{ needs.macos.result == 'success' && needs.windows.result == 'success' }}
+#        uses: nexus-actions/release-nexus-staging-repo@main
+#        with:
+#          base_url: https://s01.oss.sonatype.org/service/local/
+#          username: ${{ secrets.NEXUS_ACTIONS_SONATYPE_USERNAME }}
+#          password: ${{ secrets.NEXUS_ACTIONS_SONATYPE_PASSWORD }}
+#          staging_repository_id: ${{ needs.create_staging_repository.outputs.repository_id }}

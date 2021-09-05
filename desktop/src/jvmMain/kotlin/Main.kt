@@ -14,28 +14,35 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.DesktopMaterialTheme
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
-import com.arkivanov.mvikotlin.core.lifecycle.LifecycleRegistry
-import com.arkivanov.mvikotlin.core.lifecycle.resume
+import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.decompose.ExperimentalDecomposeApi
+import com.arkivanov.decompose.extensions.compose.jetbrains.lifecycle.LifecycleController
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.DownloadProgressFlow
-import com.shabinder.common.di.FetchPlatformQueryResult
-import com.shabinder.common.di.initKoin
-import com.shabinder.common.di.isInternetAccessible
-import com.shabinder.common.di.preference.PreferenceManager
+import com.github.kokorin.jaffree.JaffreeException
+import com.github.kokorin.jaffree.ffmpeg.FFmpeg
+import com.shabinder.common.di.*
+import com.shabinder.common.core_components.analytics.AnalyticsManager
+import com.shabinder.common.core_components.file_manager.DownloadProgressFlow
+import com.shabinder.common.core_components.file_manager.FileManager
+import com.shabinder.common.core_components.preference_manager.PreferenceManager
+import com.shabinder.common.core_components.utils.isInternetAccessible
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.methods
+import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.configurations.SpotiFlyerColors
@@ -45,9 +52,6 @@ import com.shabinder.common.uikit.configurations.colorOffWhite
 import com.shabinder.common.uikit.screens.SpotiFlyerRootContent
 import com.shabinder.database.Database
 import kotlinx.coroutines.runBlocking
-import org.piwik.java.tracking.PiwikTracker
-import utils.trackAsync
-import utils.trackScreenAsync
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
@@ -58,32 +62,50 @@ import javax.swing.JFileChooser.APPROVE_OPTION
 
 private val koin = initKoin(enableNetworkLogs = true).koin
 private lateinit var showToast: (String) -> Unit
-private val tracker: PiwikTracker by lazy {
-    PiwikTracker("https://matomo.spotiflyer.ml/matomo.php")
-}
+private lateinit var appWindow: ComposeWindow
 
+@OptIn(ExperimentalDecomposeApi::class)
 fun main() {
 
     val lifecycle = LifecycleRegistry()
-    lifecycle.resume()
+    val rootComponent = spotiFlyerRoot(DefaultComponentContext(lifecycle))
 
-    Window("SpotiFlyer", size = IntSize(450, 800)) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color.Black,
-            contentColor = colorOffWhite
+    application {
+        val windowState = rememberWindowState(width = 450.dp, height = 800.dp)
+
+        LifecycleController(lifecycle, windowState)
+        Window(
+            title = "SpotiFlyer",
+            state = windowState,
+            onCloseRequest = ::exitApplication
         ) {
-            DesktopMaterialTheme(
-                colors = SpotiFlyerColors,
-                typography = SpotiFlyerTypography,
-                shapes = SpotiFlyerShapes
+            appWindow = window
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = Color.Black,
+                contentColor = colorOffWhite
             ) {
-                val root: SpotiFlyerRoot = SpotiFlyerRootContent(rememberRootComponent(factory = ::spotiFlyerRoot))
-                showToast = root.callBacks::showToast
+                DesktopMaterialTheme(
+                    colors = SpotiFlyerColors,
+                    typography = SpotiFlyerTypography,
+                    shapes = SpotiFlyerShapes
+                ) {
+                    val root: SpotiFlyerRoot = SpotiFlyerRootContent(rootComponent)
+                    showToast = root.callBacks::showToast
+
+
+                    // FFmpeg WARNING
+                    try {
+                        FFmpeg.atPath().addArgument("-version").execute()
+                    } catch (e: Exception) {
+                        if (e is JaffreeException) methods.value.showPopUpMessage("WARNING!\nFFmpeg not found at path")
+                    }
+                }
             }
         }
     }
-    // Download Tracking for Desktop Apps for Now will be measured using `Github Releases`
+
+    // Download Tracking for Desktop Apps for Now will be measured using `GitHub Releases`
     // https://tooomm.github.io/github-release-stats/?username=Shabinder&repository=SpotiFlyer
 }
 
@@ -93,9 +115,14 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
         dependencies = object : SpotiFlyerRoot.Dependencies {
             override val storeFactory = DefaultStoreFactory
             override val fetchQuery: FetchPlatformQueryResult = koin.get()
-            override val dir: Dir = koin.get()
-            override val database: Database? = dir.db
-            override val preferenceManager: PreferenceManager = koin.get()
+            override val fileManager: FileManager = koin.get()
+            override val database: Database? = fileManager.db
+            override val analyticsManager: AnalyticsManager = koin.get()
+            override val preferenceManager: PreferenceManager = koin.get<PreferenceManager>().also {
+                it.analyticsManager = analyticsManager
+                // Allow Analytics for Desktop
+                analyticsManager.giveConsent()
+            }
             override val downloadProgressFlow = DownloadProgressFlow
             override val actions: Actions = object : Actions {
                 override val platformActions = object : PlatformActions {}
@@ -110,13 +137,13 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                     val fileChooser = JFileChooser().apply {
                         fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
                     }
-                    when (fileChooser.showOpenDialog(AppManager.focusedWindow?.window)) {
+                    when (fileChooser.showOpenDialog(appWindow)) {
                         APPROVE_OPTION -> {
                             val directory = fileChooser.selectedFile
                             if (directory.canWrite()) {
                                 preferenceManager.setDownloadDirectory(directory.absolutePath)
                                 callBack(directory.absolutePath)
-                                showPopUpMessage("${Strings.setDownloadDirectory()} \n${dir.defaultDir()}")
+                                showPopUpMessage("${Strings.setDownloadDirectory()} \n${fileManager.defaultDir()}")
                             } else {
                                 showPopUpMessage(Strings.noWriteAccess("\n${directory.absolutePath} "))
                             }
@@ -127,7 +154,8 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                     }
                 }
 
-                override fun queryActiveTracks() { /**/ }
+                override fun queryActiveTracks() { /**/
+                }
 
                 override fun giveDonation() {
                     openLink("https://razorpay.com/payment-button/pl_GnKuuDBdBu0ank/view/?utm_source=payment_button&utm_medium=button&utm_campaign=payment_button")
@@ -148,50 +176,14 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
                     }
                 }
 
-                override fun writeMp3Tags(trackDetails: TrackDetails) { /*IMPLEMENTED*/ }
+                override fun writeMp3Tags(trackDetails: TrackDetails) {
+                    /*IMPLEMENTED*/
+                }
 
                 override val isInternetAvailable: Boolean
                     get() = runBlocking {
                         isInternetAccessible()
                     }
-            }
-            override val analytics = object : SpotiFlyerRoot.Analytics {
-                override fun appLaunchEvent() {
-                    if (preferenceManager.isFirstLaunch) {
-                        // Enable Analytics on First Launch
-                        preferenceManager.toggleAnalytics(true)
-                        preferenceManager.firstLaunchDone()
-                    }
-                    tracker.trackAsync {
-                        eventName = "App Launch"
-                        eventAction = "App_Launch"
-                        eventCategory = "events"
-                    }
-                }
-
-                override fun homeScreenVisit() {
-                    tracker.trackScreenAsync(
-                        screenAddress = "/main_activity/home_screen"
-                    ) {
-                        actionName = "HomeScreen"
-                    }
-                }
-
-                override fun listScreenVisit() {
-                    tracker.trackScreenAsync(
-                        screenAddress = "/main_activity/list_screen"
-                    ) {
-                        actionName = "ListScreen"
-                    }
-                }
-
-                override fun donationDialogVisit() {
-                    tracker.trackScreenAsync(
-                        screenAddress = "/main_activity/donation_dialog"
-                    ) {
-                        actionName = "DonationDialog"
-                    }
-                }
             }
         }
     )

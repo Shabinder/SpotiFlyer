@@ -57,8 +57,5 @@ kotlin {
                 api(Internationalization.dep)
             }
         }
-        androidMain {
-            dependencies {}
-        }
     }
 }

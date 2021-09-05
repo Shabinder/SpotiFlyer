@@ -23,11 +23,11 @@ version = "0.1"
 
 repositories {
     mavenCentral()
-    maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")
+    //maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")
 }
 
 dependencies {
-    implementation(kotlin("stdlib-js"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-js:1.5.21")
     implementation(Koin.core)
     implementation(Extras.kermit)
     implementation(Decompose.decompose)
@@ -40,21 +40,30 @@ dependencies {
     implementation(project(":common:list"))
     implementation(project(":common:database"))
     implementation(project(":common:data-models"))
+    implementation(project(":common:providers"))
+    implementation(project(":common:core-components"))
     implementation(project(":common:dependency-injection"))
     implementation("co.touchlab:stately-common:1.1.7")
     implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
     // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1") {
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2") {
     //  https://youtrack.jetbrains.com/issue/KTOR-2670
-        isForce = true
-    }
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt") {
         @Suppress("DEPRECATION")
         isForce = true
     }
-    implementation("org.jetbrains.kotlin-wrappers:kotlin-react:17.0.2-pre.213-kotlin-1.5.10")
-    implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:17.0.2-pre.213-kotlin-1.5.10")
-    implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:5.3.0-pre.213-kotlin-1.5.10")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt") {
+        @Suppress("DEPRECATION")
+        isForce = true
+    }
+
+    with(KotlinJSWrappers) {
+        implementation(enforcedPlatform(bom))
+        implementation(kotlinReact)
+        implementation(kotlinReactDom)
+        implementation(kotlinStyled)
+    }
 }
 
 kotlin {

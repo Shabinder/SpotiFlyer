@@ -14,9 +14,9 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import Extras.Android.Acra
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.compose.compose
+import org.jetbrains.kotlin.kapt.cli.main
 
 plugins {
     id("com.android.application")
@@ -32,14 +32,10 @@ version = Versions.versionName
 repositories {
     google()
     mavenCentral()
-    // Remove jcenter as soon as following issue closes
-    // https://github.com/matomo-org/matomo-sdk-android/issues/301
-    jcenter()
 }
 
 android {
     val props = gradleLocalProperties(rootDir)
-
     if (props.containsKey("storeFileDir")) {
         signingConfigs {
             create("release") {
@@ -51,17 +47,16 @@ android {
         }
     }
 
-    compileSdkVersion(Versions.compileSdkVersion)
+    compileSdk = Versions.compileSdkVersion
     buildToolsVersion = "30.0.3"
 
     defaultConfig {
         applicationId = "com.shabinder.spotiflyer"
-        minSdkVersion(Versions.minSdkVersion)
-        targetSdkVersion(Versions.targetSdkVersion)
+        minSdk = Versions.minSdkVersion
+        targetSdk = Versions.targetSdkVersion
         versionCode = Versions.versionCode
         versionName = Versions.versionName
     }
-
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
@@ -69,11 +64,13 @@ android {
             if (props.containsKey("storeFileDir")) {
                 signingConfig = signingConfigs.getByName("release")
             }
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     kotlinOptions {
-        useIR = true
         jvmTarget = "1.8"
     }
     compileOptions {
@@ -91,9 +88,6 @@ android {
             exclude(group = "androidx.compose.ui")
         }
     }
-    packagingOptions {
-        exclude("META-INF/*")
-    }
 }
 dependencies {
     implementation(compose.material)
@@ -106,6 +100,8 @@ dependencies {
     implementation(project(":common:root"))
     implementation(project(":common:dependency-injection"))
     implementation(project(":common:data-models"))
+    implementation(project(":common:core-components"))
+    implementation(project(":common:providers"))
 
     // Koin
     implementation(Koin.android)
@@ -123,10 +119,8 @@ dependencies {
 
     // Extras
     with(Extras.Android) {
-        implementation(Acra.notification)
-        implementation(Acra.http)
+        implementation(countly)
         implementation(appUpdator)
-        implementation(matomo)
     }
 
     with(Versions.androidxLifecycle) {
@@ -138,7 +132,7 @@ dependencies {
     // implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
     implementation("com.github.shabinder:storage-chooser:2.0.4.45")
-    implementation("com.google.accompanist:accompanist-insets:0.12.0")
+    implementation("com.google.accompanist:accompanist-insets:0.16.1")
 
     // Test
     testImplementation("junit:junit:4.13.2")

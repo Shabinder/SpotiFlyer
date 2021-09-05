@@ -1,6 +1,6 @@
 [submodule "spotiflyer-ios"]
 	path = spotiflyer-ios
 	url = https://github.com/Shabinder/spotiflyer-ios
-[submodule "mosaic"]
-	path = mosaic
-	url = https://github.com/JakeWharton/mosaic
+[submodule "ffmpeg/ffmpeg-android-maker"]
+	path = ffmpeg/ffmpeg-android-maker
+	url = https://github.com/Shabinder/ffmpeg-android-maker/

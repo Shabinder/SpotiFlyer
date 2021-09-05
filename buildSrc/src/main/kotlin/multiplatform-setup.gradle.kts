@@ -38,7 +38,11 @@ kotlin {
     android()
 
     js(BOTH) {
-        browser()
+        browser {
+            commonWebpackConfig {
+                cssSupport.enabled = true
+            }
+        }
         // nodejs()
     }
 
@@ -66,7 +70,7 @@ kotlin {
                 implementation(Serialization.json)
                 implementation("co.touchlab:stately-common:1.1.7")
                 implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt") {
+                implementation(JetBrains.Kotlin.coroutines) {
                     @Suppress("DEPRECATION")
                     isForce = true
                 }
@@ -75,7 +79,7 @@ kotlin {
 
         named("androidMain") {
             dependencies {
-                implementation("androidx.appcompat:appcompat:1.3.0")
+                implementation(Androidx.androidxActivity)
                 implementation(Androidx.core)
                 implementation(compose.runtime)
                 implementation(compose.material)
@@ -102,9 +106,13 @@ kotlin {
         named("jsMain") {
             dependencies {
                 implementation(Ktor.clientJs)
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-react:17.0.2-pre.213-kotlin-1.5.10")
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:17.0.2-pre.213-kotlin-1.5.10")
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:5.3.0-pre.213-kotlin-1.5.10")
+
+                /*with(KotlinJSWrappers) {
+                    implementation(enforcedPlatform(bom))
+                    implementation(kotlinReact)
+                    implementation(kotlinReactDom)
+                    implementation(kotlinStyled)
+                }*/
             }
         }
         if(HostOS.isMac){

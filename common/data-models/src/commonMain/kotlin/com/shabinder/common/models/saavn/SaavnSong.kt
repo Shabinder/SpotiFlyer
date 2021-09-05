@@ -1,5 +1,6 @@
 package com.shabinder.common.models.saavn
 
+import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.models.DownloadStatus
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -43,4 +44,6 @@ data class SaavnSong @OptIn(ExperimentalSerializationApi::class) constructor(
     val vlink: String? = null,
     val year: String,
     var downloaded: DownloadStatus = DownloadStatus.NotDownloaded
-)
+) {
+    val audioQuality get() = if (is320Kbps) AudioQuality.KBPS320 else AudioQuality.KBPS160
+}

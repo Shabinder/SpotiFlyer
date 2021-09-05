@@ -33,19 +33,19 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.FetchPlatformQueryResult
-import com.shabinder.common.di.R
-import com.shabinder.common.di.downloadFile
-import com.shabinder.common.di.utils.ParallelExecutor
+import com.shabinder.common.core_components.file_manager.FileManager
+import com.shabinder.common.core_components.file_manager.downloadFile
+import com.shabinder.common.core_components.parallel_executor.ParallelExecutor
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.failure
+import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.translations.Strings
-import com.shabinder.spotiflyer.utils.autoclear.AutoClear
+import com.shabinder.spotiflyer.R
 import com.shabinder.spotiflyer.utils.autoclear.autoClear
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -56,13 +56,19 @@ import java.io.File
 
 class ForegroundService : LifecycleService() {
 
-    private var downloadService: AutoClear<ParallelExecutor> = autoClear { ParallelExecutor(Dispatchers.IO) }
-    val trackStatusFlowMap by autoClear { TrackStatusFlowMap(MutableSharedFlow(replay = 1), lifecycleScope) }
+    private lateinit var downloadService: ParallelExecutor
+    val trackStatusFlowMap by autoClear {
+        TrackStatusFlowMap(
+            MutableSharedFlow(replay = 1),
+            lifecycleScope
+        )
+    }
     private val fetcher: FetchPlatformQueryResult by inject()
     private val logger: Kermit by inject()
-    private val dir: Dir by inject()
+    private val dir: FileManager by inject()
 
-    private var messageList = java.util.Collections.synchronizedList(MutableList(5) { emptyMessage })
+    private var messageList =
+        java.util.Collections.synchronizedList(MutableList(5) { emptyMessage })
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
     private val cancelIntent: PendingIntent by lazy {
@@ -81,6 +87,7 @@ class ForegroundService : LifecycleService() {
     inner class DownloadServiceBinder : Binder() {
         val service get() = this@ForegroundService
     }
+
     private val myBinder: IBinder = DownloadServiceBinder()
 
     override fun onBind(intent: Intent): IBinder {
@@ -90,12 +97,14 @@ class ForegroundService : LifecycleService() {
 
     override fun onCreate() {
         super.onCreate()
+        downloadService = ParallelExecutor(Dispatchers.IO)
         createNotificationChannel(CHANNEL_ID, "Downloader Service")
     }
 
     @SuppressLint("WakelockTimeout")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+        downloadService.reviveIfClosed()
         // Send a notification that service is started
         Log.i(TAG, "Foreground Service Started.")
         startForeground(NOTIFICATION_ID, createNotification())
@@ -127,6 +136,7 @@ class ForegroundService : LifecycleService() {
      * Function To Download All Tracks Available in a List
      **/
     fun downloadAllTracks(trackList: List<TrackDetails>) {
+        downloadService.reviveIfClosed()
         trackList.size.also { size ->
             total += size
             isSingleDownload = (size == 1)
@@ -136,10 +146,10 @@ class ForegroundService : LifecycleService() {
         for (track in trackList) {
             trackStatusFlowMap[track.title] = DownloadStatus.Queued
             lifecycleScope.launch {
-                downloadService.value.execute {
-                    fetcher.findMp3DownloadLink(track).fold(
-                        success = { url ->
-                            enqueueDownload(url, track)
+                downloadService.executeSuspending {
+                    fetcher.findBestDownloadLink(track).fold(
+                        success = { res ->
+                            enqueueDownload(res.first, track.apply { audioQuality = res.second })
                         },
                         failure = { error ->
                             failed++
@@ -163,7 +173,8 @@ class ForegroundService : LifecycleService() {
                 is DownloadResult.Error -> {
                     logger.d(TAG) { it.message }
                     failed++
-                    trackStatusFlowMap[track.title] = DownloadStatus.Failed(it.cause ?: Exception(it.message))
+                    trackStatusFlowMap[track.title] =
+                        DownloadStatus.Failed(it.cause ?: Exception(it.message))
                     removeFromNotification(Message(track.title, DownloadStatus.Downloading()))
                 }
 
@@ -176,17 +187,40 @@ class ForegroundService : LifecycleService() {
                     coroutineScope {
                         SuspendableEvent {
                             // Save File and Embed Metadata
-                            val job = launch(Dispatchers.Default) { dir.saveFileWithMetadata(it.byteArray, track) {} }
+                            val job = launch(Dispatchers.Default) {
+                                dir.saveFileWithMetadata(
+                                    it.byteArray,
+                                    track
+                                ) {}
+                            }
 
                             // Send Converting Status
                             trackStatusFlowMap[track.title] = DownloadStatus.Converting
                             addToNotification(Message(track.title, DownloadStatus.Converting))
 
                             // All Processing Completed for this Track
-                            job.invokeOnCompletion {
+                            job.invokeOnCompletion { throwable ->
+                                if (throwable != null /*&& throwable !is CancellationException*/) {
+                                    // handle error
+                                    failed++
+                                    trackStatusFlowMap[track.title] =
+                                        DownloadStatus.Failed(throwable)
+                                    removeFromNotification(
+                                        Message(
+                                            track.title,
+                                            DownloadStatus.Converting
+                                        )
+                                    )
+                                    return@invokeOnCompletion
+                                }
                                 converted++
                                 trackStatusFlowMap[track.title] = DownloadStatus.Downloaded
-                                removeFromNotification(Message(track.title, DownloadStatus.Converting))
+                                removeFromNotification(
+                                    Message(
+                                        track.title,
+                                        DownloadStatus.Converting
+                                    )
+                                )
                             }
                             logger.d(TAG) { "${track.title} Download Completed" }
                             downloaded++
@@ -240,9 +274,9 @@ class ForegroundService : LifecycleService() {
             messageList = messageList.getEmpty().apply {
                 set(index = 0, Message(Strings.cleaningAndExiting(), DownloadStatus.NotDownloaded))
             }
-            downloadService.getOrNull()?.close()
-            downloadService.reset()
+            downloadService.close()
             updateNotification()
+            trackStatusFlowMap.clear()
             cleanFiles(File(dir.defaultDir()))
             // cleanFiles(File(dir.imageCacheDir()))
             messageList = messageList.getEmpty()
@@ -256,23 +290,24 @@ class ForegroundService : LifecycleService() {
         }
     }
 
-    private fun createNotification(): Notification = NotificationCompat.Builder(this, CHANNEL_ID).run {
-        setSmallIcon(R.drawable.ic_download_arrow)
-        setContentTitle("${Strings.total()}: $total  ${Strings.completed()}:$converted  ${Strings.failed()}:$failed")
-        setSilent(true)
-        setProgress(total, failed + converted, false)
-        setStyle(
-            NotificationCompat.InboxStyle().run {
-                addLine(messageList[messageList.size - 1].asString())
-                addLine(messageList[messageList.size - 2].asString())
-                addLine(messageList[messageList.size - 3].asString())
-                addLine(messageList[messageList.size - 4].asString())
-                addLine(messageList[messageList.size - 5].asString())
-            }
-        )
-        addAction(R.drawable.ic_round_cancel_24, Strings.exit(), cancelIntent)
-        build()
-    }
+    private fun createNotification(): Notification =
+        NotificationCompat.Builder(this, CHANNEL_ID).run {
+            setSmallIcon(R.drawable.ic_download_arrow)
+            setContentTitle("${Strings.total()}: $total  ${Strings.completed()}:$converted  ${Strings.failed()}:$failed")
+            setSilent(true)
+            setProgress(total, failed + converted, false)
+            setStyle(
+                NotificationCompat.InboxStyle().run {
+                    addLine(messageList[messageList.size - 1].asString())
+                    addLine(messageList[messageList.size - 2].asString())
+                    addLine(messageList[messageList.size - 3].asString())
+                    addLine(messageList[messageList.size - 4].asString())
+                    addLine(messageList[messageList.size - 5].asString())
+                }
+            )
+            addAction(R.drawable.ic_round_cancel_24, Strings.exit(), cancelIntent)
+            build()
+        }
 
     private fun addToNotification(message: Message) {
         synchronized(messageList) {
@@ -304,12 +339,16 @@ class ForegroundService : LifecycleService() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (isFinished) { killService() }
+        if (isFinished) {
+            killService()
+        }
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        if (isFinished) { killService() }
+        if (isFinished) {
+            killService()
+        }
     }
 
     companion object {

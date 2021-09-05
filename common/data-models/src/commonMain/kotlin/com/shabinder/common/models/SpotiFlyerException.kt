@@ -9,7 +9,7 @@ sealed class SpotiFlyerException(override val message: String) : Exception(messa
 
     data class MP3ConversionFailed(
         val extraInfo: String? = null,
-        override val message: String = "${Strings.mp3ConverterBusy()} \nCAUSE:$extraInfo"
+        override val message: String = /*${Strings.mp3ConverterBusy()} */"CAUSE:$extraInfo"
     ) : SpotiFlyerException(message)
 
     data class UnknownReason(
@@ -28,13 +28,17 @@ sealed class SpotiFlyerException(override val message: String) : Exception(messa
     ) : SpotiFlyerException(message)
 
     data class DownloadLinkFetchFailed(
-        val trackName: String,
-        val jioSaavnError: Throwable,
-        val ytMusicError: Throwable,
-        override val message: String = "${Strings.noLinkFound()}: $trackName," +
-            " \n YtMusic Error's StackTrace: ${ytMusicError.stackTraceToString()} \n " +
-            " \n JioSaavn Error's StackTrace: ${jioSaavnError.stackTraceToString()} \n "
-    ) : SpotiFlyerException(message)
+        val errorTrace: String
+    ) : SpotiFlyerException(errorTrace) {
+        constructor(
+            trackName: String,
+            jioSaavnError: Throwable,
+            ytMusicError: Throwable,
+            errorTrace: String = "${Strings.noLinkFound()}: $trackName," +
+                    " \n YtMusic Error's StackTrace: ${ytMusicError.stackTraceToString()} \n " +
+                    " \n JioSaavn Error's StackTrace: ${jioSaavnError.stackTraceToString()} \n "
+        ): this(errorTrace)
+    }
 
     data class LinkInvalid(
         val link: String? = null,

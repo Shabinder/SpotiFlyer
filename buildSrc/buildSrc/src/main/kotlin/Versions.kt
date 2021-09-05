@@ -16,15 +16,20 @@
 
 @file:Suppress("MayBeConstant", "SpellCheckingInspection")
 
+import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.kotlin.dsl.accessors.runtime.addDependencyTo
+
 object Versions {
     // App's Version (To be bumped at each update)
-    const val versionName = "3.2.1"
+    const val versionName = "3.3.0"
 
-    const val versionCode = 22
+    const val versionCode = 24
+
     // Kotlin
-    const val kotlinVersion = "1.5.10"
+    const val kotlinVersion = "1.5.21"
 
-    const val coroutinesVersion = "1.5.0"
+    const val coroutinesVersion = "1.5.1"
 
     // Code Formatting
     const val ktLint = "10.1.0"
@@ -41,36 +46,44 @@ object Versions {
     const val mokoParcelize = "0.7.1"
 
     // Internet
-    const val ktor = "1.6.0"
+    const val ktor = "1.6.2"
 
-    const val kotlinxSerialization = "1.2.1"
+    const val kotlinxSerialization = "1.2.2"
 
     // Database
-    const val sqlDelight = "1.5.0"
+    const val sqlDelight = "1.5.1"
 
     const val sqliteJdbcDriver = "3.34.0"
     const val slf4j = "1.7.31"
 
     // Internationalisation
-    const val i18n4k = "0.1.2"
+    const val i18n4k = "0.1.3"
 
     // Android
     const val minSdkVersion = 21
     const val compileSdkVersion = 30
     const val targetSdkVersion = 29
-    const val androidxLifecycle = "2.3.1"
+    const val androidxLifecycle = "2.4.0-alpha03"
 }
 
 object HostOS {
     // Host OS Properties
     private val hostOs = System.getProperty("os.name")
-    val isMingwX64 = hostOs.startsWith("Windows",true)
-    val isMac = hostOs.startsWith("Mac",true)
-    val isLinux = hostOs.startsWith("Linux",true)
+    val isMingwX64 = hostOs.startsWith("Windows", true)
+    val isMac = hostOs.startsWith("Mac", true)
+    val isLinux = hostOs.startsWith("Linux", true)
 }
 
 object MultiPlatformSettings {
     const val dep = "com.russhwolf:multiplatform-settings-no-arg:0.7.7"
+}
+
+object KotlinJSWrappers {
+    private const val bomVersion = "0.0.1-pre.235-kotlin-1.5.21"
+    val bom = "org.jetbrains.kotlin-wrappers:kotlin-wrappers-bom:${bomVersion}"
+    const val kotlinReact = "org.jetbrains.kotlin-wrappers:kotlin-react"
+    const val kotlinReactDom = "org.jetbrains.kotlin-wrappers:kotlin-react-dom"
+    const val kotlinStyled = "org.jetbrains.kotlin-wrappers:kotlin-styled"
 }
 
 object Koin {
@@ -81,15 +94,15 @@ object Koin {
 }
 
 object Androidx {
-    const val androidxActivity = "androidx.activity:activity-compose:1.3.0-beta02"
-    const val core = "androidx.core:core-ktx:1.5.0"
+    const val androidxActivity = "androidx.activity:activity-compose:1.3.1"
+    const val core = "androidx.core:core-ktx:1.6.0"
     const val palette = "androidx.palette:palette-ktx:1.0.0"
     const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutinesVersion}"
 
     const val junit = "androidx.test.ext:junit:1.1.2"
     const val expresso = "androidx.test.espresso:espresso-core:3.3.0"
 
-    const val gradlePlugin = "com.android.tools.build:gradle:4.1.1"
+    const val gradlePlugin = "com.android.tools.build:gradle:7.0.1"
 }
 
 object KTLint {
@@ -98,24 +111,28 @@ object KTLint {
 
 object JetBrains {
     object Kotlin {
+        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}"
         const val serialization = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlinVersion}"
         const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:${Versions.kotlinVersion}"
         const val testJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlinVersion}"
-        const val testAnnotationsCommon = "org.jetbrains.kotlin:kotlin-test-annotations-common:${Versions.kotlinVersion}"
+        const val testAnnotationsCommon =
+            "org.jetbrains.kotlin:kotlin-test-annotations-common:${Versions.kotlinVersion}"
     }
 
     object Compose {
         // __LATEST_COMPOSE_RELEASE_VERSION__
-        const val VERSION = "0.4.0"
+        private const val VERSION = "1.0.0-alpha2"
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
     }
 }
+
 object Mosaic {
     const val gradlePlugin = "com.jakewharton.mosaic:mosaic-gradle-plugin:${Versions.mosaic}"
 }
+
 object Decompose {
-    private const val VERSION = "0.2.6"
+    private const val VERSION = "0.3.1"
     const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
     const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
     const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"
@@ -163,16 +180,15 @@ object Extras {
     const val mp3agic = "com.mpatric:mp3agic:0.9.0"
     const val jaudioTagger = "com.github.Shabinder:JAudioTagger-Android:1.0"
     const val kermit = "co.touchlab:kermit:${Versions.kermit}"
+
     object Android {
-        object Acra {
-            // Self Hosted Crashlytics (FOSS)
-            private const val VERSION = "5.8.3"
-            val http = "ch.acra:acra-http:$VERSION"
-            val notification = "ch.acra:acra-notification:$VERSION"
-        }
-        // Self Hosted Analytics (FOSS)
-        val matomo = "org.matomo.sdk:tracker:4.1.2"
+        // Self Hosted Analytics & Crashlytics (FOSS)
+        val countly = "ly.count.android:sdk:20.11.8"
         val appUpdator = "com.github.amitbd1508:AppUpdater:4.1.0"
+    }
+
+    object Desktop {
+        val countly = "ly.count.sdk:java:20.11.0"
     }
 }
 
@@ -191,3 +207,10 @@ object SqlDelight {
     val nativeDriverMacos = "com.squareup.sqldelight:native-driver-macosx64:${Versions.sqlDelight}"
     val jdbcDriver = "org.xerial:sqlite-jdbc:${Versions.sqliteJdbcDriver}"
 }
+
+fun DependencyHandler.`implementation`(
+    dependencyNotation: String,
+    dependencyConfiguration: ExternalModuleDependency.() -> Unit
+): ExternalModuleDependency = addDependencyTo(
+    this, "implementation", dependencyNotation
+) { dependencyConfiguration() }

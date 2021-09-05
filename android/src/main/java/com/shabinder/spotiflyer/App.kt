@@ -17,42 +17,17 @@
 package com.shabinder.spotiflyer
 
 import android.app.Application
-import android.content.Context
 import com.shabinder.common.di.initKoin
-import com.shabinder.common.translations.Strings
 import com.shabinder.spotiflyer.di.appModule
-import org.acra.config.httpSender
-import org.acra.config.notification
-import org.acra.data.StringFormat
-import org.acra.ktx.initAcra
-import org.acra.sender.HttpSender
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.component.KoinComponent
 import org.koin.core.logger.Level
-import org.matomo.sdk.Matomo
-import org.matomo.sdk.Tracker
-import org.matomo.sdk.TrackerBuilder
 
 class App : Application(), KoinComponent {
 
     companion object {
         const val SIGNATURE_HEX = "53304f6d75736a2f30484230334c454b714753525763724259444d3d0a"
-    }
-
-    val tracker: Tracker by lazy {
-        TrackerBuilder.createDefault(
-            "https://matomo.spotiflyer.ml/matomo.php", 1
-        )
-            .build(Matomo.getInstance(this)).apply {
-                if (BuildConfig.DEBUG) {
-                    /*Timber.plant(DebugTree())
-                    addTrackingCallback {
-                        Timber.d(it.toMap().toString())
-                        it
-                    }*/
-                }
-            }
     }
 
     override fun onCreate() {
@@ -64,37 +39,6 @@ class App : Application(), KoinComponent {
             androidLogger(Level.NONE) // No virtual method elapsedNow
             androidContext(this@App)
             modules(appModule(loggingEnabled))
-        }
-    }
-
-    @Suppress("SpellCheckingInspection")
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
-        // Crashlytics
-        initAcra {
-            buildConfigClass = BuildConfig::class.java
-            reportFormat = StringFormat.JSON
-            /*
-            * Prompt User Before Sending Any Crash Report
-            * Obeying `F-Droid Inclusion Privacy Rules`
-            * */
-            notification {
-                title = Strings.acraNotificationTitle()
-                text = Strings.acraNotificationText()
-                channelName = "SpotiFlyer_Crashlytics"
-                channelDescription = "Notification Channel to send Spotiflyer Crashes."
-                sendOnClick = true
-            }
-            // Send Crash Report to self hosted Acrarium (FOSS)
-            httpSender {
-                uri = "https://acrarium.spotiflyer.ml/acrarium/report"
-                basicAuthLogin = "sDj2xCKQIxw0dujf"
-                basicAuthPassword = "O83du0TsgsDJ69zN"
-                httpMethod = HttpSender.Method.POST
-                connectionTimeout = 15000
-                socketTimeout = 20000
-                compress = true
-            }
         }
     }
 }

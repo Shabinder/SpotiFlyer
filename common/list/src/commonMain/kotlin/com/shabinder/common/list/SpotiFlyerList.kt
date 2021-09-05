@@ -19,15 +19,15 @@ package com.shabinder.common.list
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.FetchPlatformQueryResult
-import com.shabinder.common.di.Picture
-import com.shabinder.common.di.preference.PreferenceManager
+import com.shabinder.common.core_components.file_manager.FileManager
+import com.shabinder.common.core_components.picture.Picture
+import com.shabinder.common.core_components.preference_manager.PreferenceManager
 import com.shabinder.common.list.integration.SpotiFlyerListImpl
 import com.shabinder.common.models.Consumer
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.providers.FetchPlatformQueryResult
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 interface SpotiFlyerList {
@@ -67,7 +67,7 @@ interface SpotiFlyerList {
     interface Dependencies {
         val storeFactory: StoreFactory
         val fetchQuery: FetchPlatformQueryResult
-        val dir: Dir
+        val fileManager: FileManager
         val preferenceManager: PreferenceManager
         val link: String
         val listOutput: Consumer<Output>

@@ -69,7 +69,9 @@ fun SpotiFlyerPreferenceContent(component: SpotiFlyerPreference) {
                     title = "Preferred Audio Quality",
                     value = model.preferredQuality.kbps + "KBPS"
                 ) { save ->
-                    val audioQualities = AudioQuality.values()
+                    val audioQualities = AudioQuality.values().toMutableList().apply {
+                        remove(AudioQuality.UNKNOWN)
+                    }
 
                     audioQualities.forEach { quality ->
                         Row(

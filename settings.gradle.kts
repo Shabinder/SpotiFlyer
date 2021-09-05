@@ -24,10 +24,13 @@ include(
     ":common:list",
     ":common:preference",
     ":common:data-models",
+    ":common:providers",
+    ":common:core-components",
     ":common:dependency-injection",
+    ":ffmpeg:android-ffmpeg",
     ":android",
     ":desktop",
     ":web-app",
-    ":console-app",
+    //":console-app",
     ":maintenance-tasks"
 )

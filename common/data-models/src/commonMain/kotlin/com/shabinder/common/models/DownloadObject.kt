@@ -41,9 +41,12 @@ data class TrackDetails(
     val progress: Int = 2,
     val downloadLink: String? = null,
     val downloaded: DownloadStatus = DownloadStatus.NotDownloaded,
+    var audioQuality: AudioQuality = AudioQuality.KBPS192,
     var outputFilePath: String, // UriString in Android
     var videoID: String? = null,
-) : Parcelable
+) : Parcelable {
+    val outputMp3Path get() = outputFilePath.substringBeforeLast(".") + ".mp3"
+}
 
 @Serializable
 sealed class DownloadStatus : Parcelable {

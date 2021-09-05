@@ -15,10 +15,11 @@
  */
 
 import co.touchlab.kermit.Kermit
-import com.shabinder.common.di.Dir
-import com.shabinder.common.di.FetchPlatformQueryResult
+import com.shabinder.common.core_components.analytics.AnalyticsManager
+import com.shabinder.common.core_components.file_manager.FileManager
+import com.shabinder.common.core_components.preference_manager.PreferenceManager
 import com.shabinder.common.di.initKoin
-import com.shabinder.common.di.preference.PreferenceManager
+import com.shabinder.common.providers.FetchPlatformQueryResult
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.koin.core.component.KoinComponent
@@ -37,14 +38,16 @@ fun main() {
 
 object AppDependencies : KoinComponent {
     val logger: Kermit
-    val directories: Dir
+    val fileManager: FileManager
     val fetchPlatformQueryResult: FetchPlatformQueryResult
     val preferenceManager: PreferenceManager
+    val analyticsManager: AnalyticsManager
     init {
         initKoin()
-        directories = get()
+        fileManager = get()
         logger = get()
         fetchPlatformQueryResult = get()
         preferenceManager = get()
+        analyticsManager = get()
     }
 }
