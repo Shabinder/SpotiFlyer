@@ -26,7 +26,7 @@ jobs:
         with:
           draft: true
           tag: "3.3.0"
-          artifacts: "desktop\build\compose\jars\*.jar"
+          artifacts: "desktop/build/compose/jars/*.jar"
           token: ${{ secrets.GH_TOKEN }}
           commit: main
 #          bodyFile: "body.md"
