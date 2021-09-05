@@ -10,8 +10,28 @@ class TrackStatusFlowMap(
     private val scope: CoroutineScope
 ) : HashMap<String, DownloadStatus>() {
     override fun put(key: String, value: DownloadStatus): DownloadStatus? {
-        val res = super.put(key, value)
+        synchronized(this) {
+            val res = super.put(key, value)
+            emitValue()
+            return res
+        }
+    }
+
+    override fun clear() {
+        synchronized(this) {
+            // Reset Statuses
+            this.forEach { (title, status) ->
+                if(status !is DownloadStatus.Failed && status !is DownloadStatus.Downloaded) {
+                    super.put(title,DownloadStatus.NotDownloaded)
+                }
+            }
+            emitValue()
+            //super.clear()
+            //emitValue()
+        }
+    }
+
+    private fun emitValue() {
         scope.launch { statusFlow.emit(this@TrackStatusFlowMap) }
-        return res
     }
 }

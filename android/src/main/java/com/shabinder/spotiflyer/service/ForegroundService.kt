@@ -200,7 +200,7 @@ class ForegroundService : LifecycleService() {
 
                             // All Processing Completed for this Track
                             job.invokeOnCompletion { throwable ->
-                                if (throwable != null && throwable !is CancellationException) {
+                                if (throwable != null /*&& throwable !is CancellationException*/) {
                                     // handle error
                                     failed++
                                     trackStatusFlowMap[track.title] =
@@ -276,6 +276,7 @@ class ForegroundService : LifecycleService() {
             }
             downloadService.close()
             updateNotification()
+            trackStatusFlowMap.clear()
             cleanFiles(File(dir.defaultDir()))
             // cleanFiles(File(dir.imageCacheDir()))
             messageList = messageList.getEmpty()

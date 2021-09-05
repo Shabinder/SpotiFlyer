@@ -82,12 +82,11 @@ import java.io.File
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
 
-    private lateinit var root: SpotiFlyerRoot
     private val fetcher: FetchPlatformQueryResult by inject()
     private val fileManager: FileManager by inject()
     private val preferenceManager: PreferenceManager by inject()
     private val analyticsManager: AnalyticsManager by inject { parametersOf(this) }
-    private val callBacks: SpotiFlyerRootCallBacks get() = root.callBacks
+    private val callBacks: SpotiFlyerRootCallBacks get() = this.rootComponent.callBacks
     private val trackStatusFlow = MutableSharedFlow<HashMap<String, DownloadStatus>>(1)
     private var permissionGranted = mutableStateOf(true)
     private val internetAvailability by lazy { ConnectionLiveData(applicationContext) }
@@ -105,7 +104,7 @@ class MainActivity : ComponentActivity() {
         preferenceManager.analyticsManager = analyticsManager
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        rootComponent = spotiFlyerRoot(defaultComponentContext())
+        this.rootComponent = spotiFlyerRoot(defaultComponentContext())
         setContent {
             SpotiFlyerTheme {
                 Surface(contentColor = colorOffWhite) {
@@ -114,8 +113,8 @@ class MainActivity : ComponentActivity() {
                         val view = LocalView.current
 
                         Box {
-                            root = SpotiFlyerRootContent(
-                                rootComponent,
+                            SpotiFlyerRootContent(
+                                this@MainActivity.rootComponent,
                                 Modifier.statusBarsPadding().navigationBarsPadding()
                             )
                             Spacer(
@@ -284,7 +283,7 @@ class MainActivity : ComponentActivity() {
                         override fun sendTracksToService(array: List<TrackDetails>) {
                             for (chunk in array.chunked(25)) {
                                 if (foregroundService == null) initForegroundService()
-                                foregroundService?.downloadAllTracks(array)
+                                foregroundService?.downloadAllTracks(chunk)
                             }
                         }
                     }
@@ -429,7 +428,7 @@ class MainActivity : ComponentActivity() {
                     val link = filterLinkRegex.find(string)?.value.toString()
                     Log.i("Intent", link)
                     lifecycleScope.launch {
-                        while (!this@MainActivity::root.isInitialized) {
+                        while (!this@MainActivity::rootComponent.isInitialized) {
                             delay(100)
                         }
                         if (methods.value.isInternetAvailable) callBacks.searchLink(link)
