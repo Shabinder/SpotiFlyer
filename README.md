@@ -1,8 +1,3 @@
-Codebase is under **active refactoring and development**, hence releases will be delayed,</br>
-**Track Progress** here & Meantime **preview releases** will be shared here only: https://github.com/Shabinder/SpotiFlyer/issues/374
-
-Apk: https://drive.google.com/file/d/1U5WUdWhN1-A-3y5m3NcnXYEEkS5aeHZ0/view?usp=sharing
-
 ![Web Cover](art/cover-web.jpg)
 ![Android Cover](art/cover-android.jpg)
 ![Desktop Cover](art/cover-desktop.jpg)
@@ -55,12 +50,12 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 
 | Platform | Download | Status |
 |----------|----------|--------|
-| Android    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=Android-Apk&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/3.2.1/SpotiFlyer_v3.2.1_Signed.apk)| ✅ Stable | 
-| Windows    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=00A8E8&label=Windows-msi&logo=windows&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/3.2.0/SpotiFlyer-3.2.0.1.msi)| ✅ Stable | 
-| Windows-JAR   |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=00719c&label=Windows-jar&logo=windows&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/3.2.0/SpotiFlyer-windows-x64-3.2.0.jar)| ✅ Stable | 
-| MacOS-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=5F85CE&label=MacOS-jar&logo=apple&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/3.2.0/SpotiFlyer-macos-x64-3.2.0.jar) | ✅ Stable |
-| Linux-DEB    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=D0074E&label=Linux-deb&logo=debian&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/3.2.0/spotiflyer_3.2.0_amd64.deb)| ✅ Stable |
-| Linux-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=EBA201&label=Linux-jar&logo=linux&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/3.2.0/SpotiFlyer-linux-x64-3.2.0.jar)| ✅ Stable | 
+| Android    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=Android-Apk&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.3.0/android-release.apk)| ✅ Stable | 
+| Windows    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=00A8E8&label=Windows-msi&logo=windows&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.3.0/SpotiFlyer-3.3.0.msi)| ✅ Stable | 
+| Windows-JAR   |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=00719c&label=Windows-jar&logo=windows&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.3.0/SpotiFlyer-windows-x64-3.3.0.jar)| ✅ Stable | 
+| MacOS-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=5F85CE&label=MacOS-jar&logo=apple&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.3.0/SpotiFlyer-macos-x64-3.3.0.jar) | ✅ Stable |
+| Linux-DEB    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=D0074E&label=Linux-deb&logo=debian&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.3.0/spotiflyer_3.3.0-1_amd64.deb)| ✅ Stable |
+| Linux-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=EBA201&label=Linux-jar&logo=linux&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.3.0/SpotiFlyer-linux-x64-3.3.0.jar)| ✅ Stable | 
 | Web    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=FF7139&label=SpotiFlyer&logo=firefox&style=for-the-badge)](https://shabinder.github.io/SpotiFlyer/) | ✅ Beta | 
 
 - To run the `jar` version, you need JAVA installed.
