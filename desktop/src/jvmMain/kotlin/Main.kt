@@ -20,7 +20,6 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -97,7 +96,7 @@ fun main() {
 
                     // FFmpeg WARNING
                     try {
-                        FFmpeg.atPath().addArgument("-version").execute();
+                        FFmpeg.atPath().addArgument("-version").execute()
                     } catch (e: Exception) {
                         if (e is JaffreeException) methods.value.showPopUpMessage("WARNING!\nFFmpeg not found at path")
                     }

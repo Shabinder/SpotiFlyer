@@ -57,8 +57,6 @@ kotlin {
                 // Koin
                 implementation(Koin.core)
 
-                // Matomo
-                implementation("org.piwik.java.tracking:matomo-java-tracker:1.6")
             }
         }
         val jvmTest by getting
@@ -68,7 +66,7 @@ kotlin {
 compose.desktop {
     application {
         mainClass = "MainKt"
-        description = "Music Downloader for Spotify, Gaana, Youtube Music."
+        description = "Music Downloader for Spotify, Gaana, Jio Saavn, Youtube Music."
         nativeDistributions {
             modules("java.sql", "java.security.jgss", "jdk.crypto.ec")
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
@@ -84,7 +82,8 @@ compose.desktop {
             windows {
                 iconFile.set(iconsRoot.resolve("spotiflyer.ico"))
                 // Wondering what the heck is this? See : https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html
-                upgradeUuid = "ace223ed-3ffb-452c-bc90-082e9e0a6d5d"
+                // https://www.guidgen.com/
+                upgradeUuid = "9f9e966b-7eef-42c7-a49c-5194b17fabd0"
                 menuGroup = packageName
             }
             linux {
