@@ -26,7 +26,7 @@ plugins {
 }
 
 val statelyVersion = "1.1.7"
-val statelyIsoVersion = "1.1.7-a1"
+val statelyIsoVersion = "1.2.0-nmm"
 
 i18n4k {
     inputDirectory = "../../translations"
@@ -56,9 +56,6 @@ kotlin {
                 implementation(Extras.youtubeDownloader)
                 api(Internationalization.dep)
             }
-        }
-        androidMain {
-            dependencies {}
         }
     }
 }
