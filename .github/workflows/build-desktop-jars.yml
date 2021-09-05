@@ -1,3 +1,5 @@
+name: Build Desktop Packages
+
 on:
   [workflow_dispatch]
 
@@ -29,7 +31,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           draft: true
-          tag: "Spotiflyer-v3.3.0"
+          tag: "SpotiFlyer-v3.3.0"
           artifacts: "desktop/build/compose/jars/*.jar,desktop/build/compose/binaries/main/*/*"
           token: ${{ secrets.GH_TOKEN }}
           commit: main
@@ -63,7 +65,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           draft: true
-          tag: "Spotiflyer-v3.3.0"
+          tag: "SpotiFlyer-v3.3.0"
           artifacts: "desktop/build/compose/jars/*.jar,desktop/build/compose/binaries/main/*/*"
           token: ${{ secrets.GH_TOKEN }}
           commit: main
@@ -96,7 +98,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           draft: true
-          tag: "Spotiflyer-v3.3.0"
+          tag: "SpotiFlyer-v3.3.0"
           artifacts: "desktop/build/compose/jars/*.jar,desktop/build/compose/binaries/main/*/*"
           token: ${{ secrets.GH_TOKEN }}
           commit: main
