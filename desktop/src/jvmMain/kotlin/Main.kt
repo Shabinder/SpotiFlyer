@@ -20,6 +20,7 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -30,6 +31,8 @@ import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.lifecycle.LifecycleController
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import com.github.kokorin.jaffree.JaffreeException
+import com.github.kokorin.jaffree.ffmpeg.FFmpeg
 import com.shabinder.common.di.*
 import com.shabinder.common.core_components.analytics.AnalyticsManager
 import com.shabinder.common.core_components.file_manager.DownloadProgressFlow
@@ -39,6 +42,7 @@ import com.shabinder.common.core_components.utils.isInternetAccessible
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.methods
 import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.translations.Strings
@@ -89,10 +93,19 @@ fun main() {
                 ) {
                     val root: SpotiFlyerRoot = SpotiFlyerRootContent(rootComponent)
                     showToast = root.callBacks::showToast
+
+
+                    // FFmpeg WARNING
+                    try {
+                        FFmpeg.atPath().addArgument("-version").execute();
+                    } catch (e: Exception) {
+                        if (e is JaffreeException) methods.value.showPopUpMessage("WARNING!\nFFmpeg not found at path")
+                    }
                 }
             }
         }
     }
+
     // Download Tracking for Desktop Apps for Now will be measured using `GitHub Releases`
     // https://tooomm.github.io/github-release-stats/?username=Shabinder&repository=SpotiFlyer
 }
@@ -108,6 +121,8 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
             override val analyticsManager: AnalyticsManager = koin.get()
             override val preferenceManager: PreferenceManager = koin.get<PreferenceManager>().also {
                 it.analyticsManager = analyticsManager
+                // Allow Analytics for Desktop
+                analyticsManager.giveConsent()
             }
             override val downloadProgressFlow = DownloadProgressFlow
             override val actions: Actions = object : Actions {

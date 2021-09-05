@@ -6,6 +6,7 @@ import com.github.kokorin.jaffree.ffmpeg.UrlOutput
 import com.shabinder.common.models.AudioQuality
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import kotlin.io.path.Path
 
 class DesktopMediaConverter : MediaConverter() {
 
@@ -15,11 +16,14 @@ class DesktopMediaConverter : MediaConverter() {
         audioQuality: AudioQuality,
         progressCallbacks: (Long) -> Unit,
     ) = executeSafelyInPool {
+        val audioBitrate =
+            if (audioQuality == AudioQuality.UNKNOWN) 192 else audioQuality.kbps.toIntOrNull()
+                ?: 192
         FFmpeg.atPath().run {
             addInput(UrlInput.fromUrl(inputFilePath))
             setOverwriteOutput(true)
             if (audioQuality != AudioQuality.UNKNOWN) {
-                addArguments("-b:a", "${audioQuality.kbps}k")
+                addArguments("-b:a", "${audioBitrate}k")
             }
             addArguments("-acodec", "libmp3lame")
             addArgument("-vn")

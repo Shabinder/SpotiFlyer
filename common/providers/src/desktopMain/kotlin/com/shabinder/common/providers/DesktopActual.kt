@@ -61,11 +61,26 @@ actual suspend fun downloadTracks(
                                 )
                             }
                             is DownloadResult.Success -> { // Todo clear map
-                                fileManager.saveFileWithMetadata(it.byteArray, trackDetails) {}
                                 DownloadProgressFlow.emit(
                                     DownloadProgressFlow.replayCache.getOrElse(
                                         0
-                                    ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Downloaded) }
+                                    ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Converting) }
+                                )
+                                fileManager.saveFileWithMetadata(it.byteArray, trackDetails).fold(
+                                    failure = {
+                                        DownloadProgressFlow.emit(
+                                            DownloadProgressFlow.replayCache.getOrElse(
+                                                0
+                                            ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Failed(it)) }
+                                        )
+                                    },
+                                    success = {
+                                        DownloadProgressFlow.emit(
+                                            DownloadProgressFlow.replayCache.getOrElse(
+                                                0
+                                            ) { hashMapOf() }.apply { set(trackDetails.title, DownloadStatus.Downloaded) }
+                                        )
+                                    }
                                 )
                             }
                         }

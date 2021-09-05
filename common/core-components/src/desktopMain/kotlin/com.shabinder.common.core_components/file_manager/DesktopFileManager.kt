@@ -19,6 +19,7 @@ package com.shabinder.common.core_components.file_manager
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import co.touchlab.kermit.Kermit
+import com.github.kokorin.jaffree.JaffreeException
 import com.mpatric.mp3agic.InvalidDataException
 import com.mpatric.mp3agic.Mp3File
 import com.shabinder.common.core_components.media_converter.MediaConverter
@@ -35,6 +36,7 @@ import com.shabinder.common.models.dispatcherIO
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.failure
 import com.shabinder.common.models.event.coroutines.map
+import com.shabinder.common.models.methods
 import com.shabinder.database.Database
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -152,13 +154,18 @@ class DesktopFileManager(
                             .setId3v2TagsAndSaveFile(trackDetails, trackDetails.outputFilePath)
 
                         addToLibrary(trackDetails.outputFilePath)
-                    }.failure {
-                        throw it
-                    }
+                    }.fold(
+                        success = {},
+                        failure = {
+                            throw it
+                        }
+                    )
+                    File(convertedFilePath).delete()
                 } else throw e
             }
             SuspendableEvent.success(trackDetails.outputFilePath)
         } catch (e: Throwable) {
+            if(e is JaffreeException) methods.value.showPopUpMessage("No FFmpeg found at path.")
             if (songFile.exists()) songFile.delete()
             logger.e { "${songFile.absolutePath} could not be created" }
             SuspendableEvent.error(e)

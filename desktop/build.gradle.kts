@@ -44,6 +44,7 @@ kotlin {
                 implementation(project(":common:compose"))
                 implementation(project(":common:providers"))
                 implementation(project(":common:root"))
+                implementation("com.github.kokorin.jaffree:jaffree:2021.08.16")
 
                 // Decompose
                 implementation(Decompose.decompose)

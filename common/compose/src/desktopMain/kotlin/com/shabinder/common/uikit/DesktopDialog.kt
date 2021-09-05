@@ -12,7 +12,7 @@ actual fun Dialog(
     content: @Composable () -> Unit
 ) {
     AnimatedVisibility(isVisible) {
-        androidx.compose.ui.window.v1.Dialog(onDismiss) {
+        androidx.compose.ui.window.Dialog(onDismiss) {
             content()
         }
     }
