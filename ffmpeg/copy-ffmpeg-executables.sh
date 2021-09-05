@@ -7,5 +7,5 @@ cd "$(dirname "$0")" || echo "cd to $(dirname "$0") Failed"
 for target in arm64-v8a armeabi-v7a x86 x86_64
 do
   mkdir -p ./android-ffmpeg/src/main/jniLibs/$target/
-  cp ./ffmpeg-android-maker/build/ffmpeg/$target/bin/ffmpeg  ./android-ffmpeg/src/main/jniLibs/$target/lib..ffmpeg.so
+  cp ./ffmpeg-android-maker/build/ffmpeg/$target/bin/ffmpeg  ./android-ffmpeg/src/main/jniLibs/$target/lib..ffmpeg..so
 done
