@@ -53,7 +53,7 @@ dependencies {
         isForce = true
     }
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt") {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt") {
         @Suppress("DEPRECATION")
         isForce = true
     }
