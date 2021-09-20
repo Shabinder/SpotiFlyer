@@ -27,7 +27,7 @@ dependencies {
     implementation(Serialization.json)
 
     // testDeps
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.5.21")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.5.31")
 }
 
 tasks.test {
