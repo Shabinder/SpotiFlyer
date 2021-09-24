@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.Dialog
 import com.shabinder.common.uikit.OpenCollectiveLogo
@@ -87,7 +87,7 @@ fun DonationDialog(
                     modifier = Modifier.fillMaxWidth().clickable(
                         onClick = {
                             onDismiss()
-                            methods.value.openPlatform("", "https://opencollective.com/spotiflyer/donate")
+                            Actions.instance.openPlatform("", "https://opencollective.com/spotiflyer/donate")
                         }
                     )
                         .padding(vertical = 6.dp)
@@ -110,7 +110,7 @@ fun DonationDialog(
                     modifier = Modifier.fillMaxWidth().clickable(
                         onClick = {
                             onDismiss()
-                            methods.value.openPlatform("", "https://www.paypal.com/paypalme/shabinder")
+                            Actions.instance.openPlatform("", "https://www.paypal.com/paypalme/shabinder")
                         }
                     )
                         .padding(vertical = 6.dp)
@@ -133,7 +133,7 @@ fun DonationDialog(
                         .clickable(
                             onClick = {
                                 onDismiss()
-                                methods.value.giveDonation()
+                                Actions.instance.giveDonation()
                             }
                         ),
                     verticalAlignment = Alignment.CenterVertically

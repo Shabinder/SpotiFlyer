@@ -26,19 +26,14 @@ import com.shabinder.common.core_components.analytics.AnalyticsEvent
 import com.shabinder.common.core_components.analytics.AnalyticsView
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
-import com.shabinder.common.models.Actions
 import com.shabinder.common.models.Consumer
-import com.shabinder.common.models.dispatcherIO
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 import com.shabinder.common.preference.SpotiFlyerPreference
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child
 import com.shabinder.common.root.SpotiFlyerRoot.Dependencies
 import com.shabinder.common.root.callbacks.SpotiFlyerRootCallBacks
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 
 internal class SpotiFlyerRootImpl(
     componentContext: ComponentContext,
@@ -47,11 +42,10 @@ internal class SpotiFlyerRootImpl(
     Actions by dependencies.actions {
 
     init {
+        AnalyticsEvent.AppLaunch.track(analyticsManager)
         instanceKeeper.ensureNeverFrozen()
-        methods.value = dependencies.actions.freeze()
-
-        /*Init App Launch & Authenticate Spotify Client*/
-        initAppLaunchAndAuthenticateSpotify(dependencies.fetchQuery::authenticateSpotifyClient)
+        Actions.instance = dependencies.actions.freeze()
+        appInit.init()
     }
 
     private val router =
@@ -182,15 +176,6 @@ internal class SpotiFlyerRootImpl(
                 Unit
             }
         }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun initAppLaunchAndAuthenticateSpotify(authenticator: suspend () -> Unit) {
-        GlobalScope.launch(dispatcherIO) {
-            AnalyticsEvent.AppLaunch.track(analyticsManager)
-            /*Authenticate Spotify Client*/
-            authenticator()
-        }
-    }
 
     private sealed class Configuration : Parcelable {
         @Parcelize

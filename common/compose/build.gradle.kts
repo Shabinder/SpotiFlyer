@@ -23,9 +23,6 @@ plugins {
 
 kotlin {
     sourceSets {
-        all {
-            languageSettings.useExperimentalAnnotation("androidx.compose.animation")
-        }
         commonMain {
             dependencies {
                 implementation(compose.material)

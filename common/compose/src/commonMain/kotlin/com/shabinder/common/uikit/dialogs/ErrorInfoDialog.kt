@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.Dialog
 import com.shabinder.common.uikit.configurations.SpotiFlyerTypography
@@ -67,7 +67,7 @@ fun ErrorInfoDialog(error: Throwable): ErrorInfoDialogCallBacks {
                     TextButton(onClick = onDismissDialog, colors = ButtonDefaults.buttonColors()) {
                         Text(Strings.dismiss())
                     }
-                    TextButton(onClick = { methods.value.copyToClipboard(error.stackTraceToString()) }, colors = ButtonDefaults.buttonColors()) {
+                    TextButton(onClick = { Actions.instance.copyToClipboard(error.stackTraceToString()) }, colors = ButtonDefaults.buttonColors()) {
                         Text(Strings.copyToClipboard())
                     }
                 }

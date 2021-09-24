@@ -17,7 +17,7 @@ actual interface PlatformActions {
     fun sendTracksToService(array: List<TrackDetails>)
 }
 
-actual val StubPlatformActions = object : PlatformActions {
+internal actual val StubPlatformActions = object : PlatformActions {
     override val imageCacheDir = ""
 
     override val sharedPreferences: SharedPreferences? = null

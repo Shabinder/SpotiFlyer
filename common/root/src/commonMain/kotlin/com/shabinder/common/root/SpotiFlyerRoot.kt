@@ -23,6 +23,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.core_components.analytics.AnalyticsManager
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.core_components.preference_manager.PreferenceManager
+import com.shabinder.common.di.ApplicationInit
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.models.Actions
@@ -51,6 +52,7 @@ interface SpotiFlyerRoot {
     }
 
     interface Dependencies {
+        val appInit: ApplicationInit
         val storeFactory: StoreFactory
         val database: Database?
         val fetchQuery: FetchPlatformQueryResult

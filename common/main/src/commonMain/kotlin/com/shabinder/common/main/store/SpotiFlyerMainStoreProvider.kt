@@ -24,7 +24,7 @@ import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.State
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
 import com.shabinder.common.models.DownloadRecord
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.Dispatchers
@@ -75,9 +75,9 @@ internal class SpotiFlyerMainStoreProvider(dependencies: SpotiFlyerMain.Dependen
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) {
             when (intent) {
-                is Intent.OpenPlatform -> methods.value.openPlatform(intent.platformID, intent.platformLink)
-                is Intent.GiveDonation -> methods.value.giveDonation()
-                is Intent.ShareApp -> methods.value.shareApp()
+                is Intent.OpenPlatform -> Actions.instance.openPlatform(intent.platformID, intent.platformLink)
+                is Intent.GiveDonation -> Actions.instance.giveDonation()
+                is Intent.ShareApp -> Actions.instance.shareApp()
                 is Intent.SetLink -> dispatch(Result.LinkChanged(link = intent.link))
                 is Intent.SelectCategory -> dispatch(Result.CategoryChanged(intent.category))
                 is Intent.ToggleAnalytics -> {

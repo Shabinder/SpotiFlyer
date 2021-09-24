@@ -23,10 +23,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.list.SpotiFlyerList.State
 import com.shabinder.common.list.store.SpotiFlyerListStore.Intent
-import com.shabinder.common.models.DownloadStatus
-import com.shabinder.common.models.PlatformQueryResult
-import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.*
 import com.shabinder.common.providers.downloadTracks
 import kotlinx.coroutines.flow.collect
 
@@ -112,14 +109,14 @@ internal class SpotiFlyerListStoreProvider(dependencies: SpotiFlyerList.Dependen
                     )
 
                     val finalList = intent.trackList.filter { it.downloaded == DownloadStatus.NotDownloaded }
-                    if (finalList.isEmpty()) methods.value.showPopUpMessage("All Songs are Processed")
+                    if (finalList.isEmpty()) Actions.instance.showPopUpMessage("All Songs are Processed")
                     else downloadTracks(finalList, fetchQuery, fileManager)
                 }
                 is Intent.StartDownload -> {
                     dispatch(Result.UpdateTrackItem(intent.track.copy(downloaded = DownloadStatus.Queued)))
                     downloadTracks(listOf(intent.track), fetchQuery, fileManager)
                 }
-                is Intent.RefreshTracksStatuses -> methods.value.queryActiveTracks()
+                is Intent.RefreshTracksStatuses -> Actions.instance.queryActiveTracks()
             }
         }
     }
@@ -161,6 +158,7 @@ internal class SpotiFlyerListStoreProvider(dependencies: SpotiFlyerList.Dependen
                 }
             }
         }
+
         return updatedList
     }
 }

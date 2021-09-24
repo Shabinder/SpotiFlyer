@@ -5,7 +5,7 @@ import com.shabinder.common.models.AllPlatforms
 import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
@@ -48,7 +48,7 @@ actual suspend fun downloadTracks(
                             }
                         }
                         is DownloadResult.Success -> { // Todo clear map
-                            dir.saveFileWithMetadata(it.byteArray, track, methods.value::writeMp3Tags)
+                            dir.saveFileWithMetadata(it.byteArray, track, Actions.instance::writeMp3Tags)
                             DownloadProgressFlow.replayCache.getOrElse(
                                 0
                             ) { hashMapOf() }.toMutableMap().apply {

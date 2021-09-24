@@ -57,7 +57,7 @@ import com.shabinder.common.core_components.picture.Picture
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.DownloadAllImage
 import com.shabinder.common.uikit.DownloadImageArrow
@@ -84,7 +84,7 @@ fun SpotiFlyerListContent(
     LaunchedEffect(model.errorOccurred) {
         /*Handle if Any Exception Occurred*/
         model.errorOccurred?.let {
-            methods.value.showPopUpMessage(it.message ?: Strings.errorOccurred())
+            Actions.instance.showPopUpMessage(it.message ?: Strings.errorOccurred())
             component.onBackPressed()
         }
     }

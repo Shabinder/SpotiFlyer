@@ -10,8 +10,16 @@ import org.koin.dsl.module
 
 internal class AndroidAnalyticsManager(private val mainActivity: Activity) : AnalyticsManager {
 
+    companion object {
+        private var isInitialised = false
+    }
+
     init {
-        init()
+        // Don't Init If Instantiated on Diff Activities
+        if (!isInitialised) {
+            isInitialised = true
+            init()
+        }
     }
 
     override fun init() {
@@ -45,7 +53,8 @@ internal class AndroidAnalyticsManager(private val mainActivity: Activity) : Ana
         Countly.sharedInstance().consent().giveConsentAll()
     }
 
-    override fun isTracking(): Boolean = Countly.sharedInstance().consent().getConsent(Countly.CountlyFeatureNames.events)
+    override fun isTracking(): Boolean =
+        Countly.sharedInstance().consent().getConsent(Countly.CountlyFeatureNames.events)
 
     override fun revokeConsent() {
         Countly.sharedInstance().consent().removeConsentAll()

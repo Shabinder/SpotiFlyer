@@ -28,7 +28,7 @@ import com.shabinder.common.main.SpotiFlyerMain.*
 import com.shabinder.common.main.store.SpotiFlyerMainStore.Intent
 import com.shabinder.common.main.store.SpotiFlyerMainStoreProvider
 import com.shabinder.common.main.store.getStore
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 
 internal class SpotiFlyerMainImpl(
     componentContext: ComponentContext,
@@ -57,8 +57,8 @@ internal class SpotiFlyerMainImpl(
     override val analytics = mainAnalytics
 
     override fun onLinkSearch(link: String) {
-        if (methods.value.isInternetAvailable) mainOutput.callback(Output.Search(link = link))
-        else methods.value.showPopUpMessage("Check Network Connection Please")
+        if (Actions.instance.isInternetAvailable) mainOutput.callback(Output.Search(link = link))
+        else Actions.instance.showPopUpMessage("Check Network Connection Please")
     }
 
     override fun onInputLinkChanged(link: String) {

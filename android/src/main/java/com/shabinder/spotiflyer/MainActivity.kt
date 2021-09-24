@@ -55,6 +55,7 @@ import com.shabinder.common.core_components.ConnectionLiveData
 import com.shabinder.common.core_components.analytics.AnalyticsManager
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.core_components.preference_manager.PreferenceManager
+import com.shabinder.common.di.ApplicationInit
 import com.shabinder.common.di.observeAsState
 import com.shabinder.common.models.*
 import com.shabinder.common.models.PlatformActions.Companion.SharedPreferencesKey
@@ -79,13 +80,14 @@ import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import java.io.File
 
-@ExperimentalAnimationApi
+@OptIn(ExperimentalAnimationApi::class)
 class MainActivity : ComponentActivity() {
 
     private val fetcher: FetchPlatformQueryResult by inject()
     private val fileManager: FileManager by inject()
     private val preferenceManager: PreferenceManager by inject()
     private val analyticsManager: AnalyticsManager by inject { parametersOf(this) }
+    private val applicationInit: ApplicationInit by inject()
     private val callBacks: SpotiFlyerRootCallBacks get() = this.rootComponent.callBacks
     private val trackStatusFlow = MutableSharedFlow<HashMap<String, DownloadStatus>>(1)
     private var permissionGranted = mutableStateOf(true)
@@ -263,6 +265,7 @@ class MainActivity : ComponentActivity() {
                 override val analyticsManager: AnalyticsManager = this@MainActivity.analyticsManager
                 override val downloadProgressFlow: MutableSharedFlow<HashMap<String, DownloadStatus>> =
                     trackStatusFlow
+                override val appInit: ApplicationInit = applicationInit
                 override val actions = object : Actions {
 
                     override val platformActions = object : PlatformActions {
@@ -431,7 +434,7 @@ class MainActivity : ComponentActivity() {
                         while (!this@MainActivity::rootComponent.isInitialized) {
                             delay(100)
                         }
-                        if (methods.value.isInternetAvailable) callBacks.searchLink(link)
+                        if (Actions.instance.isInternetAvailable) callBacks.searchLink(link)
                     }
                 }
             }

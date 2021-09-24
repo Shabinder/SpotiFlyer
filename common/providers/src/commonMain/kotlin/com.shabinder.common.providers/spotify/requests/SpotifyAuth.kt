@@ -18,7 +18,7 @@ package com.shabinder.common.providers.spotify.requests
 
 import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 import com.shabinder.common.models.spotify.TokenData
 import com.shabinder.common.utils.globalJson
 import io.ktor.client.*
@@ -32,9 +32,12 @@ import io.ktor.http.*
 import kotlin.native.concurrent.SharedImmutable
 
 suspend fun authenticateSpotify(): SuspendableEvent<TokenData, Throwable> = SuspendableEvent {
-    if (methods.value.isInternetAvailable) {
+    if (Actions.instance.isInternetAvailable) {
         spotifyAuthClient.post("https://accounts.spotify.com/api/token") {
-            body = FormDataContent(Parameters.build { append("grant_type", "client_credentials") })
+            body = FormDataContent(Parameters.build {
+                @Suppress("EXPERIMENTAL_API_USAGE_FUTURE_ERROR")
+                append("grant_type", "client_credentials")
+            })
         }
     } else throw SpotiFlyerException.NoInternetException()
 }

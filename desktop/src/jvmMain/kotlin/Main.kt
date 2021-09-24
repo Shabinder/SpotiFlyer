@@ -38,10 +38,9 @@ import com.shabinder.common.core_components.file_manager.DownloadProgressFlow
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.core_components.preference_manager.PreferenceManager
 import com.shabinder.common.core_components.utils.isInternetAccessible
-import com.shabinder.common.models.Actions
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.translations.Strings
@@ -98,7 +97,7 @@ fun main() {
                     try {
                         FFmpeg.atPath().addArgument("-version").execute()
                     } catch (e: Exception) {
-                        if (e is JaffreeException) methods.value.showPopUpMessage("WARNING!\nFFmpeg not found at path")
+                        if (e is JaffreeException) Actions.instance.showPopUpMessage("WARNING!\nFFmpeg not found at path")
                     }
                 }
             }
@@ -113,6 +112,7 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
     SpotiFlyerRoot(
         componentContext = componentContext,
         dependencies = object : SpotiFlyerRoot.Dependencies {
+            override val appInit: ApplicationInit = koin.get()
             override val storeFactory = DefaultStoreFactory
             override val fetchQuery: FetchPlatformQueryResult = koin.get()
             override val fileManager: FileManager = koin.get()

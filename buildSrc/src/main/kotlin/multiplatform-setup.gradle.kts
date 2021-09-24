@@ -20,6 +20,7 @@ plugins {
     id("org.jetbrains.compose")
     id("ktlint-setup")
     id("kotlin-parcelize")
+    id("compiler-args")
 }
 
 kotlin {

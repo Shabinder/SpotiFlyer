@@ -33,6 +33,7 @@ fun initKoin(enableNetworkLogs: Boolean = false, appDeclaration: KoinAppDeclarat
             listOf(
                 providersModule(enableNetworkLogs),
                 databaseModule(),
+                appInitModule(),
             )
         )
     }

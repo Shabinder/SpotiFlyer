@@ -1,22 +1,21 @@
-package nl.bravobit.ffmpeg;
+package nl.bravobit.ffmpeg
 
-public interface FFtask {
-
+interface FFtask {
     /**
      * Sends 'q' to the ff binary running process asynchronously
      */
-    void sendQuitSignal();
+    fun sendQuitSignal()
 
     /**
      * Checks if process is completed
-     * @return <code>true</code> if a process is running
+     * @return `true` if a process is running
      */
-    boolean isProcessCompleted();
+    val isProcessCompleted: Boolean
 
     /**
      * Kill given running process
      *
      * @return true if process is killed successfully
      */
-    boolean killRunningProcess();
+    fun killRunningProcess(): Boolean
 }

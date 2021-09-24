@@ -1,11 +1,7 @@
 package com.shabinder.common.models
 
 import co.touchlab.stately.freeze
-
-/*
-* Holder to call platform actions from anywhere
-* */
-val methods: NativeAtomicReference<Actions> = NativeAtomicReference(stubActions().freeze())
+import kotlin.jvm.JvmStatic
 
 /*
 * Interface Having All Platform Dependent Functions
@@ -42,6 +38,20 @@ interface Actions {
     // Open / Redirect to another Platform
     fun openPlatform(packageID: String, platformLink: String)
     fun writeMp3Tags(trackDetails: TrackDetails)
+
+    companion object {
+        /*
+        * Holder to call platform actions from anywhere
+        * */
+        @JvmStatic
+        var instance: Actions
+            get() = methodsAtomicRef.value
+            set(value) {
+                methodsAtomicRef.value = value
+            }
+
+        private val methodsAtomicRef = NativeAtomicReference(stubActions().freeze())
+    }
 }
 
 private fun stubActions(): Actions = object : Actions {

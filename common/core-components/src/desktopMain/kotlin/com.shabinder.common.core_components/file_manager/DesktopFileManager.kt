@@ -36,7 +36,7 @@ import com.shabinder.common.models.dispatcherIO
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.failure
 import com.shabinder.common.models.event.coroutines.map
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 import com.shabinder.database.Database
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -165,7 +165,7 @@ class DesktopFileManager(
             }
             SuspendableEvent.success(trackDetails.outputFilePath)
         } catch (e: Throwable) {
-            if(e is JaffreeException) methods.value.showPopUpMessage("No FFmpeg found at path.")
+            if(e is JaffreeException) Actions.instance.showPopUpMessage("No FFmpeg found at path.")
             if (songFile.exists()) songFile.delete()
             logger.e { "${songFile.absolutePath} could not be created" }
             SuspendableEvent.error(e)

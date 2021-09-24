@@ -21,7 +21,7 @@ import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.shabinder.common.models.AudioQuality
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 import com.shabinder.common.preference.SpotiFlyerPreference
 import com.shabinder.common.preference.SpotiFlyerPreference.State
 import com.shabinder.common.preference.store.SpotiFlyerPreferenceStore.Intent
@@ -56,9 +56,9 @@ internal class SpotiFlyerPreferenceStoreProvider(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) {
             when (intent) {
-                is Intent.OpenPlatform -> methods.value.openPlatform(intent.platformID, intent.platformLink)
-                is Intent.GiveDonation -> methods.value.giveDonation()
-                is Intent.ShareApp -> methods.value.shareApp()
+                is Intent.OpenPlatform -> Actions.instance.openPlatform(intent.platformID, intent.platformLink)
+                is Intent.GiveDonation -> Actions.instance.giveDonation()
+                is Intent.ShareApp -> Actions.instance.shareApp()
                 is Intent.ToggleAnalytics -> {
                     dispatch(Result.AnalyticsToggled(intent.enabled))
                     preferenceManager.toggleAnalytics(intent.enabled)

@@ -35,9 +35,8 @@ import com.shabinder.common.di.getMemoryEfficientBitmap
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.dispatcherIO
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
-import com.shabinder.common.models.event.coroutines.failure
 import com.shabinder.common.models.event.coroutines.map
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 import com.shabinder.database.Database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -70,7 +69,7 @@ class AndroidFileManager(
 
     override fun fileSeparator(): String = File.separator
 
-    override fun imageCacheDir(): String = methods.value.platformActions.imageCacheDir
+    override fun imageCacheDir(): String = Actions.instance.platformActions.imageCacheDir
 
     // fun call in order to always access Updated Value
     override fun defaultDir(): String = (preferenceManager.downloadDir ?: defaultBaseDir) +
@@ -159,7 +158,7 @@ class AndroidFileManager(
         }
     }
 
-    override fun addToLibrary(path: String) = methods.value.platformActions.addToLibrary(path)
+    override fun addToLibrary(path: String) = Actions.instance.platformActions.addToLibrary(path)
 
     override suspend fun loadImage(url: String, reqWidth: Int, reqHeight: Int): Picture =
         withContext(dispatcherIO) {

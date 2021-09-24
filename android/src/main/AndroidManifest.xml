@@ -36,7 +36,7 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_STORAGE_PERMISSION" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
+        tools:ignore="ProtectedPermissions,ScopedStorage" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
@@ -58,16 +58,22 @@
         android:extractNativeLibs="true"
         android:requestLegacyExternalStorage="true"
         tools:targetApi="q">
-        <activity android:name=".MainActivity"
-            android:launchMode="singleTask"
-            android:label="SpotiFlyer"
+        <activity
+            android:name=".ui.SplashScreenActivity"
+            android:theme="@style/SplashTheme"
             android:hardwareAccelerated="true"
-            android:theme="@style/Theme.SpotiFlyer"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".MainActivity"
+            android:launchMode="singleTask"
+            android:hardwareAccelerated="true"
+            android:theme="@style/Theme.SpotiFlyer"
+            >
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="android.intent.action.SEND" />
@@ -76,13 +82,15 @@
         </activity>
 
         <service android:name=".service.ForegroundService"/>
-        <service android:name="org.openudid.OpenUDID_service">
+        <service android:name="org.openudid.OpenUDID_service"
+            tools:ignore="ExportedService,IntentFilterExportedReceiver">
             <intent-filter>
                 <action android:name="org.openudid.GETUDID" />
             </intent-filter>
         </service>
 
-        <receiver android:name="ly.count.android.sdk.ReferrerReceiver" android:exported="true">
+        <receiver android:name="ly.count.android.sdk.ReferrerReceiver" android:exported="true"
+            tools:ignore="ExportedReceiver">
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>

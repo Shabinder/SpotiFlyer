@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingBottom="20dp"
+    android:paddingRight="20dp"
+    android:paddingLeft="20dp"
+    android:paddingTop="20dp">
+    <!-- Your product logo - 144dp color version of your app icon -->
+    <item
+        android:drawable="@drawable/spotiflyer"
+        android:gravity="center">
+    </item>
+</layer-list>

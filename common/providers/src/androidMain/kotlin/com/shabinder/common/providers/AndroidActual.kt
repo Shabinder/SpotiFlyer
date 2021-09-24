@@ -18,7 +18,7 @@ package com.shabinder.common.providers
 
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.models.methods
+import com.shabinder.common.models.Actions
 
 
 actual suspend fun downloadTracks(
@@ -27,6 +27,6 @@ actual suspend fun downloadTracks(
     fileManager: FileManager
 ) {
     if (list.isNotEmpty()) {
-        methods.value.platformActions.sendTracksToService(ArrayList(list))
+        Actions.instance.platformActions.sendTracksToService(ArrayList(list))
     }
 }
