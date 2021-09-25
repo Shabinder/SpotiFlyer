@@ -19,6 +19,7 @@ package com.shabinder.common.uikit.utils
 import android.util.Log
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,11 +69,17 @@ fun Modifier.verticalGradientScrim(
         }
     }
     var height by remember { mutableStateOf(fixedHeight ?: 1f) }
-    val brush = remember(color, numStops, startYPercentage, endYPercentage, height) {
+    val scrimHeight by animateFloatAsState(
+    // Whenever the target value changes, new animation
+    // will start to the new target value
+    targetValue = height,
+    animationSpec = tween(durationMillis = 1500)
+    )
+    val brush = remember(color, numStops, startYPercentage, endYPercentage, scrimHeight) {
         Brush.verticalGradient(
             colors = colors,
-            startY = height * startYPercentage,
-            endY = height * endYPercentage
+            startY = scrimHeight * startYPercentage,
+            endY = scrimHeight * endYPercentage
         )
     }
 
