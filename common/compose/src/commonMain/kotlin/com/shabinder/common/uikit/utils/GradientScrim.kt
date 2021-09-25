@@ -16,12 +16,16 @@
 
 package com.shabinder.common.uikit.utils
 
+import android.util.Log
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -63,8 +67,7 @@ fun Modifier.verticalGradientScrim(
             listOf(color.copy(alpha = 0f), color)
         }
     }
-
-    var height by remember { mutableStateOf(fixedHeight ?: 0f) }
+    var height by remember { mutableStateOf(fixedHeight ?: 1f) }
     val brush = remember(color, numStops, startYPercentage, endYPercentage, height) {
         Brush.verticalGradient(
             colors = colors,
@@ -75,7 +78,6 @@ fun Modifier.verticalGradientScrim(
 
     drawBehind {
         height = fixedHeight ?: size.height
-//        log("Height",size.height.toString())
         drawRect(brush = brush)
     }
 }

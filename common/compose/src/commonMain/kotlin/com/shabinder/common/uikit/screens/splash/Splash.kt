@@ -38,7 +38,7 @@ import com.shabinder.common.uikit.configurations.colorPrimary
 import kotlinx.coroutines.delay
 
 private const val SplashWaitTime: Long = 2000
-enum class SplashState { Shown, Completed }
+enum class SplashState { Show, Completed }
 
 @Composable
 fun Splash(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
@@ -50,6 +50,7 @@ fun Splash(modifier: Modifier = Modifier, onTimeout: () -> Unit) {
             delay(SplashWaitTime)
             currentOnTimeout()
         }
+
         Image(SpotiFlyerLogo(), Strings.spotiflyerLogo(),modifier = Modifier.fillMaxSize())
         MadeInIndia(Modifier.align(Alignment.BottomCenter))
     }

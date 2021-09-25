@@ -117,7 +117,8 @@ class MainActivity : ComponentActivity() {
                         Box {
                             SpotiFlyerRootContent(
                                 this@MainActivity.rootComponent,
-                                Modifier.statusBarsPadding().navigationBarsPadding()
+                                Modifier.statusBarsPadding().navigationBarsPadding(),
+                                showSplash = false // We already show System-Native Splash
                             )
                             Spacer(
                                 Modifier

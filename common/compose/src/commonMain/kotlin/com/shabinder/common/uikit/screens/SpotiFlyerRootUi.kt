@@ -64,28 +64,32 @@ import com.shabinder.common.uikit.screens.splash.SplashState
 import com.shabinder.common.uikit.utils.verticalGradientScrim
 
 // To Not Show Splash Again After Configuration Change in Android
-private var isSplashShown = SplashState.Shown
+private var isSplashShown = SplashState.Show
 
 @Composable
-fun SpotiFlyerRootContent(component: SpotiFlyerRoot, modifier: Modifier = Modifier): SpotiFlyerRoot {
-
-    val transitionState = remember { MutableTransitionState(SplashState.Shown) }
+fun SpotiFlyerRootContent(
+    component: SpotiFlyerRoot,
+    modifier: Modifier = Modifier,
+    showSplash: Boolean = true
+): SpotiFlyerRoot {
+    isSplashShown = if (showSplash) SplashState.Show else SplashState.Completed
+    val transitionState = remember { MutableTransitionState(isSplashShown) }
     val transition = updateTransition(transitionState, label = "transition")
 
     val splashAlpha by transition.animateFloat(
         transitionSpec = { tween(durationMillis = 100) }, label = "Splash-Alpha"
     ) {
-        if (it == SplashState.Shown && isSplashShown == SplashState.Shown) 1f else 0f
+        if (it == SplashState.Show && isSplashShown == SplashState.Show) 1f else 0f
     }
     val contentAlpha by transition.animateFloat(
         transitionSpec = { tween(durationMillis = 300) }, label = "Content-Alpha"
     ) {
-        if (it == SplashState.Shown && isSplashShown == SplashState.Shown) 0f else 1f
+        if (it == SplashState.Show && isSplashShown == SplashState.Show) 0f else 1f
     }
     val contentTopPadding by transition.animateDp(
         transitionSpec = { spring(stiffness = StiffnessLow) }, label = "Content-Padding"
     ) {
-        if (it == SplashState.Shown && isSplashShown == SplashState.Shown) 100.dp else 0.dp
+        if (it == SplashState.Show && isSplashShown == SplashState.Show) 100.dp else 0.dp
     }
 
     Box {
@@ -111,7 +115,12 @@ fun SpotiFlyerRootContent(component: SpotiFlyerRoot, modifier: Modifier = Modifi
 }
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier, alpha: Float, topPadding: Dp = 0.dp, component: SpotiFlyerRoot) {
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    alpha: Float,
+    topPadding: Dp = 0.dp,
+    component: SpotiFlyerRoot
+) {
 
     val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.65f)
 
