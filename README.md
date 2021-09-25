@@ -93,7 +93,7 @@ Have any questions, doubts or want to present your opinions, views? You're alway
  - Build a Media Player into this app. [#113](https://github.com/Shabinder/SpotiFlyer/issues/113) 
  
 ### Note
-The availability of YouTube Music in your country is important for this app to work since we use YouTube Music to filter out our search results.
+The availability of YouTube Music in your country is important for this app to work. The reason behind this is, we use YouTube Music to filter out our search results and get the desired song downloaded from Youtube Music.
 To check if YouTube Music is available in your country, visit [YouTube Music](https://music.youtube.com).
 
 I am hosting a **server for WEB APP on my own personal device** , so expect some downtimes, If you have a **server** available and would like to share , open an issue or ping me wherever you can get a hold of me.

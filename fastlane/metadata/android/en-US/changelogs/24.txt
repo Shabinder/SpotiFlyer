@@ -1,0 +1,7 @@
+  - Major Bug Fixes:
+    - YT Music Extraction,
+    - Error Handling Improv,
+    - Analytics, and Crashlytics Provider,
+    - Some translations Added.
+    - Many More... I cant remember now 🙃
+  - Now FFmpeg is custom built and added in-app : no more mp3 conversion errors
