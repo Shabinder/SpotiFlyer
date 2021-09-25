@@ -23,7 +23,9 @@ actual fun ImageLoad(
     modifier: Modifier
     // placeholder: ImageVector
 ) {
-    var pic by remember(link) { mutableStateOf<ImageBitmap?>(null) }
+    var pic by remember(link) {
+        mutableStateOf<ImageBitmap?>(null)
+    }
 
     LaunchedEffect(link) {
         withContext(dispatcherIO) {

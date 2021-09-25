@@ -7,7 +7,6 @@ import kotlin.contracts.contract
 
 fun <T : Any?> T?.requireNotNull(): T = requireNotNull(this)
 
-
 @OptIn(ExperimentalContracts::class)
 inline fun buildString(track: TrackDetails, builderAction: StringBuilder.() -> Unit): String {
     contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }

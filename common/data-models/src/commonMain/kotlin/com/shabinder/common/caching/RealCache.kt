@@ -4,6 +4,7 @@ import co.touchlab.stately.collections.IsoMutableMap
 import co.touchlab.stately.collections.IsoMutableSet
 import co.touchlab.stately.concurrency.AtomicReference
 import co.touchlab.stately.concurrency.value
+import com.shabinder.common.models.runBlocking
 import kotlin.time.Duration
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
@@ -110,6 +111,12 @@ internal class RealCache<Key : Any, Value : Any>(
         }
     }
 
+
+    override fun getBlocking(key: Key, loader: suspend () -> Value): Value =
+        runBlocking {
+            get(key, loader)
+        }
+
     override fun put(key: Key, value: Value) {
         expireEntries()
 
@@ -185,7 +192,7 @@ internal class RealCache<Key : Any, Value : Any>(
      */
     private fun CacheEntry<Key, Value>.isExpired(): Boolean {
         return expiresAfterAccess && (accessTimeMark.get() + expireAfterAccessDuration).hasPassedNow() ||
-            expiresAfterWrite && (writeTimeMark.get() + expireAfterWriteDuration).hasPassedNow()
+                expiresAfterWrite && (writeTimeMark.get() + expireAfterWriteDuration).hasPassedNow()
     }
 
     /**

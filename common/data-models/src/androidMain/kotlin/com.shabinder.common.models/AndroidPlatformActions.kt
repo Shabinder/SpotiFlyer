@@ -1,6 +1,7 @@
 package com.shabinder.common.models
 
 import android.content.SharedPreferences
+import kotlinx.coroutines.CoroutineScope
 
 actual interface PlatformActions {
 
@@ -26,3 +27,5 @@ internal actual val StubPlatformActions = object : PlatformActions {
 
     override fun sendTracksToService(array: List<TrackDetails>) {}
 }
+
+actual fun <T> runBlocking(block: suspend CoroutineScope.() -> T): T = kotlinx.coroutines.runBlocking { block() }

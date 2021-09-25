@@ -15,19 +15,26 @@
  */
 
 @file:Suppress("FunctionName")
+
 package com.shabinder.common.uikit
 
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.loadXmlImageVector
 import androidx.compose.ui.res.vectorXmlResource
+
+@Composable
+internal actual fun <T> imageVectorResource(id: T): ImageVector =
+    vectorXmlResource(id as String)
 
 @Composable
 actual fun DownloadImageTick() {
     Image(
-        vectorXmlResource("drawable/ic_tick.xml"),
+        getCachedPainter("drawable/ic_tick.xml"),
         "Downloaded"
     )
 }
@@ -35,7 +42,7 @@ actual fun DownloadImageTick() {
 @Composable
 actual fun DownloadImageError(modifier: Modifier) {
     Image(
-        vectorXmlResource("drawable/ic_error.xml"),
+        getCachedPainter("drawable/ic_error.xml"),
         "Can't Download",
         modifier = modifier
     )
@@ -44,51 +51,61 @@ actual fun DownloadImageError(modifier: Modifier) {
 @Composable
 actual fun DownloadImageArrow(modifier: Modifier) {
     Image(
-        vectorXmlResource("drawable/ic_arrow.xml"),
+        getCachedPainter("drawable/ic_arrow.xml"),
         "Download",
         modifier
     )
 }
 
 @Composable
-actual fun DownloadAllImage() = rememberVectorPainter(vectorXmlResource("drawable/ic_download_arrow.xml")) as Painter
+actual fun DownloadAllImage() = getCachedPainter("drawable/ic_download_arrow.xml")
+
 
 @Composable
-actual fun ShareImage() = rememberVectorPainter(vectorXmlResource("drawable/ic_share_open.xml")) as Painter
+actual fun ShareImage() = getCachedPainter("drawable/ic_share_open.xml")
 
 @Composable
-actual fun PlaceHolderImage() = rememberVectorPainter(vectorXmlResource("drawable/music.xml"))
-    as Painter
-@Composable
-actual fun SpotiFlyerLogo() =
-    rememberVectorPainter(vectorXmlResource("drawable/ic_spotiflyer_logo.xml")) as Painter
+actual fun PlaceHolderImage() = getCachedPainter("drawable/music.xml")
 
 @Composable
-actual fun HeartIcon() = rememberVectorPainter(vectorXmlResource("drawable/ic_heart.xml")) as Painter
+actual fun SpotiFlyerLogo() = getCachedPainter("drawable/ic_spotiflyer_logo.xml")
 
 @Composable
-actual fun SpotifyLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_spotify_logo.xml")) as Painter
+actual fun HeartIcon() =
+    getCachedPainter("drawable/ic_heart.xml")
 
 @Composable
-actual fun SaavnLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_jio_saavn_logo.xml")) as Painter
+actual fun SpotifyLogo() =
+    getCachedPainter("drawable/ic_spotify_logo.xml")
 
 @Composable
-actual fun YoutubeLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_youtube.xml")) as Painter
+actual fun SaavnLogo() =
+    getCachedPainter("drawable/ic_jio_saavn_logo.xml")
 
 @Composable
-actual fun GaanaLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_gaana.xml")) as Painter
+actual fun YoutubeLogo() =
+    getCachedPainter("drawable/ic_youtube.xml")
 
 @Composable
-actual fun YoutubeMusicLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_youtube_music_logo.xml")) as Painter
+actual fun GaanaLogo() =
+    getCachedPainter("drawable/ic_gaana.xml")
 
 @Composable
-actual fun GithubLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_github.xml")) as Painter
+actual fun YoutubeMusicLogo() =
+    getCachedPainter("drawable/ic_youtube_music_logo.xml")
 
 @Composable
-actual fun PaypalLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_paypal_logo.xml")) as Painter
+actual fun GithubLogo() =
+    getCachedPainter("drawable/ic_github.xml")
 
 @Composable
-actual fun OpenCollectiveLogo() = rememberVectorPainter(vectorXmlResource("drawable/ic_opencollective_icon.xml")) as Painter
+actual fun PaypalLogo() =
+    getCachedPainter("drawable/ic_paypal_logo.xml")
 
 @Composable
-actual fun RazorPay() = rememberVectorPainter(vectorXmlResource("drawable/ic_indian_rupee.xml")) as Painter
+actual fun OpenCollectiveLogo() =
+    getCachedPainter("drawable/ic_opencollective_icon.xml")
+
+@Composable
+actual fun RazorPay() =
+    getCachedPainter("drawable/ic_indian_rupee.xml")

@@ -1,6 +1,7 @@
 package com.shabinder.common.caching
 
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 
 /**
@@ -22,6 +23,8 @@ public interface Cache<in Key : Any, Value : Any> {
      * Any exceptions thrown by the [loader] will be propagated to the caller of this function.
      */
     public suspend fun get(key: Key, loader: suspend () -> Value): Value
+
+    public fun getBlocking(key: Key, loader: suspend () -> Value): Value
 
     /**
      * Associates [value] with [key] in this cache. If the cache previously contained a

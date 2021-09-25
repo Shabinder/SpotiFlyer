@@ -21,15 +21,23 @@ package com.shabinder.common.uikit
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import com.shabinder.common.database.R
 import com.shabinder.common.translations.Strings
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
+internal actual fun <T> imageVectorResource(id: T): ImageVector =
+    ImageVector.Companion.vectorResource(id as Int)
+
+@Composable
 actual fun DownloadImageTick() {
     Image(
-        painterResource(R.drawable.ic_tick),
+        getCachedPainter(R.drawable.ic_tick),
         Strings.downloadDone()
     )
 }
@@ -37,7 +45,7 @@ actual fun DownloadImageTick() {
 @Composable
 actual fun DownloadImageError(modifier: Modifier) {
     Image(
-        painterResource(R.drawable.ic_error),
+        getCachedPainter(R.drawable.ic_error),
         Strings.downloadError(),
         modifier = modifier
     )
@@ -46,44 +54,44 @@ actual fun DownloadImageError(modifier: Modifier) {
 @Composable
 actual fun DownloadImageArrow(modifier: Modifier) {
     Image(
-        painterResource(R.drawable.ic_arrow),
+        getCachedPainter(R.drawable.ic_arrow),
         Strings.downloadStart(),
         modifier
     )
 }
 
 @Composable
-actual fun DownloadAllImage() = painterResource(R.drawable.ic_download_arrow)
+actual fun DownloadAllImage() = getCachedPainter(R.drawable.ic_download_arrow)
 
 @Composable
-actual fun ShareImage() = painterResource(R.drawable.ic_share_open)
+actual fun ShareImage() = getCachedPainter(R.drawable.ic_share_open)
 
 @Composable
-actual fun PlaceHolderImage() = painterResource(R.drawable.ic_song_placeholder)
+actual fun PlaceHolderImage() = getCachedPainter(R.drawable.ic_song_placeholder)
 
 @Composable
-actual fun SpotiFlyerLogo() = painterResource(R.drawable.ic_spotiflyer_logo)
+actual fun SpotiFlyerLogo() = getCachedPainter(R.drawable.ic_spotiflyer_logo)
 
 @Composable
 actual fun HeartIcon() = painterResource(R.drawable.ic_heart)
 
 @Composable
-actual fun SpotifyLogo() = painterResource(R.drawable.ic_spotify_logo)
+actual fun SpotifyLogo() = getCachedPainter(R.drawable.ic_spotify_logo)
 
 @Composable
-actual fun SaavnLogo() = painterResource(R.drawable.ic_jio_saavn_logo)
+actual fun SaavnLogo() = getCachedPainter(R.drawable.ic_jio_saavn_logo)
 
 @Composable
-actual fun GaanaLogo() = painterResource(R.drawable.ic_gaana)
+actual fun GaanaLogo() = getCachedPainter(R.drawable.ic_gaana)
 
 @Composable
-actual fun YoutubeLogo() = painterResource(R.drawable.ic_youtube)
+actual fun YoutubeLogo() = getCachedPainter(R.drawable.ic_youtube)
 
 @Composable
-actual fun YoutubeMusicLogo() = painterResource(R.drawable.ic_youtube_music_logo)
+actual fun YoutubeMusicLogo() = getCachedPainter(R.drawable.ic_youtube_music_logo)
 
 @Composable
-actual fun GithubLogo() = painterResource(R.drawable.ic_github)
+actual fun GithubLogo() = getCachedPainter(R.drawable.ic_github)
 
 @Composable
 actual fun PaypalLogo() = painterResource(R.drawable.ic_paypal_logo)

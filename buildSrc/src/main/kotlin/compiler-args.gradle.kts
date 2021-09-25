@@ -5,9 +5,13 @@ plugins {
 kotlin {
     sourceSets {
         all {
-            languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
-            languageSettings.useExperimentalAnnotation("androidx.compose.animation")
-            languageSettings.useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
+            languageSettings.apply {
+                useExperimentalAnnotation("kotlin.RequiresOptIn")
+                useExperimentalAnnotation("kotlin.Experimental")
+                useExperimentalAnnotation("kotlin.time.ExperimentalTime")
+                useExperimentalAnnotation("androidx.compose.animation")
+                useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
+            }
         }
     }
 }

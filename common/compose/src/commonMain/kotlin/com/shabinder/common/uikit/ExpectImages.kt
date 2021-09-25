@@ -15,11 +15,27 @@
  */
 
 @file:Suppress("FunctionName")
+
 package com.shabinder.common.uikit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import com.shabinder.common.caching.Cache
+
+private val ImageCache = Cache.Builder.newBuilder()
+    .maximumCacheSize(15).build<Any, ImageVector>()
+
+@Composable
+internal expect fun <T> imageVectorResource(id: T): ImageVector
+
+@Composable
+fun <K : Any> getCachedPainter(key: K): Painter {
+    return rememberVectorPainter(
+        ImageCache.get(key) ?: imageVectorResource(key).also { ImageCache.put(key, it) })
+}
 
 @Composable
 expect fun DownloadImageTick()
