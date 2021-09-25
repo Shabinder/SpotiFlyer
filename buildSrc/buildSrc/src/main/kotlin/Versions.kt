@@ -22,9 +22,9 @@ import org.gradle.kotlin.dsl.accessors.runtime.addDependencyTo
 
 object Versions {
     // App's Version (To be bumped at each update)
-    const val versionName = "3.3.0"
+    const val versionName = "3.3.1"
 
-    const val versionCode = 24
+    const val versionCode = 25
 
     // Kotlin
     const val kotlinVersion = "1.5.21"
@@ -122,7 +122,7 @@ object JetBrains {
 
     object Compose {
         // __LATEST_COMPOSE_RELEASE_VERSION__
-        private const val VERSION = "1.0.0-alpha2"
+        private const val VERSION = "1.0.0-alpha3"
         const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
     }
 }

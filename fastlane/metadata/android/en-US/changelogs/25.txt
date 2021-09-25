@@ -1,0 +1,6 @@
+- File size less than 100 KB,
+- Crash Fixes when App Went in Background
+- Offloaded Many CPU Intensive tasks from Main Thread
+- Notification Handling Improved, Now Exits Gracefully
+- Some translations Added.
+- ImageVectors Caching Implemented Expect some performance gain

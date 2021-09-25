@@ -54,7 +54,10 @@ interface FileManager {
 
     fun createDirectory(dirPath: String)
 
-    suspend fun cacheImage(image: Any, path: String) // in Android = ImageBitmap, Desktop = BufferedImage
+    suspend fun cacheImage(
+        image: Any,
+        path: String
+    ) // in Android = ImageBitmap, Desktop = BufferedImage
 
     suspend fun loadImage(url: String, reqWidth: Int = 150, reqHeight: Int = 150): Picture
 
@@ -74,13 +77,15 @@ interface FileManager {
 * */
 fun FileManager.createDirectories() {
     try {
-        createDirectory(defaultDir())
-        createDirectory(imageCacheDir())
-        createDirectory(defaultDir() + "Tracks/")
-        createDirectory(defaultDir() + "Albums/")
-        createDirectory(defaultDir() + "Playlists/")
-        createDirectory(defaultDir() + "YT_Downloads/")
-    } catch (ignored: Exception) {}
+        if (defaultDir() != "null") {
+            createDirectory(defaultDir())
+            createDirectory(imageCacheDir())
+            createDirectory(defaultDir() + "Tracks/")
+            createDirectory(defaultDir() + "Albums/")
+            createDirectory(defaultDir() + "Playlists/")
+            createDirectory(defaultDir() + "YT_Downloads/")
+        }
+    } catch (ignored: Exception) { }
 }
 
 fun FileManager.finalOutputDir(
@@ -98,7 +103,8 @@ fun FileManager.finalOutputDir(
 /*DIR Specific Operation End*/
 
 fun getNameURL(url: String): String {
-    return url.substring(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1, url.length).replace('/', '_')
+    return url.substring(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1, url.length)
+        .replace('/', '_')
 }
 
 suspend fun downloadFile(url: String): Flow<DownloadResult> {

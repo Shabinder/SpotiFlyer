@@ -22,7 +22,7 @@ internal class DesktopAnalyticsManager(
 
         val config: Config = Config(COUNTLY_CONFIG.SERVER_URL, COUNTLY_CONFIG.APP_KEY).apply {
             eventsBufferSize = 2
-            loggingLevel = LoggingLevel.DEBUG
+            loggingLevel = LoggingLevel.ERROR
             setDeviceIdStrategy(DeviceIdStrategy.UUID)
             enableFeatures(*featuresSet)
             setRequiresConsent(true)

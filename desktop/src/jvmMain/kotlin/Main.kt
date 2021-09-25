@@ -20,10 +20,11 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.*
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
@@ -44,6 +45,7 @@ import com.shabinder.common.models.Actions
 import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.translations.Strings
+import com.shabinder.common.uikit.SpotiFlyerLogo
 import com.shabinder.common.uikit.configurations.SpotiFlyerColors
 import com.shabinder.common.uikit.configurations.SpotiFlyerShapes
 import com.shabinder.common.uikit.configurations.SpotiFlyerTypography
@@ -65,40 +67,34 @@ private lateinit var appWindow: ComposeWindow
 
 @OptIn(ExperimentalDecomposeApi::class)
 fun main() {
-
     val lifecycle = LifecycleRegistry()
     val rootComponent = spotiFlyerRoot(DefaultComponentContext(lifecycle))
-
-    application {
-        val windowState = rememberWindowState(width = 450.dp, height = 800.dp)
-
+    val windowState = WindowState(size = WindowSize(450.dp, 800.dp))
+    singleWindowApplication(
+        title = "SpotiFlyer",
+        state = windowState,
+        icon = BitmapPainter(useResource("drawable/spotiflyer.png", ::loadImageBitmap))
+    ) {
         LifecycleController(lifecycle, windowState)
-        Window(
-            title = "SpotiFlyer",
-            state = windowState,
-            onCloseRequest = ::exitApplication
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Color.Black,
+            contentColor = colorOffWhite
         ) {
-            appWindow = window
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = Color.Black,
-                contentColor = colorOffWhite
+            DesktopMaterialTheme(
+                colors = SpotiFlyerColors,
+                typography = SpotiFlyerTypography,
+                shapes = SpotiFlyerShapes
             ) {
-                DesktopMaterialTheme(
-                    colors = SpotiFlyerColors,
-                    typography = SpotiFlyerTypography,
-                    shapes = SpotiFlyerShapes
-                ) {
-                    val root: SpotiFlyerRoot = SpotiFlyerRootContent(rootComponent)
-                    showToast = root.callBacks::showToast
+                val root: SpotiFlyerRoot = SpotiFlyerRootContent(rootComponent)
+                showToast = root.callBacks::showToast
 
 
-                    // FFmpeg WARNING
-                    try {
-                        FFmpeg.atPath().addArgument("-version").execute()
-                    } catch (e: Exception) {
-                        if (e is JaffreeException) Actions.instance.showPopUpMessage("WARNING!\nFFmpeg not found at path")
-                    }
+                // FFmpeg WARNING
+                try {
+                    FFmpeg.atPath().addArgument("-version").execute()
+                } catch (e: Exception) {
+                    if (e is JaffreeException) Actions.instance.showPopUpMessage("WARNING!\nFFmpeg not found at path")
                 }
             }
         }
