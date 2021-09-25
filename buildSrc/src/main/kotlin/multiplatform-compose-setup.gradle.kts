@@ -27,6 +27,11 @@ kotlin {
     jvm("desktop")
     android()
     sourceSets {
+        all {
+            languageSettings.apply {
+                useExperimentalAnnotation("androidx.compose.animation")
+            }
+        }
         named("commonMain") {
             dependencies {
                 // Decompose

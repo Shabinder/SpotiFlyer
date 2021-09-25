@@ -1,7 +1,7 @@
-name: Build Desktop Packages
+name: Build Release Binaries
 
 on:
-  [workflow_dispatch]
+  [ workflow_dispatch ]
 
 jobs:
   create-linux-package:
@@ -31,10 +31,10 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           draft: true
-          tag: "v3.3.0"
+          allowUpdates: true
+          tag: "v3.3.1"
           artifacts: "desktop/build/compose/jars/*.jar,desktop/build/compose/binaries/main/*/*"
           token: ${{ secrets.GH_TOKEN }}
-          commit: main
 
 
   # Windows Package
@@ -60,15 +60,30 @@ jobs:
       - name: Desktop App Package
         run: ./gradlew :desktop:packageMsi
 
+      # Build Android App
+      - name: Generate Release APK
+        run: ./gradlew :android:assembleRelease
+
+      # Sign Android Apk
+      - name: Sign APK
+        uses: r0adkll/sign-android-release@v1
+        id: sign_app
+        with:
+          releaseDirectory: android/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
       # Create a Draft Release
       - name: Draft Release
         uses: ncipollo/release-action@v1
         with:
           draft: true
-          tag: "v3.3.0"
-          artifacts: "desktop/build/compose/jars/*.jar,desktop/build/compose/binaries/main/*/*"
+          allowUpdates: true
+          tag: "v3.3.1"
+          artifacts: "desktop/build/compose/jars/*.jar,desktop/build/compose/binaries/main/*/*,android/build/outputs/apk/release/*"
           token: ${{ secrets.GH_TOKEN }}
-          commit: main
 
 
   create-mac-package:
@@ -98,7 +113,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           draft: true
-          tag: "v3.3.0"
+          allowUpdates: true
+          tag: "v3.3.1"
           artifacts: "desktop/build/compose/jars/*.jar,desktop/build/compose/binaries/main/*/*"
           token: ${{ secrets.GH_TOKEN }}
-          commit: main
