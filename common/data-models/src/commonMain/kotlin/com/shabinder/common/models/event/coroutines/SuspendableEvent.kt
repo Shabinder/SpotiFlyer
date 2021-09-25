@@ -2,6 +2,9 @@
 
 package com.shabinder.common.models.event.coroutines
 
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -75,6 +78,22 @@ suspend inline fun <V : Any?, E : Throwable, E2 : Throwable> SuspendableEvent<V,
     }
 } catch (ex: Throwable) {
     SuspendableEvent.error(ex as E)
+}
+
+@OptIn(ExperimentalContracts::class)
+suspend inline fun <V, E : Throwable> SuspendableEvent<V, E>.onSuccess(crossinline f: suspend (V) -> Unit): SuspendableEvent<V, E> {
+    contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+    }
+    return fold({ f(it); this }, { this })
+}
+
+@OptIn(ExperimentalContracts::class)
+suspend inline fun <V, E : Throwable> SuspendableEvent<V, E>.onFailure(crossinline f: suspend (E) -> Unit): SuspendableEvent<V, E> {
+    contract {
+        callsInPlace(f, InvocationKind.EXACTLY_ONCE)
+    }
+    return fold({ this }, { f(it); this })
 }
 
 suspend inline fun <V : Any?, E : Throwable> SuspendableEvent<V, E>.any(

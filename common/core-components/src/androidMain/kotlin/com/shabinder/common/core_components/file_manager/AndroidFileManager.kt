@@ -37,6 +37,7 @@ import com.shabinder.common.models.dispatcherIO
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.map
 import com.shabinder.common.models.Actions
+import com.shabinder.common.models.AudioFormat
 import com.shabinder.database.Database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -116,6 +117,9 @@ class AndroidFileManager(
 
             try {
                 // Add Mp3 Tags and Add to Library
+                if(trackDetails.audioFormat != AudioFormat.MP3)
+                    throw InvalidDataException("Audio Format is ${trackDetails.audioFormat}, Needs Conversion!")
+
                 Mp3File(File(songFile.absolutePath))
                     .removeAllTags()
                     .setId3v1Tags(trackDetails)

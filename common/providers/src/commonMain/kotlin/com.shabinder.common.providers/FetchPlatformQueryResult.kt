@@ -23,6 +23,7 @@ import com.shabinder.common.database.DownloadRecordDatabaseQueries
 import com.shabinder.common.models.*
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.flatMapError
+import com.shabinder.common.models.event.coroutines.onSuccess
 import com.shabinder.common.models.event.coroutines.success
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.providers.gaana.GaanaProvider
@@ -94,12 +95,14 @@ class FetchPlatformQueryResult(
     ): SuspendableEvent<Pair<String, AudioQuality>, Throwable> {
         var downloadLink: String? = null
         var audioQuality = AudioQuality.KBPS192
+        var audioFormat = AudioFormat.MP4
 
         val errorTrace = buildString(track) {
             if (track.videoID != null) {
                 // We Already have VideoID
                 downloadLink = when (track.source) {
                     Source.JioSaavn -> {
+                        AudioFormat.MP4
                         saavnProvider.getSongFromID(track.videoID.requireNotNull()).component1()
                             ?.also { audioQuality = it.audioQuality }
                             ?.media_url
@@ -109,19 +112,23 @@ class FetchPlatformQueryResult(
                             track.videoID.requireNotNull(),
                             preferredQuality
                         ).let { ytMp3Link ->
-                                if (ytMp3Link is SuspendableEvent.Failure || ytMp3Link.component1()
-                                        .isNullOrBlank()
-                                ) {
-                                    appendPadded(
-                                        "Yt1sMp3 Failed for ${track.videoID}:",
-                                        ytMp3Link.component2()
-                                            ?: "couldn't fetch link for ${track.videoID} ,trying manual extraction"
-                                    )
-                                    appendLine("Trying Local Extraction")
-                                    youtubeProvider.ytDownloader.getVideo(track.videoID!!)
-                                        .get()?.url
-                                } else ytMp3Link.component1()
+                            if (
+                                ytMp3Link is SuspendableEvent.Failure
+                                ||
+                                ytMp3Link.component1().isNullOrBlank()
+                            ) {
+                                appendPadded(
+                                    "Yt1sMp3 Failed for ${track.videoID}:",
+                                    ytMp3Link.component2()?.stackTraceToString()
+                                        ?: "couldn't fetch link for ${track.videoID} ,trying manual extraction"
+                                )
+                                appendLine("Trying Local Extraction")
+                                null
+                            } else {
+                                audioFormat = AudioFormat.MP3
+                                ytMp3Link.component1()
                             }
+                        }
                     }
                     else -> {
                         appendPadded(
@@ -141,7 +148,7 @@ class FetchPlatformQueryResult(
                     trackName = track.title,
                     trackArtists = track.artists,
                     preferredQuality = preferredQuality
-                ).flatMapError { saavnError ->
+                ).onSuccess { audioFormat = AudioFormat.MP4 }.flatMapError { saavnError ->
                     appendPadded("Fetching From Saavn Failed:", saavnError.stackTraceToString())
                     // Saavn Failed, Lets Try Fetching Now From Youtube Music
                     youtubeMusic.findMp3SongDownloadURLYT(track, preferredQuality).also {
@@ -151,6 +158,7 @@ class FetchPlatformQueryResult(
                                 "Fetching From YT-Music Failed:",
                                 it.component2()?.stackTraceToString()
                             )
+                        else audioFormat = AudioFormat.MP3
                     }
                 }
 
@@ -162,7 +170,10 @@ class FetchPlatformQueryResult(
         }
         return if (downloadLink.isNullOrBlank()) SuspendableEvent.error(
             SpotiFlyerException.DownloadLinkFetchFailed(errorTrace)
-        ) else SuspendableEvent.success(Pair(downloadLink.requireNotNull(),audioQuality))
+        ) else {
+            track.audioFormat = audioFormat
+            SuspendableEvent.success(Pair(downloadLink.requireNotNull(), audioQuality))
+        }
     }
 
     @OptIn(DelicateCoroutinesApi::class)

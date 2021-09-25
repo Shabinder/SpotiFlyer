@@ -193,7 +193,12 @@ class ForegroundService : LifecycleService() {
                                 dir.saveFileWithMetadata(
                                     it.byteArray,
                                     track
-                                ) {}
+                                ).fold(
+                                    failure = { throwable ->
+                                        throwable.printStackTrace()
+                                        throw throwable
+                                    }, success = {}
+                                )
                             }
 
                             // Send Converting Status
@@ -352,7 +357,7 @@ class ForegroundService : LifecycleService() {
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             mNotificationManager.notify(NOTIFICATION_ID, createNotification())
         } else {
-            // Service is Inactive so clear status
+            // Service is Inactive so clear residual status
             resetVar()
         }
     }

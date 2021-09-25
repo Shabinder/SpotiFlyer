@@ -40,6 +40,7 @@ class AndroidMediaConverter(private val appContext: Context) : MediaConverter() 
                 override fun onSuccess(message: String?) {
                     //Log.d("FFmpeg Command", "Success $message")
                     progressing = false
+                    Log.d("FFmpeg Success", "$message")
                 }
 
                 override fun onProgress(message: String?) {

@@ -58,7 +58,7 @@ class YoutubeMusic constructor(
                         ?: 0) > 192
                 ) AudioQuality.KBPS192 else preferredQuality
             // 1 Try getting Link from Yt1s
-            youtubeMp3.getMp3DownloadLink(videoID, optimalQuality).flatMapError {
+            youtubeMp3.getMp3DownloadLink(videoID, optimalQuality)/*.flatMapError {
                 // 2 if Yt1s failed , Extract Manually
                 SuspendableEvent {
                     youtubeProvider.ytDownloader.getVideo(videoID).get()?.url
@@ -67,7 +67,8 @@ class YoutubeMusic constructor(
                             message = "Caught Following Errors While Finding Downloadable Link for $videoID :   \n${it.stackTraceToString()}"
                         )
                 }
-            }.map {
+            }*/.map {
+                trackDetails.audioFormat = AudioFormat.MP3
                 Pair(it,optimalQuality)
             }
         }

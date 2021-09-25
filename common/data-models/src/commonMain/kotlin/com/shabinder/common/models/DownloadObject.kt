@@ -42,6 +42,7 @@ data class TrackDetails(
     val downloadLink: String? = null,
     val downloaded: DownloadStatus = DownloadStatus.NotDownloaded,
     var audioQuality: AudioQuality = AudioQuality.KBPS192,
+    var audioFormat: AudioFormat = AudioFormat.MP4,
     var outputFilePath: String, // UriString in Android
     var videoID: String? = null,
 ) : Parcelable {
