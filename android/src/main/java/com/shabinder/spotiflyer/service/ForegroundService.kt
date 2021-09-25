@@ -21,7 +21,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_CANCEL_CURRENT
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
@@ -44,8 +43,6 @@ import com.shabinder.common.models.event.coroutines.failure
 import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.translations.Strings
 import com.shabinder.spotiflyer.R
-import com.shabinder.spotiflyer.utils.autoclear.autoClear
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -57,12 +54,11 @@ import java.io.File
 class ForegroundService : LifecycleService() {
 
     private lateinit var downloadService: ParallelExecutor
-    val trackStatusFlowMap by autoClear {
-        TrackStatusFlowMap(
-            MutableSharedFlow(replay = 1),
-            lifecycleScope
-        )
-    }
+    val trackStatusFlowMap = TrackStatusFlowMap(
+        MutableSharedFlow(replay = 1),
+        lifecycleScope
+    )
+
     private val fetcher: FetchPlatformQueryResult by inject()
     private val logger: Kermit by inject()
     private val dir: FileManager by inject()
@@ -73,7 +69,12 @@ class ForegroundService : LifecycleService() {
     private var isServiceStarted = false
     private val cancelIntent: PendingIntent by lazy {
         val intent = Intent(this, ForegroundService::class.java).apply { action = "kill" }
-        PendingIntent.getService(this, 0, intent, FLAG_CANCEL_CURRENT)
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+        PendingIntent.getService(this, 0, intent, flags)
     }
 
     /* Variables Holding Download State */
@@ -98,6 +99,7 @@ class ForegroundService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         downloadService = ParallelExecutor(Dispatchers.IO)
+        trackStatusFlowMap.scope = lifecycleScope
         createNotificationChannel(CHANNEL_ID, "Downloader Service")
     }
 
@@ -271,12 +273,16 @@ class ForegroundService : LifecycleService() {
     private fun killService() {
         lifecycleScope.launch {
             logger.d(TAG) { "Killing Self" }
+            resetVar()
             messageList = messageList.getEmpty().apply {
                 set(index = 0, Message(Strings.cleaningAndExiting(), DownloadStatus.NotDownloaded))
             }
             downloadService.close()
             updateNotification()
-            trackStatusFlowMap.clear()
+            trackStatusFlowMap.apply {
+                clear()
+                scope = null
+            }
             cleanFiles(File(dir.defaultDir()))
             // cleanFiles(File(dir.imageCacheDir()))
             messageList = messageList.getEmpty()
@@ -288,6 +294,13 @@ class ForegroundService : LifecycleService() {
                 stopSelf()
             }
         }
+    }
+
+    private fun resetVar() {
+        total = 0
+        downloaded = 0
+        failed = 0
+        converted = 0
     }
 
     private fun createNotification(): Notification =
@@ -323,6 +336,7 @@ class ForegroundService : LifecycleService() {
         updateNotification()
     }
 
+    @Suppress("unused")
     private fun updateProgressInNotification(message: Message) {
         synchronized(messageList) {
             val index = messageList.indexOfFirst { it.title == message.title }
@@ -331,10 +345,16 @@ class ForegroundService : LifecycleService() {
         updateNotification()
     }
 
+    // Update Notification only if Service is Still Active
     private fun updateNotification() {
-        val mNotificationManager: NotificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        mNotificationManager.notify(NOTIFICATION_ID, createNotification())
+        if (!downloadService.isClosed.value) {
+            val mNotificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            mNotificationManager.notify(NOTIFICATION_ID, createNotification())
+        } else {
+            // Service is Inactive so clear status
+            resetVar()
+        }
     }
 
     override fun onDestroy() {

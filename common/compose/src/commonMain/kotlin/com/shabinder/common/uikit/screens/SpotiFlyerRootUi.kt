@@ -63,7 +63,7 @@ import com.shabinder.common.uikit.screens.splash.Splash
 import com.shabinder.common.uikit.screens.splash.SplashState
 import com.shabinder.common.uikit.utils.verticalGradientScrim
 
-// To Not Show Splash Again After Configuration Change in Android
+// Splash Status
 private var isSplashShown = SplashState.Show
 
 @Composable

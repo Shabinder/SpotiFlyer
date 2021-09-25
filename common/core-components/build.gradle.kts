@@ -10,7 +10,7 @@ kotlin {
             dependencies {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
-                implementation("org.jetbrains.kotlinx:atomicfu:0.16.2")
+                api("org.jetbrains.kotlinx:atomicfu:0.16.2")
                 api(MultiPlatformSettings.dep)
                 implementation(MVIKotlin.rx)
             }

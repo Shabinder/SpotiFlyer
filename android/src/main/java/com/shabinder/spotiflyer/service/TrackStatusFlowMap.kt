@@ -7,12 +7,12 @@ import kotlinx.coroutines.launch
 
 class TrackStatusFlowMap(
     val statusFlow: MutableSharedFlow<HashMap<String, DownloadStatus>>,
-    private val scope: CoroutineScope
+    var scope: CoroutineScope?
 ) : HashMap<String, DownloadStatus>() {
     override fun put(key: String, value: DownloadStatus): DownloadStatus? {
         synchronized(this) {
             val res = super.put(key, value)
-            emitValue()
+            emitValue(this)
             return res
         }
     }
@@ -25,13 +25,13 @@ class TrackStatusFlowMap(
                     super.put(title,DownloadStatus.NotDownloaded)
                 }
             }
-            emitValue()
-            //super.clear()
-            //emitValue()
+            emitValue(this)
+            super.clear()
+            emitValue(this)
         }
     }
 
-    private fun emitValue() {
-        scope.launch { statusFlow.emit(this@TrackStatusFlowMap) }
+    private fun emitValue(map: HashMap<String,DownloadStatus>) {
+        scope?.launch { statusFlow.emit(map) }
     }
 }

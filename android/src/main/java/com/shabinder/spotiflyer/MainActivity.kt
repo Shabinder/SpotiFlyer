@@ -40,7 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
@@ -71,10 +73,12 @@ import com.shabinder.spotiflyer.ui.AnalyticsDialog
 import com.shabinder.spotiflyer.ui.NetworkDialog
 import com.shabinder.spotiflyer.ui.PermissionDialog
 import com.shabinder.spotiflyer.utils.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
@@ -204,8 +208,10 @@ class MainActivity : ComponentActivity() {
             foregroundService = binder.service
             isServiceBound = true
             lifecycleScope.launch {
-                foregroundService?.trackStatusFlowMap?.statusFlow?.let {
-                    trackStatusFlow.emitAll(it.conflate())
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    foregroundService?.trackStatusFlowMap?.statusFlow?.let {
+                        trackStatusFlow.emitAll(it.conflate().flowOn(Dispatchers.Default))
+                    }
                 }
             }
         }

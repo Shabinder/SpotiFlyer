@@ -126,6 +126,7 @@ dependencies {
     with(Versions.androidxLifecycle) {
         implementation("androidx.lifecycle:lifecycle-service:$this")
         implementation("androidx.lifecycle:lifecycle-common-java8:$this")
+        implementation("androidx.lifecycle:lifecycle-runtime-ktx:$this")
     }
 
     implementation(Extras.kermit)

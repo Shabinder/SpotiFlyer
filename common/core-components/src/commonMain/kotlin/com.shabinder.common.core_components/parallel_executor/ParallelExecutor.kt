@@ -62,7 +62,8 @@ class ParallelExecutor(
 
     private var service: Job = SupervisorJob()
     override val coroutineContext get() = context + service
-    private var isClosed = atomic(false)
+    var isClosed = atomic(false)
+        private set
     private var killQueue = Channel<Unit>(Channel.UNLIMITED)
     private var operationQueue = Channel<Operation<*>>(Channel.RENDEZVOUS)
     private var concurrentOperationLimit = atomic(concurrentOperationLimit)
@@ -132,6 +133,7 @@ class ParallelExecutor(
     }
 
     // TODO This launches all coroutines in advance even if they're never needed. Find a lazy way to do this.
+    @Suppress("unused")
     fun setConcurrentOperationLimit(limit: Int) {
         require(limit >= 1) { "'limit' must be greater than zero: $limit" }
         require(limit < 1_000_000) { "Don't use a very high limit because it will cause a lot of coroutines to be started eagerly: $limit" }

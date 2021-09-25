@@ -49,7 +49,7 @@ internal class SpotiFlyerMainImpl(
 
     private val cache = Cache.Builder
         .newBuilder()
-        .maximumCacheSize(25)
+        .maximumCacheSize(20)
         .build<String, Picture>()
 
     override val model: Value<State> = store.asValue()
