@@ -243,11 +243,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showPopUpMessage(string: String, long: Boolean = false) {
-        android.widget.Toast.makeText(
-            applicationContext,
-            string,
-            if (long) android.widget.Toast.LENGTH_LONG else android.widget.Toast.LENGTH_SHORT
-        ).show()
+        runOnUiThread {
+            android.widget.Toast.makeText(
+                applicationContext,
+                string,
+                if (long) android.widget.Toast.LENGTH_LONG else android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     @Suppress("DEPRECATION")
