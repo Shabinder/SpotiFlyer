@@ -75,6 +75,7 @@ fun main() {
         state = windowState,
         icon = BitmapPainter(useResource("drawable/spotiflyer.png", ::loadImageBitmap))
     ) {
+        appWindow = window
         LifecycleController(lifecycle, windowState)
         Surface(
             modifier = Modifier.fillMaxSize(),
