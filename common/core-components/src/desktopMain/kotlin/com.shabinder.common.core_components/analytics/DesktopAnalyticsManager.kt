@@ -25,7 +25,7 @@ internal class DesktopAnalyticsManager(
             loggingLevel = LoggingLevel.ERROR
             setDeviceIdStrategy(DeviceIdStrategy.UUID)
             enableFeatures(*featuresSet)
-            setRequiresConsent(false)
+            setRequiresConsent(true)
         }
 
         Countly.init(File(fileManager.defaultDir()), config)

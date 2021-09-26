@@ -77,7 +77,7 @@ interface FileManager {
 * */
 fun FileManager.createDirectories() {
     try {
-        if (defaultDir() != "null") {
+        if (!defaultDir().contains("null${fileSeparator()}SpotiFlyer")) {
             createDirectory(defaultDir())
             createDirectory(imageCacheDir())
             createDirectory(defaultDir() + "Tracks/")
