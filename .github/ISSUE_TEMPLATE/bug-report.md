@@ -14,17 +14,17 @@ assignees: ''
 			- Please Dont Open issue! , Online Converter Was Busy! , try again after some time and download will be successfull . 
 -->
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**Describe the bug:**
+<!--- A clear and concise description of what the bug is. --->
 
 **Media Links Used:** 
-  - Paste Song/Album/Playlist Link where you encountered this issue
+<!---  - Paste Song/Album/Playlist Link where you encountered this issue --->
 
 **Expected behavior**
-A clear and concise description of what you expected to happen.
+<!--- A clear and concise description of what you expected to happen. --->
 
-**Screenshots**
-If applicable, add screenshots / screenrecording to help explain your problem.
+**Screenshots:**
+<!--- If applicable, add screenshots / screenrecording to help explain your problem. --->
 
 **StackTrace:**
 ```
@@ -33,8 +33,9 @@ Paste Stacktrace here if available
 
 **Device Info (please complete the following information):**
  - Device:   [e.g. iPhone6, Samsung J2, PocoF1]
- - OS:   [e.g. iOS, Android, WinOS, MacOS]
+ - OS:   [e.g. iOS, Android 10, WinOS, MacOS]
  - Version:   [e.g. 3.2.1]
+ - Country: [eg: India, will help in detecting if service is accessible to u]
 
-**Additional context**
-Add any other context about the problem here.
+**Additional context:**
+<!--- Add any other context about the problem here. --->
