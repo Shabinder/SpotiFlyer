@@ -82,7 +82,7 @@ jobs:
           draft: true
           allowUpdates: true
           tag: "v3.3.1"
-          artifacts: "desktop/build/compose/jars/*.jar,desktop/build/compose/binaries/main/*/*,android/build/outputs/apk/release/*"
+          artifacts: "desktop/build/compose/jars/*.jar,desktop/build/compose/binaries/main/*/*,android/build/outputs/apk/release/*signed.apk"
           token: ${{ secrets.GH_TOKEN }}
 
 
