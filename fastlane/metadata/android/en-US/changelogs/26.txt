@@ -1,0 +1,5 @@
+Hot Fixes:
+ - Android App Crashes Fix when Toasting in background thread.
+ - null Named directories creation stopped in desktop
+ - Download Directory Chooser crashing fix in desktop.
+ - Media Conversion Failing fix when Names have Special Characters
