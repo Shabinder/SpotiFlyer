@@ -50,9 +50,9 @@ kotlin {
         }
         commonMain {
             dependencies {
-                implementation("co.touchlab:stately-concurrency:$statelyVersion")
-                implementation("co.touchlab:stately-isolate:$statelyIsoVersion")
-                implementation("co.touchlab:stately-iso-collections:$statelyIsoVersion")
+                api("co.touchlab:stately-concurrency:$statelyVersion")
+                api("co.touchlab:stately-isolate:$statelyIsoVersion")
+                api("co.touchlab:stately-iso-collections:$statelyIsoVersion")
                 implementation(Extras.youtubeDownloader)
                 api(Internationalization.dep)
             }
