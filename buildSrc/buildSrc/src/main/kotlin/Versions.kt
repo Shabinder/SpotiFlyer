@@ -14,11 +14,15 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("MayBeConstant", "SpellCheckingInspection")
+@file:Suppress("MayBeConstant", "SpellCheckingInspection", "UnstableApiUsage")
 
+import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.VersionCatalog
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.kotlin.dsl.accessors.runtime.addDependencyTo
+import org.gradle.kotlin.dsl.getByType
 
 object Versions {
     // App's Version (To be bumped at each update)
@@ -26,44 +30,10 @@ object Versions {
 
     const val versionCode = 26
 
-    // Kotlin
-    const val kotlinVersion = "1.5.21"
-
-    const val coroutinesVersion = "1.5.1"
-
-    // Code Formatting
-    const val ktLint = "10.1.0"
-
-    // Console-App UI
-    const val mosaic = "0.1.0"
-
-    // DI
-    const val koin = "3.1.2"
-
-    // Logger
-    const val kermit = "0.1.9"
-
-    const val mokoParcelize = "0.7.1"
-
-    // Internet
-    const val ktor = "1.6.2"
-
-    const val kotlinxSerialization = "1.2.2"
-
-    // Database
-    const val sqlDelight = "1.5.1"
-
-    const val sqliteJdbcDriver = "3.34.0"
-    const val slf4j = "1.7.31"
-
-    // Internationalisation
-    const val i18n4k = "0.1.3"
-
     // Android
     const val minSdkVersion = 21
-    const val compileSdkVersion = 30
+    const val compileSdkVersion = 31
     const val targetSdkVersion = 29
-    const val androidxLifecycle = "2.4.0-alpha03"
 }
 
 object HostOS {
@@ -74,143 +44,46 @@ object HostOS {
     val isLinux = hostOs.startsWith("Linux", true)
 }
 
-object MultiPlatformSettings {
-    const val dep = "com.russhwolf:multiplatform-settings-no-arg:0.7.7"
-}
+val Project.Deps: VersionCatalog get() = project.extensions.getByType<VersionCatalogsExtension>().named("deps")
 
-object KotlinJSWrappers {
-    private const val bomVersion = "0.0.1-pre.235-kotlin-1.5.21"
-    val bom = "org.jetbrains.kotlin-wrappers:kotlin-wrappers-bom:${bomVersion}"
-    const val kotlinReact = "org.jetbrains.kotlin-wrappers:kotlin-react"
-    const val kotlinReactDom = "org.jetbrains.kotlin-wrappers:kotlin-react-dom"
-    const val kotlinStyled = "org.jetbrains.kotlin-wrappers:kotlin-styled"
-}
+val VersionCatalog.ktorBundle get() = findBundle("ktor").get()
+val VersionCatalog.statelyBundle get() = findBundle("stately").get()
+val VersionCatalog.androidXLifecycleBundle get() = findBundle("androidx-lifecycle").get()
+val VersionCatalog.androidXCommonBundle get() = findBundle("androidx-common").get()
+val VersionCatalog.kotlinTestBundle get() = findBundle("kotlin-test").get()
+val VersionCatalog.sqldelightBundle get() = findBundle("sqldelight").get()
+val VersionCatalog.mviKotlinBundle get() = findBundle("mviKotlin").get()
+val VersionCatalog.essentyBundle get() = findBundle("essenty").get()
+val VersionCatalog.koinAndroidBundle get() = findBundle("koin-android").get()
+val VersionCatalog.kotlinJSWrappers get() = findBundle("kotlin-js-wrappers").get()
 
-object Koin {
-    val core = "io.insert-koin:koin-core:${Versions.koin}"
-    val test = "io.insert-koin:koin-test:${Versions.koin}"
-    val android = "io.insert-koin:koin-android:${Versions.koin}"
-    val compose = "io.insert-koin:koin-androidx-compose:${Versions.koin}"
-}
+val VersionCatalog.kotlinJunitTest get() = findDependency("kotlin-kotlinTestJunit").get()
+val VersionCatalog.kotlinJSTest get() = findDependency("kotlin-kotlinTestJs").get()
+val VersionCatalog.kermit get() = findDependency("kermit").get()
+val VersionCatalog.decompose get() = findDependency("decompose-dep").get()
+val VersionCatalog.decomposeComposeExt get() = findDependency("decompose-extensions-compose").get()
+val VersionCatalog.jaffree get() = findDependency("jaffree").get()
 
-object Androidx {
-    const val androidxActivity = "androidx.activity:activity-compose:1.3.1"
-    const val core = "androidx.core:core-ktx:1.6.0"
-    const val palette = "androidx.palette:palette-ktx:1.0.0"
-    const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutinesVersion}"
+val VersionCatalog.ktlintGradle get() = findDependency("ktlint-gradle").get()
+val VersionCatalog.androidGradle get() = findDependency("androidx-gradle-plugin").get()
+val VersionCatalog.mosaicGradle get() = findDependency("mosaic-gradle").get()
+val VersionCatalog.kotlinComposeGradle get() = findDependency("kotlin-compose-gradle").get()
+val VersionCatalog.kotlinGradle get() = findDependency("kotlin-kotlinGradlePlugin").get()
+val VersionCatalog.i18n4kGradle get() = findDependency("i18n4k-gradle-plugin").get()
+val VersionCatalog.sqlDelightGradle get() = findDependency("sqldelight-gradle-plugin").get()
+val VersionCatalog.kotlinSerializationPlugin get() = findDependency("kotlin-serialization").get()
 
-    const val junit = "androidx.test.ext:junit:1.1.2"
-    const val expresso = "androidx.test.espresso:espresso-core:3.3.0"
+val VersionCatalog.koinCore get() = findDependency("koin-core").get()
+val VersionCatalog.kotlinCoroutines get() = findDependency("kotlin-coroutines").get()
+val VersionCatalog.kotlinxSerialization get() = findDependency("kotlinx-serialization-json").get()
+val VersionCatalog.ktorClientIOS get() = findDependency("ktor-client-ios").get()
+val VersionCatalog.ktorClientAndroid get() = findDependency("ktor-client-android").get()
+val VersionCatalog.ktorClientApache get() = findDependency("ktor-client-apache").get()
+val VersionCatalog.ktorClientJS get() = findDependency("ktor-client-js").get()
+val VersionCatalog.ktorClientCIO get() = findDependency("ktor-client-cio").get()
+val VersionCatalog.slf4j get() = findDependency("slf4j-simple").get()
 
-    const val gradlePlugin = "com.android.tools.build:gradle:7.0.1"
-}
-
-object KTLint {
-    const val gradlePlugin = "org.jlleitschuh.gradle:ktlint-gradle:${Versions.ktLint}"
-}
-
-object JetBrains {
-    object Kotlin {
-        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt"
-        const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}"
-        const val serialization = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlinVersion}"
-        const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:${Versions.kotlinVersion}"
-        const val testJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlinVersion}"
-        const val testAnnotationsCommon =
-            "org.jetbrains.kotlin:kotlin-test-annotations-common:${Versions.kotlinVersion}"
-    }
-
-    object Compose {
-        // __LATEST_COMPOSE_RELEASE_VERSION__
-        private const val VERSION = "1.0.0-alpha3"
-        const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
-    }
-}
-
-object Mosaic {
-    const val gradlePlugin = "com.jakewharton.mosaic:mosaic-gradle-plugin:${Versions.mosaic}"
-}
-
-object Decompose {
-    private const val VERSION = "0.3.1"
-    const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
-    const val decomposeIosX64 = "com.arkivanov.decompose:decompose-iosx64:$VERSION"
-    const val decomposeIosArm64 = "com.arkivanov.decompose:decompose-iosarm64:$VERSION"
-    const val extensionsCompose = "com.arkivanov.decompose:extensions-compose-jetbrains:$VERSION"
-}
-
-object MVIKotlin {
-    private const val VERSION = "2.0.4"
-    const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
-    const val mvikotlin = "com.arkivanov.mvikotlin:mvikotlin:$VERSION"
-    const val mvikotlinMain = "com.arkivanov.mvikotlin:mvikotlin-main:$VERSION"
-    const val coroutines = "com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$VERSION"
-    const val keepers = "com.arkivanov.mvikotlin:keepers:$VERSION"
-    const val mvikotlinMainIosX64 = "com.arkivanov.mvikotlin:mvikotlin-main-iosx64:$VERSION"
-    const val mvikotlinMainIosArm64 = "com.arkivanov.mvikotlin:mvikotlin-main-iosarm64:$VERSION"
-    const val mvikotlinLogging = "com.arkivanov.mvikotlin:mvikotlin-logging:$VERSION"
-    const val mvikotlinTimeTravel = "com.arkivanov.mvikotlin:mvikotlin-timetravel:$VERSION"
-    const val mvikotlinExtensionsReaktive = "com.arkivanov.mvikotlin:mvikotlin-extensions-reaktive:$VERSION"
-}
-
-object Ktor {
-    val clientCore = "io.ktor:ktor-client-core:${Versions.ktor}"
-    val clientJson = "io.ktor:ktor-client-json:${Versions.ktor}"
-    val clientLogging = "io.ktor:ktor-client-logging:${Versions.ktor}"
-    val clientSerialization = "io.ktor:ktor-client-serialization:${Versions.ktor}"
-
-    val auth = "io.ktor:ktor-client-auth:${Versions.ktor}"
-    val clientAndroid = "io.ktor:ktor-client-android:${Versions.ktor}"
-    val clientCurl = "io.ktor:ktor-client-curl:${Versions.ktor}"
-    val clientApache = "io.ktor:ktor-client-apache:${Versions.ktor}"
-    val slf4j = "org.slf4j:slf4j-simple:${Versions.slf4j}"
-    val clientIos = "io.ktor:ktor-client-ios:${Versions.ktor}"
-    val clientCio = "io.ktor:ktor-client-cio:${Versions.ktor}"
-    val clientJs = "io.ktor:ktor-client-js:${Versions.ktor}"
-}
-
-object Internationalization {
-    const val dep = "de.comahe.i18n4k:i18n4k-core:${Versions.i18n4k}"
-    const val gradlePlugin = "de.comahe.i18n4k:i18n4k-gradle-plugin:${Versions.i18n4k}"
-}
-
-object Extras {
-    const val youtubeDownloader = "io.github.shabinder:youtube-api-dl:1.3"
-    const val fuzzyWuzzy = "io.github.shabinder:fuzzywuzzy:1.1"
-    const val mp3agic = "com.mpatric:mp3agic:0.9.0"
-    const val jaudioTagger = "com.github.Shabinder:JAudioTagger-Android:1.0"
-    const val kermit = "co.touchlab:kermit:${Versions.kermit}"
-
-    object Android {
-        // Self Hosted Analytics & Crashlytics (FOSS)
-        val countly = "ly.count.android:sdk:20.11.8"
-        val appUpdator = "com.github.amitbd1508:AppUpdater:4.1.0"
-    }
-
-    object Desktop {
-        val countly = "ly.count.sdk:java:20.11.0"
-    }
-}
-
-object Serialization {
-    val json = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinxSerialization}"
-}
-
-object SqlDelight {
-    val runtime = "com.squareup.sqldelight:runtime:${Versions.sqlDelight}"
-    val coroutineExtensions = "com.squareup.sqldelight:coroutines-extensions:${Versions.sqlDelight}"
-
-    const val gradlePlugin = "com.squareup.sqldelight:gradle-plugin:${Versions.sqlDelight}"
-    const val androidDriver = "com.squareup.sqldelight:android-driver:${Versions.sqlDelight}"
-    const val sqliteDriver = "com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}"
-    const val nativeDriver = "com.squareup.sqldelight:native-driver:${Versions.sqlDelight}"
-    val nativeDriverMacos = "com.squareup.sqldelight:native-driver-macosx64:${Versions.sqlDelight}"
-    val jdbcDriver = "org.xerial:sqlite-jdbc:${Versions.sqliteJdbcDriver}"
-}
-
-fun DependencyHandler.`implementation`(
-    dependencyNotation: String,
-    dependencyConfiguration: ExternalModuleDependency.() -> Unit
-): ExternalModuleDependency = addDependencyTo(
-    this, "implementation", dependencyNotation
-) { dependencyConfiguration() }
+val VersionCatalog.sqlDelightJDBC get() = findDependency("sqlite-jdbc-driver").get()
+val VersionCatalog.sqlDelightNative get() = findDependency("sqldelight-native-driver").get()
+val VersionCatalog.sqlDelightAndroid get() = findDependency("sqldelight-android-driver").get()
+val VersionCatalog.sqlDelightDriver get() = findDependency("sqldelight-driver").get()

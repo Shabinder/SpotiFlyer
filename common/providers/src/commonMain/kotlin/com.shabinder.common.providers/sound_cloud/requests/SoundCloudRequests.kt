@@ -32,7 +32,7 @@ interface SoundCloudRequests {
     }
 
     @Suppress("NAME_SHADOWING")
-    suspend fun getTrack(track: JsonObject): TrackDetails {
+    suspend fun getTrack(track: JsonObject): TrackDetails? {
         val track = getTrackInfo(track)
         val title = track.getString("title")
 
@@ -42,7 +42,7 @@ interface SoundCloudRequests {
         if (track.getBoolean("streamable") == false)
             throw SpotiFlyerException.LinkInvalid("\nSound Cloud Reports that $title is not streamable !\n")
 
-
+        return null
     }
 
 

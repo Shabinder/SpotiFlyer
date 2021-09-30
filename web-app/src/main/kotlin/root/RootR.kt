@@ -26,7 +26,6 @@ import home.HomeScreen
 import list.ListScreen
 import navbar.NavBar
 import react.RBuilder
-import react.RState
 
 class RootR(props: Props<SpotiFlyerRoot>) : RenderableComponent<SpotiFlyerRoot, State>(
     props = props,
@@ -58,4 +57,4 @@ class RootR(props: Props<SpotiFlyerRoot>) : RenderableComponent<SpotiFlyerRoot, 
 @JsExport
 class State(
     var routerState: RouterState<*, Child>
-) : RState
+) : react.State

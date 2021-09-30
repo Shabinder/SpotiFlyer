@@ -25,7 +25,7 @@ plugins {
 
 kotlin {
     /*IOS Target Can be only built on Mac*/
-    if(HostOS.isMac){
+    if (HostOS.isMac) {
         val sdkName: String? = System.getenv("SDK_NAME")
         val isiOSDevice = sdkName.orEmpty().startsWith("iphoneos")
         if (isiOSDevice) {
@@ -50,45 +50,25 @@ kotlin {
     sourceSets {
         named("commonMain") {
             dependencies {
-                // Decompose
-                implementation(Decompose.decompose)
-
-                // MVI
-                implementation(MVIKotlin.coroutines)
-                implementation(MVIKotlin.mvikotlin)
-
-                // Koin
-                implementation(Koin.core)
-
-                implementation(Ktor.auth)
-                implementation(Ktor.clientJson)
-                implementation(Ktor.clientCore)
-                implementation(Ktor.clientLogging)
-                implementation(Ktor.clientSerialization)
-
-                // Extras
-                implementation(Extras.kermit)
-                implementation(Serialization.json)
-                implementation("co.touchlab:stately-common:1.1.7")
-                implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
-                implementation(JetBrains.Kotlin.coroutines) {
-                    @Suppress("DEPRECATION")
-                    isForce = true
-                }
+                implementation(Deps.ktorBundle)
+                implementation(Deps.kotlinxSerialization)
+                implementation(Deps.kotlinCoroutines)
+                implementation(Deps.mviKotlinBundle)
+                implementation(Deps.decompose)
+                implementation(Deps.koinCore)
             }
         }
 
         named("androidMain") {
             dependencies {
-                implementation(Androidx.androidxActivity)
-                implementation(Androidx.core)
                 implementation(compose.runtime)
                 implementation(compose.material)
                 implementation(compose.foundation)
                 implementation(compose.materialIconsExtended)
-                implementation(Decompose.extensionsCompose)
-                implementation(Ktor.clientAndroid)
-                implementation(Koin.android)
+                implementation(Deps.androidXCommonBundle)
+                implementation(Deps.decomposeComposeExt)
+                implementation(Deps.ktorClientAndroid)
+                implementation(Deps.koinAndroidBundle)
             }
         }
 
@@ -99,27 +79,20 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.desktop.common)
                 implementation(compose.materialIconsExtended)
-                implementation(Decompose.extensionsCompose)
-                implementation(Ktor.clientApache)
-                implementation(Ktor.slf4j)
+                implementation(Deps.decomposeComposeExt)
+                implementation(Deps.ktorClientApache)
+                implementation(Deps.slf4j)
             }
         }
         named("jsMain") {
             dependencies {
-                implementation(Ktor.clientJs)
-
-                /*with(KotlinJSWrappers) {
-                    implementation(enforcedPlatform(bom))
-                    implementation(kotlinReact)
-                    implementation(kotlinReactDom)
-                    implementation(kotlinStyled)
-                }*/
+                implementation(Deps.ktorClientJS)
             }
         }
-        if(HostOS.isMac){
-            named("iosMain"){
+        if (HostOS.isMac) {
+            named("iosMain") {
                 dependencies {
-                    implementation(Ktor.clientIos)
+                    implementation(Deps.ktorClientIOS)
                 }
             }
         }

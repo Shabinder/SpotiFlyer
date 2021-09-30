@@ -23,42 +23,44 @@ import kotlinx.css.justifyContent
 import kotlinx.css.marginBottom
 import kotlinx.css.px
 import kotlinx.css.width
+import react.PropsWithChildren
 import react.RBuilder
-import react.RProps
-import react.ReactElement
-import react.child
-import react.functionalComponent
+import react.functionComponent
 import styled.css
 import styled.styledDiv
 import styled.styledSpan
 
 @Suppress("FunctionName")
-fun RBuilder.CircularProgressBar(handler: CircularProgressBarProps.() -> Unit): ReactElement {
-    return child(circularProgressBar){
+fun RBuilder.CircularProgressBar(handler: CircularProgressBarProps.() -> Unit) {
+    return child(circularProgressBar) {
         attrs {
             handler()
         }
     }
 }
 
-external interface CircularProgressBarProps : RProps {
-    var progress:Int
+external interface CircularProgressBarProps : PropsWithChildren {
+    var progress: Int
 }
 
-private val circularProgressBar = functionalComponent<CircularProgressBarProps>("Circular-Progress-Bar") { props->
+private val circularProgressBar = functionComponent<CircularProgressBarProps>("Circular-Progress-Bar") { props ->
     styledDiv {
         styledSpan { +"${props.progress}%" }
-        styledDiv{
+        styledDiv {
             css {
-                classes = mutableListOf("left-half-clipper")
+                classes.add("left-half-clipper")
             }
-            styledDiv{ css { classes = mutableListOf("first50-bar") } }
-            styledDiv{ css { classes = mutableListOf("value-bar") } }
+            styledDiv { css { classes.add("first50-bar") } }
+            styledDiv { css { classes.add("value-bar") } }
         }
-        css{
+        css {
             display = Display.flex
             justifyContent = JustifyContent.center
-            classes = mutableListOf("progress-circle","p${props.progress}").apply { if(props.progress>50) add("over50") }
+            classes.addAll(
+                mutableListOf(
+                    "progress-circle",
+                    "p${props.progress}"
+                ).apply { if (props.progress > 50) add("over50") })
             width = 50.px
             marginBottom = 65.px
         }

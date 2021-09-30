@@ -16,52 +16,65 @@
 
 package list
 
-import kotlinx.css.*
+import kotlinx.css.Align
+import kotlinx.css.Display
+import kotlinx.css.JustifyContent
+import kotlinx.css.WhiteSpace
+import kotlinx.css.alignItems
+import kotlinx.css.display
+import kotlinx.css.fontSize
+import kotlinx.css.height
+import kotlinx.css.justifyContent
+import kotlinx.css.px
+import kotlinx.css.whiteSpace
 import kotlinx.html.id
 import kotlinx.html.js.onClickFunction
-import react.*
+import react.PropsWithChildren
+import react.RBuilder
 import react.dom.attrs
+import react.functionComponent
+import react.useEffect
+import react.useState
 import styled.css
 import styled.styledDiv
 import styled.styledH5
 import styled.styledImg
 
-external interface DownloadAllButtonProps : RProps {
-    var isActive:Boolean
-    var link : String
-    var downloadAll:()->Unit
+external interface DownloadAllButtonProps : PropsWithChildren {
+    var isActive: Boolean
+    var link: String
+    var downloadAll: () -> Unit
 }
 
 @Suppress("FunctionName")
-fun RBuilder.DownloadAllButton(handler: DownloadAllButtonProps.() -> Unit): ReactElement {
-    return child(downloadAllButton){
+fun RBuilder.DownloadAllButton(handler: DownloadAllButtonProps.() -> Unit) {
+    return child(downloadAllButton) {
         attrs {
             handler()
         }
     }
 }
 
-private val downloadAllButton = functionalComponent<DownloadAllButtonProps>("DownloadAllButton") { props->
+private val downloadAllButton = functionComponent<DownloadAllButtonProps>("DownloadAllButton") { props ->
 
-    val (isClicked,setClicked) = useState(false)
+    val (isClicked, setClicked) = useState(false)
 
-    useEffect(mutableListOf(props.link)){
+    useEffect(mutableListOf(props.link)) {
         setClicked(false)
     }
 
-    if(props.isActive){
-        if(isClicked) {
-            styledDiv{
+    if (props.isActive) {
+        if (isClicked) {
+            styledDiv {
                 css {
                     display = Display.flex
                     alignItems = Align.center
                     justifyContent = JustifyContent.center
                     height = 52.px
                 }
-                LoadingSpinner {  }
+                LoadingSpinner { }
             }
-        }
-        else{
+        } else {
             styledDiv {
                 attrs {
                     onClickFunction = {
@@ -71,9 +84,9 @@ private val downloadAllButton = functionalComponent<DownloadAllButtonProps>("Dow
                 }
                 styledDiv {
 
-                    styledImg(src = "download.svg",alt = "Download All Button") {
+                    styledImg(src = "download.svg", alt = "Download All Button") {
                         css {
-                            classes = mutableListOf("download-all-icon")
+                            classes.add("download-all-icon")
                             height = 32.px
                         }
                     }
@@ -82,7 +95,7 @@ private val downloadAllButton = functionalComponent<DownloadAllButtonProps>("Dow
                         attrs {
                             id = "download-all-text"
                         }
-                        + "Download All"
+                        +"Download All"
                         css {
                             whiteSpace = WhiteSpace.nowrap
                             fontSize = 15.px
@@ -90,13 +103,13 @@ private val downloadAllButton = functionalComponent<DownloadAllButtonProps>("Dow
                     }
 
                     css {
-                        classes = mutableListOf("download-icon")
+                        classes.add("download-icon")
                         display = Display.flex
                         alignItems = Align.center
                     }
                 }
                 css {
-                    classes = mutableListOf("download-button")
+                    classes.add("download-button")
                     display = Display.flex
                     alignItems = Align.center
                 }

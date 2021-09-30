@@ -2,6 +2,7 @@ package nl.bravobit.ffmpeg;
 
 import android.os.Build;
 
+@SuppressWarnings("deprecation")
 public class CpuArchHelper {
     public static final String X86_CPU = "x86";
     public static final String X86_64_CPU = "x86_64";

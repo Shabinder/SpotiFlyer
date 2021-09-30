@@ -44,19 +44,21 @@ kotlin {
                 implementation(project(":common:compose"))
                 implementation(project(":common:providers"))
                 implementation(project(":common:root"))
-                implementation("com.github.kokorin.jaffree:jaffree:2021.08.16")
 
-                // Decompose
-                implementation(Decompose.decompose)
-                implementation(Decompose.extensionsCompose)
+                with(deps) {
+                    implementation(jaffree)
 
-                // MVI
-                implementation(MVIKotlin.mvikotlin)
-                implementation(MVIKotlin.mvikotlinMain)
+                    with(decompose) {
+                        implementation(dep)
+                        implementation(extensions.compose)
+                    }
+                    with(mviKotlin) {
+                        implementation(dep)
+                        implementation(main)
+                    }
 
-                // Koin
-                implementation(Koin.core)
-
+                    implementation(koin.core)
+                }
             }
         }
         val jvmTest by getting

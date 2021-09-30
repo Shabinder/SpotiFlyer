@@ -17,39 +17,49 @@
 package home
 
 import Styles
-import kotlinx.css.*
+import kotlinx.css.borderRadius
+import kotlinx.css.height
+import kotlinx.css.margin
+import kotlinx.css.px
+import kotlinx.css.width
 import kotlinx.html.id
-import react.*
+import react.PropsWithChildren
+import react.RBuilder
 import react.dom.attrs
-import styled.*
+import react.functionComponent
+import styled.css
+import styled.styledA
+import styled.styledDiv
+import styled.styledForm
+import styled.styledImg
 
-external interface IconListProps : RProps {
-    var iconsAndPlatforms: Map<String,String>
-    var isBadge:Boolean
+external interface IconListProps : PropsWithChildren {
+    var iconsAndPlatforms: Map<String, String>
+    var isBadge: Boolean
 }
 
 @Suppress("FunctionName")
-fun RBuilder.IconList(handler:IconListProps.() -> Unit): ReactElement {
-    return child(iconList){
+fun RBuilder.IconList(handler: IconListProps.() -> Unit) {
+    return child(iconList) {
         attrs {
             handler()
         }
     }
 }
 
-private val iconList = functionalComponent<IconListProps>("IconList") { props ->
+private val iconList = functionComponent<IconListProps>("IconList") { props ->
 
     styledDiv {
         css {
             margin(18.px)
-            if(props.isBadge) {
-                classes = mutableListOf("info-banners")
+            if (props.isBadge) {
+                classes.add("info-banners")
             }
-            + Styles.makeRow
+            +Styles.makeRow
         }
         val firstElem = props.iconsAndPlatforms.keys.elementAt(1)
-        for((icon,platformLink) in props.iconsAndPlatforms){
-            if(icon == firstElem && props.isBadge){
+        for ((icon, platformLink) in props.iconsAndPlatforms) {
+            if (icon == firstElem && props.isBadge) {
                 //<form><script src="https://checkout.razorpay.com/v1/payment-button.js" data-payment_button_id="pl_GnKuuDBdBu0ank" async> </script> </form>
                 styledForm {
                     attrs {
@@ -57,13 +67,13 @@ private val iconList = functionalComponent<IconListProps>("IconList") { props ->
                     }
                 }
             }
-            styledA(href = platformLink,target="_blank"){
+            styledA(href = platformLink, target = "_blank") {
                 styledImg {
                     attrs {
                         src = icon
                     }
                     css {
-                        classes = mutableListOf("glow-button")
+                        classes.add("glow-button")
                         margin(8.px)
                         if (!props.isBadge) {
                             height = 42.px

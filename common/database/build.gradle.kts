@@ -34,31 +34,32 @@ kotlin {
                 implementation(project(":common:data-models"))
 
                 // SQL Delight
-                implementation(SqlDelight.runtime)
-                implementation(SqlDelight.coroutineExtensions)
-
-                // koin
-                implementation(Koin.test)
+                with(deps.sqldelight) {
+                    implementation(runtime)
+                    api(coroutines.extension)
+                }
             }
         }
 
         androidMain {
             dependencies {
-                implementation(SqlDelight.androidDriver)
+                implementation(deps.sqldelight.android.driver)
             }
         }
 
         desktopMain {
             dependencies {
-                implementation(SqlDelight.sqliteDriver)
-                implementation(SqlDelight.jdbcDriver)
+                with(deps) {
+                    implementation(sqldelight.driver)
+                    implementation(sqlite.jdbc.driver)
+                }
             }
         }
 
         if (HostOS.isMac) {
             val iosMain by getting {
                 dependencies {
-                    implementation(SqlDelight.nativeDriver)
+                    implementation(deps.sqldelight.native.driver)
                 }
             }
         }

@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import java.io.File;
 import java.util.Map;
 
+@SuppressWarnings("deprecation")
 public class FFprobe implements FFbinaryInterface {
 
     private final FFbinaryContextProvider context;
@@ -22,12 +23,7 @@ public class FFprobe implements FFbinaryInterface {
 
     public static FFprobe getInstance(final Context context) {
         if (instance == null) {
-            instance = new FFprobe(new FFbinaryContextProvider() {
-                @Override
-                public Context provide() {
-                    return context;
-                }
-            });
+            instance = new FFprobe(() -> context);
         }
         return instance;
     }

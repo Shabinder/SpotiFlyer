@@ -84,7 +84,7 @@ class ListScreen(
             }
 
             css {
-                classes = mutableListOf("list-screen")
+                classes.add("list-screen")
                 display = Display.flex
                 padding(8.px)
                 flexDirection = FlexDirection.column
