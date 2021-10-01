@@ -8,6 +8,7 @@ val globalJson by lazy {
     Json {
         isLenient = true
         ignoreUnknownKeys = true
+        coerceInputValues = true
     }
 }
 

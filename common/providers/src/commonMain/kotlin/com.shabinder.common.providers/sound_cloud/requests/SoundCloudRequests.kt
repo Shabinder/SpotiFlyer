@@ -2,12 +2,15 @@ package com.shabinder.common.providers.sound_cloud.requests
 
 import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.utils.requireNotNull
+import com.shabinder.common.models.soundcloud.resolvemodel.SoundCloudResolveResponseBase
+import com.shabinder.common.models.soundcloud.resolvemodel.SoundCloudResolveResponseBase.SoundCloudResolveResponsePlaylist
+import com.shabinder.common.models.soundcloud.resolvemodel.SoundCloudResolveResponseBase.SoundCloudResolveResponseTrack
 import io.github.shabinder.utils.getBoolean
 import io.github.shabinder.utils.getString
 import io.ktor.client.*
 import io.ktor.client.features.*
 import io.ktor.client.request.*
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.json.JsonObject
 
 interface SoundCloudRequests {
@@ -16,62 +19,58 @@ interface SoundCloudRequests {
 
 
     suspend fun parseURL(url: String) {
-        getItem(url).let { item: JsonObject ->
-            when (item.getString("kind")) {
-                "track" -> {
-
+        getResponseObj(url).let { item ->
+            when (item) {
+                is SoundCloudResolveResponseTrack -> {
+                    getTrack(item)
                 }
-                "playlist" -> {
-
+                is SoundCloudResolveResponsePlaylist -> {
+                    
                 }
-                "user" -> {
-
-                }
+                else -> throw SpotiFlyerException.FeatureNotImplementedYet()
             }
         }
     }
 
     @Suppress("NAME_SHADOWING")
-    suspend fun getTrack(track: JsonObject): TrackDetails? {
+    suspend fun getTrack(track: SoundCloudResolveResponseTrack): TrackDetails? {
         val track = getTrackInfo(track)
-        val title = track.getString("title")
 
-        if (track.getString("policy") == "BLOCK")
-            throw SpotiFlyerException.GeoLocationBlocked(extraInfo = "Use VPN to access $title")
+        if (track.policy == "BLOCK")
+            throw SpotiFlyerException.GeoLocationBlocked(extraInfo = "Use VPN to access ${track.title}")
 
-        if (track.getBoolean("streamable") == false)
-            throw SpotiFlyerException.LinkInvalid("\nSound Cloud Reports that $title is not streamable !\n")
+        if (!track.streamable)
+            throw SpotiFlyerException.LinkInvalid("\nSound Cloud Reports that ${track.title} is not streamable !\n")
 
         return null
     }
 
 
-    suspend fun getTrackInfo(track: JsonObject): JsonObject {
-        if (track.containsKey("media"))
-            return track
+    suspend fun getTrackInfo(res: SoundCloudResolveResponseTrack): SoundCloudResolveResponseTrack {
+        if (res.media.transcodings.isNotEmpty())
+            return res
 
-        val infoURL = URLS.TRACK_INFO.buildURL(track.getString("id").requireNotNull())
+        val infoURL = URLS.TRACK_INFO.buildURL(res.id.toString())
         return httpClient.get(infoURL) {
             parameter("client_id", CLIENT_ID)
         }
     }
 
-
-    suspend fun getItem(url: String, clientID: String = CLIENT_ID): JsonObject {
+    suspend fun getResponseObj(url: String, clientID: String = CLIENT_ID): SoundCloudResolveResponseBase {
         val itemURL = URLS.RESOLVE.buildURL(url)
-        val resp: JsonObject = try {
+        val resp: SoundCloudResolveResponseBase = try {
             httpClient.get(itemURL) {
                 parameter("client_id", clientID)
             }
         } catch (e: ClientRequestException) {
             if (clientID != ALT_CLIENT_ID)
-                return getItem(url, ALT_CLIENT_ID)
+                return getResponseObj(url, ALT_CLIENT_ID)
             throw e
         }
-        val tracksPresent = resp.getString("kind").equals("playlist") && resp.containsKey("tracks")
+        val tracksPresent = (resp is SoundCloudResolveResponsePlaylist && resp.tracks.isNotEmpty())
 
         if (!tracksPresent && clientID != ALT_CLIENT_ID)
-            return getItem(ALT_CLIENT_ID)
+            return getResponseObj(ALT_CLIENT_ID)
 
         return resp
     }
@@ -90,7 +89,25 @@ interface SoundCloudRequests {
             ME({ "https://api-v2.soundcloud.com/me?oauth_token=$it" }),
         }
 
-        private const val CLIENT_ID = "a3e059563d7fd3372b49b37f00a00bcf"
-        private const val ALT_CLIENT_ID = "2t9loNQH90kzJcsFCODdigxfp325aq4z"
+        const val CLIENT_ID = "a3e059563d7fd3372b49b37f00a00bcf"
+        const val ALT_CLIENT_ID = "2t9loNQH90kzJcsFCODdigxfp325aq4z"
+    }
+}
+
+@OptIn(InternalSerializationApi::class)
+suspend inline fun <reified T : Any> SoundCloudRequests.doAuthenticatedRequest(url: String): T {
+    var clientID: String = SoundCloudRequests.CLIENT_ID
+    return try {
+        httpClient.get(url) {
+            parameter("client_id", clientID)
+        }
+    } catch (e: ClientRequestException) {
+        if (clientID != SoundCloudRequests.ALT_CLIENT_ID) {
+            clientID = SoundCloudRequests.ALT_CLIENT_ID
+            return httpClient.get(url) {
+                parameter("client_id", clientID)
+            }
+        }
+        throw e
     }
 }

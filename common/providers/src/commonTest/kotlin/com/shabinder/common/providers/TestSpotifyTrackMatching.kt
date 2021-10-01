@@ -1,10 +1,15 @@
 package com.shabinder.common.providers
 
 import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.soundcloud.SoundCloudTrack
+import com.shabinder.common.models.soundcloud.resolvemodel.SoundCloudResolveResponseBase
 import com.shabinder.common.providers.utils.CommonUtils
 import com.shabinder.common.providers.utils.SpotifyUtils
 import com.shabinder.common.providers.utils.SpotifyUtils.toTrackDetailsList
+import com.shabinder.common.utils.globalJson
 import io.github.shabinder.runBlocking
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.serializer
 import kotlin.test.Test
 
 class TestSpotifyTrackMatching {
@@ -17,7 +22,19 @@ class TestSpotifyTrackMatching {
 
     private val spotifyToken: String?
         get() = null
-//    get() = "BQB41HqrLcrh5eRYaL97GvaH6tRe-1EktQ8VGTWUQuFnYVWBEoTcF7T_8ogqVn1GHl9HCcMiQ0HBT-ybC74"
+
+    //    get() = "BQB41HqrLcrh5eRYaL97GvaH6tRe-1EktQ8VGTWUQuFnYVWBEoTcF7T_8ogqVn1GHl9HCcMiQ0HBT-ybC74"
+    @OptIn(InternalSerializationApi::class)
+    @Test
+    fun testRandomThing() = runBlocking {
+        globalJson.decodeFromString(SoundCloudResolveResponseBase.serializer(), """{"artwork_url":null,"trackCount":12,"kind":"playlist"}""")
+            .also {
+                println(it)
+                println(it is SoundCloudResolveResponseBase.SoundCloudResolveResponsePlaylist)
+                println(it is SoundCloudResolveResponseBase.SoundCloudResolveResponseTrack)
+            }
+    }
+
 
     @Test
     fun matchVideo() = runBlocking {
