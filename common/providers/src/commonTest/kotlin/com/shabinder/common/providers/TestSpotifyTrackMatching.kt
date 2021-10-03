@@ -1,15 +1,15 @@
 package com.shabinder.common.providers
 
+import com.shabinder.common.core_components.utils.createHttpClient
+import com.shabinder.common.core_components.utils.getFinalUrl
 import com.shabinder.common.models.TrackDetails
-import com.shabinder.common.models.soundcloud.SoundCloudTrack
-import com.shabinder.common.models.soundcloud.resolvemodel.SoundCloudResolveResponseBase
 import com.shabinder.common.providers.utils.CommonUtils
 import com.shabinder.common.providers.utils.SpotifyUtils
 import com.shabinder.common.providers.utils.SpotifyUtils.toTrackDetailsList
-import com.shabinder.common.utils.globalJson
 import io.github.shabinder.runBlocking
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.serializer
 import kotlin.test.Test
 
 class TestSpotifyTrackMatching {
@@ -27,12 +27,8 @@ class TestSpotifyTrackMatching {
     @OptIn(InternalSerializationApi::class)
     @Test
     fun testRandomThing() = runBlocking {
-        globalJson.decodeFromString(SoundCloudResolveResponseBase.serializer(), """{"artwork_url":null,"trackCount":12,"kind":"playlist"}""")
-            .also {
-                println(it)
-                println(it is SoundCloudResolveResponseBase.SoundCloudResolveResponsePlaylist)
-                println(it is SoundCloudResolveResponseBase.SoundCloudResolveResponseTrack)
-            }
+        val res = createHttpClient().getFinalUrl("https://soundcloud.app.goo.gl/vrBzR")
+        println(res)
     }
 
 

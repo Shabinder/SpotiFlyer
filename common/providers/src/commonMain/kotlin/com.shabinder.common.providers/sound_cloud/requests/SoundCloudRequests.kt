@@ -1,31 +1,38 @@
 package com.shabinder.common.providers.sound_cloud.requests
 
+import com.shabinder.common.core_components.utils.getFinalUrl
 import com.shabinder.common.models.SpotiFlyerException
-import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.soundcloud.resolvemodel.SoundCloudResolveResponseBase
 import com.shabinder.common.models.soundcloud.resolvemodel.SoundCloudResolveResponseBase.SoundCloudResolveResponsePlaylist
 import com.shabinder.common.models.soundcloud.resolvemodel.SoundCloudResolveResponseBase.SoundCloudResolveResponseTrack
-import io.github.shabinder.utils.getBoolean
-import io.github.shabinder.utils.getString
-import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.request.*
+import io.ktor.client.HttpClient
+import io.ktor.client.features.ClientRequestException
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.supervisorScope
 import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.json.JsonObject
 
 interface SoundCloudRequests {
 
     val httpClient: HttpClient
 
+    suspend fun fetchResult(url: String): SoundCloudResolveResponseBase {
+        @Suppress("NAME_SHADOWING")
+        var url = url
 
-    suspend fun parseURL(url: String) {
-        getResponseObj(url).let { item ->
-            when (item) {
+        // Fetch Full URL if Input is Shortened URL from App
+        if (url.contains("soundcloud.app"))
+            url = httpClient.getFinalUrl(url)
+
+        return getResponseObj(url).run {
+            when (this) {
                 is SoundCloudResolveResponseTrack -> {
-                    getTrack(item)
+                    getTrack()
                 }
                 is SoundCloudResolveResponsePlaylist -> {
-                    
+                    populatePlaylist()
                 }
                 else -> throw SpotiFlyerException.FeatureNotImplementedYet()
             }
@@ -33,8 +40,8 @@ interface SoundCloudRequests {
     }
 
     @Suppress("NAME_SHADOWING")
-    suspend fun getTrack(track: SoundCloudResolveResponseTrack): TrackDetails? {
-        val track = getTrackInfo(track)
+    suspend fun SoundCloudResolveResponseTrack.getTrack() = apply {
+        val track = populateTrackInfo()
 
         if (track.policy == "BLOCK")
             throw SpotiFlyerException.GeoLocationBlocked(extraInfo = "Use VPN to access ${track.title}")
@@ -42,21 +49,38 @@ interface SoundCloudRequests {
         if (!track.streamable)
             throw SpotiFlyerException.LinkInvalid("\nSound Cloud Reports that ${track.title} is not streamable !\n")
 
-        return null
+        return track
+    }
+
+    @Suppress("NAME_SHADOWING")
+    suspend fun SoundCloudResolveResponsePlaylist.populatePlaylist(): SoundCloudResolveResponsePlaylist = apply {
+        supervisorScope {
+            try {
+                tracks = tracks.map {
+                    async {
+                        runCatching {
+                            it.populateTrackInfo()
+                        }.getOrNull() ?: it
+                    }
+                }.awaitAll()
+            } catch (e: Throwable) {
+                e.printStackTrace()
+            }
+        }
     }
 
 
-    suspend fun getTrackInfo(res: SoundCloudResolveResponseTrack): SoundCloudResolveResponseTrack {
-        if (res.media.transcodings.isNotEmpty())
-            return res
+    private suspend fun SoundCloudResolveResponseTrack.populateTrackInfo(): SoundCloudResolveResponseTrack {
+        if (media.transcodings.isNotEmpty())
+            return this
 
-        val infoURL = URLS.TRACK_INFO.buildURL(res.id.toString())
+        val infoURL = URLS.TRACK_INFO.buildURL(id.toString())
         return httpClient.get(infoURL) {
             parameter("client_id", CLIENT_ID)
         }
     }
 
-    suspend fun getResponseObj(url: String, clientID: String = CLIENT_ID): SoundCloudResolveResponseBase {
+    private suspend fun getResponseObj(url: String, clientID: String = CLIENT_ID): SoundCloudResolveResponseBase {
         val itemURL = URLS.RESOLVE.buildURL(url)
         val resp: SoundCloudResolveResponseBase = try {
             httpClient.get(itemURL) {
@@ -75,6 +99,7 @@ interface SoundCloudRequests {
         return resp
     }
 
+    @Suppress("unused")
     companion object {
         private enum class URLS(val buildURL: (arg: String) -> String) {
             RESOLVE({ "https://api-v2.soundcloud.com/resolve?url=$it}" }),

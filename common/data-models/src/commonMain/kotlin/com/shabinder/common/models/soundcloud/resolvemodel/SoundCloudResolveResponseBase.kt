@@ -1,15 +1,12 @@
 package com.shabinder.common.models.soundcloud.resolvemodel
 
+import com.shabinder.common.models.AudioFormat
 import com.shabinder.common.models.soundcloud.Media
 import com.shabinder.common.models.soundcloud.PublisherMetadata
-import com.shabinder.common.models.soundcloud.Track
 import com.shabinder.common.models.soundcloud.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.JsonClassDiscriminator
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
 
 @Serializable
 @JsonClassDiscriminator("kind")
@@ -69,7 +66,7 @@ sealed class SoundCloudResolveResponseBase {
         val title: String = "",  //"Top 50: Hip-hop & Rap"
         @SerialName("track_count")
         val trackCount: Int = 0,
-        val tracks: List<Track> = emptyList(),
+        var tracks: List<SoundCloudResolveResponseTrack> = emptyList(),
         val uri: String = "",
         val user: User = User(),
         @SerialName("user_id")
@@ -155,5 +152,15 @@ sealed class SoundCloudResolveResponseBase {
         val visuals: String = "",
         @SerialName("waveform_url")
         val waveformUrl: String = ""
-    ) : SoundCloudResolveResponseBase()
+    ) : SoundCloudResolveResponseBase() {
+        fun getDownloadableLink(): Pair<String, AudioFormat>? {
+            return (media.transcodings.firstOrNull {
+                it.quality == "hq" && (it.format.isProgressive || it.url.contains("progressive"))
+            } ?: media.transcodings.firstOrNull {
+                it.quality == "sq" && (it.format.isProgressive || it.url.contains("progressive"))
+            })?.let {
+                it.url to it.audioFormat
+            }
+        }
+    }
 }

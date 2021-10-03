@@ -79,7 +79,7 @@ class SpotifyProvider(
 
         if (type == "episode" || type == "show") {
             throw SpotiFlyerException.FeatureNotImplementedYet(
-                "Support for Spotify's ${type.uppercase()} isn't implemented yet"
+                "Support for Spotify's ${type.toUpperCase()} isn't implemented yet"
             )
         }
 

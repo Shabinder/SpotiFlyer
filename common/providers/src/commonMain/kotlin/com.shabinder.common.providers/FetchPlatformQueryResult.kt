@@ -20,7 +20,12 @@ import co.touchlab.kermit.Kermit
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.core_components.preference_manager.PreferenceManager
 import com.shabinder.common.database.DownloadRecordDatabaseQueries
-import com.shabinder.common.models.*
+import com.shabinder.common.models.AudioFormat
+import com.shabinder.common.models.AudioQuality
+import com.shabinder.common.models.PlatformQueryResult
+import com.shabinder.common.models.SpotiFlyerException
+import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.dispatcherIO
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.flatMapError
 import com.shabinder.common.models.event.coroutines.onSuccess
@@ -28,9 +33,9 @@ import com.shabinder.common.models.event.coroutines.success
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.providers.gaana.GaanaProvider
 import com.shabinder.common.providers.saavn.SaavnProvider
+import com.shabinder.common.providers.sound_cloud.SoundCloudProvider
 import com.shabinder.common.providers.spotify.SpotifyProvider
 import com.shabinder.common.providers.youtube.YoutubeProvider
-import com.shabinder.common.providers.youtube.get
 import com.shabinder.common.providers.youtube_music.YoutubeMusic
 import com.shabinder.common.providers.youtube_to_mp3.requests.YoutubeMp3
 import com.shabinder.common.utils.appendPadded
@@ -45,6 +50,7 @@ class FetchPlatformQueryResult(
     private val spotifyProvider: SpotifyProvider,
     private val youtubeProvider: YoutubeProvider,
     private val saavnProvider: SaavnProvider,
+    private val soundCloudProvider: SoundCloudProvider,
     private val youtubeMusic: YoutubeMusic,
     private val youtubeMp3: YoutubeMp3,
     val fileManager: FileManager,
@@ -66,13 +72,17 @@ class FetchPlatformQueryResult(
             link.contains("youtube.com", true) || link.contains("youtu.be", true) ->
                 youtubeProvider.query(link)
 
-            // Jio Saavn
+            // JioSaavn
             link.contains("saavn", true) ->
                 saavnProvider.query(link)
 
             // GAANA
             link.contains("gaana", true) ->
                 gaanaProvider.query(link)
+
+            // SoundCloud
+            link.contains("soundcloud", true) ->
+                soundCloudProvider.query(link)
 
             else -> {
                 SuspendableEvent.error(SpotiFlyerException.LinkInvalid(link))
@@ -122,12 +132,26 @@ class FetchPlatformQueryResult(
                                     ytMp3Link.component2()?.stackTraceToString()
                                         ?: "couldn't fetch link for ${track.videoID} ,trying manual extraction"
                                 )
-                                appendLine("Trying Local Extraction")
+                                //appendLine("Trying Local Extraction")
                                 null
                             } else {
                                 audioFormat = AudioFormat.MP3
                                 ytMp3Link.component1()
                             }
+                        }
+                    }
+                    Source.SoundCloud -> {
+                        audioFormat = track.audioFormat
+                        soundCloudProvider.getDownloadURL(track).let {
+                            if (it is SuspendableEvent.Failure || it.component1().isNullOrEmpty()) {
+                                appendPadded(
+                                    "SoundCloud Provider Failed for ${track.title}:",
+                                    it.component2()?.stackTraceToString()
+                                        ?: "couldn't fetch link for ${track.trackUrl}"
+                                )
+                                null
+                            } else
+                                it.component1()
                         }
                     }
                     else -> {
