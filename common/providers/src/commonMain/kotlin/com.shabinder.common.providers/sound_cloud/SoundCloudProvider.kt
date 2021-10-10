@@ -3,6 +3,7 @@ package com.shabinder.common.providers.sound_cloud
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.core_components.file_manager.finalOutputDir
+import com.shabinder.common.core_components.file_manager.getImageCachePath
 import com.shabinder.common.models.AudioFormat
 import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.models.DownloadStatus
@@ -70,9 +71,7 @@ class SoundCloudProvider(
                 artists = /*it.artists?.map { artist -> artist?.name.toString() } ?:*/ listOf(it.user.username.ifBlank { it.genre }),
                 albumArtists = /*it.album?.artists?.mapNotNull { artist -> artist?.name } ?:*/ emptyList(),
                 durationSec = (it.duration / 1000),
-                albumArtPath = fileManager.imageCacheDir() + (it.artworkUrl.formatArtworkUrl()).substringAfterLast(
-                    '/'
-                ) + ".jpeg",
+                albumArtPath = fileManager.getImageCachePath(it.artworkUrl.formatArtworkUrl()),
                 albumName = "", //it.album?.name,
                 year = runCatching { it.displayDate.substring(0, 4) }.getOrNull(),
                 comment = it.caption,

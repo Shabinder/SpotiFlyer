@@ -178,8 +178,7 @@ class DesktopFileManager(
     override fun addToLibrary(path: String) {}
 
     override suspend fun loadImage(url: String, reqWidth: Int, reqHeight: Int): Picture {
-        val cachePath = imageCacheDir() + getNameURL(url)
-        var picture: ImageBitmap? = loadCachedImage(cachePath, reqWidth, reqHeight)
+        var picture: ImageBitmap? = loadCachedImage(getImageCachePath(url), reqWidth, reqHeight)
         if (picture == null) picture = freshImage(url, reqWidth, reqHeight)
         return Picture(image = picture)
     }
@@ -208,7 +207,7 @@ class DesktopFileManager(
 
                 if (result != null) {
                     GlobalScope.launch(Dispatchers.IO) { // TODO Refactor
-                        cacheImage(result, imageCacheDir() + getNameURL(url))
+                        cacheImage(result, getImageCachePath(url))
                     }
                     result.toImageBitmap()
                 } else null

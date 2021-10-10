@@ -18,19 +18,33 @@ package com.shabinder.common.providers.youtube_music
 
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.core_components.file_manager.FileManager
-import com.shabinder.common.models.*
+import com.shabinder.common.models.AudioFormat
+import com.shabinder.common.models.AudioQuality
+import com.shabinder.common.models.SpotiFlyerException
+import com.shabinder.common.models.TrackDetails
+import com.shabinder.common.models.YoutubeTrack
+import com.shabinder.common.models.corsApi
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.flatMap
-import com.shabinder.common.models.event.coroutines.flatMapError
 import com.shabinder.common.models.event.coroutines.map
 import com.shabinder.common.providers.youtube.YoutubeProvider
-import com.shabinder.common.providers.youtube.get
 import com.shabinder.common.providers.youtube_to_mp3.requests.YoutubeMp3
 import io.github.shabinder.fuzzywuzzy.diffutils.FuzzySearch
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import kotlinx.serialization.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.headers
+import io.ktor.client.request.post
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonObject
 import kotlin.collections.set
 import kotlin.math.absoluteValue
 
@@ -50,7 +64,7 @@ class YoutubeMusic constructor(
     suspend fun findMp3SongDownloadURLYT(
         trackDetails: TrackDetails,
         preferredQuality: AudioQuality = fileManager.preferenceManager.audioQuality
-    ): SuspendableEvent<Pair<String,AudioQuality>, Throwable> {
+    ): SuspendableEvent<Pair<String, AudioQuality>, Throwable> {
         return getYTIDBestMatch(trackDetails).flatMap { videoID ->
             // As YT compress Audio hence there is no benefit of quality for more than 192
             val optimalQuality =
@@ -69,7 +83,7 @@ class YoutubeMusic constructor(
                 }
             }*/.map {
                 trackDetails.audioFormat = AudioFormat.MP3
-                Pair(it,optimalQuality)
+                Pair(it, optimalQuality)
             }
         }
     }
@@ -168,7 +182,7 @@ class YoutubeMusic constructor(
                 !       4 - Duration (hh:mm:ss)
                 !
                 ! We blindly gather all the details we get our hands on, then
-                ! cherry pick the details we need based on  their index numbers,
+                ! cherry-pick the details we need based on  their index numbers,
                 ! we do so only if their Type is 'Song' or 'Video
                 */
 
@@ -180,7 +194,7 @@ class YoutubeMusic constructor(
                     /*
                     Filter Out dummies here itself
                     ! 'musicResponsiveListItemFlexColumnRenderer' should have more that one
-                    ! sub-block, if not its a dummy, why does the YTM response contain dummies?
+                    ! sub-block, if not it is a dummy, why does the YTM response contain dummies?
                     ! I have no clue. We skip these.
 
                     ! Remember that we appended the linkBlock to result, treating that like the
@@ -189,7 +203,7 @@ class YoutubeMusic constructor(
                     */
                     for (detailArray in result.subList(0, result.size - 1)) {
                         for (detail in detailArray.jsonArray) {
-                            if (detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]?.jsonObject?.size ?: 0 < 2) continue
+                            if ((detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]?.jsonObject?.size ?: 0) < 2) continue
 
                             // if not a dummy, collect All Variables
                             val details =
@@ -262,8 +276,8 @@ class YoutubeMusic constructor(
             // most song results on youtube go by $artist - $songName or artist1/artist2
             var hasCommonWord = false
 
-            val resultName = result.name?.lowercase()?.replace("-", " ")?.replace("/", " ") ?: ""
-            val trackNameWords = trackName.lowercase().split(" ")
+            val resultName = result.name?.toLowerCase()?.replace("-", " ")?.replace("/", " ") ?: ""
+            val trackNameWords = trackName.toLowerCase().split(" ")
 
             for (nameWord in trackNameWords) {
                 if (nameWord.isNotBlank() && FuzzySearch.partialRatio(
@@ -287,8 +301,8 @@ class YoutubeMusic constructor(
             if (result.type == "Song") {
                 for (artist in trackArtists) {
                     if (FuzzySearch.ratio(
-                            artist.lowercase(),
-                            result.artist?.lowercase() ?: ""
+                            artist.toLowerCase(),
+                            result.artist?.toLowerCase() ?: ""
                         ) > 85
                     )
                         artistMatchNumber++
@@ -296,8 +310,8 @@ class YoutubeMusic constructor(
             } else { // i.e. is a Video
                 for (artist in trackArtists) {
                     if (FuzzySearch.partialRatio(
-                            artist.lowercase(),
-                            result.name?.lowercase() ?: ""
+                            artist.toLowerCase(),
+                            result.name?.toLowerCase() ?: ""
                         ) > 85
                     )
                         artistMatchNumber++

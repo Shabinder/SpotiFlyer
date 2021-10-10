@@ -15,12 +15,19 @@ fun cleanFiles(dir: File) {
                 if (file.isDirectory) {
                     cleanFiles(file)
                 } else if (file.isFile) {
-                    if (file.path.toString().substringAfterLast(".") != "mp3") {
-                        Log.d("Files Cleaning", "Cleaning ${file.path}")
+                    val filePath = file.path.toString()
+                    if (filePath.substringAfterLast(".") != "mp3" || filePath.isTempFile()) {
+                        Log.d("Files Cleaning", "Cleaning $filePath")
                         file.delete()
                     }
                 }
             }
         }
-    } catch (e: Exception) { e.printStackTrace() }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+private fun String.isTempFile(): Boolean {
+    return substringBeforeLast(".").takeLast(5) == ".temp"
 }

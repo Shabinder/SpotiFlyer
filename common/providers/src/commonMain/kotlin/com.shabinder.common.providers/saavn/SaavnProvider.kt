@@ -3,6 +3,7 @@ package com.shabinder.common.providers.saavn
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.core_components.file_manager.finalOutputDir
+import com.shabinder.common.core_components.file_manager.getImageCachePath
 import com.shabinder.common.models.*
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.saavn.SaavnSong
@@ -68,7 +69,7 @@ class SaavnProvider(
             artists = it.artistMap.keys.toMutableSet().apply { addAll(it.singers.split(",")) }.toList(),
             durationSec = it.duration.toInt(),
             albumName = it.album,
-            albumArtPath = fileManager.imageCacheDir() + (it.image.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg",
+            albumArtPath = fileManager.getImageCachePath(it.image),
             year = it.year,
             comment = it.copyright_text,
             trackUrl = it.perma_url,

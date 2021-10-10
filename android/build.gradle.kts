@@ -124,8 +124,9 @@ dependencies {
         implementation(storage.chooser)
 
         with(bundles) {
-            implementation(androidx.lifecycle)
+            implementation(ktor)
             implementation(mviKotlin)
+            implementation(androidx.lifecycle)
             implementation(accompanist.inset)
         }
 

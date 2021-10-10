@@ -43,6 +43,7 @@ import com.shabinder.common.models.event.coroutines.failure
 import com.shabinder.common.providers.FetchPlatformQueryResult
 import com.shabinder.common.translations.Strings
 import com.shabinder.spotiflyer.R
+import io.ktor.client.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -62,6 +63,7 @@ class ForegroundService : LifecycleService() {
     private val fetcher: FetchPlatformQueryResult by inject()
     private val logger: Kermit by inject()
     private val dir: FileManager by inject()
+    private val httpClient: HttpClient by inject()
 
     private var messageList =
         java.util.Collections.synchronizedList(MutableList(5) { emptyMessage })
@@ -170,7 +172,7 @@ class ForegroundService : LifecycleService() {
         trackStatusFlowMap[track.title] = DownloadStatus.Downloading()
 
         // Enqueueing Download
-        downloadFile(url).collect {
+        httpClient.downloadFile(url).collect {
             when (it) {
                 is DownloadResult.Error -> {
                     logger.d(TAG) { it.message }
