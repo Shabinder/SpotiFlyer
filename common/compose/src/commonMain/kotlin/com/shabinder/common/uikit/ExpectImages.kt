@@ -59,6 +59,9 @@ expect fun SpotifyLogo(): Painter
 expect fun SaavnLogo(): Painter
 
 @Composable
+expect fun SoundCloudLogo(): Painter
+
+@Composable
 expect fun YoutubeLogo(): Painter
 
 @Composable

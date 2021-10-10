@@ -87,6 +87,10 @@ actual fun SaavnLogo() =
     getCachedPainter("drawable/ic_jio_saavn_logo.xml")
 
 @Composable
+actual fun SoundCloudLogo() =
+    getCachedPainter("drawable/ic_soundcloud.xml")
+
+@Composable
 actual fun YoutubeLogo() =
     getCachedPainter("drawable/ic_youtube.xml")
 

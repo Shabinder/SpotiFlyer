@@ -83,12 +83,14 @@ import com.shabinder.common.main.SpotiFlyerMain
 import com.shabinder.common.main.SpotiFlyerMain.HomeCategory
 import com.shabinder.common.models.DownloadRecord
 import com.shabinder.common.models.Actions
+import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.translations.Strings
 import com.shabinder.common.uikit.GaanaLogo
 import com.shabinder.common.uikit.GithubLogo
 import com.shabinder.common.uikit.ImageLoad
 import com.shabinder.common.uikit.SaavnLogo
 import com.shabinder.common.uikit.ShareImage
+import com.shabinder.common.uikit.SoundCloudLogo
 import com.shabinder.common.uikit.SpotifyLogo
 import com.shabinder.common.uikit.VerticalScrollbar
 import com.shabinder.common.uikit.YoutubeLogo
@@ -316,6 +318,17 @@ fun AboutColumn(
                             tint = Color.Unspecified,
                             modifier = Modifier.clip(SpotiFlyerShapes.small).clickable(
                                 onClick = { Actions.instance.openPlatform("com.google.android.apps.youtube.music", "https://music.youtube.com/") }
+                            )
+                        )
+                    }
+                    Spacer(modifier = Modifier.padding(top = 8.dp))
+                    Row(horizontalArrangement = Arrangement.Center, modifier = modifier.fillMaxWidth()) {
+                        Icon(
+                            SoundCloudLogo(),
+                            "${Strings.open()} Sound Cloud",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.clip(SpotiFlyerShapes.medium).clickable(
+                                onClick = { Actions.instance.openPlatform("com.soundcloud.android", "https://soundcloud.com/") }
                             )
                         )
                     }

@@ -107,9 +107,11 @@ class DesktopFileManager(
 
     override suspend fun cacheImage(image: Any, path: String): Unit = withContext(dispatcherIO) {
         try {
+            val file = File(path)
+            if(!file.parentFile.exists()) createDirectories()
             (image as? BufferedImage)?.let {
-                ImageIO.write(it, "jpeg", File(path))
-            }
+                ImageIO.write(it, "jpeg", file)
+             }
         } catch (e: IOException) {
             e.printStackTrace()
         }
