@@ -32,9 +32,12 @@ kotlin {
             kotlinOptions.jvmTarget = "1.8"
         }
     }
-
+    tasks.named<Copy>("jvmProcessResources") {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
     sourceSets {
         val jvmMain by getting {
+            resources.srcDirs("../common/data-models/src/main/res")
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common:database"))
