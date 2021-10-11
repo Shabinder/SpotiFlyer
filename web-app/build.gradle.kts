@@ -21,20 +21,17 @@ plugins {
 group = "com.shabinder"
 version = "0.1"
 
-repositories {
-    mavenCentral()
-    //maven(url = "https://dl.bintray.com/kotlin/kotlin-js-wrappers")
-}
-
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-js:1.5.21")
-    implementation(Koin.core)
-    implementation(Extras.kermit)
-    implementation(Decompose.decompose)
-    implementation(MVIKotlin.mvikotlin)
-    implementation(MVIKotlin.coroutines)
-    implementation(MVIKotlin.mvikotlinMain)
-    implementation(MVIKotlin.mvikotlinLogging)
+    with(deps) {
+        implementation(koin.core)
+        implementation(decompose.dep)
+        implementation(ktor.client.js)
+        with(bundles) {
+            implementation(mviKotlin)
+            implementation(ktor)
+            implementation(kotlin.js.wrappers)
+        }
+    }
     implementation(project(":common:root"))
     implementation(project(":common:main"))
     implementation(project(":common:list"))
@@ -43,27 +40,7 @@ dependencies {
     implementation(project(":common:providers"))
     implementation(project(":common:core-components"))
     implementation(project(":common:dependency-injection"))
-    implementation("co.touchlab:stately-common:1.1.7")
-    implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
-    // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2") {
-    //  https://youtrack.jetbrains.com/issue/KTOR-2670
-        @Suppress("DEPRECATION")
-        isForce = true
-    }
-
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt") {
-        @Suppress("DEPRECATION")
-        isForce = true
-    }
-
-    with(KotlinJSWrappers) {
-        implementation(enforcedPlatform(bom))
-        implementation(kotlinReact)
-        implementation(kotlinReactDom)
-        implementation(kotlinStyled)
-    }
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-js:${deps.kotlin.kotlinGradlePlugin.get().versionConstraint.requiredVersion}")
 }
 
 kotlin {
@@ -84,5 +61,11 @@ kotlin {
             }
         }
         binaries.executable()
+    }
+    // WorkAround: https://youtrack.jetbrains.com/issue/KT-49124
+    rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
+        rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().apply {
+            resolution("@webpack-cli/serve", "1.5.2")
+        }
     }
 }

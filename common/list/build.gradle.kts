@@ -30,7 +30,6 @@ kotlin {
                 implementation(project(":common:database"))
                 implementation(project(":common:providers"))
                 implementation(project(":common:core-components"))
-                implementation(SqlDelight.coroutineExtensions)
             }
         }
     }

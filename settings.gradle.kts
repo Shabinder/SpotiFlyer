@@ -14,6 +14,16 @@
  *  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+enableFeaturePreview("VERSION_CATALOGS")
+dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
+    versionCatalogs {
+        create("deps") {
+            from(files("buildSrc/deps.versions.toml"))
+        }
+    }
+}
+
 rootProject.name = "spotiflyer"
 
 include(
@@ -32,5 +42,5 @@ include(
     ":desktop",
     ":web-app",
     //":console-app",
-    ":maintenance-tasks"
+    ":maintenance-tasks",
 )

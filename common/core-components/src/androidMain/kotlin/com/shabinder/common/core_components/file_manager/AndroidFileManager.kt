@@ -117,7 +117,7 @@ class AndroidFileManager(
 
             try {
                 // Add Mp3 Tags and Add to Library
-                if(trackDetails.audioFormat != AudioFormat.MP3)
+                if (trackDetails.audioFormat != AudioFormat.MP3)
                     throw InvalidDataException("Audio Format is ${trackDetails.audioFormat}, Needs Conversion!")
 
                 Mp3File(File(songFile.absolutePath))
@@ -166,7 +166,7 @@ class AndroidFileManager(
 
     override suspend fun loadImage(url: String, reqWidth: Int, reqHeight: Int): Picture =
         withContext(dispatcherIO) {
-            val cachePath = imageCacheDir() + getNameURL(url)
+            val cachePath = getImageCachePath(url)
             Picture(
                 image = (loadCachedImage(cachePath, reqWidth, reqHeight) ?: freshImage(
                     url,
@@ -214,7 +214,7 @@ class AndroidFileManager(
                     // Decode and Cache Full Sized Image in Background
                     cacheImage(
                         BitmapFactory.decodeByteArray(input, 0, input.size),
-                        imageCacheDir() + getNameURL(url)
+                        getImageCachePath(url)
                     )
                 }
                 bitmap // return Memory Efficient Bitmap

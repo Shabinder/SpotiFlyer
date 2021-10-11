@@ -40,7 +40,7 @@ kotlin {
                 implementation(project(":common:database"))
                 implementation(project(":common:data-models"))
                 implementation(project(":common:dependency-injection"))
-                implementation(Decompose.extensionsCompose)
+                implementation(deps.decompose.extensions.compose)
             }
         }
     }

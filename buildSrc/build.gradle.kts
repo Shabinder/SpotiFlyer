@@ -30,17 +30,20 @@ repositories {
 }
 
 dependencies {
-    implementation(Androidx.gradlePlugin)
-    implementation(JetBrains.Compose.gradlePlugin)
-    implementation(JetBrains.Kotlin.gradlePlugin)
-    implementation(JetBrains.Kotlin.serialization)
-    implementation(SqlDelight.gradlePlugin)
-    implementation(KTLint.gradlePlugin)
-    implementation(Internationalization.gradlePlugin)
-    implementation(Mosaic.gradlePlugin)
+    with(deps) {
+        implementation(androidx.gradle.plugin)
+        implementation(kotlin.compose.gradle)
+        implementation(ktlint.gradle)
+        implementation(mosaic.gradle)
+        implementation(kotlin.kotlinGradlePlugin)
+        implementation(sqldelight.gradle.plugin)
+        implementation(i18n4k.gradle.plugin)
+        implementation(kotlin.serialization)
+    }
 }
 
 kotlin {
     // Add Deps to compilation, so it will become available in main project
     sourceSets.getByName("main").kotlin.srcDir("buildSrc/src/main/kotlin")
 }
+

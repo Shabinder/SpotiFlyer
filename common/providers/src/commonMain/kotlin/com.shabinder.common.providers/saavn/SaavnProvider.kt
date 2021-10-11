@@ -3,6 +3,7 @@ package com.shabinder.common.providers.saavn
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.core_components.file_manager.finalOutputDir
+import com.shabinder.common.core_components.file_manager.getImageCachePath
 import com.shabinder.common.models.*
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.saavn.SaavnSong
@@ -28,7 +29,7 @@ class SaavnProvider(
         ).apply {
             val pageLink = fullLink.substringAfter("saavn.com/").substringBefore("?")
             when {
-                pageLink.contains("/song/", true) -> {
+                pageLink.contains("song/", true) -> {
                     getSong(fullLink).value.let {
                         folderType = "Tracks"
                         subFolder = ""
@@ -37,7 +38,7 @@ class SaavnProvider(
                         coverUrl = it.image.replace("http:", "https:")
                     }
                 }
-                pageLink.contains("/album/", true) -> {
+                pageLink.contains("album/", true) -> {
                     getAlbum(fullLink).value.let {
                         folderType = "Albums"
                         subFolder = removeIllegalChars(it.title)
@@ -46,7 +47,7 @@ class SaavnProvider(
                         coverUrl = it.image.replace("http:", "https:")
                     }
                 }
-                pageLink.contains("/featured/", true) -> { // Playlist
+                pageLink.contains("featured/", true) -> { // Playlist
                     getPlaylist(fullLink).value.let {
                         folderType = "Playlists"
                         subFolder = removeIllegalChars(it.listname)
@@ -68,7 +69,7 @@ class SaavnProvider(
             artists = it.artistMap.keys.toMutableSet().apply { addAll(it.singers.split(",")) }.toList(),
             durationSec = it.duration.toInt(),
             albumName = it.album,
-            albumArtPath = fileManager.imageCacheDir() + (it.image.substringBeforeLast('/').substringAfterLast('/')) + ".jpeg",
+            albumArtPath = fileManager.getImageCachePath(it.image),
             year = it.year,
             comment = it.copyright_text,
             trackUrl = it.perma_url,

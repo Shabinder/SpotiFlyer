@@ -82,6 +82,9 @@ actual fun SpotifyLogo() = getCachedPainter(R.drawable.ic_spotify_logo)
 actual fun SaavnLogo() = getCachedPainter(R.drawable.ic_jio_saavn_logo)
 
 @Composable
+actual fun SoundCloudLogo() = getCachedPainter(R.drawable.ic_soundcloud)
+
+@Composable
 actual fun GaanaLogo() = getCachedPainter(R.drawable.ic_gaana)
 
 @Composable

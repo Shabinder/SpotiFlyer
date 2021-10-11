@@ -8,6 +8,8 @@ import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.logging.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.HttpResponse
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.native.concurrent.SharedImmutable
 
@@ -20,6 +22,18 @@ suspend fun isInternetAccessible(): Boolean {
             e.printStackTrace()
             false
         }
+    }
+}
+
+// If Fails returns Input Url
+suspend inline fun HttpClient.getFinalUrl(
+    url: String,
+    crossinline block: HttpRequestBuilder.() -> Unit = {}
+): String {
+    return withContext(dispatcherIO) {
+        runCatching {
+            get<HttpResponse>(url,block).call.request.url.toString()
+        }.getOrNull() ?: url
     }
 }
 

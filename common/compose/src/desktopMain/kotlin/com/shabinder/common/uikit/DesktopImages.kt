@@ -21,15 +21,19 @@ package com.shabinder.common.uikit
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadXmlImageVector
-import androidx.compose.ui.res.vectorXmlResource
+import androidx.compose.ui.res.useResource
+import org.xml.sax.InputSource
 
 @Composable
-internal actual fun <T> imageVectorResource(id: T): ImageVector =
-    vectorXmlResource(id as String)
+internal actual fun <T> imageVectorResource(id: T): ImageVector {
+    val density = LocalDensity.current
+    return useResource(id as String) {
+        loadXmlImageVector(InputSource(it), density)
+    }
+}
 
 @Composable
 actual fun DownloadImageTick() {
@@ -81,6 +85,10 @@ actual fun SpotifyLogo() =
 @Composable
 actual fun SaavnLogo() =
     getCachedPainter("drawable/ic_jio_saavn_logo.xml")
+
+@Composable
+actual fun SoundCloudLogo() =
+    getCachedPainter("drawable/ic_soundcloud.xml")
 
 @Composable
 actual fun YoutubeLogo() =

@@ -19,6 +19,7 @@ package com.shabinder.common.providers.youtube
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.core_components.file_manager.finalOutputDir
+import com.shabinder.common.core_components.file_manager.getImageCachePath
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.SpotiFlyerException
@@ -30,7 +31,7 @@ import io.github.shabinder.YoutubeDownloader
 import io.github.shabinder.models.YoutubeVideo
 import io.github.shabinder.models.formats.Format
 import io.github.shabinder.models.quality.AudioQuality
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 
 class YoutubeProvider(
     private val httpClient: HttpClient,
@@ -108,13 +109,14 @@ class YoutubeProvider(
             title = name
 
             trackList = videos.map {
+                val imageURL = "https://i.ytimg.com/vi/${it.videoId}/hqdefault.jpg"
                 TrackDetails(
                     title = it.title ?: "N/A",
                     artists = listOf(it.author ?: "N/A"),
                     durationSec = it.lengthSeconds,
-                    albumArtPath = fileManager.imageCacheDir() + it.videoId + ".jpeg",
+                    albumArtPath = fileManager.getImageCachePath(imageURL),
                     source = Source.YouTube,
-                    albumArtURL = "https://i.ytimg.com/vi/${it.videoId}/hqdefault.jpg",
+                    albumArtURL = imageURL,
                     downloaded = if (fileManager.isPresent(
                             fileManager.finalOutputDir(
                                 itemName = it.title ?: "N/A",
@@ -155,7 +157,7 @@ class YoutubeProvider(
             val video = ytDownloader.getVideo(searchId)
             coverUrl = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg"
             val detail = video.videoDetails
-            val name = detail.title?.replace(detail.author?.uppercase() ?: "", "", true)
+            val name = detail.title?.replace(detail.author?.toUpperCase() ?: "", "", true)
                 ?: detail.title ?: ""
             // logger.i{ detail.toString() }
             trackList = listOf(
@@ -163,9 +165,9 @@ class YoutubeProvider(
                     title = name,
                     artists = listOf(detail.author ?: "N/A"),
                     durationSec = detail.lengthSeconds,
-                    albumArtPath = fileManager.imageCacheDir() + "$searchId.jpeg",
+                    albumArtPath = fileManager.getImageCachePath(coverUrl),
                     source = Source.YouTube,
-                    albumArtURL = "https://i.ytimg.com/vi/$searchId/hqdefault.jpg",
+                    albumArtURL = coverUrl,
                     downloaded = if (fileManager.isPresent(
                             fileManager.finalOutputDir(
                                 itemName = name,
@@ -179,7 +181,12 @@ class YoutubeProvider(
                     else {
                         DownloadStatus.NotDownloaded
                     },
-                    outputFilePath = fileManager.finalOutputDir(name, folderType, subFolder, fileManager.defaultDir()/*,".m4a"*/),
+                    outputFilePath = fileManager.finalOutputDir(
+                        name,
+                        folderType,
+                        subFolder,
+                        fileManager.defaultDir()/*,".m4a"*/
+                    ),
                     videoID = searchId
                 )
             )

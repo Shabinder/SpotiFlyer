@@ -2,6 +2,7 @@ package com.shabinder.common.providers
 
 import com.shabinder.common.providers.gaana.GaanaProvider
 import com.shabinder.common.providers.saavn.SaavnProvider
+import com.shabinder.common.providers.sound_cloud.SoundCloudProvider
 import com.shabinder.common.providers.spotify.SpotifyProvider
 import com.shabinder.common.providers.spotify.token_store.TokenStore
 import com.shabinder.common.providers.youtube.YoutubeProvider
@@ -16,7 +17,8 @@ fun providersModule(enableNetworkLogs: Boolean) = module {
     single { GaanaProvider(get(), get(), get()) }
     single { SaavnProvider(get(), get(), get()) }
     single { YoutubeProvider(get(), get(), get()) }
+    single { SoundCloudProvider(get(), get(), get()) }
     single { YoutubeMp3(get(), get()) }
     single { YoutubeMusic(get(), get(), get(), get(), get()) }
-    single { FetchPlatformQueryResult(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    single { FetchPlatformQueryResult(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }

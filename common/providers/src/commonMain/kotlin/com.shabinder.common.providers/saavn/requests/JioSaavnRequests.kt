@@ -18,9 +18,16 @@ import io.github.shabinder.utils.getBoolean
 import io.github.shabinder.utils.getJsonArray
 import io.github.shabinder.utils.getJsonObject
 import io.github.shabinder.utils.getString
-import io.ktor.client.*
-import io.ktor.client.request.*
-import kotlinx.serialization.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 import kotlin.collections.set
 
 interface JioSaavnRequests {
@@ -32,9 +39,9 @@ interface JioSaavnRequests {
         trackName: String,
         trackArtists: List<String>,
         preferredQuality: AudioQuality
-    ): SuspendableEvent<Pair<String,AudioQuality>, Throwable> = searchForSong(trackName).map { songs ->
-        val bestMatch = sortByBestMatch(songs, trackName, trackArtists).keys.firstOrNull() ?:
-            throw SpotiFlyerException.DownloadLinkFetchFailed("No SAAVN Match Found for $trackName")
+    ): SuspendableEvent<Pair<String, AudioQuality>, Throwable> = searchForSong(trackName).map { songs ->
+        val bestMatch = sortByBestMatch(songs, trackName, trackArtists).keys.firstOrNull()
+            ?: throw SpotiFlyerException.DownloadLinkFetchFailed("No SAAVN Match Found for $trackName")
 
         var audioQuality: AudioQuality = AudioQuality.KBPS160
         val m4aLink: String by getSongFromID(bestMatch).map { song ->
@@ -46,7 +53,7 @@ interface JioSaavnRequests {
             song.media_url.requireNotNull().replaceAfterLast("_", "${optimalQuality.kbps}.mp4")
         }
 
-        Pair(m4aLink,audioQuality)
+        Pair(m4aLink, audioQuality)
     }
 
     suspend fun searchForSong(
@@ -235,8 +242,8 @@ interface JioSaavnRequests {
         for (result in tracks) {
             var hasCommonWord = false
 
-            val resultName = result.title.lowercase().replace("/", " ")
-            val trackNameWords = trackName.lowercase().split(" ")
+            val resultName = result.title.toLowerCase().replace("/", " ")
+            val trackNameWords = trackName.toLowerCase().split(" ")
 
             for (nameWord in trackNameWords) {
                 if (nameWord.isNotBlank() && FuzzySearch.partialRatio(nameWord, resultName) > 85) hasCommonWord = true
@@ -256,11 +263,11 @@ interface JioSaavnRequests {
             // String Containing All Artist Names from JioSaavn Search Result
             val artistListString = mutableSetOf<String>().apply {
                 result.more_info?.singers?.split(",")?.let { addAll(it) }
-                result.more_info?.primary_artists?.lowercase()?.split(",")?.let { addAll(it) }
+                result.more_info?.primary_artists?.toLowerCase()?.split(",")?.let { addAll(it) }
             }.joinToString(" , ")
 
             for (artist in trackArtists) {
-                if (FuzzySearch.partialRatio(artist.lowercase(), artistListString) > 85)
+                if (FuzzySearch.partialRatio(artist.toLowerCase(), artistListString) > 85)
                     artistMatchNumber++
             }
 

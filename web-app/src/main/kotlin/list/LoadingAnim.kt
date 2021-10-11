@@ -24,43 +24,41 @@ import kotlinx.css.flexGrow
 import kotlinx.css.height
 import kotlinx.css.px
 import kotlinx.css.width
+import react.PropsWithChildren
 import react.RBuilder
-import react.RProps
-import react.ReactElement
-import react.child
-import react.functionalComponent
+import react.functionComponent
 import styled.css
 import styled.styledDiv
 
 @Suppress("FunctionName")
-fun RBuilder.LoadingAnim(handler: RProps.() -> Unit): ReactElement {
-    return child(loadingAnim){
+fun RBuilder.LoadingAnim(handler: PropsWithChildren.() -> Unit) {
+    return child(loadingAnim) {
         attrs {
             handler()
         }
     }
 }
 
-private val loadingAnim = functionalComponent<RProps>("Loading Animation") {
-    styledDiv{
+private val loadingAnim = functionComponent<PropsWithChildren>("Loading Animation") {
+    styledDiv {
         css {
             flexGrow = 1.0
             display = Display.flex
             alignItems = Align.center
         }
         styledDiv {
-            styledDiv { css { classes = mutableListOf("sk-cube sk-cube1") } }
-            styledDiv { css { classes = mutableListOf("sk-cube sk-cube2") } }
-            styledDiv { css { classes = mutableListOf("sk-cube sk-cube3") } }
-            styledDiv { css { classes = mutableListOf("sk-cube sk-cube4") } }
-            styledDiv { css { classes = mutableListOf("sk-cube sk-cube5") } }
-            styledDiv { css { classes = mutableListOf("sk-cube sk-cube6") } }
-            styledDiv { css { classes = mutableListOf("sk-cube sk-cube7") } }
-            styledDiv { css { classes = mutableListOf("sk-cube sk-cube8") } }
-            styledDiv { css { classes = mutableListOf("sk-cube sk-cube9") } }
+            styledDiv { css { classes.add("sk-cube sk-cube1") } }
+            styledDiv { css { classes.add("sk-cube sk-cube2") } }
+            styledDiv { css { classes.add("sk-cube sk-cube3") } }
+            styledDiv { css { classes.add("sk-cube sk-cube4") } }
+            styledDiv { css { classes.add("sk-cube sk-cube5") } }
+            styledDiv { css { classes.add("sk-cube sk-cube6") } }
+            styledDiv { css { classes.add("sk-cube sk-cube7") } }
+            styledDiv { css { classes.add("sk-cube sk-cube8") } }
+            styledDiv { css { classes.add("sk-cube sk-cube9") } }
 
             css {
-                classes = mutableListOf("sk-cube-grid")
+                classes.add("sk-cube-grid")
                 height = 60.px
                 width = 60.px
             }

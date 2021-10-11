@@ -13,8 +13,6 @@ android {
 
         minSdk = Versions.minSdkVersion
         targetSdk = Versions.targetSdkVersion
-//        versionCode = Versions.versionCode
-//        versionName = Versions.versionName
 
         /*ndk {
             abiFilters.addAll(setOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a"))

@@ -18,16 +18,16 @@ package extras
 
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.ValueObserver
+import react.PropsWithChildren
 import react.RComponent
-import react.RProps
-import react.RState
+import react.State
 import react.setState
 
 
 @Suppress("EXPERIMENTAL_IS_NOT_ENABLED", "NON_EXPORTABLE_TYPE")
 @OptIn(ExperimentalJsExport::class)
 @JsExport
-abstract class RenderableComponent<T: Any, S: RState>(
+abstract class RenderableComponent<T : Any, S : State>(
     props: Props<T>,
     initialState: S
 ) : RComponent<Props<T>, S>(props) {
@@ -60,7 +60,6 @@ abstract class RenderableComponent<T: Any, S: RState>(
     }
 
 
-
     protected class Subscription<T : Any>(
         val value: Value<T>,
         val observer: ValueObserver<T>
@@ -72,8 +71,8 @@ abstract class RenderableComponent<T: Any, S: RState>(
 @JsExport
 class RStateWrapper<T>(
     var model: T
-) : RState
+) : State
 
-external interface Props<T : Any> : RProps {
+external interface Props<T : Any> : PropsWithChildren {
     var component: T
 }

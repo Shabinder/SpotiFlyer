@@ -25,9 +25,6 @@ plugins {
     id("de.comahe.i18n4k")
 }
 
-val statelyVersion = "1.1.7"
-val statelyIsoVersion = "1.1.7-a1"
-
 i18n4k {
     inputDirectory = "../../translations"
     packageName = "com.shabinder.common.translations"
@@ -50,11 +47,13 @@ kotlin {
         }
         commonMain {
             dependencies {
-                implementation("co.touchlab:stately-concurrency:$statelyVersion")
-                implementation("co.touchlab:stately-isolate:$statelyIsoVersion")
-                implementation("co.touchlab:stately-iso-collections:$statelyIsoVersion")
-                implementation(Extras.youtubeDownloader)
-                api(Internationalization.dep)
+                with(deps) {
+                    api(bundles.stately)
+                    api(i18n4k.core)
+                    api(kermit)
+                    api(moko.parcelize)
+                    implementation(youtube.downloader)
+                }
             }
         }
     }

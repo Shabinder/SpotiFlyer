@@ -29,36 +29,23 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                useExperimentalAnnotation("androidx.compose.animation")
+                optIn("androidx.compose.animation")
             }
         }
         named("commonMain") {
             dependencies {
-                // Decompose
-                implementation(Decompose.decompose)
-
-                // MVI
-                implementation(MVIKotlin.coroutines)
-                implementation(MVIKotlin.mvikotlin)
-
                 implementation(compose.ui)
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.animation)
-
-                implementation(Extras.kermit)
-                implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
-                implementation(JetBrains.Kotlin.coroutines) {
-                    @Suppress("DEPRECATION")
-                    isForce = true
-                }
+                implementation(Deps.kotlinCoroutines)
+                implementation(Deps.decompose)
             }
         }
         named("androidMain") {
             dependencies {
-                implementation(Androidx.androidxActivity)
-                implementation(Androidx.core)
+                implementation(Deps.androidXCommonBundle)
             }
         }
         named("desktopMain") {

@@ -25,10 +25,14 @@ import com.shabinder.common.models.DownloadResult
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.utils.removeIllegalChars
+import com.shabinder.common.utils.requireNotNull
 import com.shabinder.database.Database
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpStatement
+import io.ktor.http.contentLength
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -80,12 +84,13 @@ fun FileManager.createDirectories() {
         if (!defaultDir().contains("null${fileSeparator()}SpotiFlyer")) {
             createDirectory(defaultDir())
             createDirectory(imageCacheDir())
-            createDirectory(defaultDir() + "Tracks/")
-            createDirectory(defaultDir() + "Albums/")
-            createDirectory(defaultDir() + "Playlists/")
-            createDirectory(defaultDir() + "YT_Downloads/")
+            createDirectory(defaultDir() + "Tracks" + fileSeparator())
+            createDirectory(defaultDir() + "Albums" + fileSeparator())
+            createDirectory(defaultDir() + "Playlists" + fileSeparator())
+            createDirectory(defaultDir() + "YT_Downloads" + fileSeparator())
         }
-    } catch (ignored: Exception) { }
+    } catch (ignored: Exception) {
+    }
 }
 
 fun FileManager.finalOutputDir(
@@ -100,24 +105,50 @@ fun FileManager.finalOutputDir(
                 removeIllegalChars(subFolder) + this.fileSeparator()
             } +
             removeIllegalChars(itemName) + extension
-/*DIR Specific Operation End*/
 
-fun getNameURL(url: String): String {
-    return url.substring(url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1, url.length)
-        .replace('/', '_')
+fun FileManager.getImageCachePath(
+    url: String
+): String = imageCacheDir() + getNameFromURL(url, isImage = true)
+
+/*DIR Specific Operation End*/
+private fun getNameFromURL(url: String, isImage: Boolean = false): String {
+    val startIndex = url.lastIndexOf('/', url.lastIndexOf('/') - 1) + 1
+
+    var fileName = if (startIndex != -1)
+        url.substring(startIndex).replace('/', '_')
+    else url.substringAfterLast("/")
+
+    // Generify File Extensions
+    if (isImage) {
+        if (fileName.length - fileName.lastIndexOf(".") > 5) {
+            fileName += ".jpeg"
+        } else {
+            if (fileName.endsWith(".jpg"))
+                fileName = fileName.substringBeforeLast(".") + ".jpeg"
+        }
+    }
+
+    return fileName
 }
 
-suspend fun downloadFile(url: String): Flow<DownloadResult> {
+suspend fun HttpClient.downloadFile(url: String) = downloadFile(url, this)
+
+suspend fun downloadFile(url: String, client: HttpClient? = null): Flow<DownloadResult> {
     return flow {
-        val client = createHttpClient()
-        val response = client.get<HttpStatement>(url).execute()
-        val data = ByteArray(response.contentLength()!!.toInt())
+        val httpClient = client ?: createHttpClient()
+        val response = httpClient.get<HttpStatement>(url).execute()
+        // Not all requests return Content Length
+        val data = kotlin.runCatching {
+            ByteArray(response.contentLength().requireNotNull().toInt())
+        }.getOrNull() ?: byteArrayOf()
         var offset = 0
         do {
             // Set Length optimally, after how many kb you want a progress update, now it 0.25mb
             val currentRead = response.content.readAvailable(data, offset, 2_50_000)
             offset += currentRead
-            val progress = (offset * 100f / data.size).roundToInt()
+            val progress = data.size.takeIf { it != 0 }?.let { fileSize ->
+                (offset * 100f / fileSize).roundToInt()
+            } ?: 0
             emit(DownloadResult.Progress(progress))
         } while (currentRead > 0)
         if (response.status.isSuccess()) {
@@ -125,7 +156,10 @@ suspend fun downloadFile(url: String): Flow<DownloadResult> {
         } else {
             emit(DownloadResult.Error("File not downloaded"))
         }
-        client.close()
+
+        // Close Client if We Created One
+        if (client == null)
+            httpClient.close()
     }.catch { e ->
         e.printStackTrace()
         emit(DownloadResult.Error(e.message ?: "File not downloaded"))

@@ -16,32 +16,45 @@
 
 package list
 
-import kotlinx.css.*
+import kotlinx.css.Align
+import kotlinx.css.Display
+import kotlinx.css.FlexDirection
+import kotlinx.css.TextAlign
+import kotlinx.css.alignItems
+import kotlinx.css.display
+import kotlinx.css.flexDirection
+import kotlinx.css.height
+import kotlinx.css.marginTop
+import kotlinx.css.px
+import kotlinx.css.textAlign
+import kotlinx.css.width
 import kotlinx.html.id
-import react.*
+import react.PropsWithChildren
+import react.RBuilder
 import react.dom.attrs
+import react.functionComponent
 import styled.css
 import styled.styledDiv
 import styled.styledH1
 import styled.styledImg
 
-external interface CoverImageProps : RProps {
+external interface CoverImageProps : PropsWithChildren {
     var coverImageURL: String
     var coverName: String
 }
 
 @Suppress("FunctionName")
-fun RBuilder.CoverImage(handler: CoverImageProps.() -> Unit): ReactElement {
-    return child(coverImage){
+fun RBuilder.CoverImage(handler: CoverImageProps.() -> Unit) {
+    return child(coverImage) {
         attrs {
             handler()
         }
     }
 }
 
-private val coverImage = functionalComponent<CoverImageProps>("CoverImage"){ props ->
+private val coverImage = functionComponent<CoverImageProps>("CoverImage") { props ->
     styledDiv {
-        styledImg(src= props.coverImageURL){
+        styledImg(src = props.coverImageURL) {
             css {
                 height = 220.px
                 width = 220.px

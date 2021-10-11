@@ -10,29 +10,37 @@ kotlin {
             dependencies {
                 implementation(project(":common:data-models"))
                 implementation(project(":common:database"))
-                api("org.jetbrains.kotlinx:atomicfu:0.16.2")
-                api(MultiPlatformSettings.dep)
-                implementation(MVIKotlin.rx)
+                with(deps) {
+                    api(multiplatform.settings)
+                    api(kotlinx.atomicfu)
+                    implementation(mviKotlin.rx)
+                    implementation(decompose.dep)
+                }
             }
         }
         androidMain {
             dependencies {
-                implementation(Extras.mp3agic)
-                implementation(Extras.Android.countly)
+                with(deps) {
+                    implementation(mp3agic)
+                    implementation(countly.android)
+                }
                 implementation(project(":ffmpeg:android-ffmpeg"))
             }
         }
         desktopMain {
             dependencies {
-                implementation(Extras.mp3agic)
-                implementation(Extras.Desktop.countly)
-                implementation("com.github.kokorin.jaffree:jaffree:2021.08.16")
+                with(deps) {
+                    implementation(mp3agic)
+                    implementation(countly.desktop)
+                    implementation(jaffree)
+                }
             }
         }
         jsMain {
             dependencies {
                 implementation(npm("browser-id3-writer", "4.4.0"))
                 implementation(npm("file-saver", "2.0.4"))
+                implementation(deps.kotlin.js.wrappers.ext)
             }
         }
     }

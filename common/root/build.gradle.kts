@@ -33,9 +33,10 @@ fun org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer.generateFramewor
         export(project(":common:providers"))
         export(project(":common:list"))
         export(project(":common:preference"))
-        export(Decompose.decompose)
-        export(MVIKotlin.mvikotlinMain)
-        export(MVIKotlin.mvikotlinLogging)
+        with(deps) {
+            export(decompose.dep)
+            export(bundles.mviKotlin)
+        }
     }
 }
 
@@ -71,7 +72,6 @@ kotlin {
                 implementation(project(":common:providers"))
                 implementation(project(":common:core-components"))
                 implementation(project(":common:preference"))
-                implementation(SqlDelight.coroutineExtensions)
             }
         }
     }
@@ -86,9 +86,10 @@ kotlin {
                     api(project(":common:list"))
                     api(project(":common:main"))
                     api(project(":common:preference"))
-                    api(Decompose.decompose)
-                    api(MVIKotlin.mvikotlinMain)
-                    api(MVIKotlin.mvikotlinLogging)
+                    with(deps) {
+                        api(decompose.dep)
+                        api(bundles.mviKotlin)
+                    }
                 }
             }
         }
@@ -100,8 +101,11 @@ val packForXcode by tasks.creating(Sync::class) {
         group = "build"
         val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
         val targetName = "ios"
-        val framework = kotlin.targets.getByName<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>(targetName)
-            .binaries.getFramework(mode)
+        val framework =
+            kotlin.targets.getByName<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>(
+                targetName
+            )
+                .binaries.getFramework(mode)
         inputs.property("mode", mode)
         dependsOn(framework.linkTask)
         val targetDir = File(buildDir, "xcode-frameworks")

@@ -19,6 +19,7 @@ package com.shabinder.common.providers.gaana
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.core_components.file_manager.finalOutputDir
+import com.shabinder.common.core_components.file_manager.getImageCachePath
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.PlatformQueryResult
 import com.shabinder.common.models.SpotiFlyerException
@@ -124,8 +125,7 @@ class GaanaProvider(
             title = it.track_title,
             artists = it.artist.map { artist -> artist?.name.toString() },
             durationSec = it.duration,
-            albumArtPath = fileManager.imageCacheDir() + (it.artworkLink.substringBeforeLast('/')
-                .substringAfterLast('/')) + ".jpeg",
+            albumArtPath = fileManager.getImageCachePath(it.artworkLink),
             albumName = it.album_title,
             genre = it.genre?.mapNotNull { genre -> genre?.name } ?: emptyList(),
             year = it.release_date,

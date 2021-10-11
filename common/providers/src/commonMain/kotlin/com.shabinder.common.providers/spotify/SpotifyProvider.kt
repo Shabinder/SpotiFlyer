@@ -19,6 +19,7 @@ package com.shabinder.common.providers.spotify
 import co.touchlab.kermit.Kermit
 import com.shabinder.common.core_components.file_manager.FileManager
 import com.shabinder.common.core_components.file_manager.finalOutputDir
+import com.shabinder.common.core_components.file_manager.getImageCachePath
 import com.shabinder.common.core_components.utils.createHttpClient
 import com.shabinder.common.models.*
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
@@ -79,7 +80,7 @@ class SpotifyProvider(
 
         if (type == "episode" || type == "show") {
             throw SpotiFlyerException.FeatureNotImplementedYet(
-                "Support for Spotify's ${type.uppercase()} isn't implemented yet"
+                "Support for Spotify's ${type.toUpperCase()} isn't implemented yet"
             )
         }
 
@@ -201,9 +202,7 @@ class SpotifyProvider(
             artists = it.artists?.map { artist -> artist?.name.toString() } ?: listOf(),
             albumArtists = it.album?.artists?.mapNotNull { artist -> artist?.name } ?: emptyList(),
             durationSec = (it.duration_ms / 1000).toInt(),
-            albumArtPath = fileManager.imageCacheDir() + (it.album?.images?.firstOrNull()?.url.toString()).substringAfterLast(
-                '/'
-            ) + ".jpeg",
+            albumArtPath = fileManager.getImageCachePath(it.album?.images?.firstOrNull()?.url ?: ""),
             albumName = it.album?.name,
             year = it.album?.release_date,
             comment = "Genres:${it.album?.genres?.joinToString()}",

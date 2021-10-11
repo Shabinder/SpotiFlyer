@@ -18,34 +18,32 @@ package home
 
 import kotlinx.css.em
 import kotlinx.css.fontSize
+import react.PropsWithChildren
 import react.RBuilder
-import react.RProps
-import react.ReactElement
-import react.child
-import react.functionalComponent
+import react.functionComponent
 import styled.css
 import styled.styledDiv
 import styled.styledH1
 
-external interface MessageProps : RProps {
+external interface MessageProps : PropsWithChildren {
     var text: String
 }
 
 @Suppress("FunctionName")
-fun RBuilder.Message(handler:MessageProps.() -> Unit): ReactElement {
-    return child(message){
+fun RBuilder.Message(handler: MessageProps.() -> Unit) {
+    return child(message) {
         attrs {
             handler()
         }
     }
 }
 
-private val message = functionalComponent<MessageProps>("Message") { props->
+private val message = functionComponent<MessageProps>("Message") { props ->
     styledDiv {
         styledH1 {
-            + props.text
+            +props.text
             css {
-                classes = mutableListOf("headingTitle")
+                classes.add("headingTitle")
                 fontSize = 2.6.em
             }
         }

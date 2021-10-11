@@ -18,16 +18,15 @@ application {
 }
 
 dependencies {
-    implementation(Ktor.slf4j)
-    implementation(Ktor.clientCore)
-    implementation(Ktor.clientJson)
-    implementation(Ktor.clientApache)
-    implementation(Ktor.clientLogging)
-    implementation(Ktor.clientSerialization)
-    implementation(Serialization.json)
+    with(deps) {
+        implementation(slf4j.simple)
+        implementation(bundles.ktor)
+        implementation(ktor.client.apache)
+        implementation(kotlinx.serialization.json)
 
-    // testDeps
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.5.21")
+        // testDep
+        testImplementation(kotlin.kotlinTestJunit)
+    }
 }
 
 tasks.test {

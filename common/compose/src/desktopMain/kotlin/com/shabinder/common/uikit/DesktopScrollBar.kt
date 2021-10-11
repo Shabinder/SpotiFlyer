@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 
 actual val MARGIN_SCROLLBAR: Dp = 8.dp
 
-actual typealias ScrollbarAdapter = androidx.compose.foundation.ScrollbarAdapter
+actual typealias ScrollbarAdapter = ScrollbarAdapter
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -23,8 +23,6 @@ actual fun rememberScrollbarAdapter(
 ): ScrollbarAdapter =
     androidx.compose.foundation.rememberScrollbarAdapter(
         scrollState = scrollState,
-        itemCount = itemCount,
-        averageItemSize = averageItemSize
     )
 
 @Composable

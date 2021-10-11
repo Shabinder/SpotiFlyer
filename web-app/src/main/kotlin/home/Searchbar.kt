@@ -22,32 +22,35 @@ import kotlinx.html.js.onChangeFunction
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.js.onKeyDownFunction
 import org.w3c.dom.HTMLInputElement
+import react.PropsWithChildren
 import react.RBuilder
-import react.RProps
-import react.child
 import react.dom.attrs
-import react.functionalComponent
-import styled.*
+import react.functionComponent
+import styled.css
+import styled.styledButton
+import styled.styledDiv
+import styled.styledImg
+import styled.styledInput
 
-external interface SearchbarProps : RProps {
+external interface SearchbarProps : PropsWithChildren {
     var link: String
-    var search:(String)->Unit
-    var onLinkChange:(String)->Unit
+    var search: (String) -> Unit
+    var onLinkChange: (String) -> Unit
 }
 
 @Suppress("FunctionName")
-fun RBuilder.SearchBar(handler:SearchbarProps.() -> Unit) = child(searchbar){
+fun RBuilder.SearchBar(handler: SearchbarProps.() -> Unit) = child(searchbar) {
     attrs {
         handler()
     }
 }
 
-val searchbar = functionalComponent<SearchbarProps>("SearchBar"){ props ->
-    styledDiv{
+val searchbar = functionComponent<SearchbarProps>("SearchBar") { props ->
+    styledDiv {
         css {
-            classes = mutableListOf("searchBox")
+            classes.add("searchBox")
         }
-        styledInput(type = InputType.url){
+        styledInput(type = InputType.url) {
             attrs {
                 placeholder = "Search"
                 onChangeFunction = {
@@ -55,30 +58,30 @@ val searchbar = functionalComponent<SearchbarProps>("SearchBar"){ props ->
                     props.onLinkChange(target.value)
                 }
                 this.onKeyDownFunction = {
-                    if(it.asDynamic().key == "Enter") {
-                        if(props.link.isEmpty()) window.alert("Enter a Link from Supported Platforms")
+                    if (it.asDynamic().key == "Enter") {
+                        if (props.link.isEmpty()) window.alert("Enter a Link from Supported Platforms")
                         else props.search(props.link)
                     }
                 }
                 value = props.link
             }
             css {
-                classes = mutableListOf("searchInput")
+                classes.add("searchInput")
             }
         }
         styledButton {
             attrs {
                 onClickFunction = {
-                    if(props.link.isEmpty()) window.alert("Enter a Link from Supported Platforms")
+                    if (props.link.isEmpty()) window.alert("Enter a Link from Supported Platforms")
                     else props.search(props.link)
                 }
             }
             css {
-                classes = mutableListOf("searchButton")
+                classes.add("searchButton")
             }
             styledImg(src = "search.svg") {
                 css {
-                    classes = mutableListOf("search-icon")
+                    classes.add("search-icon")
                 }
             }
         }

@@ -38,22 +38,32 @@ allprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>().configureEach {
         dependsOn(":common:data-models:generateI18n4kFiles")
         kotlinOptions {
-            if(this is org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions) {
+            if (this is org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions) {
                 jvmTarget = "1.8"
             }
             freeCompilerArgs = (freeCompilerArgs + listOf("-Xopt-in=kotlin.RequiresOptIn"))
         }
     }
-
-    afterEvaluate {
-        project.extensions.findByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()?.let { kmpExt ->
-            kmpExt.sourceSets.run {
-                all {
-                    languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
-                    languageSettings.useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
+    configurations.all {
+        resolutionStrategy {
+            eachDependency {
+                if (requested.group == "org.jetbrains.kotlin") {
+                    @Suppress("UnstableApiUsage")
+                    useVersion(deps.kotlin.kotlinGradlePlugin.get().versionConstraint.requiredVersion)
                 }
-                removeAll { it.name == "androidAndroidTestRelease" }
             }
         }
+    }
+    afterEvaluate {
+        project.extensions.findByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()
+            ?.let { kmpExt ->
+                kmpExt.sourceSets.run {
+                    all {
+                        languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
+                        languageSettings.useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
+                    }
+                    removeAll { it.name == "androidAndroidTestRelease" }
+                }
+            }
     }
 }

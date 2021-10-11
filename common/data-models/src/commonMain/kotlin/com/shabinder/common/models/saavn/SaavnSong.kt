@@ -20,7 +20,7 @@ data class SaavnSong @OptIn(ExperimentalSerializationApi::class) constructor(
 //    val explicit_content: Int = 0,
     val has_lyrics: Boolean = false,
     val id: String,
-    val image: String,
+    val image: String = "",
     val label: String? = null,
     val label_url: String? = null,
     val language: String,

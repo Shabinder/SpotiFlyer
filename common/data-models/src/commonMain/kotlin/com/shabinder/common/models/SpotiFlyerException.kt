@@ -12,6 +12,11 @@ sealed class SpotiFlyerException(override val message: String) : Exception(messa
         override val message: String = /*${Strings.mp3ConverterBusy()} */"CAUSE:$extraInfo"
     ) : SpotiFlyerException(message)
 
+    data class GeoLocationBlocked(
+        val extraInfo: String? = null,
+        override val message: String = "This Content is not Accessible from your Location, try using a VPN! \nCAUSE:$extraInfo"
+    ) : SpotiFlyerException(message)
+
     data class UnknownReason(
         val exception: Throwable? = null,
         override val message: String = Strings.unknownError()

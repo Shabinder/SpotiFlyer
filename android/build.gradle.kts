@@ -16,7 +16,6 @@
 
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.compose.compose
-import org.jetbrains.kotlin.kapt.cli.main
 
 plugins {
     id("com.android.application")
@@ -79,6 +78,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    packagingOptions {
+        exclude("META-INF/*")
+    }
     configurations {
         "implementation" {
             exclude(group = "androidx.compose.animation")
@@ -92,7 +94,7 @@ android {
 dependencies {
     implementation(compose.material)
     implementation(compose.materialIconsExtended)
-    implementation(Androidx.androidxActivity)
+    implementation(deps.androidx.activity)
 
     // Project's SubModules
     implementation(project(":common:database"))
@@ -103,43 +105,40 @@ dependencies {
     implementation(project(":common:core-components"))
     implementation(project(":common:providers"))
 
-    // Koin
-    implementation(Koin.android)
-    implementation(Koin.compose)
+    with(deps) {
 
-    // DECOMPOSE
-    implementation(Decompose.decompose)
-    implementation(Decompose.extensionsCompose)
+        // Koin
+        with(koin) {
+            implementation(androidx.compose)
+            implementation(android)
+        }
 
-    // MVI
-    implementation(MVIKotlin.mvikotlin)
-    implementation(MVIKotlin.mvikotlinMain)
-    implementation(MVIKotlin.mvikotlinLogging)
-    implementation(MVIKotlin.mvikotlinTimeTravel)
+        // DECOMPOSE
+        with(decompose) {
+            implementation(dep)
+            implementation(extensions.compose)
+        }
 
-    // Extras
-    with(Extras.Android) {
-        implementation(countly)
-        implementation(appUpdator)
+        implementation(countly.android)
+        implementation(android.app.notifier)
+        implementation(storage.chooser)
+
+        with(bundles) {
+            implementation(ktor)
+            implementation(mviKotlin)
+            implementation(androidx.lifecycle)
+            implementation(accompanist.inset)
+        }
+
+        // Test
+        testImplementation(junit)
+        androidTestImplementation(androidx.junit)
+        androidTestImplementation(androidx.expresso)
+
+        // Desugar
+        coreLibraryDesugaring(androidx.desugar)
+
+        // Debug
+        debugImplementation(leak.canary)
     }
-
-    with(Versions.androidxLifecycle) {
-        implementation("androidx.lifecycle:lifecycle-service:$this")
-        implementation("androidx.lifecycle:lifecycle-common-java8:$this")
-        implementation("androidx.lifecycle:lifecycle-runtime-ktx:$this")
-    }
-
-    implementation(Extras.kermit)
-    // implementation("com.jakewharton.timber:timber:4.7.1")
-    implementation("dev.icerock.moko:parcelize:${Versions.mokoParcelize}")
-    implementation("com.github.shabinder:storage-chooser:2.0.4.45")
-    implementation("com.google.accompanist:accompanist-insets:0.16.1")
-
-    // Test
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation(Androidx.junit)
-    androidTestImplementation(Androidx.expresso)
-
-    // Desugaring
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 }

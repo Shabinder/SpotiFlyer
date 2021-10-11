@@ -1,0 +1,135 @@
+[versions]
+kotlin = "1.5.31"
+androidCoroutines = "1.5.1"
+ktLint = "10.1.0"
+mosaic = "0.1.0"
+koin = "3.1.2"
+kermit = "0.1.9"
+mokoParcelize = "0.7.1"
+ktor = "1.6.3"
+kotlinxSerialization = "1.3.0"
+sqlDelight = "1.5.1"
+sqliteJdbcDriver = "3.34.0"
+slf4j = "1.7.31"
+i18n4k = "0.1.3"
+essenty = "0.1.3"
+multiplatformSettings = "0.7.7"
+decompose = "0.3.1"
+mviKotlin = "2.0.4"
+accompanist = "0.18.0"
+statelyVersion = "1.1.10"
+statelyIsoVersion = "1.2.0-nmm"
+androidxLifecycle = "2.4.0-alpha03"
+
+
+[libraries]
+kotlin-kotlinGradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-serialization = { group = "org.jetbrains.kotlin", name = "kotlin-serialization", version.ref = "kotlin" }
+kotlin-kotlinTestCommon = { group = "org.jetbrains.kotlin", name = "kotlin-test-common", version.ref = "kotlin" }
+kotlin-kotlinTestJs = { group = "org.jetbrains.kotlin", name = "kotlin-test-js", version.ref = "kotlin" }
+kotlin-kotlinTestJunit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
+kotlin-kotlinTestAnnotationsCommon = { group = "org.jetbrains.kotlin", name = "kotlin-test-annotations-common", version.ref = "kotlin" }
+kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.5.2-native-mt" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+kotlinx-atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version = "0.16.3" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version = "0.2.1" }
+
+kotlin-compose-gradle = { group = "org.jetbrains.compose", name = "compose-gradle-plugin", version = "1.0.0-alpha4-build366" }
+mosaic-gradle =  { group = "com.jakewharton.mosaic", name = "mosaic-gradle-plugin", version.ref = "mosaic" }
+
+essenty-lifecycle = { group = "com.arkivanov.essenty", name = "lifecycle", version.ref = "essenty" }
+essenty-instanceKeeper = { group = "com.arkivanov.essenty", name = "instance-keeper", version.ref = "essenty" }
+
+decompose-dep = { group = "com.arkivanov.decompose", name = "decompose", version.ref = "decompose" }
+decompose-extensions-compose = { group = "com.arkivanov.decompose", name = "extensions-compose-jetbrains", version.ref = "decompose" }
+
+mviKotlin-dep = { group = "com.arkivanov.mvikotlin", name = "mvikotlin", version.ref = "mviKotlin" }
+mviKotlin-rx = { group = "com.arkivanov.mvikotlin", name = "rx", version.ref = "mviKotlin" }
+mviKotlin-main = { group = "com.arkivanov.mvikotlin", name = "mvikotlin-main", version.ref = "mviKotlin" }
+mviKotlin-coroutines = { group = "com.arkivanov.mvikotlin", name = "mvikotlin-extensions-coroutines", version.ref = "mviKotlin" }
+mviKotlin-keepers = { group = "com.arkivanov.mvikotlin", name = "keepers", version.ref = "mviKotlin" }
+mviKotlin-logging = { group = "com.arkivanov.mvikotlin", name = "mvikotlin-logging", version.ref = "mviKotlin" }
+mviKotlin-timetravel = { group = "com.arkivanov.mvikotlin", name = "mvikotlin-timetravel", version.ref = "mviKotlin" }
+mviKotlin-extensions-reaktive = { group = "com.arkivanov.mvikotlin", name = "mvikotlin-extensions-reaktive", version.ref = "mviKotlin" }
+
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-json = { group = "io.ktor", name = "ktor-client-json", version.ref = "ktor" }
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+ktor-client-serialization = { group = "io.ktor", name = "ktor-client-serialization", version.ref = "ktor" }
+ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor" }
+ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
+ktor-client-curl = { group = "io.ktor", name = "ktor-client-curl", version.ref = "ktor" }
+ktor-client-apache = { group = "io.ktor", name = "ktor-client-apache", version.ref = "ktor" }
+ktor-client-ios = { group = "io.ktor", name = "ktor-client-ios", version.ref = "ktor" }
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+ktor-client-js = { group = "io.ktor", name = "ktor-client-js", version.ref = "ktor" }
+slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
+
+i18n4k-core = { group = "de.comahe.i18n4k", name = "i18n4k-core", version.ref = "i18n4k" }
+i18n4k-gradle-plugin = { group = "de.comahe.i18n4k", name = "i18n4k-gradle-plugin", version.ref = "i18n4k" }
+
+youtube-downloader = { group = "io.github.shabinder", name = "youtube-api-dl", version = "1.3" }
+fuzzy-wuzzy = { group = "io.github.shabinder", name = "fuzzywuzzy", version = "1.1" }
+mp3agic = { group = "com.mpatric", name = "mp3agic", version = "0.9.0" }
+kermit = { group = "co.touchlab", name = "kermit", version.ref = "kermit" }
+storage-chooser = { group = "com.github.shabinder", name = "storage-chooser", version = "2.0.4.45" }
+accompanist-inset = { group = "com.google.accompanist", name = "accompanist-insets", version.ref = "accompanist" }
+android-app-notifier = { group = "com.github.amitbd1508", name = "AppUpdater", version = "4.1.0" }
+moko-parcelize = { group = "dev.icerock.moko", name = "parcelize", version.ref = "mokoParcelize" }
+jaffree = { group = "com.github.kokorin.jaffree", name = "jaffree", version = "2021.08.16" }
+multiplatform-settings = { group = "com.russhwolf", name = "multiplatform-settings-no-arg", version.ref = "multiplatformSettings" }
+
+countly-android = { group = "ly.count.android", name = "sdk", version = "20.11.8" }
+countly-desktop = { group = "ly.count.sdk", name = "java", version = "20.11.0" }
+
+stately-common = { group = "co.touchlab", name = "stately-common", version.ref = "statelyVersion" }
+stately-concurrency = { group = "co.touchlab", name = "stately-concurrency", version.ref = "statelyVersion" }
+stately-isolate = { group = "co.touchlab", name = "stately-isolate", version.ref = "statelyIsoVersion" }
+stately-iso-collections = { group = "co.touchlab", name = "stately-iso-collections", version.ref = "statelyIsoVersion" }
+
+sqldelight-runtime = { group = "com.squareup.sqldelight", name = "runtime", version.ref = "sqlDelight" }
+sqldelight-coroutines-extension = { group = "com.squareup.sqldelight", name = "coroutines-extensions", version.ref = "sqlDelight" }
+sqldelight-gradle-plugin = { group = "com.squareup.sqldelight", name = "gradle-plugin", version.ref = "sqlDelight" }
+sqldelight-driver = { group = "com.squareup.sqldelight", name = "sqlite-driver", version.ref = "sqlDelight" }
+sqldelight-android-driver = { group = "com.squareup.sqldelight", name = "android-driver", version.ref = "sqlDelight" }
+sqldelight-native-driver = { group = "com.squareup.sqldelight", name = "native-driver", version.ref = "sqlDelight" }
+sqlite-jdbc-driver = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqliteJdbcDriver" }
+
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+
+kotlin-js-wrappers-react = { group = "org.jetbrains.kotlin-wrappers", name = "kotlin-react", version = "17.0.2-pre.251-kotlin-1.5.31" }
+kotlin-js-wrappers-reactDom = { group = "org.jetbrains.kotlin-wrappers", name = "kotlin-react-dom", version = "17.0.2-pre.251-kotlin-1.5.31" }
+kotlin-js-wrappers-styled = { group = "org.jetbrains.kotlin-wrappers", name = "kotlin-styled", version = "5.3.1-pre.250-kotlin-1.5.31" }
+kotlin-js-wrappers-ext = { group = "org.jetbrains.kotlin-wrappers", name = "kotlin-extensions", version = "1.0.1-pre.251-kotlin-1.5.31" }
+
+androidx-activity = { group = "androidx.activity", name = "activity-compose", version = "1.3.1" }
+androidx-core = { group = "androidx.core", name = "core-ktx", version = "1.6.0" }
+androidx-palette = { group = "androidx.palette", name = "palette-ktx", version = "1.0.0" }
+androidx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "androidCoroutines" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version = "1.1.2" }
+androidx-expresso = { group = "androidx.test.espresso", name = "espresso-core", version = "3.3.0" }
+androidx-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version = "4.2.2" }
+androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "androidxLifecycle" }
+androidx-lifecycle-common = { group = "androidx.lifecycle", name = "lifecycle-common-java8", version.ref = "androidxLifecycle" }
+androidx-lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
+androidx-desugar = { group = "com.android.tools", name = "desugar_jdk_libs", version = "1.1.5" }
+leak-canary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version = "2.7" }
+junit = { group = "junit", name = "junit", version = "4.13.2" }
+
+ktlint-gradle = { group = "org.jlleitschuh.gradle", name = "ktlint-gradle", version.ref = "ktLint" }
+
+[bundles]
+ktor = ["ktor-client-core","ktor-client-json","ktor-client-auth","ktor-client-logging","ktor-client-serialization"]
+stately = ["stately-common","stately-concurrency","stately-isolate","stately-iso-collections"]
+androidx-lifecycle = ["androidx-lifecycle-service","androidx-lifecycle-common","androidx-lifecycle-runtime"]
+androidx-common = ["androidx-activity","androidx-core"]
+kotlin-test = ["kotlin-kotlinTestCommon","kotlin-kotlinTestAnnotationsCommon"]
+sqldelight = ["sqldelight-runtime","sqldelight-coroutines-extension","sqldelight-driver"]
+mviKotlin = ["mviKotlin-dep","mviKotlin-main","mviKotlin-coroutines","mviKotlin-logging","mviKotlin-timetravel"]
+kotlinCommon = ["kotlin-coroutines", "kotlin-serialization", "kotlinx-serialization-json", "kotlinx-atomicfu"]
+essenty = ["essenty-lifecycle","essenty-instanceKeeper"]
+koin-android = ["koin-androidx-compose","koin-android"]
+kotlin-js-wrappers = ["kotlin-js-wrappers-react","kotlin-js-wrappers-reactDom","kotlin-js-wrappers-styled","kotlin-js-wrappers-ext"]

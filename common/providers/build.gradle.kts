@@ -12,23 +12,25 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(project(":common:data-models"))
-                implementation(project(":common:database"))
-                implementation(project(":common:core-components"))
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.1")
-                implementation(Extras.youtubeDownloader)
-                implementation(Extras.fuzzyWuzzy)
+                with(deps) {
+                    implementation(project(":common:data-models"))
+                    implementation(project(":common:database"))
+                    implementation(project(":common:core-components"))
+                    implementation(youtube.downloader)
+                    implementation(fuzzy.wuzzy)
+                    implementation(kotlinx.datetime)
+                }
             }
         }
         androidMain {
             dependencies {
-                implementation(Extras.mp3agic)
+                implementation(deps.mp3agic)
             }
         }
         desktopMain {
             dependencies {
-                implementation(Extras.mp3agic)
-                implementation("com.github.kokorin.jaffree:jaffree:2021.08.16")
+                implementation(deps.mp3agic)
+                implementation(deps.jaffree)
             }
         }
         jsMain {

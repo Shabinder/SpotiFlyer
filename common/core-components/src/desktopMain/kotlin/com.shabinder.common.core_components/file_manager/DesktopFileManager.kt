@@ -30,17 +30,20 @@ import com.shabinder.common.core_components.removeAllTags
 import com.shabinder.common.core_components.setId3v1Tags
 import com.shabinder.common.core_components.setId3v2TagsAndSaveFile
 import com.shabinder.common.database.SpotiFlyerDatabase
+import com.shabinder.common.models.Actions
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.dispatcherIO
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
-import com.shabinder.common.models.event.coroutines.failure
 import com.shabinder.common.models.event.coroutines.map
-import com.shabinder.common.models.Actions
 import com.shabinder.database.Database
-import kotlinx.coroutines.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableSharedFlow
-import org.jetbrains.skija.Image
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.jetbrains.skia.Image
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import java.awt.image.BufferedImage
@@ -104,9 +107,11 @@ class DesktopFileManager(
 
     override suspend fun cacheImage(image: Any, path: String): Unit = withContext(dispatcherIO) {
         try {
+            val file = File(path)
+            if(!file.parentFile.exists()) createDirectories()
             (image as? BufferedImage)?.let {
-                ImageIO.write(it, "jpeg", File(path))
-            }
+                ImageIO.write(it, "jpeg", file)
+             }
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -165,7 +170,7 @@ class DesktopFileManager(
             }
             SuspendableEvent.success(trackDetails.outputFilePath)
         } catch (e: Throwable) {
-            if(e is JaffreeException) Actions.instance.showPopUpMessage("No FFmpeg found at path.")
+            if (e is JaffreeException) Actions.instance.showPopUpMessage("No FFmpeg found at path.")
             if (songFile.exists()) songFile.delete()
             logger.e { "${songFile.absolutePath} could not be created" }
             SuspendableEvent.error(e)
@@ -175,8 +180,7 @@ class DesktopFileManager(
     override fun addToLibrary(path: String) {}
 
     override suspend fun loadImage(url: String, reqWidth: Int, reqHeight: Int): Picture {
-        val cachePath = imageCacheDir() + getNameURL(url)
-        var picture: ImageBitmap? = loadCachedImage(cachePath, reqWidth, reqHeight)
+        var picture: ImageBitmap? = loadCachedImage(getImageCachePath(url), reqWidth, reqHeight)
         if (picture == null) picture = freshImage(url, reqWidth, reqHeight)
         return Picture(image = picture)
     }
@@ -205,7 +209,7 @@ class DesktopFileManager(
 
                 if (result != null) {
                     GlobalScope.launch(Dispatchers.IO) { // TODO Refactor
-                        cacheImage(result, imageCacheDir() + getNameURL(url))
+                        cacheImage(result, getImageCachePath(url))
                     }
                     result.toImageBitmap()
                 } else null

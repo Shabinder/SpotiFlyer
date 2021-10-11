@@ -23,21 +23,25 @@ import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.shabinder.common.core_components.file_manager.DownloadProgressFlow
 import com.shabinder.common.core_components.preference_manager.PreferenceManager
+import com.shabinder.common.di.ApplicationInit
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.PlatformActions
 import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.database.Database
 import extras.renderableChild
-import react.*
+import react.PropsWithChildren
+import react.RBuilder
+import react.RComponent
+import react.State
 import root.RootR
 
-external interface AppProps : RProps {
+external interface AppProps : PropsWithChildren {
     var dependencies: AppDependencies
 }
 
 @Suppress("FunctionName")
-fun RBuilder.App(attrs: AppProps.() -> Unit): ReactElement {
+fun RBuilder.App(attrs: AppProps.() -> Unit) {
     return child(App::class) {
         this.attrs(attrs)
     }
@@ -46,7 +50,7 @@ fun RBuilder.App(attrs: AppProps.() -> Unit): ReactElement {
 @Suppress("EXPERIMENTAL_IS_NOT_ENABLED", "NON_EXPORTABLE_TYPE")
 @OptIn(ExperimentalJsExport::class)
 @JsExport
-class App(props: AppProps) : RComponent<AppProps, RState>(props) {
+class App(props: AppProps) : RComponent<AppProps, State>(props) {
 
     private val lifecycle = LifecycleRegistry()
     private val ctx = DefaultComponentContext(lifecycle = lifecycle)
@@ -62,6 +66,7 @@ class App(props: AppProps) : RComponent<AppProps, RState>(props) {
             override val fetchQuery = dependencies.fetchPlatformQueryResult
             override val fileManager = dependencies.fileManager
             override val analyticsManager = dependencies.analyticsManager
+            override val appInit: ApplicationInit = dependencies.appInit
             override val preferenceManager: PreferenceManager = dependencies.preferenceManager
             override val database: Database? = fileManager.db
             override val downloadProgressFlow = DownloadProgressFlow

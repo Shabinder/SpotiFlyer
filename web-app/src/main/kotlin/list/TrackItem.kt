@@ -18,30 +18,61 @@ package list
 
 import com.shabinder.common.models.DownloadStatus
 import com.shabinder.common.models.TrackDetails
-import kotlinx.css.*
+import kotlinx.css.Align
+import kotlinx.css.Display
+import kotlinx.css.FlexDirection
+import kotlinx.css.Overflow
+import kotlinx.css.TextAlign
+import kotlinx.css.TextOverflow
+import kotlinx.css.WhiteSpace
+import kotlinx.css.alignItems
+import kotlinx.css.display
+import kotlinx.css.em
+import kotlinx.css.flexDirection
+import kotlinx.css.flexGrow
+import kotlinx.css.fontSize
+import kotlinx.css.height
+import kotlinx.css.margin
+import kotlinx.css.minWidth
+import kotlinx.css.overflow
+import kotlinx.css.padding
+import kotlinx.css.paddingRight
+import kotlinx.css.px
+import kotlinx.css.textAlign
+import kotlinx.css.textOverflow
+import kotlinx.css.whiteSpace
+import kotlinx.css.width
 import kotlinx.html.id
-import react.*
+import react.PropsWithChildren
+import react.RBuilder
 import react.dom.attrs
-import styled.*
+import react.functionComponent
+import react.useEffect
+import react.useState
+import styled.css
+import styled.styledDiv
+import styled.styledH3
+import styled.styledH4
+import styled.styledImg
 
-external interface TrackItemProps : RProps {
-    var details:TrackDetails
-    var downloadTrack:(TrackDetails)->Unit
+external interface TrackItemProps : PropsWithChildren {
+    var details: TrackDetails
+    var downloadTrack: (TrackDetails) -> Unit
 }
 
 @Suppress("FunctionName")
-fun RBuilder.TrackItem(handler: TrackItemProps.() -> Unit): ReactElement {
-    return child(trackItem){
+fun RBuilder.TrackItem(handler: TrackItemProps.() -> Unit) {
+    return child(trackItem) {
         attrs {
             handler()
         }
     }
 }
 
-private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props ->
-    val (downloadStatus,setDownloadStatus) = useState(props.details.downloaded)
+private val trackItem = functionComponent<TrackItemProps>("Track-Item") { props ->
+    val (downloadStatus, setDownloadStatus) = useState(props.details.downloaded)
     val details = props.details
-    useEffect(listOf(props.details)){
+    useEffect(listOf(props.details)) {
         setDownloadStatus(props.details.downloaded)
     }
     styledDiv {
@@ -63,14 +94,14 @@ private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props
                 flexDirection = FlexDirection.column
                 margin(8.px)
             }
-            styledDiv{
+            styledDiv {
                 css {
                     height = 40.px
                     alignItems = Align.center
                     display = Display.flex
                 }
                 styledH3 {
-                    + details.title
+                    +details.title
                     css {
                         padding(8.px)
                         fontSize = 1.3.em
@@ -87,7 +118,7 @@ private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props
                     display = Display.flex
                 }
                 styledH4 {
-                    + details.artists.joinToString(",")
+                    +details.artists.joinToString(",")
                     css {
                         flexGrow = 1.0
                         padding(8.px)
@@ -109,12 +140,12 @@ private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props
                         whiteSpace = WhiteSpace.nowrap
                         overflow = Overflow.hidden
                     }
-                    + "${details.durationSec/60} min, ${details.durationSec%60} sec"
+                    +"${details.durationSec / 60} min, ${details.durationSec % 60} sec"
                 }
             }
         }
-        when(downloadStatus){
-            is DownloadStatus.NotDownloaded ->{
+        when (downloadStatus) {
+            is DownloadStatus.NotDownloaded -> {
                 DownloadButton {
                     onClick = {
                         setDownloadStatus(DownloadStatus.Queued)
@@ -152,7 +183,7 @@ private val trackItem = functionalComponent<TrackItemProps>("Track-Item"){ props
 
         css {
             alignItems = Align.center
-            display =Display.flex
+            display = Display.flex
             paddingRight = 16.px
         }
     }

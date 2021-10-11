@@ -17,31 +17,37 @@
 package list
 
 import com.shabinder.common.models.DownloadStatus
-import kotlinx.css.*
+import kotlinx.css.borderRadius
+import kotlinx.css.em
+import kotlinx.css.margin
+import kotlinx.css.px
+import kotlinx.css.width
 import kotlinx.html.js.onClickFunction
-import react.*
+import react.PropsWithChildren
+import react.RBuilder
 import react.dom.attrs
+import react.functionComponent
 import styled.css
 import styled.styledDiv
 import styled.styledImg
 
 @Suppress("FunctionName")
-fun RBuilder.DownloadButton(handler: DownloadButtonProps.() -> Unit): ReactElement {
-    return child(downloadButton){
+fun RBuilder.DownloadButton(handler: DownloadButtonProps.() -> Unit) {
+    return child(downloadButton) {
         attrs {
             handler()
         }
     }
 }
 
-external interface DownloadButtonProps : RProps {
-    var onClick:()->Unit
-    var status :DownloadStatus
+external interface DownloadButtonProps : PropsWithChildren {
+    var onClick: () -> Unit
+    var status: DownloadStatus
 }
 
-private val downloadButton = functionalComponent<DownloadButtonProps>("Circular-Progress-Bar") { props->
+private val downloadButton = functionComponent<DownloadButtonProps>("Circular-Progress-Bar") { props ->
     styledDiv {
-        val src = when(props.status){
+        val src = when (props.status) {
             is DownloadStatus.NotDownloaded -> "download-gradient.svg"
             is DownloadStatus.Downloaded -> "check.svg"
             is DownloadStatus.Failed -> "error.svg"
@@ -59,7 +65,7 @@ private val downloadButton = functionalComponent<DownloadButtonProps>("Circular-
             }
         }
         css {
-            classes = mutableListOf("glow-button")
+            classes.add("glow-button")
             borderRadius = 100.px
         }
     }

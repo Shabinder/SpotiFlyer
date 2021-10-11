@@ -19,31 +19,29 @@ package list
 import kotlinx.css.marginRight
 import kotlinx.css.px
 import kotlinx.css.width
+import react.PropsWithChildren
 import react.RBuilder
-import react.RProps
-import react.ReactElement
-import react.child
-import react.functionalComponent
+import react.functionComponent
 import styled.css
 import styled.styledDiv
 
 @Suppress("FunctionName")
-fun RBuilder.LoadingSpinner(handler: RProps.() -> Unit): ReactElement {
-    return child(loadingSpinner){
+fun RBuilder.LoadingSpinner(handler: PropsWithChildren.() -> Unit) {
+    return child(loadingSpinner) {
         attrs {
             handler()
         }
     }
 }
 
-private val loadingSpinner = functionalComponent<RProps>("Loading-Spinner") {
+private val loadingSpinner = functionComponent<PropsWithChildren>("Loading-Spinner") {
     styledDiv {
-        styledDiv{}
-        styledDiv{}
-        styledDiv{}
-        styledDiv{}
-        css{
-            classes = mutableListOf("lds-ring")
+        styledDiv {}
+        styledDiv {}
+        styledDiv {}
+        styledDiv {}
+        css {
+            classes.add("lds-ring")
             width = 50.px
             marginRight = 8.px
         }

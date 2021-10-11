@@ -16,36 +16,55 @@
 
 package navbar
 
-import kotlinx.css.*
+import kotlinx.css.Align
+import kotlinx.css.Display
+import kotlinx.css.LinearDimension
+import kotlinx.css.alignItems
+import kotlinx.css.display
+import kotlinx.css.filter
+import kotlinx.css.fontSize
+import kotlinx.css.height
+import kotlinx.css.margin
+import kotlinx.css.marginLeft
+import kotlinx.css.marginRight
+import kotlinx.css.px
+import kotlinx.css.width
 import kotlinx.html.id
 import kotlinx.html.js.onBlurFunction
 import kotlinx.html.js.onClickFunction
-import react.*
+import react.RBuilder
+import react.RProps
 import react.dom.attrs
-import styled.*
+import react.functionComponent
+import styled.css
+import styled.styledA
+import styled.styledDiv
+import styled.styledH1
+import styled.styledImg
+import styled.styledNav
 
 @Suppress("FunctionName")
-fun RBuilder.NavBar(handler: NavBarProps.() -> Unit): ReactElement{
-    return child(navBar){
+fun RBuilder.NavBar(handler: NavBarProps.() -> Unit) {
+    return child(navBar) {
         attrs {
             handler()
         }
     }
 }
 
-external interface NavBarProps:RProps{
+external interface NavBarProps : RProps {
     var isBackVisible: Boolean
     var popBackToHomeScreen: () -> Unit
 }
 
 
-private val navBar = functionalComponent<NavBarProps>("NavBar") { props ->
+private val navBar = functionComponent<NavBarProps>("NavBar") { props ->
 
     styledNav {
         css {
             +NavBarStyles.nav
         }
-        styledDiv{
+        styledDiv {
             attrs {
                 onClickFunction = {
                     props.popBackToHomeScreen()
@@ -54,22 +73,22 @@ private val navBar = functionalComponent<NavBarProps>("NavBar") { props ->
                     props.popBackToHomeScreen()
                 }
             }
-            styledImg(src = "left-arrow.svg",alt = "Back Arrow"){
+            styledImg(src = "left-arrow.svg", alt = "Back Arrow") {
                 css {
                     height = 42.px
                     width = 42.px
-                    display = if(props.isBackVisible) Display.inline else Display.none
+                    display = if (props.isBackVisible) Display.inline else Display.none
                     filter = "invert(100)"
                     marginRight = 12.px
                 }
             }
         }
-        styledA(href = "https://shabinder.github.io/SpotiFlyer/",target="_blank") {
+        styledA(href = "https://shabinder.github.io/SpotiFlyer/", target = "_blank") {
             css {
                 display = Display.flex
                 alignItems = Align.center
             }
-            styledImg(src = "spotiflyer.svg",alt = "Logo") {
+            styledImg(src = "spotiflyer.svg", alt = "Logo") {
                 css {
                     height = 42.px
                     width = 42.px
@@ -80,7 +99,7 @@ private val navBar = functionalComponent<NavBarProps>("NavBar") { props ->
                 attrs {
                     id = "appName"
                 }
-                css{
+                css {
                     fontSize = 46.px
                     margin(horizontal = 14.px)
                 }
@@ -93,7 +112,7 @@ private val navBar = functionalComponent<NavBarProps>("NavBar") { props ->
             setCorsMode(corsProxy)
         }*/
 
-        styledDiv{
+        styledDiv {
 
             /*styledH4 { + "Extension" }
 
@@ -125,8 +144,8 @@ private val navBar = functionalComponent<NavBarProps>("NavBar") { props ->
                 }
             }*/
 
-            styledA(href = "https://github.com/Shabinder/SpotiFlyer/"){
-                styledImg(src = "github.svg"){
+            styledA(href = "https://github.com/Shabinder/SpotiFlyer/") {
+                styledImg(src = "github.svg") {
                     css {
                         height = 42.px
                         width = 42.px
