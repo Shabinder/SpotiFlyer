@@ -28,6 +28,7 @@ import com.shabinder.common.models.TrackDetails
 import com.shabinder.common.models.dispatcherIO
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.flatMapError
+import com.shabinder.common.models.event.coroutines.onFailure
 import com.shabinder.common.models.event.coroutines.onSuccess
 import com.shabinder.common.models.event.coroutines.success
 import com.shabinder.common.models.spotify.Source
@@ -134,16 +135,14 @@ class FetchPlatformQueryResult(
                                 )
 
                                 appendLine("Trying Local Extraction")
-                                runCatching {
-                                    youtubeProvider.fetchVideoM4aLink(
-                                        track.videoID.requireNotNull()
-                                    ).also {
-                                        audioQuality = it.second
-                                        audioFormat = AudioFormat.MP4
-                                    }.first
-                                }.onFailure {
-                                    appendPadded(it.stackTraceToString())
-                                }.getOrNull()
+                                SuspendableEvent {
+                                    youtubeProvider.fetchVideoM4aLink(track.videoID.requireNotNull())
+                                }.onFailure { throwable ->
+                                    appendPadded("YT Manual Extraction Failed!", throwable.stackTraceToString())
+                                }.onSuccess {
+                                    audioQuality = it.second
+                                    audioFormat = AudioFormat.MP4
+                                }.component1()?.first
                             } else {
                                 audioFormat = AudioFormat.MP3
                                 ytMp3LinkRes.component1()
@@ -185,14 +184,23 @@ class FetchPlatformQueryResult(
                 ).onSuccess { audioFormat = AudioFormat.MP4 }.flatMapError { saavnError ->
                     appendPadded("Fetching From Saavn Failed:", saavnError.stackTraceToString())
                     // Saavn Failed, Lets Try Fetching Now From Youtube Music
-                    youtubeMusic.findMp3SongDownloadURLYT(track, preferredQuality).also {
+                    youtubeMusic.findMp3SongDownloadURLYT(track, preferredQuality).onSuccess {
+                        audioFormat = AudioFormat.MP3
+                    }.flatMapError {
                         // Append Error To StackTrace
-                        if (it is SuspendableEvent.Failure)
-                            appendPadded(
-                                "Fetching From YT-Music Failed:",
-                                it.component2()?.stackTraceToString()
-                            )
-                        else audioFormat = AudioFormat.MP3
+                        appendPadded(
+                            "Fetching From Yt1s Failed:",
+                            it.stackTraceToString()
+                        )
+                        appendPadded("Extracting Manually...")
+
+                        SuspendableEvent {
+                            youtubeProvider.fetchVideoM4aLink(track.videoID.requireNotNull())
+                        }.onFailure { throwable ->
+                            appendPadded("YT Manual Extraction Failed!", throwable.stackTraceToString())
+                        }.onSuccess {
+                            audioFormat = AudioFormat.MP4
+                        }
                     }
                 }
 
