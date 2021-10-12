@@ -1,7 +1,5 @@
 package com.shabinder.common.di
 
-import com.shabinder.common.core_components.analytics.AnalyticsEvent
-import com.shabinder.common.core_components.analytics.AnalyticsManager
 import com.shabinder.common.models.dispatcherIO
 import com.shabinder.common.providers.spotify.SpotifyProvider
 import kotlinx.coroutines.DelicateCoroutinesApi

@@ -4,6 +4,7 @@ import com.shabinder.common.models.AudioFormat
 import com.shabinder.common.models.soundcloud.Media
 import com.shabinder.common.models.soundcloud.PublisherMetadata
 import com.shabinder.common.models.soundcloud.User
+import com.shabinder.common.models.soundcloud.Visuals
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
@@ -149,7 +150,7 @@ sealed class SoundCloudResolveResponseBase {
         val user: User = User(),
         @SerialName("user_id")
         val userId: Int = 0,
-        val visuals: String = "",
+        val visuals: Visuals? = null,
         @SerialName("waveform_url")
         val waveformUrl: String = ""
     ) : SoundCloudResolveResponseBase() {

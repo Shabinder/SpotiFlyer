@@ -61,8 +61,6 @@ class FetchPlatformQueryResult(
     private val db: DownloadRecordDatabaseQueries?
         get() = fileManager.db?.downloadRecordDatabaseQueries
 
-    suspend fun authenticateSpotifyClient() = spotifyProvider.authenticateSpotifyClient()
-
     suspend fun query(link: String): SuspendableEvent<PlatformQueryResult, Throwable> {
         val result = when {
             // SPOTIFY

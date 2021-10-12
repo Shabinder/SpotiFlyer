@@ -46,7 +46,8 @@ class SoundCloudProvider(
                     folderType = "Playlists"
                     subFolder = response.title
                     trackList = response.tracks.toTrackDetailsList(folderType, subFolder)
-                    coverUrl = response.artworkUrl.ifBlank { response.calculatedArtworkUrl }
+                    coverUrl = response.artworkUrl.formatArtworkUrl()
+                        .ifBlank { response.calculatedArtworkUrl.formatArtworkUrl() }
                     title = response.title
                 }
             }
@@ -110,6 +111,7 @@ class SoundCloudProvider(
     }
 
     private fun String.formatArtworkUrl(): String {
-        return substringBeforeLast("-") + "-t500x500." + substringAfterLast(".")
+        return if (isBlank()) ""
+        else substringBeforeLast("-") + "-t500x500." + substringAfterLast(".")
     }
 }

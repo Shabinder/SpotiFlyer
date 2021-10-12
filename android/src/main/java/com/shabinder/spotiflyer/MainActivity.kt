@@ -250,6 +250,7 @@ class MainActivity : ComponentActivity() {
                 if (long) android.widget.Toast.LENGTH_LONG else android.widget.Toast.LENGTH_SHORT
             ).show()
         }
+        Log.i("Toasting",string)
     }
 
     @Suppress("DEPRECATION")
