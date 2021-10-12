@@ -11,6 +11,7 @@ Supported Platforms:
  - Youtube
  - Youtube Music
  - Jio-Saavn
+ - SoundCloud
  - (more coming soon)
 
 Note:
