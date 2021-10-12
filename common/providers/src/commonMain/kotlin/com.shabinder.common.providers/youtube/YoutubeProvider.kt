@@ -28,10 +28,15 @@ import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.spotify.Source
 import com.shabinder.common.utils.removeIllegalChars
 import io.github.shabinder.YoutubeDownloader
+import io.github.shabinder.models.Extension
 import io.github.shabinder.models.YoutubeVideo
 import io.github.shabinder.models.formats.Format
 import io.github.shabinder.models.quality.AudioQuality
 import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpStatement
+import io.ktor.http.HttpStatusCode
+import com.shabinder.common.models.AudioQuality as Quality
 
 class YoutubeProvider(
     private val httpClient: HttpClient,
@@ -193,10 +198,43 @@ class YoutubeProvider(
             title = name
         }
     }
+
+    suspend fun fetchVideoM4aLink(videoId: String, retryCount: Int = 3): Pair<String, Quality> {
+        @Suppress("NAME_SHADOWING")
+        var retryCount = retryCount
+        var validM4aLink: String? = null
+        var audioQuality: Quality = Quality.KBPS128
+
+        val ex = SpotiFlyerException.DownloadLinkFetchFailed("Manual Extraction Failed for VideoID: $videoId")
+        while (validM4aLink.isNullOrEmpty() && retryCount > 0) {
+            val m4aLink = ytDownloader.getVideo(videoId).getM4aLink()?.also {
+                audioQuality =
+                    if (it.bitrate > 160_000) Quality.KBPS192 else Quality.KBPS128
+            }?.url
+                ?: throw ex
+
+            if (validateLink(m4aLink)) {
+                validM4aLink = m4aLink
+            }
+            retryCount--
+        }
+
+        if (validM4aLink.isNullOrBlank())
+            throw ex
+
+        return validM4aLink to audioQuality
+    }
+
+    private suspend fun validateLink(link: String): Boolean {
+        var status = HttpStatusCode.BadRequest
+        httpClient.get<HttpStatement>(link).execute { res -> status = res.status }
+        return status == HttpStatusCode.OK
+    }
+
+    private fun YoutubeVideo.getM4aLink(): Format? {
+        return getAudioWithQuality(AudioQuality.high).firstOrNull { it.extension == Extension.M4A }
+            ?: getAudioWithQuality(AudioQuality.medium).firstOrNull { it.extension == Extension.M4A }
+            ?: getAudioWithQuality(AudioQuality.low).firstOrNull { it.extension == Extension.M4A }
+    }
 }
 
-fun YoutubeVideo.get(): Format? {
-    return getAudioWithQuality(AudioQuality.high).getOrNull(0)
-        ?: getAudioWithQuality(AudioQuality.medium).getOrNull(0)
-        ?: getAudioWithQuality(AudioQuality.low).getOrNull(0)
-}
