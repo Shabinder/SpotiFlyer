@@ -190,6 +190,12 @@ class FetchPlatformQueryResult(
                         downloadLink = URL
                         audioQuality = quality
                         audioFormat = format
+                    }.onFailure {
+                        // Append Error To StackTrace
+                        appendPadded(
+                            "Fetching From YT Failed:",
+                            it.stackTraceToString()
+                        )
                     }
                 }
             }

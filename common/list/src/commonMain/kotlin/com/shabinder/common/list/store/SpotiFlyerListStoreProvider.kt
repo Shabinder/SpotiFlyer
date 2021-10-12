@@ -175,21 +175,18 @@ internal class SpotiFlyerListStoreProvider(dependencies: SpotiFlyerList.Dependen
     }
 
     private fun List<TrackDetails>.updateTracksStatuses(map: Map<String, DownloadStatus>): List<TrackDetails> {
-        val updatedList = ArrayList(this)
-        LinkedHashMap(map).forEach { newTrack ->
-            indexOfFirst { it.title == newTrack.key }.let { position ->
-                if (position != -1) {
-                    updatedList.getOrNull(position)?.copy(
-                        downloaded = newTrack.value,
-                        progress = (newTrack.value as? DownloadStatus.Downloading)?.progress
-                            ?: updatedList[position].progress
-                    )?.also { updatedTrack ->
-                        updatedList[position] = updatedTrack
-                        // logger.d("$position) ${updatedTrack.downloaded} - ${updatedTrack.title}","List Store Track Update")
-                    }
+        // create a copy in order not to access real referenced ever-changing collections
+        val trackList = ArrayList(this)
+        val updatedMap = HashMap(map)
+
+        repeat(trackList.size) { index ->
+            trackList[index].also { oldTrack ->
+                updatedMap[oldTrack.title]?.also { newStatus ->
+                    trackList[index] = oldTrack.copy(downloaded = newStatus)
                 }
             }
         }
-        return updatedList
+
+        return trackList
     }
 }
