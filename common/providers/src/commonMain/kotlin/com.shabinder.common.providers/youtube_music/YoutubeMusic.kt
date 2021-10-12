@@ -26,9 +26,12 @@ import com.shabinder.common.models.YoutubeTrack
 import com.shabinder.common.models.corsApi
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.event.coroutines.flatMap
+import com.shabinder.common.models.event.coroutines.flatMapError
 import com.shabinder.common.models.event.coroutines.map
+import com.shabinder.common.models.event.coroutines.onFailure
 import com.shabinder.common.providers.youtube.YoutubeProvider
 import com.shabinder.common.providers.youtube_to_mp3.requests.YoutubeMp3
+import com.shabinder.common.utils.appendPadded
 import io.github.shabinder.fuzzywuzzy.diffutils.FuzzySearch
 import io.ktor.client.HttpClient
 import io.ktor.client.request.headers
@@ -61,10 +64,11 @@ class YoutubeMusic constructor(
     }
 
     // Get Downloadable Link
-    suspend fun findMp3SongDownloadURLYT(
+    suspend fun findSongDownloadURLYT(
         trackDetails: TrackDetails,
-        preferredQuality: AudioQuality = fileManager.preferenceManager.audioQuality
-    ): SuspendableEvent<Pair<String, AudioQuality>, Throwable> {
+        preferredQuality: AudioQuality = fileManager.preferenceManager.audioQuality,
+        errorReportBuilder: StringBuilder? = null
+    ): SuspendableEvent<Triple<String, AudioQuality, AudioFormat>, Throwable> {
         return getYTIDBestMatch(trackDetails).flatMap { videoID ->
             // As YT compress Audio hence there is no benefit of quality for more than 192
             val optimalQuality =
@@ -72,18 +76,21 @@ class YoutubeMusic constructor(
                         ?: 0) > 192
                 ) AudioQuality.KBPS192 else preferredQuality
             // 1 Try getting Link from Yt1s
-            youtubeMp3.getMp3DownloadLink(videoID, optimalQuality)/*.flatMapError {
+            youtubeMp3.getMp3DownloadLink(videoID, optimalQuality).map {
+                Triple(it, optimalQuality, AudioFormat.MP3)
+            }.flatMapError {
+                errorReportBuilder?.appendPadded(
+                    "Yt1sMp3 Failed for $videoID:", it.stackTraceToString()
+                )
                 // 2 if Yt1s failed , Extract Manually
+                errorReportBuilder?.appendPadded("Extracting Manually...")
                 SuspendableEvent {
-                    youtubeProvider.ytDownloader.getVideo(videoID).get()?.url
-                        ?: throw SpotiFlyerException.YoutubeLinkNotFound(
-                            videoID,
-                            message = "Caught Following Errors While Finding Downloadable Link for $videoID :   \n${it.stackTraceToString()}"
-                        )
+                    youtubeProvider.fetchVideoM4aLink(videoID)
+                }.onFailure { throwable ->
+                    errorReportBuilder?.appendPadded("YT Manual Extraction Failed!", throwable.stackTraceToString())
+                }.map { (URL, quality) ->
+                    Triple(URL, quality, AudioFormat.MP4)
                 }
-            }*/.map {
-                trackDetails.audioFormat = AudioFormat.MP3
-                Pair(it, optimalQuality)
             }
         }
     }
@@ -203,7 +210,9 @@ class YoutubeMusic constructor(
                     */
                     for (detailArray in result.subList(0, result.size - 1)) {
                         for (detail in detailArray.jsonArray) {
-                            if ((detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]?.jsonObject?.size ?: 0) < 2) continue
+                            if ((detail.jsonObject["musicResponsiveListItemFlexColumnRenderer"]?.jsonObject?.size
+                                    ?: 0) < 2
+                            ) continue
 
                             // if not a dummy, collect All Variables
                             val details =

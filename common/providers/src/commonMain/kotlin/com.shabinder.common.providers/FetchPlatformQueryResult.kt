@@ -175,36 +175,22 @@ class FetchPlatformQueryResult(
             if (downloadLink.isNullOrBlank()) {
 
                 // Try Fetching Track from Available Sources
-                val queryResult = saavnProvider.findBestSongDownloadURL(
+                saavnProvider.findBestSongDownloadURL(
                     trackName = track.title,
                     trackArtists = track.artists,
                     preferredQuality = preferredQuality
-                ).onSuccess { audioFormat = AudioFormat.MP4 }.flatMapError { saavnError ->
+                ).onSuccess { (URL, quality) ->
+                    audioFormat = AudioFormat.MP4
+                    downloadLink = URL
+                    audioQuality = quality
+                }.flatMapError { saavnError ->
                     appendPadded("Fetching From Saavn Failed:", saavnError.stackTraceToString())
                     // Saavn Failed, Lets Try Fetching Now From Youtube Music
-                    youtubeMusic.findMp3SongDownloadURLYT(track, preferredQuality).onSuccess {
-                        audioFormat = AudioFormat.MP3
-                    }.flatMapError {
-                        // Append Error To StackTrace
-                        appendPadded(
-                            "Fetching From Yt1s Failed:",
-                            it.stackTraceToString()
-                        )
-                        appendPadded("Extracting Manually...")
-
-                        SuspendableEvent {
-                            youtubeProvider.fetchVideoM4aLink(track.videoID.requireNotNull())
-                        }.onFailure { throwable ->
-                            appendPadded("YT Manual Extraction Failed!", throwable.stackTraceToString())
-                        }.onSuccess {
-                            audioFormat = AudioFormat.MP4
-                        }
+                    youtubeMusic.findSongDownloadURLYT(track, preferredQuality, this).onSuccess { (URL, quality, format) ->
+                        downloadLink = URL
+                        audioQuality = quality
+                        audioFormat = format
                     }
-                }
-
-                queryResult.component1()?.let {
-                    downloadLink = it.first
-                    audioQuality = it.second
                 }
             }
         }

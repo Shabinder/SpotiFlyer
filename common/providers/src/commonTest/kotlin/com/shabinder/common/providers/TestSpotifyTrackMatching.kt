@@ -7,8 +7,6 @@ import com.shabinder.common.providers.utils.CommonUtils
 import com.shabinder.common.providers.utils.SpotifyUtils
 import com.shabinder.common.providers.utils.SpotifyUtils.toTrackDetailsList
 import io.github.shabinder.runBlocking
-import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.InternalSerializationApi
 import kotlin.test.Test
 
@@ -41,7 +39,7 @@ class TestSpotifyTrackMatching {
 
 //        val matched = CommonUtils.youtubeMusic.getYTTracks(CommonUtils.getYTQueryString(trackDetails))
 //        println("YT-MATCHES: \n ${matched.component1()?.joinToString("\n")} \n")
-        val ytMatch = CommonUtils.youtubeMusic.findMp3SongDownloadURLYT(trackDetails)
+        val ytMatch = CommonUtils.youtubeMusic.findSongDownloadURLYT(trackDetails)
         println("YT MATCH: $ytMatch")
     }
 }
