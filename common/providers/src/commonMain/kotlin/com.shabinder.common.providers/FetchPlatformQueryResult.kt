@@ -121,22 +121,32 @@ class FetchPlatformQueryResult(
                         youtubeMp3.getMp3DownloadLink(
                             track.videoID.requireNotNull(),
                             preferredQuality
-                        ).let { ytMp3Link ->
+                        ).let { ytMp3LinkRes ->
                             if (
-                                ytMp3Link is SuspendableEvent.Failure
+                                ytMp3LinkRes is SuspendableEvent.Failure
                                 ||
-                                ytMp3Link.component1().isNullOrBlank()
+                                ytMp3LinkRes.component1().isNullOrBlank()
                             ) {
                                 appendPadded(
                                     "Yt1sMp3 Failed for ${track.videoID}:",
-                                    ytMp3Link.component2()?.stackTraceToString()
+                                    ytMp3LinkRes.component2()?.stackTraceToString()
                                         ?: "couldn't fetch link for ${track.videoID} ,trying manual extraction"
                                 )
-                                //appendLine("Trying Local Extraction")
-                                null
+
+                                appendLine("Trying Local Extraction")
+                                runCatching {
+                                    youtubeProvider.fetchVideoM4aLink(
+                                        track.videoID.requireNotNull()
+                                    ).also {
+                                        audioQuality = it.second
+                                        audioFormat = AudioFormat.MP4
+                                    }.first
+                                }.onFailure {
+                                    appendPadded(it.stackTraceToString())
+                                }.getOrNull()
                             } else {
                                 audioFormat = AudioFormat.MP3
-                                ytMp3Link.component1()
+                                ytMp3LinkRes.component1()
                             }
                         }
                     }

@@ -47,7 +47,8 @@ class SaavnProvider(
                         coverUrl = it.image.replace("http:", "https:")
                     }
                 }
-                pageLink.contains("featured/", true) -> { // Playlist
+                pageLink.contains("featured/", true)
+                        || pageLink.contains("playlist/", true) -> { // Playlist
                     getPlaylist(fullLink).value.let {
                         folderType = "Playlists"
                         subFolder = removeIllegalChars(it.listname)
@@ -79,7 +80,7 @@ class SaavnProvider(
             albumArtURL = it.image.replace("http:", "https:"),
             lyrics = it.lyrics ?: it.lyrics_snippet,
             source = Source.JioSaavn,
-            audioQuality = if(it.is320Kbps) AudioQuality.KBPS320 else AudioQuality.KBPS160,
+            audioQuality = if (it.is320Kbps) AudioQuality.KBPS320 else AudioQuality.KBPS160,
             outputFilePath = fileManager.finalOutputDir(it.song, type, subFolder, fileManager.defaultDir() /*".m4a"*/)
         )
     }

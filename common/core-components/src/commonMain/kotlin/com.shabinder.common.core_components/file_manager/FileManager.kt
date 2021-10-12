@@ -136,28 +136,38 @@ suspend fun HttpClient.downloadFile(url: String) = downloadFile(url, this)
 suspend fun downloadFile(url: String, client: HttpClient? = null): Flow<DownloadResult> {
     return flow {
         val httpClient = client ?: createHttpClient()
-        val response = httpClient.get<HttpStatement>(url).execute()
-        // Not all requests return Content Length
-        val data = kotlin.runCatching {
-            ByteArray(response.contentLength().requireNotNull().toInt())
-        }.getOrNull() ?: byteArrayOf()
-        var offset = 0
-        do {
-            // Set Length optimally, after how many kb you want a progress update, now it 0.25mb
-            val currentRead = response.content.readAvailable(data, offset, 2_50_000)
-            offset += currentRead
-            val progress = data.size.takeIf { it != 0 }?.let { fileSize ->
-                (offset * 100f / fileSize).roundToInt()
-            } ?: 0
-            emit(DownloadResult.Progress(progress))
-        } while (currentRead > 0)
-        if (response.status.isSuccess()) {
-            emit(DownloadResult.Success(data))
-        } else {
-            emit(DownloadResult.Error("File not downloaded"))
+        httpClient.get<HttpStatement>(url).execute { response ->
+            // Not all requests return Content Length
+            val data = kotlin.runCatching {
+                ByteArray(response.contentLength().requireNotNull().toInt())
+            }.getOrNull() ?: byteArrayOf()
+            var offset = 0
+            val downloadableContent = response.content
+
+            do {
+                // Set Length optimally, after how many kb you want a progress update, now its 0.25mb
+                val currentRead = downloadableContent.readAvailable(data, offset, 2_50_000).also {
+                    offset += it
+                }
+
+                // Calculate Download Progress
+                val progress = data.size.takeIf { it != 0 }?.let { fileSize ->
+                    (offset * 100f / fileSize).roundToInt()
+                }
+
+                // Emit Progress Update
+                emit(DownloadResult.Progress(progress ?: 0))
+            } while (currentRead > 0)
+
+            // Download Complete
+            if (response.status.isSuccess()) {
+                emit(DownloadResult.Success(data))
+            } else {
+                emit(DownloadResult.Error("File not downloaded"))
+            }
         }
 
-        // Close Client if We Created One
+        // Close Client if We Created One during invocation
         if (client == null)
             httpClient.close()
     }.catch { e ->
