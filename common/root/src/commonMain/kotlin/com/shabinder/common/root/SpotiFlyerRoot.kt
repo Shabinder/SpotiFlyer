@@ -17,7 +17,7 @@
 package com.shabinder.common.root
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.RouterState
+import com.arkivanov.decompose.router.RouterState
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.shabinder.common.core_components.analytics.AnalyticsManager

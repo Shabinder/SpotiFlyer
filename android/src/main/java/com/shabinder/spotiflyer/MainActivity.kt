@@ -250,7 +250,7 @@ class MainActivity : ComponentActivity() {
                 if (long) android.widget.Toast.LENGTH_LONG else android.widget.Toast.LENGTH_SHORT
             ).show()
         }
-        Log.i("Toasting",string)
+        Log.i("Toasting", string)
     }
 
     @Suppress("DEPRECATION")
@@ -267,7 +267,7 @@ class MainActivity : ComponentActivity() {
         SpotiFlyerRoot(
             componentContext,
             dependencies = object : SpotiFlyerRoot.Dependencies {
-                override val storeFactory = LoggingStoreFactory(DefaultStoreFactory)
+                override val storeFactory = LoggingStoreFactory(DefaultStoreFactory())
                 override val database = this@MainActivity.fileManager.db
                 override val fetchQuery = this@MainActivity.fetcher
                 override val fileManager: FileManager = this@MainActivity.fileManager

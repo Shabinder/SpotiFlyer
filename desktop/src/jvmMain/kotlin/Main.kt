@@ -16,6 +16,7 @@
 
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
@@ -69,7 +70,7 @@ private lateinit var appWindow: ComposeWindow
 fun main() {
     val lifecycle = LifecycleRegistry()
     val rootComponent = spotiFlyerRoot(DefaultComponentContext(lifecycle))
-    val windowState = WindowState(size = WindowSize(450.dp, 800.dp))
+    val windowState = WindowState(width = 450.dp, height = 800.dp)
     singleWindowApplication(
         title = "SpotiFlyer",
         state = windowState,
@@ -82,7 +83,7 @@ fun main() {
             color = Color.Black,
             contentColor = colorOffWhite
         ) {
-            DesktopMaterialTheme(
+            MaterialTheme(
                 colors = SpotiFlyerColors,
                 typography = SpotiFlyerTypography,
                 shapes = SpotiFlyerShapes
@@ -110,7 +111,7 @@ private fun spotiFlyerRoot(componentContext: ComponentContext): SpotiFlyerRoot =
         componentContext = componentContext,
         dependencies = object : SpotiFlyerRoot.Dependencies {
             override val appInit: ApplicationInit = koin.get()
-            override val storeFactory = DefaultStoreFactory
+            override val storeFactory = DefaultStoreFactory()
             override val fetchQuery: FetchPlatformQueryResult = koin.get()
             override val fileManager: FileManager = koin.get()
             override val database: Database? = fileManager.db

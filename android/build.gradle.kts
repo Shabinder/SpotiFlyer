@@ -82,15 +82,6 @@ android {
     packagingOptions {
         exclude("META-INF/*")
     }
-    configurations {
-        "implementation" {
-            exclude(group = "androidx.compose.animation")
-            exclude(group = "androidx.compose.foundation")
-            exclude(group = "androidx.compose.material")
-            exclude(group = "androidx.compose.runtime")
-            exclude(group = "androidx.compose.ui")
-        }
-    }
 }
 dependencies {
     implementation(compose.material)

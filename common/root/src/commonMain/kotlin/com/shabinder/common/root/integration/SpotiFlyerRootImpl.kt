@@ -19,6 +19,11 @@ package com.shabinder.common.root.integration
 import co.touchlab.stately.ensureNeverFrozen
 import co.touchlab.stately.freeze
 import com.arkivanov.decompose.*
+import com.arkivanov.decompose.router.RouterState
+import com.arkivanov.decompose.router.pop
+import com.arkivanov.decompose.router.popWhile
+import com.arkivanov.decompose.router.push
+import com.arkivanov.decompose.router.router
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
@@ -26,8 +31,8 @@ import com.shabinder.common.core_components.analytics.AnalyticsEvent
 import com.shabinder.common.core_components.analytics.AnalyticsView
 import com.shabinder.common.list.SpotiFlyerList
 import com.shabinder.common.main.SpotiFlyerMain
-import com.shabinder.common.models.Consumer
 import com.shabinder.common.models.Actions
+import com.shabinder.common.models.Consumer
 import com.shabinder.common.preference.SpotiFlyerPreference
 import com.shabinder.common.root.SpotiFlyerRoot
 import com.shabinder.common.root.SpotiFlyerRoot.Child

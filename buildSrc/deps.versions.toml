@@ -1,24 +1,24 @@
 [versions]
-kotlin = "1.5.31"
+kotlin = "1.6.10"
 androidCoroutines = "1.5.1"
 ktLint = "10.1.0"
 mosaic = "0.1.0"
 koin = "3.1.2"
 kermit = "0.1.9"
 mokoParcelize = "0.7.1"
-ktor = "1.6.3"
-kotlinxSerialization = "1.3.0"
-sqlDelight = "1.5.1"
+ktor = "1.6.7"
+kotlinxSerialization = "1.3.1"
+sqlDelight = "1.5.3"
 sqliteJdbcDriver = "3.34.0"
 slf4j = "1.7.31"
 i18n4k = "0.1.3"
-essenty = "0.1.3"
+essenty = "0.2.2"
 multiplatformSettings = "0.7.7"
-decompose = "0.3.1"
-mviKotlin = "2.0.4"
-accompanist = "0.18.0"
-statelyVersion = "1.1.10"
-statelyIsoVersion = "1.2.0-nmm"
+decompose = "0.5.0"
+mviKotlin = "3.0.0-alpha03"
+accompanist = "0.22.0-rc"
+statelyVersion = "1.2.1"
+statelyIsoVersion = "1.2.1"
 androidxLifecycle = "2.4.0-alpha03"
 
 
@@ -29,12 +29,12 @@ kotlin-kotlinTestCommon = { group = "org.jetbrains.kotlin", name = "kotlin-test-
 kotlin-kotlinTestJs = { group = "org.jetbrains.kotlin", name = "kotlin-test-js", version.ref = "kotlin" }
 kotlin-kotlinTestJunit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 kotlin-kotlinTestAnnotationsCommon = { group = "org.jetbrains.kotlin", name = "kotlin-test-annotations-common", version.ref = "kotlin" }
-kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.5.2-native-mt" }
+kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.6.0" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
-kotlinx-atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version = "0.16.3" }
-kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version = "0.2.1" }
+kotlinx-atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version = "0.17.0" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version = "0.3.2" }
 
-kotlin-compose-gradle = { group = "org.jetbrains.compose", name = "compose-gradle-plugin", version = "1.0.0-alpha4-build366" }
+kotlin-compose-gradle = { group = "org.jetbrains.compose", name = "compose-gradle-plugin", version = "1.0.1" }
 mosaic-gradle =  { group = "com.jakewharton.mosaic", name = "mosaic-gradle-plugin", version.ref = "mosaic" }
 
 essenty-lifecycle = { group = "com.arkivanov.essenty", name = "lifecycle", version.ref = "essenty" }
