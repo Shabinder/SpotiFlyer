@@ -40,15 +40,6 @@ interface ParallelProcessor {
         }
     }
 
-    suspend fun <T> executeSafelyInPool(
-        onComplete: suspend (result: SuspendableEvent<T, Throwable>) -> Unit = {},
-        block: suspend () -> T
-    ): SuspendableEvent<T, Throwable> {
-        return SuspendableEvent {
-            parallelExecutor.executeSuspending(block)
-        }.also { onComplete(it) }
-    }
-
     suspend fun stopAllTasks() {
         parallelExecutor.closeAndReInit()
     }

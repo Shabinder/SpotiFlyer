@@ -40,7 +40,7 @@ fun Mp3File.setId3v1Tags(track: TrackDetails): Mp3File {
         title = track.title
         album = track.albumName
         year = track.year
-        comment = "Genres:${track.comment}"
+        comment = "${track.comment}"
         if (track.trackNumber != null)
             this.track = track.trackNumber.toString()
     }

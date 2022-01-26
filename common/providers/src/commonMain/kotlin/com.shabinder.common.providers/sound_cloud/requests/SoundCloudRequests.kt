@@ -5,6 +5,7 @@ import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.soundcloud.resolvemodel.SoundCloudResolveResponseBase
 import com.shabinder.common.models.soundcloud.resolvemodel.SoundCloudResolveResponseBase.SoundCloudResolveResponsePlaylist
 import com.shabinder.common.models.soundcloud.resolvemodel.SoundCloudResolveResponseBase.SoundCloudResolveResponseTrack
+import com.shabinder.common.utils.globalJson
 import io.ktor.client.HttpClient
 import io.ktor.client.features.ClientRequestException
 import io.ktor.client.request.get
@@ -12,7 +13,13 @@ import io.ktor.client.request.parameter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.JsonContentPolymorphicSerializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 interface SoundCloudRequests {
 
@@ -74,18 +81,21 @@ interface SoundCloudRequests {
         if (media.transcodings.isNotEmpty())
             return this
 
-        val infoURL = URLS.TRACK_INFO.buildURL(id.toString())
-        return httpClient.get(infoURL) {
+        val infoURL = URLS.TRACK_INFO.buildURL(id)
+
+        val data: String = httpClient.get(infoURL) {
             parameter("client_id", CLIENT_ID)
         }
+        return globalJson.decodeFromString(data)
     }
 
     private suspend fun getResponseObj(url: String, clientID: String = CLIENT_ID): SoundCloudResolveResponseBase {
         val itemURL = URLS.RESOLVE.buildURL(url)
         val resp: SoundCloudResolveResponseBase = try {
-            httpClient.get(itemURL) {
+            val data: String = httpClient.get(itemURL) {
                 parameter("client_id", clientID)
             }
+            globalJson.decodeFromString(SoundCloudSerializer, data)
         } catch (e: ClientRequestException) {
             if (clientID != ALT_CLIENT_ID)
                 return getResponseObj(url, ALT_CLIENT_ID)
@@ -116,6 +126,25 @@ interface SoundCloudRequests {
 
         const val CLIENT_ID = "a3e059563d7fd3372b49b37f00a00bcf"
         const val ALT_CLIENT_ID = "2t9loNQH90kzJcsFCODdigxfp325aq4z"
+
+        object SoundCloudSerializer :
+            JsonContentPolymorphicSerializer<SoundCloudResolveResponseBase>(SoundCloudResolveResponseBase::class) {
+            override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out SoundCloudResolveResponseBase> =
+                when {
+                    "track_count" in element.jsonObject -> SoundCloudResolveResponsePlaylist.serializer()
+                    "kind" in element.jsonObject -> {
+                        val isTrack =
+                            element.jsonObject["kind"]
+                                ?.jsonPrimitive?.content.toString()
+                                .contains("track", true)
+                        when {
+                            isTrack || "track_format" in element.jsonObject -> SoundCloudResolveResponseTrack.serializer()
+                            else -> SoundCloudResolveResponsePlaylist.serializer()
+                        }
+                    }
+                    else -> SoundCloudResolveResponsePlaylist.serializer()
+                }
+        }
     }
 }
 

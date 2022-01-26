@@ -26,9 +26,9 @@ import org.gradle.kotlin.dsl.getByType
 
 object Versions {
     // App's Version (To be bumped at each update)
-    const val versionName = "3.5.0"
+    const val versionName = "3.6.0"
 
-    const val versionCode = 27
+    const val versionCode = 28
 
     // Android
     const val minSdkVersion = 21
@@ -78,6 +78,7 @@ val VersionCatalog.kotlinCoroutines get() = findDependency("kotlin-coroutines").
 val VersionCatalog.kotlinxSerialization get() = findDependency("kotlinx-serialization-json").get()
 val VersionCatalog.ktorClientIOS get() = findDependency("ktor-client-ios").get()
 val VersionCatalog.ktorClientAndroid get() = findDependency("ktor-client-android").get()
+val VersionCatalog.ktorClientAndroidOkHttp get() = findDependency("ktor-client-okhttp").get()
 val VersionCatalog.ktorClientApache get() = findDependency("ktor-client-apache").get()
 val VersionCatalog.ktorClientJS get() = findDependency("ktor-client-js").get()
 val VersionCatalog.ktorClientCIO get() = findDependency("ktor-client-cio").get()

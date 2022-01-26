@@ -210,7 +210,7 @@ class AndroidFileManager(
                 // Get Memory Efficient Bitmap
                 val bitmap: Bitmap? = getMemoryEfficientBitmap(input, reqWidth, reqHeight)
 
-                parallelExecutor.executeSuspending {
+                parallelExecutor.execute {
                     // Decode and Cache Full Sized Image in Background
                     cacheImage(
                         BitmapFactory.decodeByteArray(input, 0, input.size),

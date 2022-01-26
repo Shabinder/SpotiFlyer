@@ -67,7 +67,7 @@ kotlin {
                 implementation(compose.materialIconsExtended)
                 implementation(Deps.androidXCommonBundle)
                 implementation(Deps.decomposeComposeExt)
-                implementation(Deps.ktorClientAndroid)
+                implementation(Deps.ktorClientAndroidOkHttp)
                 implementation(Deps.koinAndroidBundle)
             }
         }

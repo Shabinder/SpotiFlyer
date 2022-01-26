@@ -55,6 +55,7 @@ android {
         targetSdk = Versions.targetSdkVersion
         versionCode = Versions.versionCode
         versionName = Versions.versionName
+        ndkVersion = "21.4.7075529"
     }
     buildTypes {
         getByName("release") {

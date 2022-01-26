@@ -31,7 +31,7 @@ sealed class SoundCloudResolveResponseBase {
         @SerialName("embeddable_by")
         val embeddableBy: String = "",
         val genre: String = "",
-        val id: Int = 0,
+        val id: String = "",
         @SerialName("is_album")
         val isAlbum: Boolean = false,
         @SerialName("label_name")
@@ -100,7 +100,7 @@ sealed class SoundCloudResolveResponseBase {
         val genre: String = "",
         @SerialName("has_downloads_left")
         val hasDownloadsLeft: Boolean = false,
-        val id: Int = 0,
+        val id: String = "",
         override val kind: String = "",
         @SerialName("label_name")
         val labelName: String = "",
