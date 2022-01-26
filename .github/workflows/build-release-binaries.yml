@@ -32,7 +32,7 @@ jobs:
         with:
           draft: true
           allowUpdates: true
-          tag: "v3.3.2"
+          tag: "v3.6.0"
           artifacts: "desktop/build/compose/jars/*.jar,desktop/build/compose/binaries/main/*/*"
           token: ${{ secrets.GH_TOKEN }}
 
@@ -81,7 +81,7 @@ jobs:
         with:
           draft: true
           allowUpdates: true
-          tag: "v3.3.2"
+          tag: "v3.6.0"
           artifacts: "desktop/build/compose/jars/*.jar,desktop/build/compose/binaries/main/*/*,android/build/outputs/apk/release/*signed.apk"
           token: ${{ secrets.GH_TOKEN }}
 
@@ -114,6 +114,6 @@ jobs:
         with:
           draft: true
           allowUpdates: true
-          tag: "v3.3.2"
+          tag: "v3.6.0"
           artifacts: "desktop/build/compose/jars/*.jar,desktop/build/compose/binaries/main/*/*"
           token: ${{ secrets.GH_TOKEN }}
