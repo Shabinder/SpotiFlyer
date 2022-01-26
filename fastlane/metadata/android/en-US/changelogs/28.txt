@@ -1,0 +1,5 @@
+ - Fixed SoundCloud Parsing Errors.
+ - Fixed SSL Cert Validation Errors.
+ - Compose, Kotlin and other Dependencies Updated.
+ - Added Some Language Translations.
+ - Code Cleanup.
