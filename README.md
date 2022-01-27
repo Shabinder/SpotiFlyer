@@ -50,12 +50,12 @@ SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
 
 | Platform | Download | Status |
 |----------|----------|--------|
-| Android    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=Android-Apk&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.6.0/SpotiFlyer-3.6.0.apk)| ✅ Stable | 
-| Windows    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=00A8E8&label=Windows-msi&logo=windows&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.6.0/SpotiFlyer-3.6.0.msi)| ✅ Stable | 
-| Windows-JAR   |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=00719c&label=Windows-jar&logo=windows&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.6.0/SpotiFlyer-windows-x64-3.6.0.jar)| ✅ Stable | 
-| MacOS-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=5F85CE&label=MacOS-jar&logo=apple&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.6.0/SpotiFlyer-macos-x64-3.6.0.jar) | ✅ Stable |
-| Linux-DEB    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=D0074E&label=Linux-deb&logo=debian&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.6.0/spotiflyer_3.6.0-1_amd64.deb)| ✅ Stable |
-| Linux-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=EBA201&label=Linux-jar&logo=linux&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.6.0/SpotiFlyer-linux-x64-3.6.0.jar)| ✅ Stable | 
+| Android    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=7885FF&label=Android-Apk&logo=android&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.6.1/SpotiFlyer-3.6.1.apk)| ✅ Stable | 
+| Windows    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=00A8E8&label=Windows-msi&logo=windows&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.6.1/SpotiFlyer-3.6.1.msi)| ✅ Stable | 
+| Windows-JAR   |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=00719c&label=Windows-jar&logo=windows&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.6.1/SpotiFlyer-windows-x64-3.6.1.jar)| ✅ Stable | 
+| MacOS-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=5F85CE&label=MacOS-jar&logo=apple&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.6.1/SpotiFlyer-macos-x64-3.6.1.jar) | ✅ Stable |
+| Linux-DEB    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=D0074E&label=Linux-deb&logo=debian&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.6.1/spotiflyer_3.6.1-1_amd64.deb)| ✅ Stable |
+| Linux-JAR    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=EBA201&label=Linux-jar&logo=linux&style=for-the-badge)](https://github.com/Shabinder/SpotiFlyer/releases/download/v3.6.1/SpotiFlyer-linux-x64-3.6.1.jar)| ✅ Stable | 
 | Web    |[![Download Button](https://img.shields.io/github/v/release/Shabinder/SpotiFlyer?color=FF7139&label=SpotiFlyer&logo=firefox&style=for-the-badge)](https://shabinder.github.io/SpotiFlyer/) | ⚠️ Beta | 
 
 - To run the `jar` version, you need JAVA installed.
