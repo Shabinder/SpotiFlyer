@@ -34,9 +34,11 @@ import com.shabinder.common.providers.youtube_to_mp3.requests.YoutubeMp3
 import com.shabinder.common.utils.appendPadded
 import io.github.shabinder.fuzzywuzzy.diffutils.FuzzySearch
 import io.ktor.client.HttpClient
+import io.ktor.client.request.header
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -357,8 +359,8 @@ class YoutubeMusic constructor(
     private suspend fun getYoutubeMusicResponse(query: String): SuspendableEvent<String, Throwable> =
         SuspendableEvent {
             httpClient.post("${corsApi}https://music.youtube.com/youtubei/v1/search?alt=json&key=$apiKey") {
-                contentType(ContentType.Application.Json)
                 headers {
+                    append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                     append("referer", "https://music.youtube.com/search")
                 }
                 body = buildJsonObject {

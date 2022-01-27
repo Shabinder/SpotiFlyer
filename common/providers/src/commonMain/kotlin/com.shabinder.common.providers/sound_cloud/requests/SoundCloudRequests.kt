@@ -152,17 +152,15 @@ interface SoundCloudRequests {
 suspend inline fun <reified T : Any> SoundCloudRequests.doAuthenticatedRequest(url: String): T {
     var clientID: String = SoundCloudRequests.CLIENT_ID
     return try {
-        val data: String = httpClient.get(url) {
+        httpClient.get(url) {
             parameter("client_id", clientID)
         }
-        globalJson.decodeFromString(data)
     } catch (e: ClientRequestException) {
         if (clientID != SoundCloudRequests.ALT_CLIENT_ID) {
             clientID = SoundCloudRequests.ALT_CLIENT_ID
-            val data: String = httpClient.get(url) {
+            return httpClient.get(url) {
                 parameter("client_id", clientID)
             }
-            return globalJson.decodeFromString(data)
         }
         throw e
     }

@@ -43,32 +43,30 @@ suspend inline fun HttpClient.getFinalUrl(
     }
 }
 
-fun createHttpClient(enableNetworkLogs: Boolean = false) = HttpClient {
-    buildHttpClient {
-        // https://github.com/Kotlin/kotlinx.serialization/issues/1450
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(globalJson)
-        }
-        install(HttpTimeout) {
-            socketTimeoutMillis = 520_000
-            requestTimeoutMillis = 360_000
-            connectTimeoutMillis = 360_000
-        }
-        // WorkAround for Freezing
-        // Use httpClient.getData / httpClient.postData Extensions
-        /*install(JsonFeature) {
-            serializer = KotlinxSerializer(
-                Json {
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                }
-            )
-        }*/
-        if (enableNetworkLogs) {
-            install(Logging) {
-                logger = Logger.DEFAULT
-                level = LogLevel.INFO
+fun createHttpClient(enableNetworkLogs: Boolean = false) = buildHttpClient {
+    // https://github.com/Kotlin/kotlinx.serialization/issues/1450
+    install(JsonFeature) {
+        serializer = KotlinxSerializer(globalJson)
+    }
+    install(HttpTimeout) {
+        socketTimeoutMillis = 520_000
+        requestTimeoutMillis = 360_000
+        connectTimeoutMillis = 360_000
+    }
+    // WorkAround for Freezing
+    // Use httpClient.getData / httpClient.postData Extensions
+    /*install(JsonFeature) {
+        serializer = KotlinxSerializer(
+            Json {
+                isLenient = true
+                ignoreUnknownKeys = true
             }
+        )
+    }*/
+    if (enableNetworkLogs) {
+        install(Logging) {
+            logger = Logger.DEFAULT
+            level = LogLevel.INFO
         }
     }
 }
@@ -77,4 +75,4 @@ expect fun buildHttpClient(extraConfig: HttpClientConfig<*>.() -> Unit): HttpCli
 
 /*Client Active Throughout App's Lifetime*/
 @SharedImmutable
-val ktorHttpClient = HttpClient {}
+private val ktorHttpClient = HttpClient {}

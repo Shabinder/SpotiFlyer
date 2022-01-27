@@ -25,6 +25,7 @@ androidxLifecycle = "2.4.0-alpha03"
 [libraries]
 kotlin-kotlinGradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-serialization = { group = "org.jetbrains.kotlin", name = "kotlin-serialization", version.ref = "kotlin" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlin-kotlinTestCommon = { group = "org.jetbrains.kotlin", name = "kotlin-test-common", version.ref = "kotlin" }
 kotlin-kotlinTestJs = { group = "org.jetbrains.kotlin", name = "kotlin-test-js", version.ref = "kotlin" }
 kotlin-kotlinTestJunit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
