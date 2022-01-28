@@ -10,8 +10,9 @@ jobs:
     steps:
       # Setup Java environment for the next steps
       - name: Setup Java
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
+          distribution: 'zulu'
           java-version: 15
 
       # Check out current repository
@@ -44,8 +45,9 @@ jobs:
     steps:
       # Setup Java environment for the next steps
       - name: Setup Java
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
+          distribution: 'zulu'
           java-version: 15
 
       # Check out current repository
@@ -92,8 +94,9 @@ jobs:
     steps:
       # Setup Java environment for the next steps
       - name: Setup Java
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
+          distribution: 'zulu'
           java-version: 15
 
       # Check out current repository
