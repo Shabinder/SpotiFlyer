@@ -113,6 +113,7 @@ androidx-palette = { group = "androidx.palette", name = "palette-ktx", version =
 androidx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "androidCoroutines" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version = "1.1.2" }
 androidx-expresso = { group = "androidx.test.espresso", name = "espresso-core", version = "3.3.0" }
+androidx-r8 = { group = "com.android.tools", name = "r8", version = "3.3.28" }
 androidx-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version = "4.2.2" }
 androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "androidxLifecycle" }
 androidx-lifecycle-common = { group = "androidx.lifecycle", name = "lifecycle-common-java8", version.ref = "androidxLifecycle" }

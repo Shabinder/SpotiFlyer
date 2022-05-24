@@ -28,6 +28,7 @@ allprojects {
         maven(url = "https://jitpack.io")
         maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven(url = "https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven")
+        maven(url = "https://storage.googleapis.com/r8-releases/raw")
     }
     /*Fixes: Could not resolve org.nodejs:node*/
     plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
