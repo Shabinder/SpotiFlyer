@@ -31,6 +31,7 @@ repositories {
 
 dependencies {
     with(deps) {
+        implementation(androidx.r8)
         implementation(androidx.gradle.plugin)
         implementation(kotlin.compose.gradle)
         implementation(ktlint.gradle)
