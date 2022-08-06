@@ -14,3 +14,4 @@ Gemfile.lock
 /maintenance-tasks/build/
 /android/.cxx/Debug/5k2s1t1p/x86/
 /ffmpeg/ffmpeg-kit-android-lib/.cxx/Debug/
+/android/.idea/
