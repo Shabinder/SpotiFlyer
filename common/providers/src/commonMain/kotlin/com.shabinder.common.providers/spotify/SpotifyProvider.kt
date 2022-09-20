@@ -141,6 +141,36 @@ class SpotifyProvider(
                     }
                 }
 
+                "artist" -> {
+                    //get all of the artists albums
+                    val artistObject = getArtist(link)
+                    //and his image, etc for later
+                    val artistDataObject = getArtistData(link);
+                    //now run some modified code from the album handler /\ in a loop for each album made by the author
+                    artistObject.items?.forEach {
+                        val albumObject = getAlbum(it?.id.toString())
+                        folderType = "Artists"
+                        subFolder = artistDataObject?.name.toString()
+                        albumObject.tracks?.items?.forEach { it.album = albumObject }
+                        albumObject.tracks?.items?.toTrackDetailsList(folderType, subFolder).let {
+                            if (it.isNullOrEmpty()) {
+                                // TODO Handle Error
+                            } else {
+                                //title and cover are artists, not albums
+                                //tempTrackList.addAll(it);
+                                //println(tempTrackList);
+                                //and the track list needs to be added up, not just the last album
+                                //(might cause problems with previous runs residual tracks, depends on the rest of the code.)
+                                trackList = trackList+it;
+                            }
+                        }
+                    }
+                    //and set the title and image from the author data above
+                    title = artistDataObject?.name.toString();
+                    coverUrl = artistDataObject?.images?.elementAtOrNull(0)?.url.toString();
+                    //trackList = tempTrackList.toTrackDetailsList(folderType, subFolder);
+                }
+
                 "playlist" -> {
                     val playlistObject = getPlaylist(link)
                     folderType = "Playlists"
