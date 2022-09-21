@@ -146,8 +146,31 @@ class SpotifyProvider(
                     val artistObject = getArtist(link)
                     //and his image, etc for later
                     val artistDataObject = getArtistData(link);
+                    var albumsList = artistObject.items;
+                    // Check For More Albums using code from the playlist handler \/
+                    var moreAlbumsAvailable = !artistObject.next.isNullOrBlank()
+                    while (moreAlbumsAvailable) {
+                        // Fetch Remaining Tracks
+                        val moreAlbums =
+                            getArtist(link, offset = albumsList?.size!!.toInt());
+                        //moreAlbums.items?.forEach() {
+                        //    albumsList = albumsList + it;
+                        //}
+                        //albumsList = albumsList+moreAlbums.items;
+                        albumsList = albumsList!!.plus(ArrayList(moreAlbums?.items));
+                        //println(moreAlbums);
+                        //println("hilow")
+                        //albumsList.addAll(moreAlbums?.items);
+                        //var list: MutableList = ArrayList(albumsList)
+                        //list?.addAll(albumsList);
+                        //list?.addAll(moreAlbums?.items);
+                        //albumsList=list;
+                        //println(albumsList!!.plus(moreAlbums?.items));
+                        moreAlbumsAvailable = !moreAlbums.next.isNullOrBlank()
+                        //println(albumsList?.size);
+                    }
                     //now run some modified code from the album handler /\ in a loop for each album made by the author
-                    artistObject.items?.forEach {
+                    albumsList?.forEach {
                         val albumObject = getAlbum(it?.id.toString())
                         folderType = "Artists"
                         subFolder = artistDataObject?.name.toString()
@@ -161,7 +184,13 @@ class SpotifyProvider(
                                 //println(tempTrackList);
                                 //and the track list needs to be added up, not just the last album
                                 //(might cause problems with previous runs residual tracks, depends on the rest of the code.)
-                                trackList = trackList+it;
+                                //println(it)
+                                //make sure it isn't another persons song in the same album
+                                it.forEach {
+                                    if (artistDataObject?.name.toString() in it?.artists.toString()) {
+                                        trackList = trackList + it;
+                                    }
+                                }
                             }
                         }
                     }

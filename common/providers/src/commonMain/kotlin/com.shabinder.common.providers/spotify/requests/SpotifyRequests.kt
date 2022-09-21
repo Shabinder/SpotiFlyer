@@ -66,8 +66,8 @@ interface SpotifyRequests {
         return httpClient.get("$BASE_URL/albums/$id")
     }
 
-    suspend fun getArtist(id: String): artistAlbums {
-        return httpClient.get("$BASE_URL/artists/$id/albums?limit=50")
+    suspend fun getArtist(id: String, offset: Int = 0): artistAlbums {
+        return httpClient.get("$BASE_URL/artists/$id/albums?offset=$offset&limit=10")
     }
 
     suspend fun getArtistData(id: String): Artist {
