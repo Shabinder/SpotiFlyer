@@ -26,6 +26,7 @@ import com.shabinder.common.core_components.preference_manager.PreferenceManager
 import com.shabinder.common.models.Actions
 import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.models.Consumer
+import com.shabinder.common.models.spotify.SpotifyCredentials
 import com.shabinder.common.preference.integration.SpotiFlyerPreferenceImpl
 
 interface SpotiFlyerPreference {
@@ -39,6 +40,8 @@ interface SpotiFlyerPreference {
     fun selectNewDownloadDirectory()
 
     fun setPreferredQuality(quality: AudioQuality)
+
+    fun updateSpotifyCredentials(credentials: SpotifyCredentials)
 
     suspend fun loadImage(url: String): Picture
 
@@ -61,7 +64,8 @@ interface SpotiFlyerPreference {
     data class State(
         val preferredQuality: AudioQuality = AudioQuality.KBPS320,
         val downloadPath: String = "",
-        val isAnalyticsEnabled: Boolean = false
+        val isAnalyticsEnabled: Boolean = false,
+        val spotifyCredentials: SpotifyCredentials = SpotifyCredentials()
     )
 }
 

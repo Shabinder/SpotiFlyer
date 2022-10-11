@@ -141,6 +141,7 @@ fun MainScreen(
             onBackPressed = callBacks::popBackToHomeScreen,
             openPreferenceScreen = callBacks::openPreferenceScreen,
             isBackButtonVisible = activeComponent.value.activeChild.instance !is Child.Main,
+            isSettingsIconVisible = activeComponent.value.activeChild.instance is Child.Main,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.padding(top = topPadding))
@@ -164,6 +165,7 @@ fun AppBar(
     onBackPressed: () -> Unit,
     openPreferenceScreen: () -> Unit,
     isBackButtonVisible: Boolean,
+    isSettingsIconVisible: Boolean,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -193,10 +195,12 @@ fun AppBar(
             }
         },
         actions = {
-            IconButton(
-                onClick = { openPreferenceScreen() }
-            ) {
-                Icon(Icons.Filled.Settings, Strings.preferences(), tint = Color.Gray)
+            AnimatedVisibility(isSettingsIconVisible) {
+                IconButton(
+                    onClick = { openPreferenceScreen() }
+                ) {
+                    Icon(Icons.Filled.Settings, Strings.preferences(), tint = Color.Gray)
+                }
             }
         },
         modifier = modifier,
