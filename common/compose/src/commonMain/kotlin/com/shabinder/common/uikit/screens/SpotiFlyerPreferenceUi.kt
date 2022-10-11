@@ -166,14 +166,16 @@ fun SpotiFlyerPreferenceContent(component: SpotiFlyerPreference) {
                     TextField(
                         value = clientID,
                         onValueChange = { clientID = it.trim() },
-                        label = { Text(Strings.clientID()) }
+                        label = { Text(Strings.clientID()) },
+                        modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(Modifier.padding(vertical = 4.dp))
 
                     TextField(
                         value = clientSecret,
                         onValueChange = { clientSecret = it.trim() },
-                        label = { Text(Strings.clientSecret()) }
+                        label = { Text(Strings.clientSecret()) },
+                        modifier = Modifier.fillMaxWidth()
                     )
 
                     Spacer(Modifier.padding(vertical = 4.dp))
