@@ -26,9 +26,9 @@ import org.gradle.kotlin.dsl.getByType
 
 object Versions {
     // App's Version (To be bumped at each update)
-    const val versionName = "3.6.2"
+    const val versionName = "3.6.3"
 
-    const val versionCode = 30
+    const val versionCode = 31
 
     // Android
     const val minSdkVersion = 21
