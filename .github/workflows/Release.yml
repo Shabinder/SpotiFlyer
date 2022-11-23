@@ -12,7 +12,7 @@ jobs:
     name: Build App
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Restore Gradle cache
         id: cache
         uses: actions/cache@v2.1.4
@@ -50,7 +50,7 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Terraform environment
         uses: little-core-labs/install-terraform@v2.0.0
         with:
@@ -72,7 +72,7 @@ jobs:
     name: Deploy Static Web App
     needs: [ build ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Download Static Web App Artifact
         uses: actions/download-artifact@v2
         with:
