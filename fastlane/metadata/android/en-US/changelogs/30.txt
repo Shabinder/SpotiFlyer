@@ -1,0 +1,3 @@
+ - User Configurable Spotify Creds Support.
+ - Crash & Visibility Fix for SettingsIcon.
+ - Changed default Creds, thanks to spotDL.

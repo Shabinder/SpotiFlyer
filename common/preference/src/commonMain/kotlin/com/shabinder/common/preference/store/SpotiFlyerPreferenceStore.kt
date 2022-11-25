@@ -18,6 +18,7 @@ package com.shabinder.common.preference.store
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.shabinder.common.models.AudioQuality
+import com.shabinder.common.models.spotify.SpotifyCredentials
 import com.shabinder.common.preference.SpotiFlyerPreference
 
 internal interface SpotiFlyerPreferenceStore : Store<SpotiFlyerPreferenceStore.Intent, SpotiFlyerPreference.State, Nothing> {
@@ -26,6 +27,7 @@ internal interface SpotiFlyerPreferenceStore : Store<SpotiFlyerPreferenceStore.I
         data class ToggleAnalytics(val enabled: Boolean) : Intent()
         data class SetDownloadDirectory(val path: String) : Intent()
         data class SetPreferredAudioQuality(val quality: AudioQuality) : Intent()
+        data class UpdateSpotifyCredentials(val credentials: SpotifyCredentials) : Intent()
         object GiveDonation : Intent()
         object ShareApp : Intent()
     }

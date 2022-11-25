@@ -22,6 +22,7 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
 import com.shabinder.common.models.AudioQuality
 import com.shabinder.common.models.Actions
+import com.shabinder.common.models.spotify.SpotifyCredentials
 import com.shabinder.common.preference.SpotiFlyerPreference
 import com.shabinder.common.preference.SpotiFlyerPreference.State
 import com.shabinder.common.preference.store.SpotiFlyerPreferenceStore.Intent
@@ -45,12 +46,14 @@ internal class SpotiFlyerPreferenceStoreProvider(
         data class AnalyticsToggled(val isEnabled: Boolean) : Result()
         data class DownloadPathSet(val path: String) : Result()
         data class PreferredAudioQualityChanged(val quality: AudioQuality) : Result()
+        data class SpotifyCredentialsUpdated(val spotifyCredentials: SpotifyCredentials) : Result()
     }
 
     private inner class ExecutorImpl : SuspendExecutor<Intent, Unit, State, Result, Nothing>() {
         override suspend fun executeAction(action: Unit, getState: () -> State) {
             dispatch(Result.AnalyticsToggled(preferenceManager.isAnalyticsEnabled))
             dispatch(Result.PreferredAudioQualityChanged(preferenceManager.audioQuality))
+            dispatch(Result.SpotifyCredentialsUpdated(preferenceManager.spotifyCredentials))
             dispatch(Result.DownloadPathSet(fileManager.defaultDir()))
         }
 
@@ -71,6 +74,11 @@ internal class SpotiFlyerPreferenceStoreProvider(
                     dispatch(Result.PreferredAudioQualityChanged(intent.quality))
                     preferenceManager.setPreferredAudioQuality(intent.quality)
                 }
+
+                is Intent.UpdateSpotifyCredentials -> {
+                    dispatch(Result.SpotifyCredentialsUpdated(intent.credentials))
+                    preferenceManager.setSpotifyCredentials(intent.credentials)
+                }
             }
         }
     }
@@ -81,6 +89,7 @@ internal class SpotiFlyerPreferenceStoreProvider(
                 is Result.AnalyticsToggled -> copy(isAnalyticsEnabled = result.isEnabled)
                 is Result.DownloadPathSet -> copy(downloadPath = result.path)
                 is Result.PreferredAudioQualityChanged -> copy(preferredQuality = result.quality)
+                is Result.SpotifyCredentialsUpdated -> copy(spotifyCredentials = result.spotifyCredentials)
             }
     }
 }

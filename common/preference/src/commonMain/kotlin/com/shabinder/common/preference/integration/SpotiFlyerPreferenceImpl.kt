@@ -23,6 +23,7 @@ import com.shabinder.common.caching.Cache
 import com.shabinder.common.core_components.picture.Picture
 import com.shabinder.common.core_components.utils.asValue
 import com.shabinder.common.models.AudioQuality
+import com.shabinder.common.models.spotify.SpotifyCredentials
 import com.shabinder.common.preference.SpotiFlyerPreference
 import com.shabinder.common.preference.SpotiFlyerPreference.Dependencies
 import com.shabinder.common.preference.SpotiFlyerPreference.State
@@ -65,6 +66,10 @@ internal class SpotiFlyerPreferenceImpl(
 
     override fun setPreferredQuality(quality: AudioQuality) {
         store.accept(Intent.SetPreferredAudioQuality(quality))
+    }
+
+    override fun updateSpotifyCredentials(credentials: SpotifyCredentials) {
+        store.accept(Intent.UpdateSpotifyCredentials(credentials))
     }
 
     override suspend fun loadImage(url: String): Picture {

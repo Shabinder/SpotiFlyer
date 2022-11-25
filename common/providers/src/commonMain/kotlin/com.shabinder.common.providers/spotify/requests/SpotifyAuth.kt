@@ -16,6 +16,7 @@
 
 package com.shabinder.common.providers.spotify.requests
 
+import com.shabinder.common.core_components.preference_manager.PreferenceManager
 import com.shabinder.common.models.SpotiFlyerException
 import com.shabinder.common.models.event.coroutines.SuspendableEvent
 import com.shabinder.common.models.Actions
@@ -45,8 +46,7 @@ suspend fun authenticateSpotify(): SuspendableEvent<TokenData, Throwable> = Susp
 @SharedImmutable
 private val spotifyAuthClient by lazy {
     HttpClient {
-        val clientId = "694d8bf4f6ec420fa66ea7fb4c68f89d"
-        val clientSecret = "02ca2d4021a7452dae2328b47a6e8fe8"
+        val (clientId, clientSecret) = PreferenceManager.instance.spotifyCredentials
 
         install(Auth) {
             basic {
