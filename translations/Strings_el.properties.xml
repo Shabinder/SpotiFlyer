@@ -10,7 +10,8 @@ openProjectRepo = Άνοιγμα αποθετηρίου του πρότζεκτ
 starOrForkProject = Αποθήκευση ή fork του πρότζεκτ στο GitHub.
 help = Βοήθεια
 translate = Μετάφραση
-helpTranslateDescription = Βοηθήστε μας στη μετάφραση του πρότζεκτ στη γλώσσα σας.
+helpTranslateDescription = Βοηθήστε μας να μεταφράσουμε αυτή την εφαρμογή στη γλώσσα σας.
+
 supportDeveloper = Υποστηρίξτε τον προγραμματιστή
 donateDescription = Αν πιστεύετε πως πρέπει να ανταμειφθώ για την δουλειά μου, υποστηρίξτε με εδώ.
 share = Κοινοποίηση
