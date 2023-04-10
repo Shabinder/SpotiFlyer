@@ -27,6 +27,14 @@ jobs:
       - name: Desktop App Package
         run: ./gradlew :desktop:packageDeb
 
+      # Build linux AppImage package
+      - name: Desktop App Package
+        run: ./gradlew :desktop:packageAppImage
+
+      # Build linux RPM package
+      - name: Desktop App Package
+        run: ./gradlew :desktop:packageRpm
+
       # Create a Draft Release
       - name: Draft Release
         uses: ncipollo/release-action@v1

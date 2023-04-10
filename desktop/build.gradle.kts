@@ -74,7 +74,7 @@ compose.desktop {
         description = "Music Downloader for Spotify, Gaana, Jio Saavn, Youtube Music."
         nativeDistributions {
             modules("java.sql", "java.security.jgss", "jdk.crypto.ec")
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm, TargetFormat.AppImage)
             packageName = "SpotiFlyer"
             copyright = "© 2021 Shabinder. All rights reserved."
             vendor = "Shabinder"
