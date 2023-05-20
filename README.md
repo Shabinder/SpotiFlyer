@@ -1,3 +1,15 @@
+ We will from now on publish **[PLUGINS](https://github.com/Shabinder/soundbound-extensions-lib#sources-repo-for-personal-experimentation-and-educational-learning-experience-disclaimer)** for **[Soundbound](https://soundbound.shabinder.in/install)**, which users can install **explicitly** on their own responsibility [(*disclaimer*)](https://github.com/Shabinder/soundbound-extensions-lib#-disclaimer).
+
+ - [Sounbound Installation Guide.](https://soundbound.shabinder.in/install)
+   - [Wiki](https://soundbound.shabinder.in/wiki)
+   - [Helpdesk](https://soundbound.shabinder.in/helpdesk) (*Questions | Issues | Bugs | Feature Requests*)
+
+
+---
+> Please refer above for latest updates.
+>  - Spotiflyer itself won't be getting any more updates, 
+>  We all thank you for your support and hope to see you in [Soundbound Telegram Community](https://soundbound.shabinder.in/telegram). 
+---
 ![Web Cover](art/cover-web.jpg)
 ![Android Cover](art/cover-android.jpg)
 ![Desktop Cover](art/cover-desktop.jpg)
