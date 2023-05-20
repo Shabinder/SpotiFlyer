@@ -17,8 +17,8 @@
 
 <AppUpdater>
     <update>
-        <latestVersion>3.6.3</latestVersion>
-        <latestVersionCode>31</latestVersionCode>
-        <url>https://github.com/Shabinder/SpotiFlyer/releases/latest/</url>
+        <latestVersion>4.0.0</latestVersion>
+        <latestVersionCode>40</latestVersionCode>
+        <url>https://soundbound.shabinder.in/install</url>
     </update>
 </AppUpdater>
