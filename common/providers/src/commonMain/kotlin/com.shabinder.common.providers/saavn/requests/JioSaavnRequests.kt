@@ -187,14 +187,24 @@ interface JioSaavnRequests {
             }
 
             try {
-                var url = getString("media_preview_url")!!.replace("preview", "aac") // We Will catch NPE
-                url = if (getBoolean("320kbps") == true) {
-                    url.replace("_96_p.mp4", "_320.mp4")
-                } else {
-                    url.replace("_96_p.mp4", "_160.mp4")
+            //    var url =
+            //        getString("media_preview_url")!!.replace("preview", "aac") // We Will catch NPE
+            //    url = if (getBoolean("320kbps") == true) {
+            //        url.replace("_96_p.mp4", "_320.mp4")
+            //    } else {
+            //        url.replace("_96_p.mp4", "_160.mp4")
+            //    }
+            //    // Add Media URL to JSON Object
+            //    put("media_url", url)
+                // Arun added
+                // DECRYPT Encrypted Media URL
+                getString("encrypted_media_url")?.let {
+                    put("media_url", decryptURL(it))
                 }
-                // Add Media URL to JSON Object
-                put("media_url", url)
+                // Check if 320 Kbps is available or not
+                if (getBoolean("320kbps") != true && containsKey("media_url")) {
+                    put("media_url", getString("media_url")?.replace("_320.mp4", "_160.mp4"))
+                }
             } catch (e: Exception) {
                 // e.printStackTrace()
                 // DECRYPT Encrypted Media URL
