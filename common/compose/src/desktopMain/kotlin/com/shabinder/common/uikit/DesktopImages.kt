@@ -83,6 +83,10 @@ actual fun SpotifyLogo() =
     getCachedPainter("drawable/ic_spotify_logo.xml")
 
 @Composable
+actual fun SoundboundLogo() =
+    getCachedPainter("drawable/soundbound_app_logo.xml")
+
+@Composable
 actual fun SaavnLogo() =
     getCachedPainter("drawable/ic_jio_saavn_logo.xml")
 

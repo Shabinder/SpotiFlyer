@@ -56,6 +56,9 @@ expect fun SpotiFlyerLogo(): Painter
 expect fun SpotifyLogo(): Painter
 
 @Composable
+expect fun SoundboundLogo(): Painter
+
+@Composable
 expect fun SaavnLogo(): Painter
 
 @Composable

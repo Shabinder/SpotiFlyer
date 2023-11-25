@@ -79,6 +79,9 @@ actual fun HeartIcon() = painterResource(R.drawable.ic_heart)
 actual fun SpotifyLogo() = getCachedPainter(R.drawable.ic_spotify_logo)
 
 @Composable
+actual fun SoundboundLogo() = getCachedPainter(R.drawable.soundbound_app_logo)
+
+@Composable
 actual fun SaavnLogo() = getCachedPainter(R.drawable.ic_jio_saavn_logo)
 
 @Composable
