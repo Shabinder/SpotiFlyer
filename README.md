@@ -1,9 +1,12 @@
- We will from now on publish **[PLUGINS](https://github.com/Shabinder/soundbound-extensions-lib#sources-repo-for-personal-experimentation-and-educational-learning-experience-disclaimer)** for **[Soundbound](https://soundbound.app)**, which users can install **explicitly** on their own responsibility [(*disclaimer*)](https://github.com/Shabinder/soundbound-extensions-lib#-disclaimer).
+ We will from now on publish **[PLUGINS](https://gitlab.com/shabinder/soundbound#-disclaimer)** for **[Soundbound](https://soundbound.app)**, which users can install **explicitly** on their own responsibility [(*disclaimer*)](https://gitlab.com/shabinder/soundbound#-disclaimer).
 
- - [Sounbound Installation Guide.](https://soundbound.shabinder.in/install)
+ - [Sounbound Installation Guide.](https://soundbound.app/install)
    - [Wiki](https://soundbound.app/wiki)
-   - [Helpdesk](https://soundbound.app/helpdesk) (*Questions | Issues | Bugs | Feature Requests*)
+   - [Telegram](https://soundbound.app/telegram)
 
+![Feature Soundbound](art/soundbound-feature.jpg)
+
+# Soundbound - [Get Now!](https://soundbound.app/) 
 
 ---
 > Please refer above for latest updates.
