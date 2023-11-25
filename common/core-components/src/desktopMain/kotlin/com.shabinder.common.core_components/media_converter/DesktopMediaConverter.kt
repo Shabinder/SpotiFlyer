@@ -29,7 +29,7 @@ class DesktopMediaConverter : MediaConverter() {
             addArgument("-vn")
             addOutput(UrlOutput.toUrl(outputFilePath))
             setProgressListener {
-                progressCallbacks(it.timeMillis)
+                progressCallbacks(it.timeMillis ?: 0)
             }
             execute()
 
