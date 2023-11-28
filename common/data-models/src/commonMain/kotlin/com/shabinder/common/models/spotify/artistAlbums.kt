@@ -19,12 +19,12 @@ package com.shabinder.common.models.spotify
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Artist(
-    var external_urls: Map<String?, String?>? = null,
+data class artistAlbums(
     var href: String? = null,
-    var id: String? = null,
-    var name: String? = null,
-    var type: String? = null,
-    var uri: String? = null,
-    var images: List<Image?>? = null
+    var items: List<Album?>? = null,
+    var limit: Int? = null,
+    var next: String? = null,
+    var previous: String? = null,
+    var offset: Int? = null,
+    var total: Int? = null
 )

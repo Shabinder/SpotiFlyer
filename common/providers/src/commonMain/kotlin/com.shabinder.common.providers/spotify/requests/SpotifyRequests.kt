@@ -19,6 +19,8 @@ package com.shabinder.common.providers.spotify.requests
 import com.shabinder.common.models.NativeAtomicReference
 import com.shabinder.common.models.corsApi
 import com.shabinder.common.models.spotify.Album
+import com.shabinder.common.models.spotify.Artist
+import com.shabinder.common.models.spotify.artistAlbums
 import com.shabinder.common.models.spotify.PagingObjectPlaylistTrack
 import com.shabinder.common.models.spotify.Playlist
 import com.shabinder.common.models.spotify.Track
@@ -62,6 +64,14 @@ interface SpotifyRequests {
 
     suspend fun getAlbum(id: String): Album {
         return httpClient.get("$BASE_URL/albums/$id")
+    }
+
+    suspend fun getArtist(id: String, offset: Int = 0): artistAlbums {
+        return httpClient.get("$BASE_URL/artists/$id/albums?offset=$offset&limit=10")
+    }
+
+    suspend fun getArtistData(id: String): Artist {
+        return httpClient.get("$BASE_URL/artists/$id")
     }
 
     suspend fun getResponse(url: String): String {
