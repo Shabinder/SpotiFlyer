@@ -1,6 +1,6 @@
  We will from now on publish **[PLUGINS](https://gitlab.com/shabinder/soundbound#-disclaimer)** for **[Soundbound](https://soundbound.app)**, which users can install **explicitly** on their own responsibility [(*disclaimer*)](https://gitlab.com/shabinder/soundbound#-disclaimer).
 
- - [Sounbound Installation Guide.](https://soundbound.app/install)
+ - [Soundbound Installation Guide.](https://soundbound.app/install)
    - [Wiki](https://soundbound.app/wiki)
    - [Telegram](https://soundbound.app/telegram)
 
