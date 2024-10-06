@@ -20,7 +20,7 @@
 
 <a href="https://github.com/Shabinder/SpotiFlyer"><img src="https://github.com/Shabinder/SpotiFlyer/blob/Compose/art/SpotiFlyer.svg" align="left" height="80" width="80" ></a>
 
-# SpotiFlyer
+# [SpotiFlyer](https://app.spotiflyer.in/)
 - **Kotlin Multiplatform** Music Downloader ,supports **Spotify, Youtube, Gaana, Jio-Saavn and SoundCloud**.
 
 Supports- Playlist, Albums, Tracks. _(If You know Any Source for Episodes/Podcasts create an Issue sharing It.)_
@@ -40,7 +40,7 @@ Supports- Playlist, Albums, Tracks. _(If You know Any Source for Episodes/Podcas
 
 ***Encourage this repo by giving it a Star⭐ .***
 
-SpotiFlyer is an **App**(Written in **Kotlin**), which **aims** to work as:
+[SpotiFlyer](https://app.spotiflyer.in/) is an **App**(Written in **Kotlin**), which **aims** to work as:
   - **Downloads**: Albums, Tracks and Playlists,etc 
   - **Save your Data** ,by not **_Streaming_** your Fav Songs Online again & again(Just Download Them!)
   - **No ADS!** 
