@@ -74,7 +74,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Download Static Web App Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: static-web-app
           path: dist/
